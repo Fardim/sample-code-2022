@@ -1,0 +1,19 @@
+div.root {
+  margin: 10px 0;
+
+  .packageView {
+    width: 100%;
+    justify-content: space-between;
+    // margin: 25px;
+    padding: 5px 0;
+    border-radius: 5px;
+
+    .right-sec {
+      .data-set-name {
+        width: 150px;
+        border-radius: 20px;
+        text-align: center;
+      }
+    }
+  }
+}

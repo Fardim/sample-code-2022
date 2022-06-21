@@ -1,0 +1,13 @@
+<div class="modal-wrapper">
+    <div class="f-row modal-header-left">
+        <lib-button icon="times" (click)="close()"></lib-button>
+        <lib-text-line class="title" type="leading" [enableWrap]="true">{{parentData ? parentData.title : ''}}</lib-text-line>
+    </div>
+    <div class="f-col modal-body modal-body-padding">
+        <lib-textarea label="Record number" labelIcon="question-circle" [rows]="10" i18n-label="@@record_number" type="text" [formControl]="recordNumberCtrl"
+            placeholder="A101, A102, A103, A105, A106"
+            hint="Add multiple records number seperated by a comma"
+            i18n-placeholder="@@record_number">
+      </lib-textarea>
+    </div>
+</div>

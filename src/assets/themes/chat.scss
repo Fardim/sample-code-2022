@@ -1,0 +1,102 @@
+pros-chat-editor {
+  div.chat-editor-inner {
+    background: $color-app-accent;
+    border: 1px solid $color-app-border;
+    border-radius: 4px;
+    padding: 0 6px;
+
+    .ql-toolbar,
+    .ql-container {
+      border: none;
+
+      &.ql-snow {
+        padding: 0;
+      }
+    }
+
+    &.visible {
+      .toolbar-outer {
+        opacity: 1;
+        border-top: 1px solid $color-app-border;
+        transition: opacity ease-in-out 0.15s;
+        margin-bottom: 4px;
+      }
+    }
+
+    &.visible-on-hover {
+      .toolbar-outer {
+        opacity: 0;
+        border-top: 1px solid $color-app-border;
+        transition: opacity ease-in-out 0.15s;
+      }
+
+      &:hover {
+        .toolbar-outer {
+          opacity: 1;
+        }
+      }
+    }
+
+    .ql-editor {
+      padding: 6px 0;
+      line-height: 22px;
+      max-height: 130px;
+      overflow: auto;
+
+      .mention {
+        background-color: $color-status-info-accent;
+        color: $color-text-link;
+        padding: 6px;
+        border-radius: 40px;
+      }
+
+      .attachment-link a {
+        color: $color-text-link;
+      }
+    }
+
+    .ql-toolbar {
+      button {
+        margin: 2px;
+        height: 26px;
+        padding: 4px;
+        width: 26px;
+        color: $color-text-secondary;
+      }
+
+      button:hover,
+      .ql-active,
+      .ql-stroke {
+        color: $color-text-canvas;
+        background-color: $color-status-button-accent;
+        border-color: $color-status-button-accent;
+      }
+    }
+
+    .ql-snow.ql-toolbar button.ql-active .ql-stroke,
+    .ql-snow.ql-toolbar button:hover .ql-stroke {
+      stroke: $color-text-canvas;
+    }
+
+    .ql-mention-list-container {
+      top: -295px;
+      left: 15px;
+      height: 300px;
+      width: 300px;
+
+      .ql-mention-list-item {
+        overflow-wrap: break-word;
+        padding: 8px 12px;
+        background-color: $color-text-canvas;
+        line-height: 24px;
+        font-size: 14px;
+        color: $color-text-primary;
+        cursor: pointer;
+
+        &:hover {
+          background-color: $color-app-hover;
+        }
+      }
+    }
+  }
+}

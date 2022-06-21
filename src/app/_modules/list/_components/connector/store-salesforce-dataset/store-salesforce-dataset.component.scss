@@ -1,0 +1,20 @@
+.root {
+  height: 100%;
+  user-select: text;
+  padding: 0;
+
+  .manually-dataset {
+    width: 62%;
+    margin: 0 auto;
+
+    .field-label {
+      margin-bottom: 6px;
+    }
+  }
+
+  .dataset-button {
+    position: absolute;
+    bottom: 16px;
+    width: 100%;
+  }
+}

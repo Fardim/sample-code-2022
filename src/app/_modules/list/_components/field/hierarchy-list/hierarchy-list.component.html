@@ -1,0 +1,99 @@
+<div class="root" *ngIf="hierarchyList?.length">
+    <ng-container *ngFor="let hierarchy of hierarchyList">
+        <!-- loop through the hierarchy nodes except for the deleted ones -->
+        <ng-container *ngIf="!hierarchy.deleted">
+            <div class="f-col" *ngIf="hierarchy.level<2; else lastNode">
+                <mat-expansion-panel togglePosition="before" cdkDropList [cdkDropListData]="hierarchy?.child" (cdkDropListDropped)="drop($event, hierarchy)" cdkDragLockAxis="y" cdkDrag
+                [cdkDragDisabled]="hierarchy?.label === 'Header Data'"
+                    class="mat-elevation-z0 hierarchy-node" [expanded]="hierarchy?.child?.length" hideToggle="true">
+                    <mat-expansion-panel-header [ngClass]="{'selected': isActive(hierarchy)}"
+                        (click)="navigateToNode(hierarchy?.id)" expandedHeight="48px" collapsedHeight="48px"
+                        class="expansion-header" prosExpansionPanelToggleHandler>
+                        <mat-panel-title class="f-row">
+                            <ng-container *ngFor="let tab of getTabs(hierarchy)">
+                                <lib-button [disabled]="true"></lib-button>
+                            </ng-container>
+
+                            <div class="f-row editable-wrapper" *ngIf="!isBeingEdited(hierarchy)"
+                                (click)="editCurrentNode(firstContainerRef, hierarchy)">
+                                <lib-text-line class="hierarchy-name text-overflow" *ngIf="!isNodeLoading(hierarchy.id)" type="base"
+                                    [enableWrap]="false" i18n="@@header" [innerHTML]="hierarchy.label | highlight: searchString">
+                                    {{hierarchy?.label}}</lib-text-line>
+                                <ng-template [ngIf]="isNodeLoading(hierarchy.id)">
+                                    <lib-skeleton class="hierarchy-name" type="line"></lib-skeleton>
+                                </ng-template>
+                            </div>
+
+                            <ng-template prosContainerRef #firstContainerRef="prosContainerRef">
+                            </ng-template>
+
+                            <span class="f-spacer"></span>
+
+                            <lib-button class="add-hierarchy" *ngIf="!isBeingEdited(hierarchy) && !readOnlyMode"
+                                (click)="navigateToNode(hierarchy?.id)" icon="plus" iconFontType="light" type="plain"
+                                [matMenuTriggerFor]="hierarchyOptionMenu" prosClickStopPropagation>
+                            </lib-button>
+                            <mat-menu #hierarchyOptionMenu="matMenu" xPosition="before" class="navigation-menu">
+                                <ng-container *ngFor="let option of hierarchyOptions">
+                                    <!-- options for non root hierarchy -->
+                                    <ng-container *ngIf="hierarchy.level === 0; else notRoot">
+                                        <lib-filter-option *ngIf="option.key !== 'sibling' && option.key !== 'remove'"
+                                            (click)="selectHeirarchyOption(option.key, hierarchy)" class="hierarchy-rows">
+                                            <div class="f-row">
+                                                <lib-text-line type="base" [innerHTML]="option.label | highlight: searchString">
+                                                    {{option.label}}
+                                                </lib-text-line>
+                                                <lib-button [disabled]="true"></lib-button>
+                                            </div>
+                                        </lib-filter-option>
+                                    </ng-container>
+
+                                    <!-- Options for root hierarchy -->
+                                    <ng-template #notRoot>
+                                        <lib-filter-option (click)="selectHeirarchyOption(option.key, hierarchy)" class="hierarchy-rows">
+                                            <div class="f-row">
+                                                <lib-text-line type="base" [innerHTML]="option.label | highlight: searchString">
+                                                    {{option.label}}
+                                                </lib-text-line>
+                                                <lib-button [disabled]="true"></lib-button>
+                                            </div>
+                                        </lib-filter-option>
+                                    </ng-template>
+                                </ng-container>
+                            </mat-menu>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <ng-container *ngIf="hierarchy?.child?.length">
+                        <div class="f-col">
+                            <pros-hierarchy-list [hierarchyList]="hierarchy.child" [nextStructureId]="nextStructureId"
+                                [moduleId]="moduleId" [selectedStructureId]="selectedStructureId"
+                                (valueChange)="emitValueChange($event)" [readOnlyMode]="readOnlyMode" [searchString]="searchString">
+                            </pros-hierarchy-list>
+                        </div>
+                    </ng-container>
+                </mat-expansion-panel>
+            </div>
+        </ng-container>
+
+        <ng-template #lastNode>
+            <lib-filter-option class="hierarchy-rows child-item" (click)="navigateToNode(hierarchy?.id)"
+                [ngClass]="{'selected': isActive(hierarchy)}" cdkDragLockAxis="y" cdkDrag>
+                <div class="f-row">
+                    <ng-container *ngFor="let tab of getTabs(hierarchy)">
+                        <lib-button [disabled]="true"></lib-button>
+                    </ng-container>
+                    <div class="f-row editable-wrapper" *ngIf="!isBeingEdited(hierarchy)" type="base"
+                        (click)="editCurrentNode(secondContainerRef, hierarchy)">
+                        <lib-text-line class="hierarchy-name text-overflow" [enableWrap]="false" *ngIf="!isNodeLoading(hierarchy.id)"
+                            [innerHTML]="hierarchy.label | highlight: searchString">{{hierarchy.label}}</lib-text-line>
+                        <ng-template [ngIf]="isNodeLoading(hierarchy.id)">
+                            <lib-skeleton class="hierarchy-name" type="line"></lib-skeleton>
+                        </ng-template>
+                    </div>
+                    <ng-template prosContainerRef #secondContainerRef="prosContainerRef"></ng-template>
+                </div>
+            </lib-filter-option>
+        </ng-template>
+    </ng-container>
+</div>

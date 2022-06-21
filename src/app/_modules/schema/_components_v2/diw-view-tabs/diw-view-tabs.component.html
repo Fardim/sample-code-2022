@@ -1,0 +1,43 @@
+<div class="root" [class.hide]="!showTabs" *ngIf="!showLoader">
+    <lib-tab-group disableRipple="true" #matTabgroup class="lib-tab" (selectedIndexChange)="changeTab($event)" [selectedIndex]="selectedIndex" [ngClass]="{'lib-tab-with-actions': (tabs.length-1) >= (possiableTabs - 1)}">
+        <ng-template [ngIf]="tabs.length >0 ">
+            <lib-tab [label]="'Overview'">
+            </lib-tab>
+        </ng-template>
+        <ng-template ngFor let-tab [ngForOf]="tabs | slice:0:(possiableTabs - 1)">
+            <ng-template [ngIf]="tab.schemaId === '0'" [ngIfElse]="other">
+            </ng-template>
+            <ng-template #other>
+                <lib-tab [label]="''">
+                    <div label class="f-row" (mouseenter)="showClose($event)" (mouseleave)="hideClose($event)">
+                        <lib-text-line [enableWrap]="false" [libTooltip]="tabDescription(tab)">{{ tabDescription(tab) }}</lib-text-line>                     
+                        <mat-icon fontSet="mdo-icons-light" libClickStopPropagation style="display: none;" (click)="removeTab(tab)">times</mat-icon>    
+                    </div>
+                </lib-tab>
+            </ng-template>
+        </ng-template>
+    </lib-tab-group>
+
+    <ng-template [ngIf]="(tabs.length-1) >= (possiableTabs - 1)">
+        <lib-button type="base" [matMenuTriggerFor]="moreActions" icon="caret-down" iconFontType="solid" class="more-actions">
+        </lib-button>
+        <mat-menu #moreActions="matMenu" class="navigation-menu">
+            <ng-template ngFor let-tab [ngForOf]="tabs | slice:(possiableTabs - 2):(tabs.length-1)">
+                <button mat-menu-item (click)="addTabToViewPort(tab)">
+                    <div class="f-row" (mouseenter)="showClose($event)" (mouseleave)="hideClose($event)">
+                        <lib-text-line [enableWrap]="false" [libTooltip]="tabDescription(tab)">{{ tabDescription(tab) }}</lib-text-line>                     
+                        <mat-icon fontSet="mdo-icons-light" libClickStopPropagation style="display: none;" (click)="removeTab(tab)">times</mat-icon>    
+                    </div>
+                </button>
+            </ng-template>
+        </mat-menu>
+    </ng-template>
+</div>
+<div class="f-row tab-loader" *ngIf="showLoader">
+    <lib-skeleton class="lib-skeleton" type="line"></lib-skeleton>
+    <lib-skeleton class="lib-skeleton" type="line"></lib-skeleton>
+    <lib-skeleton class="lib-skeleton" type="line"></lib-skeleton>
+    <lib-skeleton class="lib-skeleton" type="line"></lib-skeleton>
+    <lib-skeleton class="lib-skeleton" type="line"></lib-skeleton>
+    <lib-skeleton class="lib-skeleton" type="line"></lib-skeleton>
+</div>

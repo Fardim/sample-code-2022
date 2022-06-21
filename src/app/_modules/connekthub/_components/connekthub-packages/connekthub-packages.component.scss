@@ -1,0 +1,35 @@
+div.root {
+  overflow: auto;
+  height: 100%;
+
+  .content {
+    height: calc(100% - 36px - 16px);
+    overflow: auto;
+
+    .lib-search {
+      width: 213px;
+    }
+
+    .dataset-cards {
+      box-shadow: none;
+      margin-bottom: 12px;
+
+      .label-tag {
+        margin-right: 6px;
+      }
+
+      .space-container {
+        justify-content: space-between;
+      }
+    }
+  }
+
+  .empty-block {
+    justify-content: center;
+    height: 100%;
+  }
+}
+
+.dashboard {
+  width: 600px;
+}

@@ -1,0 +1,77 @@
+<div class="root">
+    <ng-container *ngIf="tileKey === 'editProfileH'">
+        <pros-tile-item
+            title="Edit your profile"
+            description="Upload your profile picture and fill
+            in basic details"
+            icon="EDIT_PROFILE"
+            actionButtonText="Edit"
+            action="edit"
+            svgIconSize="74"
+            svgIconHeight="80"
+            svgIconViewBox="0 0 262 251"
+            [disableClose]="disableClose"
+            (closeClicked)="redirectToSubPage($event)"
+        ></pros-tile-item>
+    </ng-container>
+
+    <ng-container *ngIf="tileKey === 'inviteUserH'">
+        <pros-tile-item
+            title="Invite your colleagues"
+            description="Invite your team to join MDO and start collaborating"
+            icon="INVITE"
+            actionButtonText="Invite"
+            action="invite"
+            svgIconSize="80"
+            svgIconHeight="80"
+            svgIconViewBox="0 0 304 263"
+            [disableClose]="disableClose"
+            (closeClicked)="redirectToSubPage($event)"
+        ></pros-tile-item>
+    </ng-container>
+
+    <ng-container *ngIf="tileKey === 'exploreCKH'">
+        <pros-tile-item
+            title="Explore ConnektHub"
+            description="Validate your data using Data Intelligence Workbench"
+            icon="EXPLORE"
+            action="connectHub"
+            actionButtonText="Explore"
+            svgIconSize="74"
+            svgIconHeight="80"
+            svgIconViewBox="0 0 286 245"
+            [disableClose]="disableClose"
+            (closeClicked)="redirectToSubPage($event)">
+        </pros-tile-item>
+    </ng-container>
+
+    <ng-container *ngIf="tileKey === 'data'">
+        <pros-tile-item
+            title="Data"
+            description="Manage your datasets and analyze your data"
+            icon="DATA"
+            actionButtonText="Open"
+            action="data"
+            svgIconSize="70"
+            svgIconHeight="80"
+            svgIconViewBox="0 0 236 262"
+            [disableClose]="disableClose"
+            (closeClicked)="redirectToSubPage($event)"
+        ></pros-tile-item>
+    </ng-container>
+
+    <ng-container *ngIf="tileKey === 'DIW'">
+        <pros-tile-item
+            title="DIW"
+            description="Validate your data using business rules"
+            icon="DIW"
+            actionButtonText="Open"
+            action="open"
+            svgIconSize="70"
+            svgIconHeight="80"
+            svgIconViewBox="0 0 258 230"
+            [disableClose]="disableClose"
+            (closeClicked)="redirectToSubPage($event)"
+        ></pros-tile-item>
+    </ng-container>
+</div>

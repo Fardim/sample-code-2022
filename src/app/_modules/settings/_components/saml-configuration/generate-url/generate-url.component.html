@@ -1,0 +1,19 @@
+<div class="modal-wrapper">
+    <div class="f-row modal-header">
+        <lib-text-line type="leading" i18n="@@generated_url">Generated URL</lib-text-line>
+        <lib-button icon="times" iconFontType="light" (afterClick)="closeDialog()"></lib-button>
+    </div>
+
+    <div class="modal-body">
+        <div class="mdo-field-input">
+            <lib-input type="text" [formControl]="url" suffixIcon="copy" (afterSuffixBtnClick)="afterLabelIconClick($event)"></lib-input>
+            <!-- <mat-icon (click)="copyURL()">content_copy</mat-icon> -->
+        </div>
+    </div>
+
+    <div class="f-row modal-footer space-between">
+        <lib-button (afterClick)="closeDialog()" i18n="@@cancel">Cancel</lib-button>
+        <span class="f-spacer"></span>
+        <lib-button type="major" (afterClick)="closeDialog()" i18n="@@ok">Done</lib-button>
+    </div>
+</div>

@@ -1,0 +1,14 @@
+div.root {
+  .display-none {
+    display: none;
+  }
+
+  .upload-container {
+    flex-wrap: wrap;
+
+    .attachment-section {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+}

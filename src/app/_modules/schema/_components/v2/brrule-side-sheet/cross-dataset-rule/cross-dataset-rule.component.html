@@ -1,0 +1,166 @@
+<div class="root" >
+  <div class="f-row breadcrum-toolbar" *ngIf="!expandedView">
+    <lib-button type="plain" (click)="close(false)" iconFontType="light" icon="times"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@cross_module_rule">Cross module rule</lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button *ngIf="!submitted" type="major" width="80px" i18n="@@save" (afterClick)="saveCrossDatasetRule()">
+          Save
+        </lib-button>
+        <lib-button *ngIf="submitted" type="minor" width="100%" i18n="@@save">
+          <lib-spinner [type]="'minor'" size="25"></lib-spinner>
+        </lib-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-row breadcrum-toolbar" *ngIf="expandedView">
+    <lib-button type="plain" (click)="expandedView = false" iconFontType="light" icon="compress-alt"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@cross_module_rule">Expansion view</lib-text-line>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-row-spacer-half"></div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <form [formGroup]="crossDatasetFormGroup" [hidden]="expandedView">
+        <div class="f-col">
+          <lib-input [isRequired]="true" label="Rule name(Description)" placeholder="Type field name to add"
+            formControlName="rule_name"
+            [hint]="formHasError && crossDatasetFormGroup.controls.rule_name.errors && crossDatasetFormGroup.controls.rule_name.errors.required ? 'Please enter Rule name' : ''"
+            [hasError]="formHasError && crossDatasetFormGroup.controls.rule_name.errors && crossDatasetFormGroup.controls.rule_name.errors.required">
+          </lib-input>
+        </div>
+
+        <div class="f-col">
+          <lib-input [isRequired]="true" label="Rule name(Description)" placeholder="Type field name to add"
+            formControlName="rule_name"
+            [hint]="submitted && crossDatasetFormGroup.controls.rule_name.errors && crossDatasetFormGroup.controls.rule_name.errors.required ? 'Please enter Rule name' : ''"
+            [hasError]="submitted && crossDatasetFormGroup.controls.rule_name.errors && crossDatasetFormGroup.controls.rule_name.errors.required">
+          </lib-input>
+        </div>
+
+        <div class="f-col">
+          <lib-textarea label="Usage" placeholder="Type business rules details and usage" formControlName="usage"
+            [rows]="3" [maxLength]="2000"></lib-textarea>
+        </div>
+
+        <div class="f-col mdo-field">
+          <pros-dataset-search class="dataset-search" [isRequired]="true" formControlName="targetDataset"
+            i18n-label="@@target_dataset" [value]="getTargetDatasetValue" label="Target dataset" labelKey="moduleName"
+            valueKey="moduleId" [error]="
+              formHasError &&
+              crossDatasetFormGroup.controls.targetDataset.errors &&
+              crossDatasetFormGroup.controls.targetDataset.errors.required
+                ? 'This is a required field'
+                : ''
+            " [hasError]="
+              formHasError &&
+              crossDatasetFormGroup.controls.targetDataset.errors &&
+              crossDatasetFormGroup.controls.targetDataset.errors.required
+            " [availableOptions]="dataSetModules"
+            (selectionChange)="crossDatasetFormGroup.controls.moduleId.setValue($event); selectedDataset($event)">
+          </pros-dataset-search>
+        </div>
+
+        <div class="f-col mdo-field" [class.mdo-form-error]="formHasError && !selectedFields.length"
+          (click)="fieldClicked('linkingField')">
+          <lib-text-line [textColor]="formHasError && !selectedFields.length ? 'error' : 'default'" class="field-label"
+            type="xsmall" weight="strong"><span i18n="@@fields">Linking field</span>
+            <span class="mandatory">*</span>
+          </lib-text-line>
+          <mat-form-field appearance="outline" [ngClass]="{'has-error': formHasError && !selectedFields.length}">
+            <mat-chip-list class="f-row field-chip-list" #chipList1>
+              <lib-chip *ngFor="let field of selectedFields;let i = index" [removable]="true" class="lib-chip"
+                (removed)="remove(i)">
+                {{field.fieldDescri}}
+              </lib-chip>
+              <input matInput id="fieldsInput" #fieldsInput class="mat-input" [matAutocomplete]="auto"
+                formControlName="linkingField" [matChipInputFor]="chipList1"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes">
+            </mat-chip-list>
+            <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" (optionSelected)="selectField($event)"
+              [displayWith]="displayFn">
+              <mat-optgroup *ngFor="let group of filteredModules | async">
+                <div [libTooltip]="group.fieldDescri" matTooltipPosition="right" class="custom-opt-grp-header">{{
+                  group.fieldDescri }}</div>
+                <ng-container *ngFor="let child of group.childs">
+                  <mat-option [libTooltip]="child.fieldDescri" matTooltipPosition="right" [value]="child">
+                    {{ child.fieldDescri }}
+                  </mat-option>
+                </ng-container>
+              </mat-optgroup>
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-error class="mdo-field-hint" *ngIf="formHasError && !selectedFields.length">
+            <lib-text-line type="xsmall">Please select the fields</lib-text-line>
+          </mat-error>
+          <mat-error class="mdo-field-hint" *ngIf="
+            !formHasError && checkForFieldsClicked.linkingField && !crossDatasetFormGroup.get('targetDataset').value
+          ">
+            <lib-text-line type="xsmall">Please select targetDataset</lib-text-line>
+          </mat-error>
+        </div>
+
+        <div class="f-col mdo-field"
+          [class.mdo-form-error]="formHasError && !crossDatasetFormGroup.get('selectedTriggerConditionId').value">
+          <lib-text-line type="xsmall" weight="strong" class="field-label" [textColor]="
+              formHasError && !crossDatasetFormGroup.get('selectedTriggerConditionId').value ? 'error' : 'default'
+            ">
+            Trigger condition<span class="mandatory">*</span>
+          </lib-text-line>
+          <pros-form-input-autoselect fieldLabel="Type rule name to add"
+            [hasError]="formHasError && !crossDatasetFormGroup.get('selectedTriggerConditionId').value"
+            (emitExtraLabelClick)="openBusinessRuleSideSheet()" (openCustomDialog)="openBusinessRuleSideSheet()"
+            [updatedOptionsList]="businessRuleObs | async" [labelKey]="'brInfo'"
+            (optionSelectedEmit)="addTransRule($event)"
+            [preSelectedValue]="crossDatasetFormGroup.get('triggerCondition').value" [isExtraLabel]="true"
+            i18n-extraOptionLabel="@@add_br_rule" extraOptionLabel="Add new business rule">
+          </pros-form-input-autoselect>
+          <mat-error class="mdo-field-hint"
+            *ngIf="formHasError && !crossDatasetFormGroup.get('selectedTriggerConditionId').value">
+            <lib-text-line type="xsmall">Please select the condition</lib-text-line>
+          </mat-error>
+        </div>
+      </form>
+
+      <lib-section class="divider-section" text="Field mapping" *ngIf="!expandedView"></lib-section>
+
+      <div class="f-col mdo-field">
+        <pros-mapping-filters (filterChange)="setFilters($event)"></pros-mapping-filters>
+      </div>
+
+      <div class="f-row">
+        <div class="f-col">
+          <pros-mapping-wrapper class="mapping-container-wrapper"
+            [sourceTitle]="mappingDatasetInfo.sourceDataSet.objectdesc"
+            [sourceFields]="sourceFieldsObs | async" [targetTitle]="mappingDatasetInfo.targetDataSet.objectdesc"
+            [mappingSourceLoader]="mappingSourceLoader" [targetFields]="targetFieldsObs | async"
+            [existingMapping]="existingMapping" [mappingTargetLoader]="mappingTargetLoader"
+            (infoMessage)="setBannerText($event)" [isResponseType]="null"
+            (updateTargetMapping)="updateMappedTarget($event)" [mappingFilter]="mappingFilter"
+            (expandMap)="expandMap($event)" [showExpandButton]="!expandedView"></pros-mapping-wrapper>
+        </div>
+
+        <div class="f-col value-transformation-section">
+          <div class="f-row property-breadcrum" *ngIf="isTargetFieldSelected">
+            <lib-text-line type="leading">Value transformation</lib-text-line>
+          </div>
+          <div class="row-spacer"></div>
+          <form [formGroup]="translationRuleFormGroup" class="f-col property-transformation">
+            <pros-target-field-transformation-rule [targetFields]="targetFieldsObs | async"
+              formControlName="translationRule" [componentName]="'crossDataset'" [brType]="'BR_TRANSFORMATION'">
+            </pros-target-field-transformation-rule>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

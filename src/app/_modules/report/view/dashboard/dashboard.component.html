@@ -1,0 +1,57 @@
+<div class="root">
+	<ng-template [ngIf]="reportExist">
+		<div class="f-row-spacer-half"></div>
+		<div class="f-row dashborad-row">
+			<lib-text-line type="leading">{{reportName ? reportName: 'Untitled'}}</lib-text-line>
+			<div class="f-spacer"></div>
+			<lib-button-group>
+				<lib-button *ngIf="showClearFilterBtn" (mouseup)="clearFilters()" type="minor">Clear filter(s)
+				</lib-button>
+				<ng-template [ngIf]="!isFromMsteam">
+					<lib-button icon="share-alt" [matMenuTriggerFor]="shareMenu" type="minor" ></lib-button>
+					<mat-menu #shareMenu="matMenu" class="navigation-menu">
+						<button mat-menu-item (click)="openSendEmailSideSheet()" i18n="@@send_via_email">Send via Email</button>
+					</mat-menu>
+					<lib-button
+						*ngIf="(collaboratorEditPermission || collaboratorDeletePermission || collaboratorAdminPermission)"
+						[matMenuTriggerFor]="moremenu" type="minor" icon="ellipsis-h"></lib-button>
+					<mat-menu #moremenu="matMenu" class="navigation-menu">
+						<button mat-menu-item *ngIf="(collaboratorEditPermission || collaboratorAdminPermission)"
+							(click)="editReport()">Edit</button>
+						<button mat-menu-item *ngIf="(collaboratorEditPermission || collaboratorAdminPermission)"
+							(click)="duplicateReport()">Duplicate</button>
+						<button mat-menu-item *ngIf="(collaboratorEditPermission || collaboratorAdminPermission)"
+							(click)="exportReport()">Export</button>
+						<button mat-menu-item *ngIf="(collaboratorDeletePermission || collaboratorAdminPermission)"
+							(click)="delete()">Delete</button>
+						<button mat-menu-item (click)="importLog()">Import Log</button>
+					</mat-menu>
+				</ng-template>
+			</lib-button-group>
+		</div>
+		<div class="row-spacer"></div>
+		<pros-dashboard-container [reportId]="reportId" [emitClearBtnEvent]="emitClearBtnEvent"
+			(emitFilterApplied)="showClearBtnEmit($event)" [isClearButtonClicked]="isClearButtonClicked" class="container" [emtClearBtnClickedEvent]="isClearBtnClicked"></pros-dashboard-container>
+		<!-- <pros-null-state [iconPath]="'./assets/images/empty-order.svg'" [subtext]="'Nothing to see here'" [message]="'You dont have any report. Would you like to create one?'" [button]="{text: 'Create'}"> </pros-null-state> -->
+	</ng-template>
+	<ng-template [ngIf]="!reportExist">
+		<div class="f-row empty-state">
+			<ng-template [ngIf]="errStatusCode" #ngIfElse ="errState">
+				<lib-empty-state primaryText="Nothing to see here"
+				icon="order" iconSize="100">
+					<div class="messages">
+						<lib-text-line type="base" textColor="error" class="spacer"> Oops! something is not right. </lib-text-line>
+						&nbsp;<lib-text-line type="base" textColor="link" class="spacer cursor" onclick="window.open(`https://www.prospecta.com/support/`,`_blank`)"> Contact support </lib-text-line>
+					</div>
+				</lib-empty-state>
+			</ng-template>
+			<ng-template #errState>
+				<lib-empty-state primaryText="Nothing to see here"
+				secondaryText="You don't have any reports. Would you like to create one?"
+				icon="order" iconSize="100">
+				<lib-button type="minor" iconFontType="solid" (afterClick)="router.navigate(['home/report/dashboard-builder/new'])">Create</lib-button>
+				</lib-empty-state>
+			</ng-template>			
+		</div>
+	</ng-template>
+</div>

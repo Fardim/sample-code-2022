@@ -1,0 +1,62 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button (click)="close()" type="plain" iconFontType="light" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading">Change history</lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-button type="major" (click)="submit()">Submit</lib-button>
+            </div>
+        </div>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <table mat-table [dataSource]="dataSource" class="table-vertical">
+                <ng-container matColumnDef="settings" sticky>
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let element">
+                        <lib-text-line type="base">Restore</lib-text-line>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="version" sticky>
+                    <th mat-header-cell *matHeaderCellDef>Version</th>
+                    <td mat-cell *matCellDef="let element">
+                        <lib-text-line type="base" textColor="link">
+                            {{element.version}}
+                        </lib-text-line>
+                        <lib-text-line type="base">
+                            (Current version)
+                        </lib-text-line>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="modifiedOn" sticky>
+                    <th mat-header-cell *matHeaderCellDef>Modified on</th>
+                    <td mat-cell *matCellDef="let element">
+                        <lib-text-line type="base">
+                            {{element.modifiedOn | date:'dd.MM.yyyy'}}
+                        </lib-text-line>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="modifiedBy" sticky>
+                    <th mat-header-cell *matHeaderCellDef>Modified by</th>
+                    <td mat-cell *matCellDef="let element">
+                        <lib-avatar size="small" initials="TU"></lib-avatar>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="whatsNew" sticky>
+                    <th mat-header-cell *matHeaderCellDef>Whats new?</th>
+                    <td mat-cell *matCellDef="let element">
+                        <lib-text-line type="base">
+                            {{element.whatsNew}}
+                        </lib-text-line>
+                    </td>
+                </ng-container>
+    
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+        </div>
+    </div>
+</div>

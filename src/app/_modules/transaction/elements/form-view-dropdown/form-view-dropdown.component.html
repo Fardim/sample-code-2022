@@ -1,0 +1,69 @@
+<!-- <input [formControl]="control" type="hidden" /> -->
+<div class="f-col mdo-field">
+    <ng-template [ngIf]="fieldCtrl?.isCheckList" [ngIfElse]="elseBlock">
+        <mat-form-field appearance="outline" class="multi-select">
+            <mat-chip-list class="f-row field-chip-list" #chipList>
+                <lib-chip *ngFor="let field of selectedOptions;let i = index" removable="true" class="lib-chip"
+                    (removed)="remove(i)">
+                    {{field.text || field.code}}
+                </lib-chip>
+                <input matInput placeholder="Select..." #optionsInput #autocompleteTrigger="matAutocompleteTrigger"
+                    class="mat-input" [matAutocomplete]="auto" [matChipInputFor]="chipList"
+                    (keyup)="searchOption($event.target.value)" (focus)="inputFocus()">
+            </mat-chip-list>
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event, false)">
+                <mat-option *ngFor="let opt of optionList | async" [value]="opt">
+                    <lib-checkbox [checked]="isItemChecked(opt)" [disabled]="false" [label]="opt.text">
+                    </lib-checkbox>
+                </mat-option>
+                <ng-template [ngIf]="(optionList | async).length > 0">
+                    <mat-option>Clear Selection</mat-option>
+                </ng-template>
+                <ng-template [ngIf]="useFrom === transactionMaterialDescName">
+                    <mat-option value="plus-add-new">
+                        <div class="sticky-actions">
+                            <mat-icon fontSet="mdo-icons" class="option-icon">plus</mat-icon>
+                            Add New
+                        </div>
+                    </mat-option>
+                </ng-template>
+            </mat-autocomplete>
+            <button mat-icon-button matSuffix prosClickStopPropagation (click)="openAuto(autocompleteTrigger)">
+                <mat-icon>expand_more</mat-icon>
+            </button>
+        </mat-form-field>
+    </ng-template>
+    <ng-template #elseBlock>
+        <div class="mdo-field-input">
+            <input matInput placeholder="Select any one..." #optionsInput [disabled]="isFieldReadOnly"
+                [matAutocomplete]="optionsAutoComp" #autocompleteTrigger="matAutocompleteTrigger"
+                (input)="searchOption($event.target.value)" (focus)="inputFocus()" />
+            <mat-autocomplete class="mdo-autocomplete" #optionsAutoComp="matAutocomplete"
+                (optionSelected)="selected($event, true)" [displayWith]="formatValue.bind(this)">
+                <mat-option class="mdo-option" *ngFor="let data of optionList | async" [value]="data">
+                    {{ data.text }}
+                </mat-option>
+                <ng-template [ngIf]="useFrom === transactionMaterialDescName">
+                    <mat-option value="plus-add-new">
+                        <div class="sticky-actions">
+                            <mat-icon fontSet="mdo-icons" class="option-icon">plus</mat-icon>
+                            Add New
+                        </div>
+                    </mat-option>
+                </ng-template>
+            </mat-autocomplete>
+            <lib-button-group>
+                <ng-template [ngIf]="selectedOptions.length == 1">
+                    <lib-button matSuffix (click)="clear(false)" icon="times" iconFontType="light"
+                        [disabled]="isFieldReadOnly">
+                    </lib-button>
+                </ng-template>
+                <lib-button icon="chevron-down" matSuffix prosClickStopPropagation [disabled]="isFieldReadOnly"
+                    (click)="openAuto(autocompleteTrigger)">
+                </lib-button>
+            </lib-button-group>
+        </div>
+    </ng-template>
+</div>
+<!-- <div prosCorrectedValue [displayValue]="oldValue" useWith="withSuffix">
+</div> -->

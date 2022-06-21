@@ -1,0 +1,426 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading" enableWrap="false" class="leading-text summary-sidesheet-heading">
+                    <div class="title-text" libTooltip="{{schemaDetails?.moduleDescription ? schemaDetails.moduleDescription : 'Untitled'}}">{{schemaDetails?.moduleDescription ? schemaDetails.moduleDescription : 'Untitled'}}</div>&nbsp;/&nbsp;<div class="title-text" libTooltip="{{schemaDetails?.schemaDescription ? schemaDetails.schemaDescription: 'Untitled'}}">{{schemaDetails?.schemaDescription ? schemaDetails.schemaDescription: 'Untitled'}}</div>
+                </lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button (click)="openUploadSideSheet()" type="plain" iconPosition="before" icon="arrow-from-bottom" iconFontType="light">
+                    Upload data
+                </lib-button>
+            
+                <lib-button-group>
+                    <lib-button (click)="saveCheckData()" type="major">Check data</lib-button>
+                    <lib-button type="major" icon="layer-group" iconFontType="light" (click)="openDatascopeListSidesheet()"></lib-button>
+                    <lib-button type="major" icon="ellipsis-h" [matMenuTriggerFor]="menu"></lib-button>
+                    <mat-menu #menu="matMenu" class="navigation-menu">
+                        <button i18n="@@publish" (click)="publishSchema()" mat-menu-item>Publish</button>
+                    </mat-menu>
+                </lib-button-group>  
+            </div>
+        </div>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <div class="f-col">
+                <div class="f-col">
+                    <lib-banner *ngIf="errorStateRes && !schemaRunFailureMsg" status="error">
+                        <ng-template [ngIf]="(errorStateRes?.code === 'ES_SHARDS' || errorStateRes?.code === 'RMQ_NOT_FOUND' || errorStateRes?.code === 'RMQ_STUCK' || errorStateRes?.code === 'RMQ_TIMEOUT')"
+                        [ngIfElse]="supportPortal">
+                            <lib-text-line type="base" textColor="error" class="spacer"> Oops! something is not right. Please </lib-text-line>
+                            &nbsp;<lib-text-line type="base" textColor="link" class="spacer cursor" (click)="createQueueAndRerunSchema()"> click here </lib-text-line>&nbsp;
+                            <lib-text-line type="base" textColor="error" class="spacer"> to re-run schema. </lib-text-line>
+                        </ng-template>
+                        <ng-template #supportPortal>
+                            <lib-text-line type="base" textColor="error" class="spacer"> Oops! something is not right. Please </lib-text-line>
+                            &nbsp;<lib-text-line type="base" textColor="link" class="spacer cursor" onclick="window.open(`https://www.prospecta.com/support/`,`_blank`)"> click here </lib-text-line>&nbsp;
+                            <lib-text-line type="base" textColor="error" class="spacer"> to notify support. </lib-text-line>
+                        </ng-template>                        
+                    </lib-banner>
+                    <lib-banner *ngIf="schemaRunFailureMsg" status="error" [text]="schemaRunFailureMsg"></lib-banner>
+                    <lib-banner *ngIf="bannerSuccessText" [text]="bannerSuccessText" status="success"></lib-banner>
+                    <lib-banner status="info"
+                        text="{{ currentVariantCnt || 0 }} out of {{ entireDataSetCount || 0 }} records will be validated based on your data scope selection">
+                    </lib-banner>
+                </div>
+
+                <div class="f-col mdo-field">
+                    <lib-input label="Schema name"[type]="'text'" [isRequired]="true" placeholder="Schema name" 
+                    [formControl]="schemaName" (input)="sanitizeValue(schemaName)" (afterBlur)="onChangeSchemaDescription(schemaName.value)"
+                    [hint]="submitted && schemaName.errors && schemaName.errors.required ? 'Schema name is required' : ''" 
+                    [hasError]="submitted && schemaName.errors && schemaName.errors.required">
+                    </lib-input>                    
+                </div>
+
+                <div class="f-col mdo-field">
+                    <lib-text-line class="field-label" type="xsmall" weight="strong">
+                        <span i18n="@@data_scope">Data scope</span>&nbsp;<mat-icon fontSet="mdo-icons-light" i18n-libTooltip="@@data_scope_tooltip" libTooltip="Enter the data scope associated to the schema">question-circle</mat-icon>
+                    </lib-text-line>
+
+                    <div class="mdo-field-input">
+                        <input matInput placeholder="Select a data scope" #optionsInput [formControl]="dataScopeName"
+                            [matAutocomplete]="auto" (blur)="resetLastScope()" />
+                        <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete"
+                            (optionSelected)="selectDataScope()">
+                            <div class="datascope-scroll" prosInfiniteScroll bufferPercentage="20"
+                                (scrollEnd)="updateDataScopeList()">
+                                <mat-option value='0' i18n="@@entire_data_scope">
+                                    <div class="f-row">
+                                        <lib-text-line type="base" weight="strong">Entire data scope</lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <lib-text-line type="base" textColor="secondary">{{entireDataSetCount ? entireDataSetCount : 0}}
+                                        </lib-text-line>
+                                        <!-- <span class="f-col-spacer-half"></span>
+                                        <lib-button icon="trash-alt" type="plain" class="option-button"></lib-button> -->
+                                    </div>
+                                </mat-option>
+                                <mat-option *ngFor="let variant of variantDetails" [value]="variant.variantId">
+                                    <div class="f-row">
+                                        <lib-text-line type="base">{{variant.variantName}}</lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <lib-text-line type="base" textColor="secondary">{{variant.dataScopeCount ? variant.dataScopeCount :
+                                            0}}</lib-text-line>
+                                        <!-- <span class="f-col-spacer-half"></span>
+                                        <lib-button icon="trash-alt" type="plain" class="option-button"></lib-button> -->
+                                    </div>
+                                </mat-option>
+                                <mat-divider></mat-divider>
+                                <mat-option (click)="openDataScopeSideSheet()">
+                                    <lib-text-line type="base" textColor="link" i18n="@@add_data_scope">New data scope</lib-text-line>
+                                </mat-option>
+                            </div>
+                        </mat-autocomplete>
+                    </div>
+                </div>
+
+                <div class="f-col">
+                    <lib-text-line class="field-label" type="xsmall" weight="strong">
+                        <span i18n="@@threshold">Threshold</span>&nbsp;<mat-icon fontSet="mdo-icons-light" i18n-libTooltip="@@threshold_tooltip" libTooltip="Enter the % to determine the schema success. If the threshold is not met, an error will occur.">question-circle</mat-icon>
+                    </lib-text-line>
+                    <div class="f-row slider-row">
+                        <lib-range-slider class="lib-slider" [formControl]="schemaThresholdControl" tickInterval="1"
+                            [formatLabelFn]="rangeSliderLabelFormat" [value]="schemaThresholdControl.value"
+                            color="primary" (valueChange)="onChangeSchemaThreshold($event)"></lib-range-slider>
+                        &nbsp;
+                        <lib-text-line type="base" class="percentage">{{schemaThresholdControl.value}}%
+                        </lib-text-line>
+                    </div>
+                </div>
+
+                <div class="f-col mdo-field">
+                    <lib-text-line class="field-label" type="xsmall" weight="strong">
+                        <span i18n="@@business_rules">Business rule</span>&nbsp;<mat-icon fontSet="mdo-icons-light"  i18n-libTooltip="@@business_rule_tooltip" libTooltip="Assign business rule(s) to the schema. Note: The combination of all business rules assigned to the schema must have a total weightage of 100">question-circle</mat-icon>
+                    </lib-text-line>
+                    <pros-form-input-autoselect i18n-fieldLabel="@@type_rule_name_to_add"
+                        fieldLabel="Type rule name to add" (openCustomDialog)="openBrLibrarySideSheet()"
+                        [updatedOptionsList]="allBusinessRulesList" (emitExtraLabelClick)="openBusinessRuleSideSheet()"
+                        [labelKey]="'brInfo'" (optionSelectedEmit)="addBusinessRule($event)"
+                        i18n-extraOptionLabel="@@new_br_rule" extraOptionLabel="New business rule"
+                        [isExtraLabel]="true"
+                        (emitSearchValue)="getUpdatedBrList($event,0)">
+                    </pros-form-input-autoselect>
+                    <!-- (emitExtraLabelClick)="openBusinessRuleSideSheet()" -->
+                </div>
+
+
+                <ng-template [ngIf]="businessRuleData.length>0">
+                    <div class="colunm-listing">
+                        <!-- <div class="f-row colunm-box rule-border-row">
+                            <div class="col col-x2"></div>
+                            <div class="col col-x8">
+                                <lib-text-line type="small" weight="strong" i18n="@@business_rule">Business rule
+                                </lib-text-line>
+                            </div>
+                            <div class="col col-x4">
+                                <lib-text-line type="small" weight="strong" i18n="@@type">Type</lib-text-line>
+                            </div>
+                            <div class="col col-x8 mat-item-center">
+                                <lib-text-line type="small" weight="strong" i18n="@@weightage">Weightage
+                                    <mat-icon i18n-libTooltip="@@br_weightage_tooltip_msg" class="mat-head-icon"
+                                        libTooltip="Score assigned to a record upon successful validation of a business rule.For a schema total weightage of all the business rules must not exceed 100"
+                                        fontSet="mdo-icons">
+                                        question-circle</mat-icon>
+                                </lib-text-line>
+                            </div>
+                            <div class="col col-x2 mat-item-center">
+                                <lib-text-line type="small" weight="strong" i18n="@@enabled">Enabled</lib-text-line>
+                            </div>
+                            <div class="col col-x4 action mat-item-end"></div>
+                        </div> -->
+                        <div cdkDropList [cdkDropListData]="businessRuleData" (cdkDropListDropped)="drop($event)">
+                            <div cdkDrag *ngFor="let businessRule of businessRuleData; let i=index">
+                                <div class="f-row colunm-box rule-border-row">
+                                    <div class="col col-x2">
+                                        <lib-button cdkDragHandle type="plain" iconFontType="light" icon="grip-lines">
+                                        </lib-button>
+                                    </div>
+                                    <div class="col col-x8">
+                                        <lib-text-line type="base" enableWrap="true" textColor="link" class="cursor"
+                                            (click)="editBuisnessRule(businessRule);">{{businessRule.brInfo}}
+                                        </lib-text-line>
+                                    </div>
+
+                                    <div class="col col-x4">
+                                        <lib-text-line type="base" enableWrap="true">{{
+                                            getRuleTypeDesc(businessRule.brType)
+                                            }}</lib-text-line>
+                                    </div>
+
+                                    <div class="col col-x8 mat-item-center">
+                                        <div class="f-row slider-row">
+                                            <lib-range-slider minValue="0" 
+                                            (valueChange)="updateBrForRangeSlider(businessRule,$event)"
+                                            [maxValue]="100" 
+                                            class="lib-slider"
+                                            tickInterval="1" 
+                                            [formatLabelFn]="rangeSliderLabelFormat"
+                                            [value]="businessRule.brWeightage" 
+                                            color="primary"></lib-range-slider>
+                                            &nbsp;
+                                            <lib-text-line type="base" class="percentage">{{businessRule.brWeightage}}%
+                                            </lib-text-line>
+                                        </div>
+                                    </div>
+
+                                    <div class="col col-x2 mat-item-center">
+                                        <lib-checkbox color="primary" [checked]="businessRule.status === '1'"
+                                            (valueChange)="updateBr(businessRule, $event, 'checkbox')"></lib-checkbox>
+                                    </div>
+
+                                    <div class="col col-x4 action mat-item-end">
+                                        <!-- This will not required for top node -->
+                                        <ng-template [ngIf]="i===0" [ngIfElse]="enableDepDrop">
+                                            <lib-button type="plain" [disabled]='i===0'
+                                                icon="link" iconFontType="light">
+                                            </lib-button>
+                                        </ng-template>
+                                        <ng-template #enableDepDrop>
+                                            <lib-button type="plain"
+                                                [matMenuTriggerFor]="mapTheDepRule" icon="link" iconFontType="light"></lib-button>
+                                        </ng-template>
+
+                                        <!-- Mapping Dropdown Menu -->
+                                        <mat-menu #mapTheDepRule="matMenu" #aboveMenu="matMenu" yPosition="above"
+                                            xPosition="before" class="mat-elevation-z0 tooltip-fields-menu">
+                                            <div class="f-col">
+                                                <lib-text-line type="base" i18n="@@run_rule_warning_msg" enableWrap="true">Only run this rule if the preceding rule returns</lib-text-line>
+                                                <lib-radio-group (click)="$event.stopPropagation()"
+                                                    [options]="depRuleList" class="f-col" color="primary"
+                                                    [value]="getCurrentBrStatusObj(businessRule.dependantStatus)?.value"
+                                                    (valueChange)="updateDepRule(businessRule,$event)">
+                                                </lib-radio-group>
+                                            </div>
+                                        </mat-menu>
+                                        <lib-button type="plain" (click)="deleteBr(businessRule)" icon="trash-alt" iconFontType="light">
+                                        </lib-button>
+                                    </div>
+                                </div>
+                                <div cdkDropList [cdkDropListData]="businessRule.dep_rules"
+                                    (cdkDropListDropped)="drop($event)">
+                                    <div cdkDrag *ngFor="let deps of businessRule.dep_rules;let i=index;">
+                                        <div class="f-row colunm-box rule-border-row">
+                                            <div class="col col-x2">
+                                                <lib-button cdkDragHandle>
+                                                    <mat-icon>subdirectory_arrow_right</mat-icon>
+                                                </lib-button>
+                                            </div>
+                                            <div class="col col-x8">
+                                                <lib-text-line type="base" enableWrap="true" textColor="link" (click)="editBuisnessRule(deps);"
+                                                    class="cursor">{{deps.brInfo}}</lib-text-line>
+                                            </div>
+
+                                            <div class="col col-x4">
+                                                <lib-text-line type="base" enableWrap="true">{{
+                                                    getRuleTypeDesc(deps.brType) }}</lib-text-line>
+                                            </div>
+
+                                            <div class="col col-x8 mat-item-center">
+                                                <div class="f-row slider-row">
+                                                    <lib-range-slider minValue="0"
+                                                    [maxValue]="availableWeightage(deps.brWeightage)"
+                                                    (valueChange)="updateBr(deps,$event, 'slider', true)" class="lib-slider"
+                                                    thumbLabel="false" tickInterval="1"
+                                                    [formatLabelFn]="rangeSliderLabelFormat" [value]="deps.brWeightage"
+                                                    color="primary"></lib-range-slider>
+                                                    &nbsp;
+                                                    <lib-text-line type="base" class="percentage">{{deps.brWeightage}}%
+                                                    </lib-text-line>
+                                                </div>
+                                                
+                                            </div>
+
+                                            <div class="col col-x2 mat-item-center">
+                                                <lib-checkbox color="primary" [checked]="deps.status === '1'"
+                                                    (valueChange)="updateBr(deps, $event, 'checkbox', true)">
+                                                </lib-checkbox>
+                                            </div>
+
+                                            <div class="col col-x4 action mat-item-end">
+                                                <lib-button type="plain" [matMenuTriggerFor]="mappingdependency"
+                                                   icon="link" iconFontType="light"></lib-button>
+
+                                                <!-- Mapping Dropdown Menu -->
+                                                <mat-menu #mappingdependency="matMenu" #aboveMenu="matMenu"
+                                                    yPosition="above" xPosition="before"
+                                                    class="mat-elevation-z0 tooltip-fields-menu">
+                                                    <!-- <div class="top-tiparrow"></div> -->
+                                                    <div class="f-col">
+                                                        <lib-text-line type="base" i18n="@@run_rule_warning_msg" enableWrap="true">Only run this rule if the preceding rule returns</lib-text-line>
+                                                        <lib-radio-group (click)="$event.stopPropagation()"
+                                                            [options]="depRuleList" class="f-col" color="primary"
+                                                            [value]="getCurrentBrStatusObj(deps.dependantStatus)?.value"
+                                                            (valueChange)="updateDepRuleForChild(businessRule,i, $event)">
+                                                        </lib-radio-group>
+                                                    </div>
+                                                </mat-menu>
+                                                <lib-button type="plain" (click)="deleteBrChild(deps,businessRule)"
+                                                    iconFontType="light" icon="trash-alt"></lib-button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row-spacer"></div>
+                    </div>
+                </ng-template>
+
+                <div class="f-col mdo-field">
+                    <lib-text-line class="field-label" type="xsmall" weight="strong">
+                        <span i18n="@@collaborators">Collaborators</span>&nbsp;<mat-icon fontSet="mdo-icons-light"  i18n-libTooltip="@@collaborators_tooltip" libTooltip="Select users to receive updates or perform tasks associated to schema">question-circle</mat-icon>
+                    </lib-text-line>
+                    <pros-form-input-autoselect i18n-fieldLabel="@@type_user_name" fieldLabel="Type user name to add"
+                        (openCustomDialog)="openSubscriberSideSheet()" [updatedOptionsList]="allSubscribers"
+                        [labelKey]="'fullName'" (optionSelectedEmit)="addSubscriber($event)"
+                        (emitSearchValue)="getCollaborators($event, 0)" i18n-extraOptionLabel="@@invite_people_to_team"
+                        extraOptionLabel="Invite people to your team">
+                    </pros-form-input-autoselect>
+                </div>
+
+
+                <ng-template [ngIf]="subscriberData.length>0">
+                    <div class="colunm-listing">
+                        <!-- <div class="f-row colunm-box rule-border-row">
+                            <div class="col col-x2"></div>
+                            <div class="col col-x8">
+                                <lib-text-line weight="strong" type="small" i18n="@@collaborator">Collaborator
+                                </lib-text-line>
+                            </div>
+                            <div class="col col-x4">
+                                <lib-text-line weight="strong" type="small" i18n="@@role">Role</lib-text-line>
+                            </div>
+                            <div class="col col-x16">
+                                <lib-text-line weight="strong" type="small" i18n="@@data_allocation">Data allocation
+                                </lib-text-line>
+                            </div>
+                            <div class="col mat-item-end">
+                            </div>
+                        </div> -->
+                        <div class="f-row colunm-box rule-border-row" *ngFor="let subscriber of subscriberData">
+                            <div class="col col-x2">
+                                <ng-template [ngIf]="subscriber.userMdoModel && subscriber.isInvited!==true"
+                                    [ngIfElse]="invitedUserProfile">
+                                    <div class="f-row">
+                                        <lib-avatar [initials]="shortName(subscriber.userMdoModel.fName, subscriber.userMdoModel.lName)">
+                                        </lib-avatar>
+                                        <div *ngIf="false">
+                                            <lib-text-line type="base" *ngIf="subscriber.userMdoModel">
+                                                {{shortName(subscriber.userMdoModel.fName, subscriber.userMdoModel.lName)}}
+                                            </lib-text-line>
+                                        </div>
+                                    </div>
+                                </ng-template>
+
+                                <ng-template #invitedUserProfile>
+                                    <lib-avatar>
+                                        <mat-icon fontSet="mdo-icons">user</mat-icon>
+                                    </lib-avatar>
+                                </ng-template>
+                            </div>
+
+                            <div class="col col-x8">
+                                <ng-template [ngIf]="subscriber.userMdoModel && subscriber.isInvited!==true"
+                                [ngIfElse]="isInvited">
+                                <lib-text-line type="base" *ngIf="subscriber.userMdoModel!==undefined">
+                                    {{subscriber.userMdoModel.fName}} {{subscriber.userMdoModel.lName}}
+                                </lib-text-line>
+                            </ng-template>
+
+                            <ng-template #isInvited>
+                                <lib-text-line type="base">{{subscriber.userid}}</lib-text-line>
+                            </ng-template>
+                            </div>
+
+                            <div class="col col-x5" [matMenuTriggerFor]="subscriberRole">
+                                <lib-label *ngIf="subscriber.isAdmin" i18n="@@admin" text="Admin" iconFontType="solid" suffixIcon="caret-down"></lib-label>
+                                <lib-label *ngIf="subscriber.isReviewer" i18n="@@viewer" text="Reviewer" iconFontType="solid" suffixIcon="caret-down"></lib-label>
+                                <lib-label *ngIf="subscriber.isEditer" i18n="@@editor" text="Editor"  iconFontType="solid" suffixIcon="caret-down"></lib-label>
+                               
+                                <ng-template
+                                    [ngIf]="!subscriber.isAdmin && !subscriber.isReviewer && !subscriber.isEditer">
+                                    <lib-label *ngIf="subscriber.isViewer" i18n="@@viewer" text="Viewer" iconFontType="solid" suffixIcon="caret-down"></lib-label>
+                                </ng-template>
+                            </div>
+                            <mat-menu #subscriberRole="matMenu" class="navigation-menu">
+                                <button mat-menu-item *ngFor="let role of roles"
+                                    (click)="updateRole(subscriber, role.code)">{{role.text}}</button>
+                            </mat-menu>
+
+                            <div class="col col-x16">
+                                <mat-chip-list class="data-allocation-list">
+                                    <ng-template ngFor let-ctrl [ngForOf]="subscriber.filterCriteria">
+                                        <mat-chip class="mdo-filter-matchip" disableRipple="true"
+                                            [matMenuTriggerFor]="appliedfiltermenu" (click)="loadDropValues(ctrl)">
+                                            <lib-text-line class="selected-text">
+                                                <label>
+                                                    {{ ctrl.fldCtrl?.fieldDescri || ctrl.fldCtrl?.fieldDesc || 'Unknown' }}
+                                                    :
+                                                </label>
+                                                <span class="info">
+                                                    {{ prepareTextToShow(ctrl) }}
+                                                </span>
+                                            </lib-text-line>
+                                            <mat-icon matChipRemove (click)="removeAppliedFilter(ctrl, subscriber.uuid)">
+                                                clear
+                                            </mat-icon>
+                                        </mat-chip>
+                                    </ng-template>
+                                    <mat-chip class="mdo-filter-matchip" disableRipple="true"
+                                        [matMenuTriggerFor]="addfiltermenu" (click)="reInilize = !reInilize"
+                                        *ngIf="subscriber.isInvited!==true">
+                                        <mat-icon fontSet="mdo-icons">filter</mat-icon>
+                                    </mat-chip>
+                                </mat-chip-list>
+
+                                <mat-menu #appliedfiltermenu="matMenu">
+                                    <pros-filter-values [moduleId]="moduleId"
+                                        (selectedValues)="fetchSelectedValues($event, subscriber.uuid)"
+                                        [fieldId]="loadDopValuesFor ? loadDopValuesFor.fieldId : ''"
+                                        [checkedValue]="loadDopValuesFor ? loadDopValuesFor.checkedValue : []">
+                                    </pros-filter-values>
+                                </mat-menu>
+
+                                <mat-menu #addfiltermenu="matMenu">
+                                    <pros-add-filter-menu [moduleId]="moduleId"
+                                        (evtReadyForApply)="makeFilterControl($event, subscriber.uuid)"
+                                        [reInilize]="reInilize">
+                                    </pros-add-filter-menu>
+                                </mat-menu>
+                            </div>
+
+                            <div class="col mat-item-end">
+                                <lib-button type="plain" (click)="deleteSubscriber(subscriber.uuid)"
+                                    icon="trash-alt" iconFontType="light"></lib-button>
+                            </div>
+                        </div>
+                        <div class="row-spacer"></div>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</div>

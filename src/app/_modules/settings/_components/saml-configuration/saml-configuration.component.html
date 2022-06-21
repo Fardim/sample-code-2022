@@ -1,0 +1,97 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar" *ngIf="!configurationTableDetails?.showSkeleton">
+    <lib-text-line i18n="@@business_rules" type="leading" enableWrap="true">SAML configuration</lib-text-line>
+    <div class="f-spacer"></div>
+    <lib-button i18n="@@new_configuration" type="minor" (click)="showConfiguration('new')">New configuration
+    </lib-button>
+  </div>
+
+  <div class="f-row-spacer-half"></div>
+  <pros-toolbar-skeleton *ngIf="configurationTableDetails?.showSkeleton"></pros-toolbar-skeleton>
+  <lib-skeleton-table *ngIf="configurationTableDetails?.showSkeleton"></lib-skeleton-table>
+
+  <div class="f-row" *ngIf="configurationTableDetails.formListHasData || configurationTableDetails.searchString">
+    <lib-search *ngIf="configurationTableDetails?.showSkeleton && configurationTableDetails.defaultTableDataLength" i18n-placeholder="@@search" placeholder="Search" class="lib-search" (valueChange)="searchFieldSub.next($event)">
+    </lib-search>
+  </div>
+
+  <div class="f-row-spacer-half"></div>
+
+  <div class="f-row empty-block" *ngIf="!configurationTableDetails?.showSkeleton && !configurationTableDetails.defaultTableDataLength">
+    <!-- Empty State -->
+    <lib-empty-state primaryText="Nothing to see here" icon="table" iconSize="200"
+      secondaryText="You don't have any SAML configurations yet. Would you like to create one?">
+      <lib-button i18n="@@new_configuration" type="minor" (click)="showConfiguration('new')">New
+        configuration
+      </lib-button>
+    </lib-empty-state>
+  </div>
+
+  <!-- Configuration LISTING -->
+  <div class="configuration-table"
+    *ngIf="configurationTableDetails.formListHasData && configurationTableDetails.defaultTableDataLength">
+    <table [ngStyle]="{ display: configurationTableDetails?.showSkeleton ? 'none' : '' }" mat-table
+      [dataSource]="dataSource" matSort class="mat-elevation-z0">
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header i18n="@@action">
+          <lib-text-line type="base" weight="strong"></lib-text-line>
+        </th>
+        <td mat-cell *matCellDef="let element">
+          <div class="f-row">
+            <lib-button type="plain" icon="ellipsis-h" (click)="$event.stopPropagation()"
+              [matMenuTriggerFor]="actionMenu">
+            </lib-button>
+            <mat-menu #actionMenu="matMenu" class="navigation-menu">
+              <!-- <button mat-menu-item i18n="@@download_metadata">Download metadata</button> -->
+              <button mat-menu-item i18n="@@edit_config" (click)="showConfiguration('edit',element)">Edit</button>
+              <button mat-menu-item i18n="@@generate_URL" (click)="generateURL(element)">Generate URL</button>
+              <lib-section></lib-section>
+              <button mat-menu-item i18n="@@delete_config" (click)="openConfirmation(element)">Delete</button>
+            </mat-menu>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="spEntityId">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header i18n="@@spEntityId">
+          <lib-text-line type="base" weight="strong">SP entity ID</lib-text-line>
+        </th>
+        <td mat-cell *matCellDef="let element">{{element.spEntityId}}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="idpEntityId">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header i18n="@@idpEntityId">
+          <lib-text-line type="base" weight="strong">IDP entity ID</lib-text-line>
+        </th>
+        <td mat-cell *matCellDef="let element">{{element.idpEntityId}}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="idpXmlUrl">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header i18n="@@idpXmlUrl">
+          <lib-text-line type="base" weight="strong">IDP XML URL</lib-text-line>
+        </th>
+        <td mat-cell *matCellDef="let element">
+          <lib-text-line textColor="link" enableWrap="true" class="cursor">{{element.idpXmlUrl}}</lib-text-line>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+
+  <div class="f-row-spacer-half"></div>
+
+  <!-- PAGINATION -->
+  <div class="f-row" *ngIf="configurationTableDetails.totalCount">
+    <lib-pagination [currentPageIndex]="configurationTableDetails.recordsPageIndex"
+      [totalCount]="configurationTableDetails.totalCount" [pageSize]="configurationTableDetails.recordsPageSize"
+      (pageChangeEvent)="onPageChange($event)">
+    </lib-pagination>
+    <lib-text-line type="base" enableWrap="true">
+      {{ displayedRecordsRange }}
+    </lib-text-line>
+  </div>
+</div>

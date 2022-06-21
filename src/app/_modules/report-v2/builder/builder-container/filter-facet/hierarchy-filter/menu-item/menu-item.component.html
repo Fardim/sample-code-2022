@@ -1,0 +1,26 @@
+<mat-menu #childMenu="matMenu" [overlapTrigger]="false" prosClickStopPropagation>
+    <div class="f-col multiselect-checkbox" prosClickStopPropagation>
+        <span class="button-flex" *ngFor="let data of nestedData" class="nestedData">
+            <!-- Handle branch node menu items -->
+            <span class="button-flex" *ngIf="data.child && data.child.length > 0">
+                <lib-checkbox class="checkbox-flex" [checked]="data.checked" 
+                    (valueChange)="clickedActive(data)" [matTooltip]="getLabel(data)" 
+                    matTooltipPosition="right" [label]="getLabel(data)"
+                    [indeterminate]="getCheckedAmount(data)"
+                    >
+                </lib-checkbox>
+                <button mat-menu-item color="primary" [matMenuTriggerFor]="menu.childMenu">
+                </button>
+                <pros-menu-item #menu (valueChange)="clickedActive($event)" [nestedData]="data.child"
+                    [selectedNode]="selectedNode" [displayCriteria]="displayCriteria" prosClickStopPropagation></pros-menu-item>
+            </span>
+            <!-- Handle leaf node menu items -->
+            <span *ngIf="!data.child || data.child.length === 0">
+                <lib-checkbox [checked]="data.checked" [matTooltip]="getLabel(data)"
+                    (valueChange)="clickedActive(data)" 
+                    matTooltipPosition="right" [label]="getLabel(data)">
+                </lib-checkbox>
+            </span>
+        </span>
+    </div>
+</mat-menu>

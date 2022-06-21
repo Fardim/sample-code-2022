@@ -1,0 +1,75 @@
+<mat-expansion-panel
+  #panel="matExpansionPanel"
+  [expanded]="true"
+  togglePosition="before"
+  class="mat-elevation-z0 notification-settings"
+>
+  <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+    <lib-text-line weight="strong">Notification settings</lib-text-line>
+  </mat-expansion-panel-header>
+
+  <form [formGroup]="notificationForm">
+    <div class="f-col mdo-field">
+      <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@notification_type"
+        >Notification type
+      </lib-text-line>
+      <lib-segment
+        class="lib-segment"
+        [optionsList]="notificationType"
+        [selected]="notificationForm.get('notifyType')?.value"
+        labelKey="label"
+        valueKey="value"
+        formControlName="notifyType"
+      >
+      </lib-segment>
+    </div>
+
+    <div class="f-col mdo-field">
+      <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@priority">Priority</lib-text-line>
+      <lib-segment
+        class="lib-segment"
+        [optionsList]="notificationPriority"
+        [selected]="notificationForm.get('priority')?.value"
+        labelKey="label"
+        valueKey="value"
+        formControlName="priority"
+      >
+      </lib-segment>
+    </div>
+
+    <div class="f-col mdo-field">
+      <lib-text-line type="xsmall" weight="strong" class="field-label">Workflow template </lib-text-line>
+      <div class="mdo-field-input">
+        <input
+          matInput
+          #inputAutoComplete
+          placeholder="Type to select a template..."
+          [formControl]="workflowTemplateCtrl"
+          [matAutocomplete]="templateList"
+        />
+        <mat-icon matSuffix fontSet="mdo-icons-light" class="autocomplete-icon" prosClickStopPropagation>
+          chevron-down
+        </mat-icon>
+        <mat-autocomplete
+          class="mdo-autocomplete"
+          #templateList="matAutocomplete"
+          [displayWith]="displayTemplateDetail"
+          (optionSelected)="selectedTemplate($event)"
+        >
+          <ng-template [ngIf]="(workflowTemplateListObs | async)?.length !== 0" [ngIfElse]="noOption">
+            <mat-option
+              class="mdo-option"
+              *ngFor="let templateDetail of workflowTemplateListObs | async"
+              [value]="templateDetail"
+            >
+              {{ templateDetail?.templateName }}
+            </mat-option>
+          </ng-template>
+          <ng-template #noOption>
+            <mat-option disabled>No data found</mat-option>
+          </ng-template>
+        </mat-autocomplete>
+      </div>
+    </div>
+  </form>
+</mat-expansion-panel>

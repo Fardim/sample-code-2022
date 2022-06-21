@@ -1,0 +1,16 @@
+<div class="modal-wrapper">
+    <div class="f-row modal-header">
+        <lib-text-line type="leading" i18n="@@save_filter_as">Save filter as...</lib-text-line>
+        <lib-button type="plain" iconFontType="light" (click)="close(false)" icon="times"></lib-button>
+    </div>
+    <div class="modal-body">
+        <lib-input i18n-label="@@filter_name" label="Filter name" [hasError]="submitted && nameControl.invalid"
+            [hint]="submitted && nameControl.invalid ? 'filter name is required' :''" [formControl]="nameControl">
+        </lib-input>
+    </div>
+    <div class="f-row modal-footer space-between">
+        <lib-button type="plain" (click)="close(false)" i18n="@@cancel"> Cancel </lib-button>
+        <span class="f-spacer"></span>
+        <lib-button type="major" (click)="close(true)" i18n="@@save">Save</lib-button>
+    </div>
+</div>

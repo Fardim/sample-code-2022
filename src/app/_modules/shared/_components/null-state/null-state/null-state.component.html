@@ -1,0 +1,10 @@
+<div class="f-col state-container">
+    <div><img [src]="iconPath" [width]="iconWidth"></div>
+    <lib-text-line [enableWrap]="true" type="leading" class="spacer">{{subtext}}</lib-text-line>
+    <lib-text-line [enableWrap]="true" type="base" textColor="secondary" class="spacer">{{message}}</lib-text-line>
+    <div class="f-row action-button" *ngIf="button">
+        <button mat-flat-button color="accent" (click)="emitAction()">
+            <mat-icon *ngIf="button && button.icon" fontSet="mdo-icons">{{button.icon}}</mat-icon> {{button.text}}
+        </button>
+    </div>
+</div>

@@ -1,0 +1,20 @@
+<mat-card class="root mat-elevation-z0">
+    <div class="modal-wrapper">
+        <div class="f-row modal-header">
+            <lib-text-line type="leading">Confirmation</lib-text-line>
+            <lib-button type="plain" (click)="close(false)" iconFontType="light" icon="times"></lib-button>
+        </div>
+
+        <div class="modal-body">
+            <lib-text-line type="base" [enableWrap]="true">{{data ? data.label : 'Are you sure you want to delete
+                this?'}}
+            </lib-text-line>
+        </div>
+
+        <div class="f-row modal-footer space-between">
+            <lib-button type="minor" width="80px" (click)="close(false)">No</lib-button>
+            <span class="f-spacer"></span>
+            <lib-button type="major" width="80px" (click)="close(true)">Yes</lib-button>
+        </div>
+    </div>
+</mat-card>

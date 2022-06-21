@@ -1,0 +1,111 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  width: 668px;
+
+  .breadcrum-toolbar {
+    padding: 8px 16px;
+
+    .mdo-constrained-right {
+      width: 100%;
+      align-items: center;
+
+      .breadcrum-head {
+        align-items: center;
+        width: 100%;
+        min-height: 36px;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px);
+    overflow: auto;
+
+    .mdo-justify {
+      height: 100%;
+      margin: 0 16px;
+
+      mat-slide-toggle {
+        margin: 4px 8px;
+      }
+
+      .collaborators-list {
+        height: calc(100% - 40px - 70px - 8px - 220px);
+        overflow-y: auto;
+      }
+
+      .chip-enable-coll-list {
+        height: calc(100% - 40px - 70px - 8px - 264px);
+      }
+
+      .collaborators-add {
+        justify-content: end;
+        height: 236px;
+
+        .selected-coll-groups {
+          margin: 8px 0;
+          align-items: center;
+          justify-content: flex-start;
+
+          mat-chip-list {
+            width: calc(100% - 80px);
+
+            mat-chip {
+              min-width: 120px;
+              justify-content: space-between;
+              max-width: 170px;
+              height: 30px;
+
+              .chip-content {
+                width: calc(100% - 36px);
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: pre-line;
+                word-break: break-word;
+                margin-left: 8px;
+              }
+
+              .icon-user {
+                color: #0d66d0;
+              }
+
+              .icon-role {
+                color: #cb6f10;
+              }
+
+              .icon-group {
+                color: #12805c;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    .permissions {
+      justify-content: space-between;
+      font-size: 0.8rem;
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 66px;
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+div.root {
+  position: relative;
+  justify-content: center;
+  height: 100%;
+  user-select: text;
+  align-items: center;
+
+  .close-button {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+  }
+
+  .action-login {
+    display: flex;
+  }
+}

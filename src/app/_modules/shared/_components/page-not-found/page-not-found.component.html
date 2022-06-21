@@ -1,0 +1,26 @@
+<div class="wrapper404">
+    <div class="row">
+        <div>
+            <span class="sorry" i18n="@@weAreSorry">WE ARE SORRY</span>
+            <span class="code">404</span>
+            <div class="buttons">
+                <button mat-icon-button routerLink="/home">
+                    <mat-icon>home</mat-icon>
+                </button>
+                <button mat-flat-button (click)="back()" i18n="@@goBack">Go Back</button>
+            </div>
+        </div>
+        <div>
+            <span class="nopage" i18n="@@404msg">We couldn't find the page you were looking for</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="f-spacer"></div>
+        <button mat-icon-button>
+            <mat-icon>gavel</mat-icon>
+        </button>
+        <button mat-icon-button>
+            <mat-icon>gavel</mat-icon>
+        </button>
+    </div>
+</div>

@@ -1,0 +1,18 @@
+<div class="f-col root">
+  <lib-text-line type="base" class="field-label">Select a dashboard</lib-text-line>
+  <div class="mdo-field-input">
+    <mat-form-field appearance="outline">
+      <input matInput  [matAutocomplete]="ruleTypeAuto" [formControl]="reportCtrl"/>
+      <mat-autocomplete class="mdo-autocomplete" #ruleTypeAuto="matAutocomplete" [displayWith]="displayRuleFn.bind(this)" (optionSelected)="onSelect($event)">
+          <mat-option class="mdo-option" *ngIf="!reportList.length" disabled>
+              Result Not Found
+          </mat-option>
+          <ng-container *ngFor="let report of reportList">
+              <mat-option class="mdo-option" [value]="report">
+                  {{ report.reportName }}
+              </mat-option>
+          </ng-container>
+      </mat-autocomplete>
+    </mat-form-field>
+  </div>
+</div>

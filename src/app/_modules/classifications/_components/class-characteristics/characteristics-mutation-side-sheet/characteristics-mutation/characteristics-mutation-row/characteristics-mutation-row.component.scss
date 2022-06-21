@@ -1,0 +1,98 @@
+form {
+  display: flex;
+  padding: 6px 0;
+
+  .col {
+    display: flex;
+    flex: 1 0 auto;
+    width: 1px;
+    align-items: center;
+    margin: 0 2px;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    &.col-x1_5 {
+      flex: 1.5;
+
+      &.f-left {
+        justify-content: unset;
+        padding-left: 25px;
+      }
+    }
+
+    &.col-x2 {
+      flex: 2;
+    }
+
+    &.col-x2_5 {
+      flex: 2.5;
+    }
+
+    &.col-x3 {
+      flex: 3;
+    }
+
+    &.col-x4 {
+      flex: 4;
+    }
+
+    &.col-x5 {
+      flex: 5;
+    }
+
+    &.col-x8 {
+      flex: 8;
+    }
+
+    &.col-x9 {
+      flex: 9;
+    }
+
+    .mat-item-end {
+      justify-content: flex-end;
+    }
+
+    .mdo-field {
+      margin-bottom: 0;
+    }
+
+    .lib-input,
+    .date-picker {
+      display: flex;
+      height: 36px;
+    }
+  }
+
+  .form-lib-button-group {
+    padding-left: 10px;
+  }
+}
+
+.file-name {
+  max-width: 150px;
+}
+
+.import-files {
+  padding-right: 10px;
+
+  .drag-input {
+    position: absolute;
+    width: 100%;
+    opacity: 0;
+  }
+
+  .cursor {
+    cursor: pointer;
+  }
+}
+
+.p-right-25 {
+  padding-right: 25px;
+}
+
+.text-editor {
+  pros-rich-text-editor {
+    margin-top: 10px;
+    width: 100%;
+  }
+}

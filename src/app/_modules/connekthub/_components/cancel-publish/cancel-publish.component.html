@@ -1,0 +1,28 @@
+<div class="modal-wrapper root">
+    <div class="f-row modal-header">
+        <lib-text-line type="leading" [enableWrap]="true">Alert</lib-text-line>
+        <lib-button icon="times" (click)="close()"></lib-button>
+    </div>
+
+    <div class="modal-body" *ngIf="loginForm">
+        <pros-connekthub-login (hasLogined)="loginForm = false">
+        </pros-connekthub-login>
+    </div>
+
+    <div class="f-row modal-body" *ngIf="!loginForm">
+        <lib-button [sizeLarge]="true" [rounded]="true" icon="exclamation" iconFontType="solid" type="major">
+        </lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col">
+            <lib-text-line type="base">The dashboard is under review. We will notify you when it is published.
+            </lib-text-line>
+            <div class="row-spacer"></div>
+            <lib-text-line type="base">Are you sure you want to cancel publishing this?</lib-text-line>
+        </div>
+    </div>
+    <div class="f-row modal-footer" *ngIf="!loginForm">
+        <lib-button (click)="close()">No</lib-button>
+        <div class="f-spacer"></div>
+        <lib-button type="major" (click)="cancel()">Yes</lib-button>
+    </div>
+</div>

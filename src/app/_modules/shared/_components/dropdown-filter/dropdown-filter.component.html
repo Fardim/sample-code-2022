@@ -1,0 +1,61 @@
+<!-- single select example -->
+<div class="f-col mdo-field">
+  <!-- label -->
+  <mat-label class="mdo-field-label" *ngIf="!!label">{{ label }}</mat-label>
+  <!-- input container -->
+  <div
+    class="mdo-field-input"
+    [matMenuTriggerFor]="selectMenu"
+    (menuOpened)="menuOpenedState = true"
+    (menuClosed)="menuOpenedState = false"
+  >
+    <div class="f-row">
+      <ng-container *ngIf="!!selectedLabel; else placeholderText">
+        <lib-text-line [enableWrap]="false" class="text" type="base" textColor="primary">{{ selectedLabel }}</lib-text-line>
+      </ng-container>
+      <ng-template #placeholderText>
+        <lib-text-line [enableWrap]="false" class="text" type="base" textColor="secondary">{{ placeholder }}</lib-text-line>
+      </ng-template>
+
+      <mat-icon class="suffix-icon" [fontSet]="fontSet">{{ suffixIcon }}</mat-icon>
+    </div>
+  </div>
+
+  <mat-menu #selectMenu>
+      <div class="dropdown-search-wrapper" prosClickStopPropagation>
+        <lib-search placeholder="Search" [formControl]="optionsControl"></lib-search>
+      </div>
+      <div class="dropdown-options-wrapper f-col">
+        <!-- When using virtual scroll this DIV can be replaced by cdk-virtual-scroll-viewport -->
+        <div class="dropdown-options-inner-container" prosClickStopPropagation>
+          <!-- for specifying a default selection -->
+          <div class="default-options">
+            <lib-filter-option>
+              <lib-checkbox label="All" [checked]="options?.length === selectedOptionsList?.length"></lib-checkbox>
+            </lib-filter-option>
+            <div class="separator">
+              <mat-divider></mat-divider>
+            </div>
+          </div>
+          <!-- separate section for selected options -->
+          <div class="options">
+            <lib-filter-option *ngFor="let option of selectedOptionsList">
+              <lib-checkbox [label]="option[labelKey] || 'Untitled'" [checked]="true"></lib-checkbox>
+            </lib-filter-option>
+          </div>
+          <!-- separating the checked options from the unchecked ones -->
+          <div class="separator" *ngIf="selectedOptionsList?.length">
+            <mat-divider></mat-divider>
+          </div>
+          <!-- separate section for selected options -->
+          <div class="options">
+            <lib-filter-option *ngFor="let option of filteredOptionsList | async">
+              <lib-checkbox [label]="option[labelKey] || 'Untitled'" (valueChange)="selectOption($event, option)"></lib-checkbox>
+            </lib-filter-option>
+          </div>
+        </div>
+      </div>
+  </mat-menu>
+  <!-- hint -->
+  <mat-hint class="mdo-field-hint" *ngIf="!!hint">{{hint}}</mat-hint>
+</div>

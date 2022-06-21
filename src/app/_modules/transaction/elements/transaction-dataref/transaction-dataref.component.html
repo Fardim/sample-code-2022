@@ -1,0 +1,136 @@
+<div class="f-row">
+  <lib-checkbox [formControl]="copyField" *ngIf="process === 'copy'" class="copy-box"></lib-checkbox>
+  <div class="f-col w-100">
+    <lib-text-line type="xsmall" weight="strong" class="field-label" [ngClass]="{ 'required-field': isRequired }"
+      >{{ fieldObj?.fieldCtrl?.description }}
+    </lib-text-line>
+    <input [formControl]="control" type="hidden" />
+    <div prosCorrectedValue [displayValue]="oldValue" useWith="withSuffix" [isMultiSelect]="!allowSingleSelect">
+      <div class="f-col mdo-field">
+        <ng-template [ngIf]="allowSingleSelect" [ngIfElse]="elseBlock">
+          <div class="f-row">
+            <div class="mdo-field-input multi-select f-row">
+              <input
+                matInput
+                placeholder="Select Any One..."
+                #optionsInput
+                [disabled]="isFieldReadOnly || isNewRefRecordExists"
+                [matAutocomplete]="optionsAutoComp"
+                #autocompleteTrigger="matAutocompleteTrigger"
+                (keyup)="searchOption($event.target.value)"
+                (focus)="inputFocus()"
+              />
+              <mat-autocomplete
+                class="mdo-autocomplete"
+                #optionsAutoComp="matAutocomplete"
+                [displayWith]="formatValue.bind(this)"
+                (optionSelected)="selected($event, true)"
+              >
+                <mat-option class="mdo-option" *ngFor="let data of optionList | async" [value]="data"
+                  >{{ data.id }}
+                </mat-option>
+              </mat-autocomplete>
+              <ng-template [ngIf]="selectedOptions.length == 1">
+                <!-- <mat-icon (click)="clear(false)">close</mat-icon> -->
+                <lib-button
+                  *ngIf="!newRecordDetails"
+                  matSuffix
+                  [disabled]="isFieldReadOnly || newRecordDetails"
+                  (afterClick)="clear(false)"
+                  icon="times"
+                  iconFontType="light"
+                >
+                </lib-button>
+              </ng-template>
+              <lib-button
+                [disabled]="newRecordDetails || isFieldReadOnly"
+                icon="external-link-alt"
+                iconFontType="light"
+                class="lib-button"
+                matSuffix
+                prosClickStopPropagation
+                (afterClick)="openFilterModal()"
+              ></lib-button>
+            </div>
+            <span class="f-col-spacer-half"></span>
+            <lib-button-group>
+              <!-- <lib-button icon="filter" iconFontType="light" type="minor" [disabled]="isFieldReadOnly" (afterClick)="openFilterModal()"></lib-button> -->
+              <lib-button
+                *ngIf="!newRecordDetails && !isRecordExists && !isFieldReadOnly && isPlusShouldVisiable"
+                icon="plus"
+                iconFontType="light"
+                type="plain"
+                [rounded]="true"
+                (click)="addReferenceRecord()"
+                libTooltip="New record"
+              ></lib-button>
+
+              <lib-button
+                type="plain"
+                *ngIf="newRecordDetails"
+                icon="eye"
+                iconFontType="light"
+                libTooltip="View record"
+                (click)="viewReferenceRecord()"
+              ></lib-button>
+            </lib-button-group>
+          </div>
+        </ng-template>
+        <ng-template #elseBlock>
+          <div class="f-row">
+            <mat-form-field appearance="outline" class="multi-select" [disabled]="isFieldReadOnly">
+              <mat-chip-list class="f-row field-chip-list" #chipList>
+                <lib-chip
+                  *ngFor="let field of selectedOptions; let i = index"
+                  [removable]="!isFieldReadOnly"
+                  class="lib-chip"
+                  (removed)="remove(i)"
+                >
+                  {{ field.id }}
+                </lib-chip>
+                <input
+                  matInput
+                  [placeholder]="selectedOptions.length === 0 ? 'Select...' : null"
+                  #optionsInput
+                  [disabled]="isFieldReadOnly"
+                  #autocompleteTrigger="matAutocompleteTrigger"
+                  class="mat-input"
+                  [matAutocomplete]="auto"
+                  [matChipInputFor]="chipList"
+                  (keyup)="searchOption($event.target.value)"
+                  (focus)="inputFocus()"
+                />
+              </mat-chip-list>
+              <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event, false)">
+                <mat-option *ngFor="let opt of optionList | async" [value]="opt">
+                  <lib-checkbox [checked]="isItemChecked(opt)" [disabled]="isFieldReadOnly" [label]="opt.id">
+                  </lib-checkbox>
+                </mat-option>
+              </mat-autocomplete>
+              <lib-button
+                icon="external-link-alt"
+                iconFontType="light"
+                class="lib-button"
+                matSuffix
+                prosClickStopPropagation
+                (afterClick)="openFilterModal()"
+              >
+              </lib-button>
+            </mat-form-field>
+            <span class="f-col-spacer-half"></span>
+            <lib-button-group>
+              <lib-button
+                icon="plus"
+                iconFontType="light"
+                type="plain"
+                [rounded]="true"
+                (click)="addReferenceRecord()"
+                libTooltip="New record"
+              ></lib-button>
+            </lib-button-group>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

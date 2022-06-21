@@ -1,0 +1,62 @@
+<div class="root">
+    <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" [expanded]="menuToggle">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                <div class="title-container">
+                    <lib-text-line class="title" [title]="item?.description" textColor="primary" [enableWrap]="false">
+                        <div [innerHTML]="item?.description | highlight: control?.value">
+                            {{item?.description}}
+                        </div>
+                    </lib-text-line>
+                    <lib-text-line textColor="secondary">1:1</lib-text-line>
+                </div>
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <ng-container *ngFor="let field of filteredFields | async; trackBy: trackSourceItem;">
+            <ng-container *ngIf="field?.childfields?.length>0; else fieldWithoutChildrens">
+                  <div class="f-row">
+                    <div class="f-col-spacer-half"></div>
+                    <pros-source-section
+                        class="source-section"
+                        [item]="field"
+                        [control]="control"
+                        [menuToggle]="menuToggle"
+                        [currentMapping]="currentMapping"
+                        [existingMapping]="existingMapping"
+                        (sourceSelected)="selectSourceField($event)"
+                        (dragReleased)="dragReleasedEvent()"
+                        (showTargets)="showMappedTargets($event)">
+                    </pros-source-section>
+                  </div>
+            </ng-container>
+
+            <ng-template #fieldWithoutChildrens>
+                <!-- Source fields list -->
+                <div class="source-field-item"
+                    (mouseenter)="cursorState = field.fieldId;"
+                    (mouseleave)="cursorState = null;"
+                    *ngIf="isFieldOrHeaderMatching(field)">
+
+                    <pros-source-field *ngIf="field" class="source-field"
+                        [searchTerm]="control?.value"
+                        [name]="getSourceFieldDescription(field)"
+                        [hasMapping]="fieldHasMapping(field.fieldId)"
+                        [id]="field.fieldId"
+                        (click)="showMappedTargets(field.fieldId)"
+                        [selected]="isSelected(field.fieldId)">
+                    </pros-source-field>
+
+                    <span class="source-drag-handle" [style.transform]="'none'" *ngIf="showBadge(fieldHasMapping(field.fieldId),field.fieldId)"
+                        (cdkDragStarted)="selectSourceField(field)"
+                        (cdkDragReleased)="dragReleasedEvent()"
+                        cdkDrag>
+                        <i class="mdo-icons">plus</i>
+                        <span *cdkDragPreview></span>
+                    </span>
+                </div>
+            </ng-template>
+        </ng-container>
+    </mat-expansion-panel>
+
+</div>

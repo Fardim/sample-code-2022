@@ -1,0 +1,75 @@
+<!-- OPEN IN EDIT MODE -->
+<mat-card *ngIf="isEditMode" class="mat-elevation-z3 collaborators-card">
+    <div class="f-row">
+        <ng-template [ngIf] = "collaborator && collaborator.permissionType === 'USER'">
+            <div class="mat-card-avatar"><mat-icon mat-list-icon matTooltip="User" class="icon-user">person</mat-icon></div>
+            <div class="f-col">            
+                <h4 mat-line>{{ collaborator.userMdoModel ? collaborator.userMdoModel.fullName : 'Unknown' }}</h4>
+                <p mat-line>{{ collaborator.userMdoModel ? collaborator.userMdoModel.email : 'Unknown' }}</p>
+            </div>
+        </ng-template>
+
+        <ng-template [ngIf] = "collaborator && collaborator.permissionType === 'GROUP'">
+            <div class="mat-card-avatar"><mat-icon mat-list-icon matTooltip="Group" class="icon-group">group</mat-icon></div>
+            <div class="f-col">            
+                <h4 mat-line>{{ collaborator.groupId }}</h4>
+                <p mat-line>{{ collaborator.groupHeaderModel ? collaborator.groupHeaderModel.description : 'Undescribe' }}</p>
+            </div>
+        </ng-template>
+
+        <ng-template [ngIf] = "collaborator && collaborator.permissionType === 'ROLE'">
+            <div class="mat-card-avatar"><mat-icon mat-list-icon matTooltip="Role" class="icon-role">how_to_reg</mat-icon></div>
+            <div class="f-col">            
+                <h4 mat-line> {{ collaborator.roleId }}</h4>
+                <p mat-line>{{ collaborator.rolesModel ? collaborator.rolesModel.roleDesc : 'Unknown' }}</p>
+            </div>
+        </ng-template>
+
+        <div class="f-spacer"></div>
+        <button mat-icon-button (click)="updateEmit()"><mat-icon class="action-editable">save</mat-icon></button>
+    </div>
+    <div class="f-row permissions" [formGroup]="permissionFrmGrp">
+        <mat-slide-toggle color="primary" formControlName="isAdmin">Admin</mat-slide-toggle>
+        <mat-slide-toggle color="primary" formControlName="isViewer">Viewer</mat-slide-toggle>
+        <mat-slide-toggle color="primary" formControlName="isEditer">Editor</mat-slide-toggle>
+        <mat-slide-toggle color="primary" formControlName="isReviewer">Reviewer</mat-slide-toggle>
+    </div>
+</mat-card>
+
+
+
+<!-- ON VIEW MODE -->
+<mat-card *ngIf="!isEditMode" class="mat-elevation-z0 collaborators-card" (mouseover) ="isEditDisplay = true"  (mouseout) ="isEditDisplay = false">
+    <div class="f-row">
+        <ng-template [ngIf] = "collaborator && collaborator.permissionType === 'USER'">
+            <div class="mat-card-avatar"><mat-icon mat-list-icon matTooltip="User" class="icon-user">person</mat-icon></div>
+            <div class="f-col">            
+                <h4 mat-line>{{ collaborator.userMdoModel ? collaborator.userMdoModel.fullName : 'Unknown' }}</h4>
+                <p mat-line>{{ collaborator.userMdoModel ? collaborator.userMdoModel.email : 'Unknown' }}</p>
+            </div>
+        </ng-template>
+
+        <ng-template [ngIf] = "collaborator && collaborator.permissionType === 'GROUP'">
+            <div class="mat-card-avatar"><mat-icon mat-list-icon matTooltip="Group" class="icon-group">group</mat-icon></div>
+            <div class="f-col">            
+                <h4 mat-line>{{ collaborator.groupId }}</h4>
+                <p mat-line>{{ collaborator.groupHeaderModel ? collaborator.groupHeaderModel.description : 'Undescribe' }}</p>
+            </div>
+        </ng-template>
+
+        <ng-template [ngIf] = "collaborator && collaborator.permissionType === 'ROLE'">
+            <div class="mat-card-avatar"><mat-icon mat-list-icon matTooltip="Role" class="icon-role">how_to_reg</mat-icon></div>
+            <div class="f-col">            
+                <h4 mat-line>{{ collaborator.roleId }}</h4>
+                <p mat-line>{{ collaborator.rolesModel ? collaborator.rolesModel.roleDesc : 'Unknown' }}</p>
+            </div>
+        </ng-template>
+
+
+        <div class="f-spacer"></div>
+        <button mat-icon-button [style.display]="isEditDisplay ? 'block' : 'none'" (click)="isEditMode = true" matTooltip="Edit"><mat-icon class="action-editable">edit</mat-icon></button>
+        <div class="f-col-spacer-half"></div>
+        <button mat-icon-button [style.display]="isEditDisplay ? 'block' : 'none'" (click)="deleteEmit()"><mat-icon class="action-editable" matTooltip="Delete">delete</mat-icon></button>
+    </div>
+</mat-card>
+

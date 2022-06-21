@@ -1,0 +1,64 @@
+<div class="modal-wrapper" *ngIf="schemaFileUploadRes?.log?.length">
+  <div class="f-row modal-header">
+    <lib-text-line type="leading" i18n="@@import_report">Import a schema</lib-text-line>
+    <span class="f-spacer"></span>
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+  </div>
+  <!-- [ngClass]="{'scrollable-modal' : uploadLoader && (isDuplicate || isMissingModule)}" -->
+  <div class="modal-body import-body">
+    <lib-banner *ngIf="errMsg" status="error" [text]="errMsg"></lib-banner>
+    <lib-banner *ngIf="infoMsg" status="info" [text]="infoMsg"></lib-banner>
+    <lib-banner *ngIf="apiFailureMsg" status="error" [text]="apiFailureMsg"></lib-banner>
+    <!-- Table section -->
+    <table mat-table [dataSource]="schemaFileUploadRes.log">
+      <ng-container matColumnDef="message">
+        <th mat-header-cell *matHeaderCellDef><span>Message</span></th>
+        <td mat-cell *matCellDef="let element">{{ element.message }}</td>
+      </ng-container>
+      <ng-container matColumnDef="category">
+        <th mat-header-cell *matHeaderCellDef><span i18n="@@category">Category</span></th>
+        <td mat-cell *matCellDef="let element">
+          <ng-container *ngIf="element.category === 'WARNING'">
+            <lib-label text="Warning" iconFontType="solid" status="warning"></lib-label>
+          </ng-container>
+          <ng-container *ngIf="element.category === 'ERROR'">
+            <lib-label text="Error" iconFontType="solid" status="error"></lib-label>
+          </ng-container>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumnsEror"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumnsEror"></tr>
+    </table>
+    <!-- Table section -->
+  </div>
+  <div class="f-row modal-footer space-between">
+    <lib-button (click)="close()" type="plain">Close</lib-button>
+    <span class="f-spacer"></span>
+    <lib-button-group>
+      <lib-button type="major" *ngIf="isDuplicate" (click)="importSchema(true)">Create a copy</lib-button>
+      <lib-button type="major" *ngIf="isDuplicate" (click)="importSchema(false, true)">Overwrite existing</lib-button>
+      <lib-button type="major" *ngIf="!isDuplicate" [disabled]="errMsg" (click)="importSchema()">Import</lib-button>
+    </lib-button-group>
+  </div>
+</div>
+
+<div class="modal-wrapper" *ngIf="isDuplicate && !schemaFileUploadRes?.log?.length">
+  <div class="f-row modal-header">
+    <lib-text-line type="leading">{{ 'Alert' }}</lib-text-line>
+    <lib-button icon="times" (click)="close()"></lib-button>
+  </div>
+  <lib-banner *ngIf="apiFailureMsg" status="error" [text]="apiFailureMsg"></lib-banner>
+  <div class="f-row modal-body">
+    <lib-button [sizeLarge]="true" [rounded]="true" icon="{{ 'exclamation' }}" iconFontType="solid" type="major"></lib-button>
+    <div class="col-spacer"></div>
+    <lib-text-line type="base">{{ infoMsg }}</lib-text-line>
+  </div>
+  <div class="f-row modal-footer end">
+    <lib-button (click)="close()" type="plain">Close</lib-button>
+    <span class="f-spacer"></span>
+    <lib-button-group>
+      <lib-button type="major" (click)="importSchema(true)">Create a copy</lib-button>
+      <lib-button type="major" (click)="importSchema(false, true)">Overwrite existing</lib-button>
+    </lib-button-group>
+  </div>
+</div>

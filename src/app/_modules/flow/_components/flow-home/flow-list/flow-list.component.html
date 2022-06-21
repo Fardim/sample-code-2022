@@ -1,0 +1,222 @@
+<div #filterContainer class="f-row filter-container" *ngIf="dataLoadersValue?.tableHasData">
+    <lib-search class="lib-search" [formControl]="search" placeholder="Search flows">
+    </lib-search>
+</div>
+    <!-- Start Chip for dataset dropdown-->
+    <!-- <lib-chip type="info" class="mdo-filter-matchip" disableRipple="true" label="Dataset:"
+        [matMenuTriggerFor]="datasetDrop" [removable]="appliedDatasetList.length>0"
+        (removed)="appliedDatasetList = []; apply('DATASETS',true);">
+        {{ brDatasetDesc }}
+    </lib-chip>
+    
+    <mat-menu #datasetDrop="matMenu" xPosition="after" class="filter-menudropdown">
+        <lib-filter-dropdown class="chip-filters">
+           <div class="dropdown-search-wrapper">
+            <lib-search prosClickStopPropagation placeholder="Search..."></lib-search>
+           </div>
+           <div class="dropdown-options-wrapper f-col">
+              <div class="dropdown-options-inner-container">
+                 <div class="options">
+                    <lib-filter-option prosClickStopPropagation *ngFor="let ckbox of filterableDatasetOb | async;">
+                        <lib-checkbox (valueChange)="addFilterFromDataset(ckbox, $event)"
+                        [checked]="isDatasetAppliedChecked(ckbox)"
+                        [label]="ckbox.moduleDesc ? ckbox.moduleDesc : ckbox.moduleId">
+                    </lib-checkbox>
+                    </lib-filter-option>
+                 </div>
+              </div>
+              <div class="filter-button-wrapper">
+                <lib-button type="minor" i18n="@@apply" (click)="apply('DATASETS')">Apply </lib-button>
+              </div>
+           </div>
+        </lib-filter-dropdown>
+     </mat-menu> -->
+
+
+    <!-- Start Chip for status dropdown-->
+    <!-- <lib-chip type="info" class="mdo-filter-matchip" disableRipple="true" label="Status:"
+        [matMenuTriggerFor]="statusDrop">
+        All
+    </lib-chip>
+
+    <mat-menu #statusDrop="matMenu" xPosition="after" class="filter-menudropdown">
+        <lib-filter-dropdown class="chip-filters">
+           <div class="dropdown-search-wrapper">
+            <lib-search prosClickStopPropagation placeholder="Search..."></lib-search>
+           </div>
+           <div class="dropdown-options-wrapper f-col">
+              <div class="dropdown-options-inner-container">
+                 <div class="options">
+                    <lib-filter-option prosClickStopPropagation *ngFor="let ckbox of status">
+                        <lib-checkbox [label]="ckbox"> </lib-checkbox>
+                    </lib-filter-option>
+                 </div>
+              </div>
+              <div class="filter-button-wrapper">
+                <lib-button type="minor" i18n="@@apply">Apply </lib-button>
+              </div>
+           </div>
+        </lib-filter-dropdown>
+     </mat-menu> -->
+
+    <!-- Start Chip for form dropdown-->
+    <!-- <lib-chip type="info" class="mdo-filter-matchip" disableRipple="true" label="Form:" [matMenuTriggerFor]="formDrop">
+        All
+    </lib-chip>
+
+    <mat-menu #formDrop="matMenu" xPosition="after" class="filter-menudropdown">
+        <lib-filter-dropdown class="chip-filters">
+           <div class="dropdown-search-wrapper">
+            <lib-search prosClickStopPropagation placeholder="Search..."></lib-search>
+           </div>
+           <div class="dropdown-options-wrapper f-col">
+              <div class="dropdown-options-inner-container">
+                 <div class="options">
+                    <lib-filter-option prosClickStopPropagation>
+                    </lib-filter-option>
+                 </div>
+              </div>
+              <div class="filter-button-wrapper">
+                <lib-button type="minor" i18n="@@apply">Apply </lib-button>
+              </div>
+           </div>
+        </lib-filter-dropdown>
+     </mat-menu> -->
+
+    <!-- Start for business rule type filter .. -->
+    <!-- <lib-chip type="info" class="mdo-filter-matchip" [matMenuTriggerFor]="businessRuleType" label="Business rule:"
+        [removable]="appliedBrList.length>0" (removed)="appliedBrList = []; apply('BRTYPE',true);">
+        {{ brRuleFilterDesc }}
+    </lib-chip>
+    <mat-menu #businessRuleType="matMenu" xPosition="after" class="filter-menudropdown">
+        <lib-filter-dropdown class="chip-filters">
+           <div class="dropdown-search-wrapper">
+            <lib-search prosClickStopPropagation placeholder="Search..."></lib-search>
+           </div>
+           <div class="dropdown-options-wrapper f-col">
+              <div class="dropdown-options-inner-container">
+                 <div class="options">
+                    <lib-filter-option prosClickStopPropagation *ngFor="let ckbox of filterableRulesOb | async">
+                        <lib-checkbox (valueChange)="addFilterFromBrRule(ckbox, $event)" [libTooltip]="ckbox.ruleDesc"
+                        [checked]="isBrAppliedChecked(ckbox)" [label]="ckbox.ruleDesc ? ckbox.ruleDesc : ''">
+                    </lib-checkbox>
+                    </lib-filter-option>
+                 </div>
+              </div>
+              <div class="filter-button-wrapper">
+                <lib-button type="minor" i18n="@@apply" (click)="apply('BRTYPE')">Apply</lib-button>
+              </div>
+           </div>
+        </lib-filter-dropdown>
+     </mat-menu> -->
+
+    <!-- Start Chip for modified-by dropdown-->
+    <!-- <lib-chip type="info" class="mdo-filter-matchip" disableRipple="true" label="Modified by:"
+        [matMenuTriggerFor]="modifiedByDrop">
+        All
+    </lib-chip>
+    <mat-menu #modifiedByDrop="matMenu" xPosition="after" class="filter-menudropdown">
+        <lib-filter-dropdown class="chip-filters">
+           <div class="dropdown-search-wrapper">
+            <lib-search prosClickStopPropagation placeholder="Search..."></lib-search>
+           </div>
+           <div class="dropdown-options-wrapper f-col">
+              <div class="dropdown-options-inner-container">
+                 <div class="options">
+                    <lib-filter-option prosClickStopPropagation>
+                    </lib-filter-option>
+                 </div>
+              </div>
+              <div class="filter-button-wrapper">
+                <lib-button type="minor" i18n="@@apply">Apply </lib-button>
+              </div>
+           </div>
+        </lib-filter-dropdown>
+     </mat-menu>
+</div> -->
+
+<div class="f-row empty-block" *ngIf="dataSource.length === 0 && search.value">
+    <lib-empty-state primaryText="Nothing to see here" 
+        secondaryText="Your search does not return any results, try modifying your search" icon="search">
+    </lib-empty-state>
+</div>
+
+<div class="f-col flow-listing" #tableContainer *ngIf="dataSource.length > 0">
+    <table mat-table [dataSource]="dataSource" #table matSort>
+        <!-- <ng-container matColumnDef="_row_sel" sticky>
+            <th mat-header-cell *matHeaderCellDef>
+                <lib-checkbox>
+                </lib-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+                <lib-checkbox>
+                </lib-checkbox>
+            </td>
+        </ng-container> -->
+
+        <ng-container matColumnDef="flow" sticky>
+            <th mat-header-cell *matHeaderCellDef>
+                <div mat-sort-header>Flow</div>
+            </th>
+            <td mat-cell *matCellDef="let element">
+                <lib-text-line [textColor]="'link'" class="cursor" (click)="openSidesheet(element)">
+                    {{ element.name }}
+                </lib-text-line>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="reference_datasets">
+            <th mat-header-cell *matHeaderCellDef>
+                <div mat-sort-header> Reference datasets </div>
+            </th>
+            <td mat-cell *matCellDef="let element">
+                {{ element.refrenceDataSets?element.refrenceDataSets:'' }}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef>
+                <div mat-sort-header> Status</div>
+            </th>
+            <td mat-cell *matCellDef="let element">
+                <label [ngClass]="{'flow-status_confirm': element.status === 'Configured', 'flow-status_warning' : element.status === 'Not configured',
+                'flow-status_error' : element.status === 'Not defined','flow-status':true }" class="flow-status">{{
+                    element.status?element.status:'' }}</label>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="created">
+            <th mat-header-cell *matHeaderCellDef>
+                <div mat-sort-header> Created</div>
+            </th>
+            <td mat-cell *matCellDef="let element">
+                {{ element.created?element.created:'' }}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="last_modified">
+            <th mat-header-cell *matHeaderCellDef>
+                <div mat-sort-header> Last modified</div>
+            </th>
+            <td mat-cell *matCellDef="let element">
+                {{ element.last_modified?element.last_modified:'' }}
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="modified_by">
+            <th mat-header-cell *matHeaderCellDef>
+                <div mat-sort-header> Modified by</div>
+            </th>
+            <td mat-cell *matCellDef="let element">
+                {{ element.modified_by?element.modified_by:'' }}
+            </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedFields; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedFields;"></tr>
+    </table>
+</div>
+<!-- <div class="f-row">
+    <lib-pagination></lib-pagination>
+    <lib-text-line type="base" textColor="secondary">1-50 of 112</lib-text-line>
+</div> -->

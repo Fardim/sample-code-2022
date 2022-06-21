@@ -1,0 +1,250 @@
+<div class="f-col root">
+  <div class="f-row breadcrum-toolbar" *ngIf="tableHasData">
+    <lib-text-line type="leading" enableWrap="true">{{node | titlecase}}</lib-text-line>
+  </div>
+  <div class="f-col breadcrum-toolbar" *ngIf="!tableHasData && showSkeleton">
+    <pros-skeleton-title></pros-skeleton-title>
+  </div>
+
+  <div class="f-row" *ngIf="tableHasData">
+    <lib-chip-list class="filters-list">
+      <lib-search placeholder="Search tasks" class="lib-search"></lib-search>
+      <ng-container *ngFor="let chip of currentNodeFilterChips">
+        <lib-chip-list>
+          <lib-chip *ngIf="chip.hasMenu; else noMenu" [label]="chip.fldId + ':' " [matMenuTriggerFor]="filterMenu"
+            (click)="!chip.hasMenu ? setChipValue(chip, 'true') : null" (menuOpened)="getOptions(chip.fldId)"
+            type="info">{{ chip.hasMenu ?
+            ' ' : '' }}{{ chip.hasMenu ? (chip.value.length > 0 ? chip.value.join(', ') : 'All') : '' }}</lib-chip>
+          <ng-template #noMenu>
+            <lib-chip [label]="chip.fldId" (click)="!chip.hasMenu ? setChipValue(chip, 'true') : null"
+              [selectable]="true" [selected]="chip.value.includes('true') && !chip.hasMenu">{{ chip.hasMenu ? ': ' : ''
+              }}{{ chip.hasMenu ?
+              (chip.value.length > 0 ? chip.value.join(', ') : 'All') : '' }}</lib-chip>
+          </ng-template>
+        </lib-chip-list>
+        <mat-menu #filterMenu="matMenu" xPosition="after" class="filter-menudropdown">
+          <lib-filter-dropdown *ngIf="chip?.hasMenu" class="mix-filter-dropdown">
+            <div class="dropdown-search-wrapper">
+              <lib-search #searchInput prosClickStopPropagation (valueChange)="filterModulesMenu($event, chip.fldId)"
+                placeholder="Search">
+              </lib-search>
+            </div>
+            <div class="dropdown-options-wrapper f-col">
+              <div class="dropdown-options-inner-container">
+                <div class="default-options">
+                  <lib-filter-option>
+                    <lib-checkbox label="All" [checked]="chip.value.length <= 0"
+                      (valueChange)="selectAllChipValue(chip)"></lib-checkbox>
+                  </lib-filter-option>
+                  <lib-section></lib-section>
+                </div>
+                <div class="options">
+                  <ng-template [ngIf]="chip.fldId === 'Requestedby' || chip.fldId === 'Sent'"
+                    [ngIfElse]="defaultOptionTemplate">
+                    <ng-template [ngIf]="(requestedByList | async)?.length > 0" [ngIfElse]="emptyState">
+                      <lib-filter-option prosClickStopPropagation (click)="setChipValue(chip, item)"
+                        *ngFor="let item of requestedByList | async">
+                        <lib-checkbox [label]="item.firstName" prosClickStopPropagation
+                          (valueChange)="setChipValue(chip, item.firstName)"
+                          [checked]="chip.value.indexOf(item.firstName) >= 0"></lib-checkbox>
+                      </lib-filter-option>
+                    </ng-template>
+                    <ng-template #emptyState>
+                      <div class="empty-state">
+                          <lib-empty-state primaryText="Nothing to see here" secondaryText="Your search did not return any results, try modifying your search"
+                              icon="table" iconSize="100">
+                          </lib-empty-state>
+                      </div>
+                  </ng-template>
+                  </ng-template>
+                  <ng-template #defaultOptionTemplate>
+                    <lib-filter-option prosClickStopPropagation (click)="setChipValue(chip, item)"
+                      *ngFor="let item of filteredNodeChipsMenuItems[chip.fldId]">
+                      <lib-checkbox [label]="item" prosClickStopPropagation (valueChange)="setChipValue(chip, item)"
+                        [checked]="chip.value.indexOf(item) >= 0"></lib-checkbox>
+                    </lib-filter-option>
+                  </ng-template>
+
+                </div>
+              </div>
+            </div>
+          </lib-filter-dropdown>
+        </mat-menu>
+      </ng-container>
+      <lib-chip class="mdo-filter-matchip list-table filter-pill"
+        [libBadge]="sideSheetFilterData ? sideSheetFilterData.length || '' : ''" (click)="openFilterSettingsPanel()">
+        <mat-icon fontSet="mdo-icons-light">filter</mat-icon>
+      </lib-chip>
+      <lib-chip class="mdo-filter-matchip filter-pill">
+        <mat-icon fontSet="mdo-icons" [matMenuTriggerFor]="filterActions" (menuOpened)="getAllFilters()">ellipsis-h
+        </mat-icon>
+        <mat-menu #filterActions="matMenu" xPosition="before" class="navigation-menu">
+          <button mat-menu-item (click)="filterSaveAs()"> Save as... </button>
+          <button mat-menu-item (click)="resetFilter()"> Reset </button>
+          <lib-section>Saved filter</lib-section>
+          <ng-template [ngIf]="(savedFilterList | async)?.length > 0" [ngIfElse]="emptyState">
+            <ng-container *ngFor="let filterDet of savedFilterList | async">
+              <ng-template [ngIf]="activeFilterId !== filterDet.taskFilterId" [ngIfElse]="activeFilter">
+                <button mat-menu-item>
+                  <div class="f-row">
+                    <lib-text-line type="base" (click)="setActiveFilter(filterDet.taskFilterId)">{{
+                      filterDet.taskFilterName }}
+                    </lib-text-line>
+                    <span class="f-spacer"></span>
+                    <a (click)="deleteTaskListFilter(filterDet.taskFilterId)" class="cursor"><mat-icon fontSet="mdo-icons-light">times</mat-icon></a>
+                  </div>
+                  
+                  <!-- <a (click)="deleteTaskListFilter(filterDet.taskFilterId)"><mat-icon fontSet="mdo-icons-light">times</mat-icon></a> -->
+                </button>
+              </ng-template>
+              <ng-template #activeFilter>
+                <button mat-menu-item [focus]="false" class="no-data-text">{{ filterDet.taskFilterName }}</button>
+              </ng-template>
+            </ng-container>
+          </ng-template>
+          <ng-template #emptyState>
+            <button mat-menu-item [focus]="false" class="no-data-text">No data</button>
+          </ng-template>
+        </mat-menu>
+      </lib-chip>
+    </lib-chip-list>
+  </div>
+
+  <div class="row-spacer"></div>
+
+  <div class="f-col table-loader" *ngIf="showSkeleton">
+  <lib-skeleton-table></lib-skeleton-table>
+  </div>
+
+  <div class="f-row" *ngIf="!showSkeleton">
+
+    <lib-text-line type="base" textColor="secondary" *ngIf="selection.hasValue()">
+      {{ selection.selected?.length }} of {{tableDataTotalCount}} records selected.
+    </lib-text-line>
+  </div>
+
+  <div class="task-inbox" [ngStyle]="{ 'display':!tableDataTotalCount ? 'none' : '' }">
+    <table [ngStyle]="{ 'display': showSkeleton ? 'none' : '' }" mat-table [dataSource]="dataSource"
+      class="mat-elevation-z0">
+      <!-- Checkbox Column -->
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef>
+          <lib-checkbox-option [menuOptions]="CheckboxOptions" (valueChange)="masterToggle($event)"
+            [checked]="selection.hasValue()&& isAllSelected()"
+            [indeterminate]="selection.hasValue()  && !isAllSelected()"></lib-checkbox-option>
+            
+        </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="{'row-higlight' : element['READ'] === 'true'}">
+          <lib-checkbox (valueChange)="selection.toggle(element)" [checked]="selection.isSelected(element)"
+            [aria-label]="checkboxLabel(element)"></lib-checkbox>
+        </td>
+      </ng-container>
+
+      <!-- Setting Column -->
+      <ng-container matColumnDef="setting">
+        <th mat-header-cell *matHeaderCellDef>
+          <lib-button icon="cog" iconFontType="light" (click)="openTableViewSettings()"></lib-button>
+        </th>
+        <td mat-cell *matCellDef="let element" [ngClass]="{'row-higlight' : element['READ'] === 'true'}">
+          <lib-button-group>
+            <lib-button *ngIf="isRowActionVisible" type="minor" icon="ellipsis-h" [matMenuTriggerFor]="rowActions">
+            </lib-button>
+            <lib-button type="minor" [iconFontType]="element['BMKD'] === 'true' ? 'solid' : 'light' " icon="star"
+              (click)="handleRowStatusDetail('bookmark', element)"></lib-button>
+            <!-- <lib-button type="minor" iconFontType="light" icon="comment-alt"></lib-button> -->
+          </lib-button-group>
+          <mat-menu #rowActions="matMenu" xPosition="before" class="navigation-menu">
+            <button *ngIf="node === 'inbox'" mat-menu-item (click)="getFlowListOptions(element)"> Approve </button>
+            <button mat-menu-item (click)="viewProcessLog(element)"> Process log </button>
+          </mat-menu>
+        </td>
+      </ng-container>
+
+      <!-- Records Column -->
+      <ng-container matColumnDef="Records">
+        <th mat-header-cell *matHeaderCellDef>Record</th>
+        <td mat-cell *matCellDef="let element" [ngClass]="{'row-higlight' : element['READ'] === 'true'}"
+          (click)="handleRowStatusDetail('rowClick', element)">
+          <lib-text-line type="base" textColor="link" prosClickStopPropagation (click)="getFlowListOptions(element)"
+            [ngClass]="{'info-link': isRowActionVisible}">
+            {{ element.staticFieldsVal && element.staticFieldsVal.OBJECT_NUMBER }}
+          </lib-text-line>
+        </td>
+      </ng-container>
+
+      <!-- dynamic columns -->
+      <ng-template ngFor let-dynCol [ngForOf]="displayedColumns" let-i="index">
+        <ng-template [ngIf]="isStaticCol(dynCol)" [ngIfElse]="dynamic"> </ng-template>
+        <ng-template #dynamic>
+          <ng-container [matColumnDef]="dynCol">
+            <th mat-header-cell *matHeaderCellDef class="sort-container">
+              {{ getFieldDesc(dynCol) }}
+              <span class="col-spacer"></span>
+              <mat-icon fontSet="mdo-icons-light"> sort </mat-icon>
+            </th>
+            <td mat-cell *matCellDef="let element"
+              [ngClass]="{'row-higlight' : element['READ'] === 'true', 'row-unread': (element['READ'] !== 'true' && i === 3)}"
+              (click)="handleRowStatusDetail('rowClick', element)">
+              <div *ngIf="dynCol == 'labels'; else avatarCellTemplate">
+
+              </div>
+              <ng-template #avatarCellTemplate>
+                <ng-container *ngIf="dynCol === 'USR' || dynCol == 'SNDR' || dynCol === 'USERCREATED' || dynCol === 'REQ_BY';else rightAlignCellTemplate">
+                  <!-- class="cell-float-right" -->
+                  <lib-avatar *ngIf="element[dynCol]" [initials]="getAvatarInitials(element[dynCol])" [editable]="false" [libTooltip]="element[dynCol]"
+                    [online]="false">
+                  </lib-avatar>
+                </ng-container>
+              </ng-template>
+              <ng-template #rightAlignCellTemplate>
+                <ng-container *ngIf="dynCol === 'RCVD_ON' || dynCol === 'EXPD_ON';else statusCellTemplate">
+                  <div>
+                    {{ (element[dynCol] ? element[dynCol] : '') | prosDatePipe }}
+                  </div>
+                </ng-container>
+              </ng-template>
+              <ng-template #statusCellTemplate>
+                <ng-container *ngIf="dynCol === 'STATUS';else defaultCellTemplate">
+                  <lib-label text="{{ (element[dynCol] ? element[dynCol] : '') | titlecase }}" iconFontType="solid"></lib-label>
+                </ng-container>
+              </ng-template>
+              <ng-template #defaultCellTemplate>
+                <div>
+                  {{ element[dynCol] ? element[dynCol] : '' }}
+                </div>
+              </ng-template>
+            </td>
+          </ng-container>
+        </ng-template>
+      </ng-template>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+
+  <div class="f-row empty-block" *ngIf="tableHasData && tableDataTotalCount === 0 && !showSkeleton">
+    <lib-empty-state icon="search"
+      primaryText="Nothing to see here"
+      secondaryText="Your search did not return any results, try modifying your search"></lib-empty-state>
+  </div>
+
+  <div class="f-row-spacer-half"></div>
+
+  <div class="f-row" *ngIf="tableDataTotalCount || dataSource?.docLength()">
+    <lib-pagination [currentPageIndex]="pageEvent.pageIndex" [totalCount]="tableDataTotalCount"
+      [pageSize]="pageEvent.pageSize" (pageChangeEvent)="onPageChange($event)">
+    </lib-pagination>
+    <lib-text-line type="base">{{ displayedRecordsRange }}</lib-text-line>
+  </div>
+
+  <div class="f-row-spacer-half"></div>
+
+  <ng-container *ngIf="!showSkeleton && !tableHasData && tableDataTotalCount === 0">
+    <div class="f-row empty-block">
+      <lib-empty-state primaryText="Nothing to see here" secondaryText="Your search did not return any results, try modifying your search"
+          icon="order">
+      </lib-empty-state>
+   </div>
+  </ng-container>
+</div>

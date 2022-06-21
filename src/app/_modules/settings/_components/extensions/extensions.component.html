@@ -1,0 +1,39 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-text-line type="leading">Integration</lib-text-line>
+    </div>
+    <div class="f-row-spacer-half"></div>
+    <div class="f-row">
+        <mat-card class="mat-elevation-z0 extension-blocks">
+            <div class="extension-image"><img src="assets/images/micro-excel.png" width="135px" height="135px" /></div>
+            <div class="f-row extension-content">
+                <lib-text-line type="base">Microsoft excel</lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-button type="plain" icon="caret-down" iconFontType="solid" [matMenuTriggerFor]="intergration"></lib-button>
+                <mat-menu #intergration="matMenu" class="navigation-menu">
+                    <button mat-menu-item>Download excel connect template</button>
+                    <button mat-menu-item>Download excel connect installer</button>
+                    <button mat-menu-item>Download excel connect installer help</button>
+                    <lib-section></lib-section>
+                    <button mat-menu-item><lib-text-line type="base" textColor="error">Update</lib-text-line></button>
+                </mat-menu>
+            </div>
+        </mat-card>
+
+        <div class="col-spacer"></div>
+
+        <mat-card class="mat-elevation-z0 extension-blocks">
+            <div class="extension-image"><img src="assets/images/micro-teams.png" width="135px" height="135px" /></div>
+            <div class="f-row extension-content">
+                <lib-text-line type="base">Microsoft teams</lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-button type="plain" icon="caret-down" iconFontType="solid" [matMenuTriggerFor]="intergration"></lib-button>
+                <mat-menu #intergration="matMenu" class="navigation-menu">
+                    <button mat-menu-item>Download Teams Connect template</button>
+                    <button mat-menu-item>Download Teams Connect installer</button>
+                    <button mat-menu-item>Download Teams Connect template help</button>
+                </mat-menu>
+            </div>
+        </mat-card>
+    </div>
+</div>

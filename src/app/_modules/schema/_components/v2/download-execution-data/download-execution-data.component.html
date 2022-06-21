@@ -1,0 +1,73 @@
+<mat-card class="root mat-elevation-z0">
+    <div class="f-row breadcrum-toolbar">
+        <lib-text-line type="leading" i18n="@@export_to_csv">Export to CSV</lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="plain" (click)="close()" icon="times"></lib-button>
+    </div>
+    
+    <div class="nav-tree" *ngIf="data.executionTreeHierarchy">
+        <lib-banner *ngIf="errorStateRes" status="error">
+            <!-- <ng-template [ngIf]="(errorStateRes?.code === 'ES_SHARDS' || errorStateRes?.code === 'RMQ_NOT_FOUND' || errorStateRes?.code === 'RMQ_STUCK' || errorStateRes?.code === 'RMQ_TIMEOUT')"
+                        [ngIfElse]="supportPortal">
+                <lib-text-line type="base" textColor="error" class="spacer"> Oops! something is not right. Please </lib-text-line>
+                &nbsp;<lib-text-line type="base" textColor="link" class="spacer cursor"> click here </lib-text-line>&nbsp;
+                <lib-text-line type="base" textColor="error" class="spacer"> to re-run schema. </lib-text-line>
+            </ng-template>
+            <ng-template #supportPortal>
+               <lib-text-line type="base" textColor="error" class="spacer"> Oops! something is not right. Please </lib-text-line>
+                &nbsp;<lib-text-line type="base" textColor="link" class="spacer cursor" onclick="window.open(`https://www.prospecta.com/support/`,`_blank`)"> click here </lib-text-line>&nbsp;
+                <lib-text-line type="base" textColor="error" class="spacer"> to notify support. </lib-text-line>
+            </ng-template>  -->
+            <lib-text-line type="base" textColor="error" class="spacer"> Oops! something is not right. Please </lib-text-line>
+            &nbsp;<lib-text-line type="base" textColor="link" class="spacer cursor" onclick="window.open(`https://www.prospecta.com/support/`,`_blank`)"> click here </lib-text-line>&nbsp;
+            <lib-text-line type="base" textColor="error" class="spacer"> to notify support. </lib-text-line>
+        </lib-banner>
+        <mat-accordion>
+            <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" [hideToggle]="(data.executionTreeHierarchy.childs && data.executionTreeHierarchy.childs.length) ? false : true"
+                expanded="true">
+                <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+                    <mat-panel-title>
+                        <lib-checkbox [checked]="selectedNodes.indexOf(data.executionTreeHierarchy.nodeId) !== -1"
+                            (valueChange)="nodeSelectionChanged(data.executionTreeHierarchy.nodeId)" prosClickStopPropagation></lib-checkbox>
+                        <div class="expand-title">{{ data.executionTreeHierarchy.nodeDesc }}</div>
+                        <span class="f-spacer"></span>
+                        <div class="default-badge">{{ data.executionTreeHierarchy.docCount }}</div>
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div *ngIf="data.executionTreeHierarchy.childs && data.executionTreeHierarchy.childs.length">
+                    <mat-accordion *ngFor="let child of data.executionTreeHierarchy.childs">
+                        <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" [hideToggle]="(child.childs && child.childs.length) ? false : true">
+                            <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px" class="undertree-expansion-panel">
+                                <mat-panel-title>
+                                    <lib-checkbox [checked]="selectedNodes.indexOf(child.nodeId) !== -1"
+                                    (valueChange)="nodeSelectionChanged(child.nodeId)"></lib-checkbox>
+                                    <div class="expand-title">{{ child.nodeDesc }}</div>
+                                    <span class="f-spacer"></span>
+                                    <div class="default-badge">{{ child.docCount }}</div>
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <mat-nav-list role="navigation" class="tree-nav-list" *ngIf="child.childs && child.childs.length">
+                                <mat-list-item class="f-row understep-two" *ngFor="let subChild of child.childs">
+                                    <lib-checkbox [checked]="selectedNodes.indexOf(subChild.nodeId) !== -1"
+                                        (valueChange)="nodeSelectionChanged(subChild.nodeId)"></lib-checkbox>
+                                    <div mat-line> {{ subChild.nodeDesc }} </div>
+                                    <span class="f-spacer"></span>
+                                    <div class="default-badge">{{ subChild.docCount }}</div>
+                                </mat-list-item>
+                            </mat-nav-list>
+                        </mat-expansion-panel>
+                    </mat-accordion>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+
+    <div class="row-spacer"></div>
+    <!-- navigation buttons -->
+    <div class="f-row actions-row">
+        <lib-button type="minor" (click)="close()" i18n="@@cancel"> Cancel </lib-button>
+        <span class="f-spacer"></span>
+        <lib-button type="major" (click)="downloadExecutionDetails()" i18n="@@download"> Download </lib-button>
+    </div>
+</mat-card>
+

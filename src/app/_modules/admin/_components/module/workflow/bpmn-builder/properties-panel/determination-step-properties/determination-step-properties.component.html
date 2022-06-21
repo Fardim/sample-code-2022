@@ -1,0 +1,18 @@
+<!-- BASIC DETAILS-->
+<mat-accordion>
+    <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                Basic Details
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="f-col fields-col" [formGroup]="determinationForm">
+            <div class="f-col">
+                <mat-label>Description</mat-label>
+                <mat-form-field appearance="outline">
+                    <textarea matInput formControlName="name"></textarea>
+                </mat-form-field>
+            </div>
+        </div>
+    </mat-expansion-panel>
+</mat-accordion>

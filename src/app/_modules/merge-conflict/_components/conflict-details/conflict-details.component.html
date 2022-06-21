@@ -1,0 +1,219 @@
+<div class="root">
+    <div class="f-row-spacer-half"></div>
+    <div class="f-row">
+        <div class="f-col-spacer-half"></div>
+        <lib-text-line type="leading" enableWrap="true" i18n="@@CR_conflict">
+          CR conflict
+        </lib-text-line>
+        <div class="f-spacer"></div>
+        <div class="col-spacer"></div>
+        <lib-button *ngIf="crId && !massId" i18n="@@reset" type="major" [disabled]="isSaving || isReseting" 
+          (afterClick)="reset()"> Reset </lib-button>
+        <div class="f-col-spacer-half"></div>
+        <lib-button i18n="@@save" type="major" [disabled]="disableSubmit" (afterClick)="save()"> Submit </lib-button>
+    </div>
+    <div class="f-row-spacer-half"></div>
+    <div class="f-col" *ngIf="isSaving">
+      <lib-banner status="info" text="Processing your request...">
+      </lib-banner>
+    </div>
+    <div class="f-row conflict-data">
+      <div class="cr-records" *ngIf="massId || hasChilds">
+        <pros-cr-records-list [massId]="massId" [parentCrId]="parentCrId" 
+          (selectedRecord)="getRecordDetails($event)"></pros-cr-records-list>
+      </div>
+      <div class="f-col conflict-details" [ngStyle]="{'width':'calc(100% - ' + (massId ? '220' : '0') + 'px - 12px)' }">
+          <table class="mat-table no-hover">
+              <tr class="mat-header-row">
+                <th class="mat-header-cell"> Field </th>
+                <th class="mat-header-cell">
+                  <div class="f-row">
+                      <lib-radio-group class="lib-radio" name="group_globalSelection" [(ngModel)]="globalDesicion"
+                          labelPosition="after" layout="vertical" theme="primary" [options]="[{key: 'Base', value: 'base'}]"
+                          (valueChange)="globalToggleMergeSelection($event)"></lib-radio-group>
+                  </div>
+                </th>
+                <th class="mat-header-cell">
+                  <div class="f-row">
+                      <lib-radio-group class="lib-radio" name="group_globalSelection" [(ngModel)]="globalDesicion"
+                          labelPosition="after" layout="vertical" theme="primary" [options]="[{key: 'CR', value: 'cr'}]"
+                          (valueChange)="globalToggleMergeSelection($event)"></lib-radio-group>
+                  </div>
+                </th>
+              </tr>
+              <!-- Header fields -->
+              <ng-container *ngIf="conflictedRecordDetails?.header?.fields && conflictedRecordDetails?.header?.fields.length">
+                  <tr class="mat-row" *ngFor="let header of conflictedRecordDetails?.header?.fields">
+                    <td class="mat-cell">
+                      {{ header.fieldDesc }}
+                    </td>
+                    <td class="mat-cell">
+                      <div class="f-row">
+                          <lib-radio-group class="lib-radio" [value]="getMergeSelection(header)" [disabled]="!hasFieldPermission(header)" name="group_{{header.fieldId}}"
+                              labelPosition="after" layout="vertical" theme="primary" [options]="[{key: header.base.value, value: 'base'}]"
+                              labelKey="key" valueKey="value" (valueChange)="toggleMergeSelection(header, $event)"></lib-radio-group>
+                      </div>
+                    </td>
+                    <td class="mat-cell">
+                      <div class="f-row">
+                          <lib-radio-group class="lib-radio" [value]="getMergeSelection(header)" [disabled]="!hasFieldPermission(header)" name="group_{{header.fieldId}}"
+                              labelPosition="after" layout="vertical" theme="primary" [options]="[{key: header.cr.value, value: 'cr'}]"
+                              labelKey="key" valueKey="value" (valueChange)="toggleMergeSelection(header, $event)"></lib-radio-group>
+                      </div>
+                    </td>
+                  </tr>
+              </ng-container>
+              <!-- Hierarchy fields -->
+              <ng-container *ngFor="let hierarchy of conflictedRecordDetails?.hierarchy">
+                <tr class="mat-row" cdkAccordionItem #accordionItem="cdkAccordionItem" expanded (click)="accordionItem.toggle()">
+                    <td class="mat-cell">
+                      <mat-icon fontSet="mdo-icons-light" class="mat-menu-icon"> {{ accordionItem.expanded ? 'chevron-down' : 'chevron-right ' }} </mat-icon>
+                      {{ hierarchy.hierarchyDesc }}
+                    </td>
+                    <td class="mat-cell"></td>
+                    <td class="mat-cell"></td>
+                </tr>
+                <ng-container *ngIf="accordionItem.expanded && hierarchy.fields && hierarchy.fields.length">
+                    <tr class="mat-row" *ngFor="let field of hierarchy.fields">
+                        <td class="mat-cell second-level">
+                          {{ field.fieldDesc }}
+                        </td>
+                        <td class="mat-cell">
+                          <div class="f-row">
+                              <lib-radio-group class="lib-radio" [value]="getMergeSelection(field)" [disabled]="!hasFieldPermission(field)" name="group_{{field.fieldId}}"
+                                  labelPosition="after" layout="vertical" theme="primary" [options]="[{key: field.base.value, value: 'base'}]"
+                                  labelKey="key" valueKey="value" (valueChange)="toggleMergeSelection(field, $event)"></lib-radio-group>
+                          </div>
+                        </td>
+                        <td class="mat-cell">
+                          <div class="f-row">
+                              <lib-radio-group class="lib-radio" [value]="getMergeSelection(field)" [disabled]="!hasFieldPermission(field)" name="group_{{field.fieldId}}"
+                                  labelPosition="after" layout="vertical" theme="primary" [options]="[{key: field.cr.value, value: 'cr'}]"
+                                  labelKey="key" valueKey="value" (valueChange)="toggleMergeSelection(field, $event)"></lib-radio-group>
+                          </div>
+                        </td>
+                      </tr>
+                </ng-container>
+                <!-- Hierarchy Grid fields -->
+                <ng-container *ngIf="accordionItem.expanded && hierarchy.grids && hierarchy.grids.length">
+                  <tr class="mat-row">
+                    <td class="mat-cell second-level" colspan="3" *ngFor="let grid of hierarchy.grids">
+                      <mat-accordion>
+                        <pros-grid-conflict-details class="w-100" [grid]="grid" 
+                          (decisionChanged)="isChanged = true"></pros-grid-conflict-details>
+                      </mat-accordion>
+                    </td>
+                  </tr>
+                </ng-container>
+                <!-- Child hierarchy fields  -->
+                <ng-container *ngIf="accordionItem.expanded && hierarchy.childs && hierarchy.childs.length">
+                    <ng-container *ngFor="let childHierarchy of hierarchy.childs">
+                        <tr class="mat-row" cdkAccordionItem #childAccordionItem="cdkAccordionItem" expanded (click)="childAccordionItem.toggle()">
+                            <td class="mat-cell second-level">
+                                <mat-icon fontSet="mdo-icons-light" class="mat-menu-icon"> {{ childAccordionItem.expanded ? 'chevron-down' : 'chevron-right ' }}</mat-icon>
+                              {{ childHierarchy.hierarchyDesc }}
+                            </td>
+                            <td class="mat-cell"></td>
+                            <td class="mat-cell"></td>
+                        </tr>
+                        <ng-container *ngIf="childAccordionItem.expanded && childHierarchy.fields && childHierarchy.fields.length">
+                            <tr class="mat-row" *ngFor="let childField of childHierarchy?.fields">
+                                <td class="mat-cell third-level">
+                                  {{ childField.fieldDesc }}
+                                </td>
+                                <td class="mat-cell">
+                                  <div class="f-row">
+                                      <lib-radio-group class="lib-radio" [value]="getMergeSelection(childField)" [disabled]="!hasFieldPermission(childField)" name="group_{{childField.fieldId}}"
+                                          labelPosition="after" layout="vertical" theme="primary" [options]="[{key: childField.base.value, value: 'base'}]"
+                                          labelKey="key" valueKey="value" (valueChange)="toggleMergeSelection(childField, $event)"></lib-radio-group>
+                                  </div>
+                                </td>
+                                <td class="mat-cell">
+                                  <div class="f-row">
+                                      <lib-radio-group class="lib-radio" [value]="getMergeSelection(childField)" [disabled]="!hasFieldPermission(childField)" name="group_{{childField.fieldId}}"
+                                          labelPosition="after" layout="vertical" theme="primary" [options]="[{key: childField.cr.value, value: 'cr'}]"
+                                          labelKey="key" valueKey="value" (valueChange)="toggleMergeSelection(childField, $event)"></lib-radio-group>
+                                  </div>
+                                </td>
+                            </tr>
+                        </ng-container>
+                        <!-- Child Hierarchy Grid fields -->
+                        <ng-container *ngIf="childAccordionItem.expanded && childHierarchy.grids && childHierarchy.grids.length">
+                          <tr class="mat-row">
+                            <td class="mat-cell third-level" colspan="3" *ngFor="let grid of childHierarchy.grids">
+                              <mat-accordion>
+                                <pros-grid-conflict-details class="w-100" [grid]="grid"
+                                  (decisionChanged)="isChanged = true"></pros-grid-conflict-details>
+                              </mat-accordion>
+                            </td>
+                          </tr>
+                        </ng-container>
+                        <!-- SubChild hierarchy fields -->
+                        <ng-container *ngIf="childAccordionItem.expanded && childHierarchy.childs && childHierarchy.childs.length">
+                            <ng-container *ngFor="let subChildHierarchy of childHierarchy.childs">
+                                <tr class="mat-row" cdkAccordionItem #subChildAccordionItem="cdkAccordionItem" expanded (click)="subChildAccordionItem.toggle()">
+                                    <td class="mat-cell third-level">
+                                      <mat-icon fontSet="mdo-icons-light" class="mat-menu-icon"> {{ subChildAccordionItem.expanded ? 'chevron-down' : 'chevron-right ' }} </mat-icon>
+                                      {{ subChildHierarchy.hierarchyDesc }}
+                                    </td>
+                                    <td class="mat-cell"></td>
+                                    <td class="mat-cell"></td>
+                                </tr>
+                                <ng-container *ngIf="subChildAccordionItem.expanded && subChildHierarchy.fields && subChildHierarchy.fields.length">
+                                    <tr class="mat-row" *ngFor="let subChildField of subChildHierarchy.fields">
+                                        <td class="mat-cell fourth-level">
+                                          {{ subChildField.fieldDesc }}
+                                        </td>
+                                        <td class="mat-cell">
+                                          <div class="f-row">
+                                              <lib-radio-group class="lib-radio" [value]="getMergeSelection(subChildField)" [disabled]="!hasFieldPermission(subChildField)" name="group_{{subChildField.fieldId}}"
+                                                  labelPosition="after" layout="vertical" theme="primary" [options]="[{key: subChildField.base.value, value: 'base'}]"
+                                                  labelKey="key" valueKey="value" (valueChange)="toggleMergeSelection(subChildField, $event)"></lib-radio-group>
+                                          </div>
+                                        </td>
+                                        <td class="mat-cell">
+                                          <div class="f-row">
+                                              <lib-radio-group class="lib-radio" [value]="getMergeSelection(subChildField)" [disabled]="!hasFieldPermission(subChildField)" name="group_{{subChildField.fieldId}}"
+                                                  labelPosition="after" layout="vertical" theme="primary" [options]="[{key: subChildField.cr.value, value: 'cr'}]"
+                                                  labelKey="key" valueKey="value" (valueChange)="toggleMergeSelection(subChildField, $event)"></lib-radio-group>
+                                          </div>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                                <!-- Child Hierarchy Grid fields -->
+                                <ng-container *ngIf="subChildAccordionItem.expanded && subChildHierarchy.grids && subChildHierarchy.grids.length">
+                                  <tr class="mat-row">
+                                    <td class="mat-cell fourth-level" colspan="3" *ngFor="let grid of subChildHierarchy.grids">
+                                      <mat-accordion>
+                                        <pros-grid-conflict-details class="w-100" [grid]="grid"
+                                          (decisionChanged)="isChanged = true"></pros-grid-conflict-details>
+                                      </mat-accordion>
+                                    </td>
+                                  </tr>
+                                </ng-container>
+                              </ng-container>
+                        </ng-container>
+                    </ng-container>
+                </ng-container>
+              </ng-container>
+          </table>
+          <div class="f-row-spacer-half"></div>
+          <!-- Grid fields -->
+          <ng-container *ngIf="conflictedRecordDetails?.header?.grids && conflictedRecordDetails?.header?.grids.length">
+              <div class="f-row-spacer-half"></div>
+              <mat-accordion>
+                  <ng-container *ngFor="let grid of conflictedRecordDetails?.header?.grids">
+                      <pros-grid-conflict-details [grid]="grid"
+                        (decisionChanged)="isChanged = true"></pros-grid-conflict-details>
+                  </ng-container>
+              </mat-accordion>
+          </ng-container>
+      </div>
+    </div>
+</div>
+<!-- Blank mat table to load material styling -->
+<table mat-table [dataSource]="blankDataSource" class="mat-elevation-z0 cr-expanded-data"
+    style="display: none;">
+    <tr mat-header-row *matHeaderRowDef="blankColumnsList"></tr>
+    <tr mat-row *matRowDef="let row; columns: blankColumnsList"></tr>
+</table>

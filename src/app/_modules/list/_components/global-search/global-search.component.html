@@ -1,0 +1,72 @@
+<mat-card class="f-row mat-elevation-z2 global-search">
+    <div class="f-row">
+        <lib-text-line type="base" weight="strong">Material</lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-button type="plain" icon="long-arrow-left" (click)="close()"></lib-button>
+        <div class="f-col-spacer-half"></div>
+        <lib-text-line type="base" weight="strong">Back</lib-text-line>
+    </div>
+    <lib-section></lib-section>
+    <div class="f-row filter-button">
+        <lib-tab-group>
+            <lib-tab label="Material number 72">
+            </lib-tab>
+            <lib-tab label="Material type 51">
+            </lib-tab>
+            <lib-tab label="Brand 12">
+            </lib-tab>
+            <lib-tab label="Material equipment 29">
+            </lib-tab>
+        </lib-tab-group>
+        <div class="f-spacer"></div>
+        <lib-button type="plain" iconFontType="solid" icon="caret-down" [matMenuTriggerFor]="filtermenu"></lib-button>
+        <mat-menu #filtermenu="matMenu" class="navigation-menu">
+            <button mat-menu-item>Manager 20</button>
+            <button mat-menu-item>Country 20</button>
+            <button mat-menu-item>Region 7</button>
+            <button mat-menu-item>Spare part 2</button>
+        </mat-menu>
+    </div>
+    <div class="f-row">
+        <div class="f-col filter-table" prosInfiniteScroll bufferPercentage="20" (scrollEnd)="onTableScrollEnd()">
+            <ng-template [ngIf]="isLoading" [ngIfElse]="tableData">
+                <div class="loader">
+                    <lib-spinner></lib-spinner>
+                </div>
+            </ng-template>
+            <ng-template #tableData>
+                <table mat-table [dataSource]="previewData" matSort>
+
+                    <!-- Material Number Column -->
+                    <!-- <ng-container matColumnDef="materialnumber">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Material number </th>
+                                <td mat-cell *matCellDef="let element">
+                                    <lib-text-line textColor="link" type="base">{{element.materialnumber}}
+                                    </lib-text-line>
+                                </td>
+                            </ng-container> -->
+
+                    <ng-template ngFor let-dynCol let-index="index" [ngForOf]="(displayedColumns | async)">
+                        <ng-container [matColumnDef]="dynCol">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> {{ getFieldDesc(dynCol) }} </th>
+                            <td mat-cell *matCellDef="let element">
+                                {{ element[dynCol] ? element[dynCol].fieldData || '' : ''}}
+                            </td>
+                        </ng-container>
+                    </ng-template>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns | async; sticky: true"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns | async;"></tr>
+                </table>
+            </ng-template>
+        </div>
+    </div>
+    <div class="row-spacer"></div>
+    <div class="f-row">
+        <lib-button [type]="'minor'" (click)="applyFilter()">
+            <lib-text-line type="base">Apply filter for&nbsp;<strong>material number</strong></lib-text-line>
+        </lib-button>
+        <div class="f-spacer"></div>
+        <lib-button iconFontType="solid" icon="sliders-h"></lib-button>
+    </div>
+</mat-card>

@@ -1,0 +1,16 @@
+.root {
+  height: auto;
+  background-color: transparent;
+  margin-top: 16px;
+
+  mat-toolbar-row {
+    height: auto;
+
+    mat-icon {
+      font-size: 14px;
+      height: 14px;
+      width: 14px;
+      cursor: pointer;
+    }
+  }
+}

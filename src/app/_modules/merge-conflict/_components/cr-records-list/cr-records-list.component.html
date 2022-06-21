@@ -1,0 +1,31 @@
+<div class="f-col root">
+    <lib-search placeholder="Search" (valueChange)="searchSub.next($event)"></lib-search>
+    <div class="f-row-spacer-half"></div>
+    <div class="f-col records-list" prosInfiniteScroll bufferPercentage="20" (scrollEnd)="getRecordsList(true)">
+        <mat-accordion *ngIf="recordsList && recordsList.length">
+            <mat-expansion-panel *ngFor="let record of recordsList" togglePosition="before" class="mat-elevation-z0" expanded="expanded"
+                > <!-- [hideToggle]="(record.childs && record.childs.length) ? 'false' : 'true'" -->
+                <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px"
+                    [class.selected-cr]="record.crId===activeRecord" prosExpansionPanelToggleHandler
+                    (click)="selectionChange(record.crId)">
+                    <mat-panel-title>
+                        <lib-text-line type="base" class="expand-title"> {{ record.rec_num }} </lib-text-line>
+                        <!-- <span class="f-spacer"></span>
+                        <lib-text-line type="base" textColor="info"> {{ record.count }} </lib-text-line> -->
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <mat-nav-list *ngIf="record.childs && record.childs.length" role="navigation" class="tree-nav-list">
+                    <mat-list-item class="f-row"
+                        [class.selected-cr]="child.crId===activeRecord"
+                        *ngFor="let child of record.childs"
+                        (click)="selectionChange(child.crId)">
+                        <lib-text-line type="base" class="expand-title">{{ child.rec_num }}</lib-text-line>
+                        <!-- <span class="f-spacer"></span>
+                        <lib-text-line type="base"> {{ child.count }} </lib-text-line> -->
+                        <span class="col-spacer"></span>
+                    </mat-list-item>
+                </mat-nav-list>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+</div>

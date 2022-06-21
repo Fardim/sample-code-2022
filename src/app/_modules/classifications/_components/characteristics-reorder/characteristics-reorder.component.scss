@@ -1,0 +1,134 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  width: 90vw;
+
+  .breadcrum-toolbar {
+    padding: 8px 12px;
+
+    .mdo-constrained-right {
+      align-items: center;
+      width: 100%;
+
+      .breadcrum-head {
+        width: 100%;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px - 16px);
+    overflow: auto;
+
+    .mdo-justify {
+      margin: 0 16px;
+
+      .field-label {
+        margin-bottom: 6px;
+      }
+    }
+
+    .cdk-drag-preview {
+      box-sizing: border-box;
+      border-radius: 4px;
+
+      .mat-cell {
+        border-right: none;
+        min-width: 150px;
+
+        &.mat-column-select,
+        &.mat-column-action {
+          min-width: 48px;
+        }
+
+        &.mat-column-fieldType,
+        &.mat-column-decimalPlaces {
+          min-width: 120px;
+        }
+
+        &.mat-column-dataType {
+          min-width: 100px;
+        }
+
+        &.mat-column-length {
+          min-width: 80px;
+        }
+      }
+    }
+
+    .cdk-drag-placeholder {
+      opacity: 0;
+    }
+
+    .cdk-drag-animating {
+      transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    .cdk-drop-list-dragging .mat-row:not(.cdk-drag-placeholder) {
+      transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+    }
+
+    .reorder-dailog {
+      padding: 0;
+      height: 100%;
+
+      .modal-body {
+        height: calc(100% - 60px * 2);
+        overflow: auto;
+
+        .char-table {
+          overflow: auto;
+          height: 100%;
+
+          mat-table.mat-table {
+            .mat-header-cell {
+              font-weight: 600;
+            }
+
+            mat-header-cell,
+            mat-cell,
+            mat-row {
+              border-right: none;
+              min-width: 150px;
+
+              &.mat-column-select,
+              &.mat-column-action {
+                min-width: 36px;
+              }
+
+              &.mat-column-fieldType,
+              &.mat-column-decimalPlaces {
+                min-width: 120px;
+              }
+
+              &.mat-column-dataType {
+                min-width: 100px;
+              }
+
+              &.mat-column-length {
+                min-width: 80px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        // margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 16px;
+      }
+    }
+  }
+}

@@ -1,0 +1,290 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" (click)="closeDialogComponent()" iconFontType="light" icon="times"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@new_br_rule">Business rule</lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="major" i18n="@@save" (click)="save();$event.stopPropagation()" width="80px">Save</lib-button>
+      </div>
+    </div>
+  </div>
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <lib-banner status="error" *ngIf="validationError.status" [text]="validationError.message">
+      </lib-banner>
+      <form [formGroup]="form">
+        <div class="f-col mdo-field">
+          <lib-text-line class="field-label" type="xsmall" weight="strong" i18n="@@rule_type">Rule type <span
+              class="mandatory">*</span></lib-text-line>
+          <div class="mdo-field-input">
+            <input matInput [(ngModel)]="searchRuleTypeStr" formControlName="rule_type" i18n-placeholder="@@rule_type"
+              placeholder="Rule type" [matAutocomplete]="ruleTypeAuto" />
+            <mat-autocomplete class="mdo-autocomplete" [displayWith]="displayRuleFn.bind(this)"
+              #ruleTypeAuto="matAutocomplete" (optionSelected)="selectSingle(form, 'rule_type', $event)">
+              <mat-option class="mdo-option" *ngIf="!businessRuleTypesFiltered.length" disabled>
+                Result Not Found
+              </mat-option>
+              <ng-container *ngFor="let rule of businessRuleTypesFiltered">
+                <mat-option class="mdo-option" *ngIf="rule.isImplemented" [value]="rule.ruleType">
+                  {{rule.ruleDesc}}
+                </mat-option>
+              </ng-container>
+            </mat-autocomplete>
+          </div>
+        </div>
+
+        <div class="f-col" *ngIf="!isDuplicateType && !isDRTieBreaker">
+          <lib-text-line type="xsmall" class="field-label" weight="strong"><span i18n="@@weightage">Weightage</span>&nbsp;<mat-icon fontSet="mdo-icons-light" i18n-libTooltip="@@weightage_tooltip" libTooltip="	
+            Allocate weightage to the Business Rule to determine a successful validation of data. eg. 100% weightage means data in specified fields must exactly meet criteria or error message will display">question-circle</mat-icon>&nbsp;<span
+              class="mandatory">*</span></lib-text-line>
+          <div class="f-row slider-row">
+            <lib-range-slider class="lib-slider" formControlName="weightage" tickInterval="1" minValue="0"
+              [formatLabelFn]="rangeSliderLabelFormat" [value]="form.controls.weightage.value"
+              [maxValue]="maxWeightageLimit" color="primary"></lib-range-slider> &nbsp;
+            <lib-text-line type="base" class="percentage">{{form.controls.weightage.value}}%
+            </lib-text-line>
+          </div>
+          <mat-error i18n="@@weightage_missing_msg"
+            *ngIf="submitted && form.controls.weightage.errors && form.controls.weightage.errors.required">
+            <lib-text-line type="small">Please enter weightage</lib-text-line>
+          </mat-error>
+        </div>
+
+        <div class="f-col" *ngIf="isMPNI">
+          <lib-text-line type="xsmall" class="field-label" weight="strong"><span i18n="@@accuracy_score">Accuracy score</span>&nbsp;<mat-icon fontSet="mdo-icons-light" i18n-libTooltip="@@accuracy_tooltip" libTooltip="The accuracy score of the matched text">question-circle</mat-icon><span
+            class="mandatory">*</span>
+          </lib-text-line>
+          <div class="f-row slider-row">
+            <lib-range-slider class="lib-slider" formControlName="accuracyScore" tickInterval="1" minValue="0"
+              [formatLabelFn]="rangeSliderLabelFormat" [value]="form.controls.accuracyScore.value" [maxValue]="100"
+              color="primary"></lib-range-slider> &nbsp;
+            <lib-text-line type="base" class="percentage">{{form.controls.accuracyScore.value}}%
+            </lib-text-line>
+          </div>
+          <mat-error i18n="@@accuracy_score_missing_msg"
+            *ngIf="submitted && form.controls.accuracyScore.errors && form.controls.accuracyScore.errors.required">
+            Please enter accuracy score</mat-error>
+        </div>
+
+        <div class="f-col mdo-field"
+          [class.has-error]="submitted && (form.controls.categoryId.errors?.required || !form.controls.categoryId?.value)"
+          *ngIf="!isDuplicateType && !isWebServiceCall && !isUDR && !isLookupRule">
+          <lib-text-line class="field-label" type="xsmall" weight="strong"><span i18n="@@category">Category</span>&nbsp;
+            <mat-icon fontSet="mdo-icons-light" libTooltip="Select the Category for the rule">question-circle</mat-icon>
+            <span class="mandatory">*</span></lib-text-line>
+          <!-- input container -->
+          <div *ngIf="categoryList?.length" class="mdo-field-input">
+            <input matInput formControlName="categoryId" i18n-placeholder="@@category" placeholder="Category"
+              [matAutocomplete]="categoryIDAuto" />
+            <mat-autocomplete class="mdo-autocomplete" [displayWith]="displayCategoryFn.bind(this)"
+              #categoryIDAuto="matAutocomplete" (optionSelected)="selectSingle(form, 'categoryId', $event)">
+              <mat-option class="mdo-option" *ngIf="!categoryList.length" disabled>
+                Result Not Found
+              </mat-option>
+              <mat-option class="mdo-option" *ngFor="let category of categoryList" [value]="category.categoryId">
+                {{category.categoryDesc}}
+              </mat-option>
+            </mat-autocomplete>
+          </div>
+          <mat-error i18n="@@please_select_category"
+            *ngIf="submitted && (submitted && form.controls.categoryId.errors && form.controls.categoryId.errors.required)">
+            Please select category</mat-error>
+        </div>
+
+        <div class="f-col">
+          <lib-input [isRequired]="true" i18n-label="@@rule_name_desc" label="Rule name (Description)"
+            formControlName="rule_name"
+            [hint]="submitted && form.controls.rule_name.errors && form.controls.rule_name.errors.required ? 'Please enter Rule name' : ''"
+            [hasError]="submitted && form.controls.rule_name.errors && form.controls.rule_name.errors.required">
+          </lib-input>
+        </div>
+
+        <ng-container *ngIf="isWebServiceCall">
+          <pros-setup-web-service-call [submitted]="submitted" [coreSchemaBrInfo]="coreSchemaBrInfo" (formChange)="setupWebServiceCallFormRef($event)"></pros-setup-web-service-call>
+        </ng-container>
+
+        <ng-container *ngIf="isLookupRule">
+          <pros-lookup-dataset-rule 
+              [operatorsList]="operators"
+              [parentFieldsList]="fieldsList"
+              [checkValidation]="saveRule"
+              [isDRChild]="data?.isDRChildRule"
+              (saveRule)="saveLookupRule($event)"
+              [existingData]="data.createRuleFormValues"
+              [selectedFields]="selectedFields"
+          ></pros-lookup-dataset-rule>
+        </ng-container>
+
+        <pros-daxe-input *ngIf="!isDuplicateType && isDaxeRule" [moduleId]="data?.moduleId ? data.moduleId : null"></pros-daxe-input>
+
+        <div class="f-col" *ngIf="!isDuplicateType && !(data?.isDRChildRule) && !isDaxeRule">
+          <lib-text-line [textColor]="submitted && form.controls.error_message.errors?.required ? 'error' : 'default'" type="xsmall" weight="strong" class="field-label">
+            <span i18n="@@error_message">Error message</span>&nbsp;
+            <mat-icon fontSet="mdo-icons-light" i18n-libTooltip="@@errormsg_tooltip" libTooltip="Enter the error message to display if rule is not met">question-circle</mat-icon>
+            <span class="mandatory">*</span>
+          </lib-text-line>
+          <lib-input
+            formControlName="error_message"
+            [hint]="submitted && form.controls.error_message.errors && form.controls.error_message.errors.required ? 'Please enter Error message' : ''"
+            [hasError]="submitted && form.controls.error_message.errors && form.controls.error_message.errors.required">
+          </lib-input>
+        </div>
+
+        <div class="f-col mdo-field"
+          *ngIf="form.controls.rule_type.value === 'MRO_GSN_DESC_MATCH' || form.controls.rule_type.value === 'MRO_MANU_PRT_NUM_LOOKUP' || form.controls.rule_type.value === 'MRO_MANU_PRT_NUM_IDENTI'">
+          <lib-text-line class="field-label" type="xsmall" weight="strong"><span i18n="@@enter_access_token">Enter access
+            token</span>&nbsp;<mat-icon class="mat-icon" fontSet="mdo-icons-light" i18n-libTooltip="@@access_token_tooltip" [libTooltip]="'Please enter your spare part library access token. If you do not have access to our spare part library, please contact sales@prospecta.com for more information.'">question-circle</mat-icon><span class="mandatory">*</span></lib-text-line>
+          <pros-form-input [value]="form.get('apiKey').value" [control]="formField('apiKey')" [isHelpIcon]="true"
+            i18n-toolTipInfo="@@access_token_tooltip"
+            [toolTipInfo]="'Please enter your spare part library access token. If you do not have access to our spare part library, please contact sales@prospecta.com for more information.'">
+          </pros-form-input>
+          <mat-error *ngIf="submitted && form.controls.apiKey.errors && form.controls.apiKey.errors.required">
+            Please enter access token</mat-error>
+        </div>
+
+        <div class="f-row mdo-field" *ngIf="isTransformationRule">
+          <lib-radio-group [options]="transRuleTypeList" class="f-col" color="primary"
+            (valueChange)="updateTransformationRuleType($event)" [value]="selectedTransRuleTypeRadio"></lib-radio-group>
+        </div>
+
+        <!-- transformation rule... -->
+        <pros-transformation-rule
+          *ngIf="isTransformationRule && selectedTransformationType === transformationType.REGEX"
+          [selectedRuleType]="currentSelectedRule" [targetFieldsObject]="targetFieldsObject"
+          [sourceFieldsObject]="sourceFieldsObject" [submitted]="submitted"
+          [initialTransformationData]="transformationData"
+          (transformationFormOutput)="setTransformationFormData($event)">
+        </pros-transformation-rule>
+
+        <!-- transformation lookup rule -->
+        <pros-lookup-rule *ngIf="isTransformationRule && selectedTransformationType === transformationType.LOOKUP"
+          [fieldsObject]="sourceFieldsObject" [initialLookupData]="transformationLookUpData"
+          (lookupRuleOutput)="setLookupData($event)">
+        </pros-lookup-rule>
+
+        <!-- Duplicate Rule form group  -->
+        <ng-template prosContainerRef #containerRef="prosContainerRef">
+        </ng-template>
+
+        <div class="f-col mdo-field" *ngIf="!isUDR && !isTransformationRule && !isDuplicateType && !isMPNI && !isWebServiceCall && !isLookupRule && !isDaxeRule">
+          <lib-text-line class="field-label" type="xsmall" weight="strong"><span i18n="@@fields">Fields</span>&nbsp;<mat-icon *ngIf="fieldsTooltip" fontSet="mdo-icons-light"  [libTooltip]="fieldsTooltip">question-circle</mat-icon></lib-text-line>
+          <mat-form-field appearance="outline">
+            <mat-chip-list class="f-row field-chip-list" #chipList>
+              <lib-chip *ngFor="let field of selectedFields;let i = index" [removable]="true"
+                (removed)="remove(field,i)" class="lib-chip">{{field.fieldDescri}}</lib-chip>
+              <input matInput id="fieldsInput" #fieldsInput class="mat-input" [matAutocomplete]="auto"
+                formControlName="fields" [matChipInputFor]="chipList"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes">
+            </mat-chip-list>
+            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn.bind(this)"
+              (optionSelected)="selectedField($event)">
+              <mat-option class="mat-result-option" *ngFor="let fieldItem of filteredModules | async" [value]="fieldItem.fieldId">
+                {{fieldItem.fieldDescri}}
+              </mat-option>
+              <mat-option class="mat-result-option no-result" *ngIf="!(dataSource?.data?.length)" disabled>
+                Result Not Found
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-error i18n="@@fields_missing_msg" *ngIf="submitted && !selectedFields.length">
+            Please select the fields
+          </mat-error>
+        </div>
+
+        <div class="f-col mdo-field"
+          [class.has-error]="submitted && (form.controls.source_field.errors?.required || !form.controls.source_field?.value)"
+          *ngIf="isMPNI">
+          <lib-text-line class="field-label" type="xsmall" weight="strong"><span i18n="@@source_field">Source field</span>&nbsp;
+            <mat-icon fontSet="mdo-icons-light" i18n-libTooltip="@@source_field_tooltip" libTooltip="Select the field to extract the manufacturer part number">question-circle</mat-icon><span class="mandatory">*</span>
+          </lib-text-line>
+          <div class="mdo-field-input">
+            <input matInput [(ngModel)]="searchSourceFieldStr" formControlName="source_field"
+              i18n-placeholder="@@source_field" placeholder="Source field" [matAutocomplete]="sourceFieldAuto" />
+            <mat-autocomplete class="mdo-autocomplete" [displayWith]="displaySourceFieldFn.bind(this)"
+              #sourceFieldAuto="matAutocomplete" (optionSelected)="selectSingle(form, 'source_field', $event)">
+              <mat-option class="mdo-option" *ngFor="let field of sourceFieldFiltered"
+                [value]="field[sourceFieldsObject.valueKey]">
+                {{field[sourceFieldsObject.labelKey]}}
+              </mat-option>
+            </mat-autocomplete>
+          </div>
+          <mat-error i18n="@@source_field_missing"
+            *ngIf="submitted && (submitted && form.controls.source_field.errors && form.controls.source_field.errors.required)">
+            Please select the source field</mat-error>
+        </div>
+
+        <div class="f-col mdo-field" *ngIf="isMPNI">
+          <lib-text-line class="field-label" type="xsmall" weight="strong"><span i18n="@@target_fields">Target fields</span>&nbsp;
+            <mat-icon fontSet="mdo-icons-light" i18n-libTooltip="@@target_fields_tooltip" libTooltip="Select the field(s) to insert the manufacturer part number">question-circle</mat-icon><span class="mandatory">*</span>
+          </lib-text-line>
+          <mat-form-field appearance="outline">
+            <mat-chip-list class="f-row field-chip-list" #chipList1>
+              <lib-chip *ngFor="let field of selectedTargetFields;let i = index" [removable]="true"
+                (removed)="removeTargetField(field,i)" class="lib-chip">
+                {{field.fieldDescri}}</lib-chip>
+              <input matInput id="targetFieldsInput" #targetFieldsInput class="mat-input" [matAutocomplete]="auto"
+                formControlName="target_field" [matChipInputFor]="chipList1"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes">
+            </mat-chip-list>
+            <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn.bind(this)"
+              (optionSelected)="selectTargetField($event)">
+              <mat-option *ngFor="let fieldItem of targetFieldModules | async" [value]="fieldItem.fieldId">
+                {{fieldItem.fieldDescri}}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+          <mat-error i18n="@@fields_missing_msg" *ngIf="submitted && !selectedTargetFields.length">
+            Please select the fields
+          </mat-error>
+        </div>
+
+        <div class="f-col mdo-field" *ngIf="isRegexType">
+          <lib-text-line class="field-label" type="xsmall" weight="strong" i18n="@@standard_function">Standard function&nbsp;
+            <mat-icon fontSet="mdo-icons-light" i18n-libTooltip="@@standard_function_tooltip" libTooltip="Select the standard function of the field">question-circle</mat-icon>
+          </lib-text-line>
+          <div class="mdo-field-input">
+            <input [formControlName]="'standard_function'" matInput i18n-placeholder="@@standard_function"
+              [(ngModel)]="searchRegexFunctionStr" placeholder="Standard function" [matAutocomplete]="regexNameAuto" />
+            <mat-autocomplete class="mdo-autocomplete" [displayWith]="displayRegexFn.bind(this)"
+              #regexNameAuto="matAutocomplete" (optionSelected)="selectSingle(form, 'standard_function', $event)">
+              <ng-container *ngFor="let regex of preDefinedRegexFiltered">
+                <mat-option class="mdo-option" [value]="regex.FUNC_TYPE">
+                  {{regex.FUNC_NAME}}
+                </mat-option>
+              </ng-container>
+            </mat-autocomplete>
+          </div>
+        </div>
+
+        <div class="f-col" *ngIf="isRegexType">
+          <lib-text-line [textColor]="submitted && form.controls.regex.errors && form.controls.regex.errors.required ? 'error' : 'default'" type="xsmall" weight="strong" class="field-label">
+            <span i18n="@@regex_value">Regex value</span>&nbsp;
+            <mat-icon fontSet="mdo-icons-light" i18n-libTooltip="@@regexval_tooltip" libTooltip="Enter the value for the function selected">question-circle</mat-icon>
+            <span class="mandatory">*</span>
+          </lib-text-line>
+          <lib-input formControlName="regex"
+            [hint]="submitted && form.controls.regex.errors && form.controls.regex.errors.required ? 'Please enter regex' : ''"
+            [hasError]="submitted && form.controls.regex.errors && form.controls.regex.errors.required">
+          </lib-input>
+          <mat-error i18n="@@regex_missing"
+            *ngIf="submitted && form.controls.regex.errors && form.controls.regex.errors.required">
+            Please enter regex</mat-error>
+        </div>
+      </form>
+      <pros-blocks-hierarchy
+      *ngIf="isUDR && udrNodeForm"
+      [blocksGrp]="udrNodeForm"
+      [operatorsList]="operators"
+      [submitted]="submitted"
+      [sourceList]="fieldsListFiltered"
+      [blocksList]="udrBlockList"
+      [showRegex]="true"
+      [isNewModule]="true"
+      (updateFldList)="updateUDRFldList($event.searchString)"
+      [initialSrcList]="initialFieldList"
+      ></pros-blocks-hierarchy>
+    </div>
+  </div>
+</div>

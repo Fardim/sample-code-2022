@@ -1,0 +1,48 @@
+mat-card.root {
+  height: 100%;
+  user-select: text;
+  padding: 0;
+  border: none;
+
+  .modal-wrapper {
+    .lib-search {
+      margin-right: 6px;
+      width: 213px;
+    }
+
+    .modal-body {
+      height: calc(100% - 120px);
+      overflow: auto;
+
+      .dataset-list {
+        align-items: center;
+        margin: 0 auto;
+
+        .dataset-palette {
+          flex-wrap: wrap;
+          justify-content: space-between;
+
+          mat-card.mat-card {
+            width: 174px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin-right: 16px;
+            margin-bottom: 16px;
+            text-align: center;
+            flex-direction: column;
+
+            .plain-icon {
+              font-size: 14px;
+            }
+
+            .svg-block {
+              height: 88px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

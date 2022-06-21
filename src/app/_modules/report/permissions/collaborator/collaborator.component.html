@@ -1,0 +1,75 @@
+<!-- OPEN IN EDIT MODE -->
+<mat-list class="collaborators-list">
+    <mat-list-item *ngIf="collaborator.showEditMode">
+        <div class="f-col">
+            <div class="f-row">
+                <ng-template [ngIf]="collaborator && collaborator.permissionType === 'USER'">
+                    <mat-icon mat-list-icon matTooltip="User" class="icon-user">person</mat-icon>
+                    <div class="f-col">
+                        <lib-text-line type="base" *ngIf="collaborator?.userMdoModel?.fullName">{{ collaborator.userMdoModel.fullName }}</lib-text-line>
+                        <lib-text-line type="base">{{ collaborator.userMdoModel ? collaborator.userMdoModel.email : collaborator.userId }}</lib-text-line>
+                    </div>
+                </ng-template>
+
+                <ng-template [ngIf]="collaborator && collaborator.permissionType === 'GROUP'">
+                    <mat-icon mat-list-icon matTooltip="Group" class="icon-group">group</mat-icon>
+                    <div class="f-col">
+                        <lib-text-line type="base">{{ collaborator.groupId }}</lib-text-line>
+                        <lib-text-line type="base">{{ collaborator.groupHeaderModel ? collaborator.groupHeaderModel.description : 'Undescribe' }}</lib-text-line>
+                    </div>
+                </ng-template>
+
+                <ng-template [ngIf]="collaborator && collaborator.permissionType === 'ROLE'">
+                    <mat-icon mat-list-icon matTooltip="Role" class="icon-role">how_to_reg</mat-icon>
+                    <div class="f-col">
+                        <lib-text-line type="base">{{ collaborator.roleId }}</lib-text-line>
+                        <lib-text-line type="base">{{ collaborator.rolesModel ? collaborator.rolesModel.roleDesc : collaborator.roleId  }}</lib-text-line>
+                    </div>
+                </ng-template>
+                <div class="f-spacer"></div>
+                <lib-button type="major" (click)="updateEmit()" >Save</lib-button>
+            </div>
+            <div class="f-row permissions" [formGroup]="permissionFrmGrp" >
+                <lib-slide-toggle  formControlName="isViewable"  labelposition="before" label="Can view" theme="primary"></lib-slide-toggle>
+                <lib-slide-toggle formControlName="isEditable" labelposition="before" label="Can edit" theme="primary"></lib-slide-toggle>  
+                <lib-slide-toggle formControlName="isDeleteable" labelposition="before" label="Can delete" theme="primary"></lib-slide-toggle>
+        
+            </div>
+        </div>
+    </mat-list-item>
+
+    <!-- ON VIEW MODE -->
+    <mat-list-item *ngIf="!collaborator.showEditMode" (mouseover)="isEditDisplay = true" (mouseout)="isEditDisplay = false">
+        <div class="f-col">
+            <div class="f-row">
+                <ng-template [ngIf]="collaborator && collaborator.permissionType === 'USER'">
+                    <mat-icon mat-list-icon matTooltip="User" class="icon-user">person</mat-icon>
+                    <div class="f-col">
+                        <lib-text-line type="base" *ngIf="collaborator?.userMdoModel?.fullName">{{ collaborator.userMdoModel.fullName }}</lib-text-line>
+                        <lib-text-line type="base">{{ collaborator.userMdoModel ? collaborator.userMdoModel.email : collaborator.userId }}</lib-text-line>
+                    </div>
+                </ng-template>
+
+                <ng-template [ngIf]="collaborator && collaborator.permissionType === 'GROUP'">
+                    <mat-icon mat-list-icon matTooltip="Group" class="icon-group">group</mat-icon>
+                    <div class="f-col">
+                        <lib-text-line type="base">{{ collaborator.groupId }}</lib-text-line>
+                        <lib-text-line type="base">{{ collaborator.groupHeaderModel ? collaborator.groupHeaderModel.description : 'Undescribe' }}</lib-text-line>
+                    </div>
+                </ng-template>
+
+                <ng-template [ngIf]="collaborator && collaborator.permissionType === 'ROLE'">
+                    <mat-icon mat-list-icon matTooltip="Role" class="icon-role">how_to_reg</mat-icon>
+                    <div class="f-col">
+                        <lib-text-line type="base">{{ collaborator.roleId }}</lib-text-line>
+                        <lib-text-line type="base">{{ collaborator.rolesModel ? collaborator.rolesModel.roleDesc : collaborator.roleId }}</lib-text-line>
+                    </div>
+                </ng-template>
+                <div class="f-spacer"></div>
+                <lib-button [style.display]="isEditDisplay ? 'block' : 'none'" (click)="editPermission()" type="plain" icon="pencil-alt"></lib-button>
+                <div class="f-col-spacer-half"></div>
+                <lib-button [style.display]="isEditDisplay ? 'block' : 'none'" (click)="deleteEmit()" icon="trash-alt"></lib-button>
+            </div>
+        </div>
+    </mat-list-item>
+</mat-list>

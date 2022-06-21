@@ -1,0 +1,208 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button (click)="close()" icon="times" iconFontType="light"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading">{{ currentTemplateId ? 'Edit template' : 'New template' }}</lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button width="80px" type="plain" (afterClick)="clearRichTextData()">Reset</lib-button>&nbsp;
+        <lib-button width="80px" type="plain" (afterClick)="openQuickPreviewSideSheet()" >Quick preview</lib-button>&nbsp;
+        <lib-button width="80px" (click)="onSaveTemplate()" type="major" [disabled]="saving">{{ currentTemplateId ? 'Update' : 'Save' }}
+        </lib-button>
+      </div>
+    </div>
+  </div>
+  <div class="f-row-spacer-half"></div>
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <div class="template-container">
+        <form [formGroup]="emailTemplateForm">
+          <div class="f-col">
+            <lib-input inputState="undefined" [hasError]="false" [isRequired]="true" autocomplete="off" label="Name"
+              labelIcon="question-circle" labelIconFont="mdo-icons" (valueChange)="valueChange($event)"
+              (afterBlur)="afterBlur($event)" formControlName="templateName"></lib-input>
+          </div>
+
+          <div class="f-col mdo-field">
+            <lib-text-line type="xsmall" weight="strong" class="field-label">Template type</lib-text-line>
+            <div class="mdo-field-input">
+              <input matInput placeholder="Select" #optionsInput [formControl]="templateTypeOptionCtrl"
+                [matAutocomplete]="textCaseFilterAuto" />
+              <mat-icon matSuffix fontSet="mdo-icons" class="autocomplete-icon">chevron-down</mat-icon>
+              <mat-autocomplete class="mdo-autocomplete" #textCaseFilterAuto="matAutocomplete"
+                (optionSelected)="onSelectTemplateType($event)">
+                <mat-option class="mdo-option" *ngFor="let data of filteredTemplateTypeOptions" [value]="data.value">
+                  {{ data.key }}
+                </mat-option>
+              </mat-autocomplete>
+            </div>
+          </div>
+
+          <div class="f-col mdo-field" *ngIf="emailTemplateForm.get('templateType').value === 'PDF_TEMPLATE'"
+              [class.has-error]="emailTemplateForm.controls?.dataSet?.touched && emailTemplateForm.controls?.dataSet.invalid">
+              <lib-text-line type="xsmall" weight="strong" class="field-label">Dataset</lib-text-line>
+              <div class="mdo-field-input">
+                  <input matInput #datasetInputEl #srcDatasetAutoTrigger="matAutocompleteTrigger"
+                      [matAutocomplete]="srcDatasetAuto"  [formControl]="searchModuleCtrl"
+                      />
+                  <mat-icon matSuffix fontSet="mdo-icons-light" class="autocomplete-icon">chevron-down</mat-icon>
+                  <mat-autocomplete class="mdo-autocomplete" #srcDatasetAuto="matAutocomplete"
+                      [displayWith]="displayDatasetFn" (optionSelected)="selectRefDataset($event)">
+                      <mat-option *ngFor="let dataset of moduleList"
+                          [value]="{moduleId: dataset.moduleId, moduleDesc: dataset.moduleDesc}">
+                          {{ dataset.moduleDesc }}
+                      </mat-option>
+                  </mat-autocomplete>
+              </div>
+              <mat-error>
+                  <mat-error
+                      *ngIf="emailTemplateForm.controls?.dataSet?.touched && emailTemplateForm.controls?.dataSet?.errors?.required">
+                      <lib-text-line type="small"> This is required</lib-text-line>
+                  </mat-error>
+              </mat-error>
+          </div>
+
+          <div class="f-col" *ngIf="emailTemplateForm.get('templateType').value !== 'PDF_TEMPLATE'">
+            <lib-input inputState="undefined" [hasError]="false" [isRequired]="true" autocomplete="off"
+              label="Email subject" labelIcon="question-circle" labelIconFont="mdo-icons"
+              (valueChange)="valueChange($event)" (afterBlur)="afterBlur($event)" formControlName="subject"></lib-input>
+          </div>
+
+          <button (menuOpened)="getMenuCoordinates()" [style.position]="'absolute'" [style.left.px]="menuX"
+            [style.top.px]="menuY" mat-button [matMenuTriggerFor]="headerData"></button>
+
+          <div #editor class="f-col mdo-field">
+            <lib-text-line type="xsmall" weight="strong" class="field-label">Editor</lib-text-line>
+            <pros-quill-editor [fieldid]="'email-body'" #quillEditorRef [denotationChar]="denotationChar" [selectedMenuItem]="selectedMenuItem"
+              (afterBlur)="fireValidationStatus($event)" formControlName="data" [editorConfig]="editorConfig" [returnDelta]="true"
+              (valueChange)="templateBodyUpdated($event)"></pros-quill-editor>
+          </div>
+
+          <div class="f-col" *ngIf="emailTemplateForm.get('templateType').value !== 'PDF_TEMPLATE'">
+            <lib-text-line type="xsmall" weight="strong" class="field-label">Attachment type</lib-text-line>
+            <lib-radio-group
+              layout="horizontal"
+              [options]="attachmentTypeList"
+              [value]="selectedAttachmentType" (valueChange)="attachmentTypeChanged($event)"
+            >
+            </lib-radio-group>
+          </div>
+
+          <div class="f-col mdo-field" *ngIf="selectedAttachmentType === 'STATIC' && emailTemplateForm.get('templateType').value !== 'PDF_TEMPLATE'">
+            <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@industry">Attachment</lib-text-line>
+            <div class="mdo-field-input import-files">
+              <input class="drag-input" type="file" (change)="fileChange($event.target.files)" (drop)="fileChange($event.target.files)" multiple="true"
+                id="fileUpload" />
+              <div class="f-col-spacer-half"></div>
+              <!-- <lib-text-line *ngIf="emailTemplateForm.get('fileName').value">{{emailTemplateForm.get('fileName').value}}</lib-text-line> -->
+              <div class="f-row">
+                <lib-text-line type="base" textColor="secondary">Drag files here or&nbsp;</lib-text-line>
+                <lib-text-line type="base" textColor="link" class="cursor">browse </lib-text-line>
+                <lib-text-line textColor="secondary" type="base">&nbsp;to upload</lib-text-line>
+              </div>
+            </div>
+          </div>
+
+          <div class="attachment-listrow">
+            <ng-container *ngFor="let file of dataSource;let index = index">
+                <div class="f-col attachment-section">
+                    <div class="f-row">
+                      <img [src]="getAttachmentIcon(file.name)" class="attachment-icon"/>
+                      <lib-text-line (click)="downloadFile(file?.docid, file?.name)" type="base" [libTooltip]="file.name" matTooltipPosition="below" [matTooltipDisabled]="file.name.length < 25">
+                        {{ file.name | slice:0:25 }} <span *ngIf="file.name.length > 25">...</span>
+                      </lib-text-line>
+                      <lib-button class="lib-button" *ngIf="!isFieldReadOnly" icon="times" iconFontType="light" type="plain"
+                        (afterClick)="removeSelectedFile(file)"></lib-button>
+                    </div>
+                </div>
+            </ng-container>
+          </div>
+
+
+          <div class="f-col dynamic-attachment" *ngIf="emailTemplateForm.get('templateType').value !== 'PDF_TEMPLATE' && selectedAttachmentType === 'DYNAMIC'">
+            <div class="f-row">
+              <lib-text-line type="leading">Dynamic attachments</lib-text-line>
+              <div class="f-spacer"></div>
+              <lib-button type="plain" icon="plus" iconFontType="light" id="add-item" (click)="addDynamicAttach()"></lib-button>
+            </div>
+
+            <div formArrayName="attachementDetailsModel" *ngFor="let child of attachementDetailsFormArray.controls; let i = index">
+              <pros-dynamic-attachment [frmGrp]="child" (remove)="remove(i)" *ngIf="child.get('type').value === 'DYNAMIC'"></pros-dynamic-attachment>
+            </div>
+          </div>
+        </form>
+      </div>
+      <mat-menu panelClass="header-menu" #headerData="matMenu">
+        <pros-dash-menu [searchedTermForHeaderData]="searchedTermForHeaderData" [menuDataType]="menuDataType" (selectedFlow)="selectedFlow($event)" (closeMenu)="closeMenu($event)"></pros-dash-menu>
+
+      </mat-menu>
+
+      <mat-menu class="header-menu" #dataset="matMenu">
+        <lib-search class="mat-menu-search"></lib-search>
+        <button *ngFor="let module of moduleList" mat-menu-item [matMenuTriggerFor]="dataset2">
+          {{module.moduleDescriptionRequestDTO?.information || module.moduleDescriptionRequestDTO?.description}}
+        </button>
+      </mat-menu>
+
+      <mat-menu class="header-menu" #dataset2="matMenu">
+        <lib-search class="mat-menu-search"></lib-search>
+        <button mat-menu-item>Name</button>
+        <button mat-menu-item [matMenuTriggerFor]="datasetRecordNo">Record no</button>
+        <button mat-menu-item [matMenuTriggerFor]="datasetRecordData">Record data</button>
+        <button mat-menu-item [matMenuTriggerFor]="fieldList">Field</button>
+      </mat-menu>
+
+      <mat-menu class="header-menu" #datasetRecordNo="matMenu">
+        <lib-search class="mat-menu-search"></lib-search>
+        <button mat-menu-item>Record no #1</button>
+        <button mat-menu-item>Record no #2</button>
+        <button mat-menu-item>Record no #3</button>
+        <button mat-menu-item>Record no #4</button>
+      </mat-menu>
+
+      <mat-menu class="header-menu" #datasetRecordData="matMenu">
+        <lib-search class="mat-menu-search"></lib-search>
+        <button mat-menu-item [matMenuTriggerFor]="datasetField">Record no #1</button>
+        <button mat-menu-item [matMenuTriggerFor]="datasetField">Record no #2</button>
+        <button mat-menu-item [matMenuTriggerFor]="datasetField">Record no #3</button>
+        <button mat-menu-item [matMenuTriggerFor]="datasetField">Record no #4</button>
+      </mat-menu>
+
+      <mat-menu class="header-menu" #datasetField="matMenu">
+        <lib-search class="mat-menu-search"></lib-search>
+        <lib-section text="System fields"></lib-section>
+        <button mat-menu-item>Last modified on</button>
+        <button mat-menu-item>Last modified by</button>
+        <button mat-menu-item>Created by</button>
+        <button mat-menu-item>Created on</button>
+        <lib-section text="Record fields"></lib-section>
+        <button mat-menu-item>Field #1</button>
+        <button mat-menu-item>Field #2</button>
+        <button mat-menu-item>Field #3</button>
+        <button mat-menu-item>Field #4</button>
+      </mat-menu>
+
+      <mat-menu class="header-menu" #flow="matMenu">
+        <button mat-menu-item>Insects</button>
+        <button mat-menu-item>Molluscs</button>
+        <button mat-menu-item>Crustaceans</button>
+        <button mat-menu-item>Corals</button>
+        <button mat-menu-item>Arachnids</button>
+        <button mat-menu-item>Velvet worms</button>
+        <button mat-menu-item>Horseshoe crabs</button>
+      </mat-menu>
+
+      <mat-menu class="header-menu" #fieldList="matMenu">
+        <button mat-menu-item>Field #1</button>
+        <button mat-menu-item>Field #2</button>
+        <button mat-menu-item>Field #3</button>
+        <button mat-menu-item>Field #4</button>
+        <button mat-menu-item>Field #5</button>
+        <button mat-menu-item>Field #6</button>
+      </mat-menu>
+    </div>
+  </div>
+
+
+</div>

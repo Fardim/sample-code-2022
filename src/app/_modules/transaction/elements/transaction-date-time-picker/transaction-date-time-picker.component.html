@@ -1,0 +1,23 @@
+<div class="f-row">
+    <lib-checkbox
+    [formControl]="copyField"
+    *ngIf="process === 'copy'"
+    class="copy-box"
+    ></lib-checkbox>
+
+  <div class="f-col w-100">
+    <lib-date-time-picker
+      [selectedDate]="SelectedDate"
+      (valueChange)="timeChange($event)"
+      [enableTimeInput]="true"
+      [emitDateOnSave]="false"
+      [disabled]="isFieldReadOnly  || control.disabled"
+      [minDate]="minDate"
+      [maxDate]="maxDate"
+      [isRequired]="isRequired"
+      [label]="fieldObj?.fieldCtrl?.description"
+      [hint]="getHint"
+    ></lib-date-time-picker>
+  </div>
+</div>
+

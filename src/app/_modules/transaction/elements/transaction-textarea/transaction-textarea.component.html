@@ -1,0 +1,19 @@
+<div class="f-row">
+  <lib-checkbox
+  [formControl]="copyField"
+  *ngIf="process === 'copy'"
+  class="copy-box"
+  ></lib-checkbox>
+
+  <div class="f-col w-100">
+    <lib-textarea
+      value="Textarea value"
+      [label]="fieldObj.fieldCtrl.description"
+      hint="You should use this for longer text content"
+      [formControl]="control"
+      [hasError]="control.invalid && !control.pristine"
+      (afterBlur)="afterBlur()"
+    ></lib-textarea>
+  </div>
+</div>
+

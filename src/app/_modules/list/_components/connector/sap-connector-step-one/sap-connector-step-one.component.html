@@ -1,0 +1,146 @@
+<div class="root">
+  <div class="f-col manually-dataset">
+    <div class="f-row-spacer-half"></div>
+    <form>
+      <div class="f-col mdo-field">
+        <lib-banner status="error" text="formErrMsg"></lib-banner>
+      </div>
+
+      <div class="f-col mdo-field">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@service_structure">Service structure
+        </lib-text-line>
+        <lib-segment [optionsList]="serviceStructureOptions" labelKey="label" valueKey="value"> </lib-segment>
+      </div>
+
+      <div class="f-col mdo-field">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@standard_package">Standard package
+        </lib-text-line>
+        <div class="mdo-field-input">
+          <input matInput placeholder="Select data type" #optionsInput [matAutocomplete]="standardPackageAuto" />
+          <mat-autocomplete class="mdo-autocomplete" #standardPackageAuto="matAutocomplete">
+            <mat-option class="mdo-option" *ngFor="let data of standardPackageOptions" [value]="data">
+              {{ data }}
+            </mat-option>
+          </mat-autocomplete>
+        </div>
+      </div>
+
+      <div class="f-col mdo-field">
+        <lib-slide-toggle i18n-label="@@update_data_system" label="Update data in the system" theme="primary"
+          labelPosition="before">
+        </lib-slide-toggle>
+      </div>
+
+      <div class="f-col mdo-field">
+        <lib-slide-toggle i18n-label="@@sync_data" label="Sync data" theme="primary" labelPosition="before">
+        </lib-slide-toggle>
+      </div>
+
+      <div class="f-col mdo-field">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@standard_package">Standard package
+        </lib-text-line>
+        <div class="mdo-field-input">
+          <input matInput placeholder="Select data type" #optionsInput [matAutocomplete]="sapTableAuto" />
+          <mat-autocomplete class="mdo-autocomplete" #sapTableAuto="matAutocomplete">
+            <mat-option class="mdo-option" *ngFor="let data of sapTableOptions" [value]="data">
+              {{ data }}
+            </mat-option>
+          </mat-autocomplete>
+        </div>
+      </div>
+
+      <div class="f-col mdo-field">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@parent_dataset">Parent dataset(s)
+        </lib-text-line>
+        <div class="mdo-field-input">
+          <lib-chip-list>
+            <ng-container *ngFor="let opt of selectedColumns; let i = index">
+              <ng-container *ngIf="i <= limit - 1">
+                <lib-chip [removable]="true" (removed)="remove(opt)">{{ opt }}</lib-chip>
+              </ng-container>
+            </ng-container>
+            <lib-chip *ngIf="hasLimit(true)">+{{ selectedColumns.length - limit }}</lib-chip>
+            <input matInput placeholder="Type to search" id="parentOptionInput" [matAutocomplete]="parentDatsetAuto" />
+          </lib-chip-list>
+          <mat-autocomplete class="mdo-autocomplete" #parentDatsetAuto="matAutocomplete">
+            <mat-option class="mdo-option" name="parentDataset" *ngFor="let opt of columnOptions" [value]="opt">
+              {{ opt }}
+            </mat-option>
+          </mat-autocomplete>
+        </div>
+        <lib-text-line type="xsmall" textColor="secondary"> Columns are displayed based on the SAP table selected above
+        </lib-text-line>
+      </div>
+
+      <div class="f-col mdo-field">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@service_structure">Generate structure
+          from...
+        </lib-text-line>
+        <lib-segment [optionsList]="generateStructureOptions" labelKey="label" valueKey="value"> </lib-segment>
+      </div>
+
+      <div class="f-col mdo-field" *ngIf="!hideUrlDropdown">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@standard_package">Url </lib-text-line>
+        <div class="mdo-field-input">
+          <input matInput placeholder="Select data type" #optionsInput [matAutocomplete]="urlAuto" />
+          <mat-autocomplete class="mdo-autocomplete" #urlAuto="matAutocomplete">
+            <mat-option class="mdo-option" *ngFor="let data of urlOptions" [value]="data">
+              {{ data }}
+            </mat-option>
+            <mat-option>
+              <lib-text-line class="link-text" textColor="link" type="base" (click)="hideUrlDropdown = true">
+                Add Manually...
+              </lib-text-line>
+            </mat-option>
+          </mat-autocomplete>
+        </div>
+      </div>
+
+      <div class="f-col" *ngIf="hideUrlDropdown">
+        <lib-input suffixIcon="times" (afterSuffixBtnClick)="hideUrlDropdown = false" label="Url" i18n-label="@@url"
+          type="text" placeholder="Type to search URL...">
+        </lib-input>
+      </div>
+
+      <div class="f-col upload-container">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@upload_file">Upload file
+        </lib-text-line>
+        <label class="file">
+          <input type="file" id="file" style="display: none" multiple (change)="uploadAttachements($event.target.files)"
+            (click)="$event.target.value = ''" />
+          <span class="file-custom"></span>
+          <span class="placeholder">Drag a file here or <span
+              style="color: rgb(0, 120, 212); cursor: pointer;">Browse</span> to upload</span>
+        </label>
+        <div class="row-spacer"></div>
+        <div class="f-col attachment-section" *ngFor="let attachment of attachments; let index = index">
+          <div class="attachment" [ngClass]="{ hasError: attachment.uploadError }">
+            <img [src]="getAttachmentIcon(attachment.file?.name)" class="attachment-icon" />
+            <span class="attachment-name" [libTooltip]="attachment.file?.name.length > 25 ? attachment.file?.name : ''">
+              {{ truncateAttachmentName(attachment.file?.name) }}</span>
+              <span class="f-spacer"></span>
+            <lib-button class="lib-button" (click)="removeAttachment(index)" icon="times" type="plain"></lib-button>
+          </div>
+          <mat-progress-bar *ngIf="!attachment.uploadError && !attachment.uploaded" mode="indeterminate">
+          </mat-progress-bar>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="f-row dataset-button">
+    <lib-button type="plain" i18n="@@cancel">Cancel</lib-button>
+    <span class="f-spacer"></span>
+    <div class="f-row">
+      <lib-button type="plain" i18n="@@back" (click)="connectorService.updateNextStep(-1)">Back</lib-button>
+      <lib-button type="major" i18n="@@next" (click)="connectorService.updateNextStep(1)">Next </lib-button>
+    </div>
+  </div>
+</div>
+<div class="row-spacer"></div>
+<div class="f-row">
+  <lib-button type="plain" i18n="@@cancel">Cancel</lib-button>
+  <span class="f-spacer"></span>
+  <lib-button type="plain" i18n="@@back">Back</lib-button>
+  <span class="f-col-spacer-half"></span>
+  <lib-button type="major" i18n="@@next">Next </lib-button>
+</div>

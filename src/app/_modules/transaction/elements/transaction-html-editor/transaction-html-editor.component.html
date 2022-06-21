@@ -1,0 +1,17 @@
+<div class="f-row">
+  <lib-checkbox
+  [formControl]="copyField"
+  *ngIf="process === 'copy'"
+  class="copy-box"
+  ></lib-checkbox>
+
+  <div class="f-col w-100">
+    <lib-text-line type="xsmall" weight="strong" class="field-label">{{ fieldObj?.fieldCtrl?.description }}</lib-text-line>
+    <pros-rich-text-editor
+      [tabFieldId]="fieldObj.fieldId"
+      [control]="control"
+      [isReadOnly]="isFieldReadOnly"
+      (valueChange)="editorValueChange($event)"
+    ></pros-rich-text-editor>
+  </div>
+</div>

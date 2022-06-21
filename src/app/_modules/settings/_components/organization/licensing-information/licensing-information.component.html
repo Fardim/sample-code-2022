@@ -1,0 +1,18 @@
+<div class="f-col root">
+    <div class="f-col" *ngIf="licenseInfo?.licenseType === 'TRIAL'">
+        <lib-banner text="You have 30 days left in your trial." status="info"  *ngIf="licenseInfo?.licenseType === 'TRIAL'">
+        </lib-banner>
+    </div>
+
+    <ng-template [ngIf]="licenseInfo?.licenseType === 'SUBSCRIPTION'">
+        <lib-banner text="Your subscription expired has been soon. Please renew your subscription." status="error" *ngIf="licenseInfo?.status === 'EXPIRED'">
+        </lib-banner>
+        <div class="f-col">
+            <lib-input label="Licence type" disabled="true" [value]="licenseInfo?.licenseType"></lib-input>
+        </div>
+
+        <div class="f-col">
+            <lib-input label="Expiry date" disabled="true" [value]="licenseInfo?.expiryDate"></lib-input>
+        </div>
+    </ng-template>
+</div>

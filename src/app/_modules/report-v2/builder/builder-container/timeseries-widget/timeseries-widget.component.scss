@@ -1,0 +1,40 @@
+mat-card.widget {
+  box-sizing: border-box;
+  padding: 8px;
+  height: 100%;
+
+  .lib-text {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .chart-height {
+    height: 100%;
+  }
+
+  mat-card-content {
+    height: calc(100% - 36px - 16px);
+    overflow: auto;
+
+    .datafilter {
+      align-items: center;
+      flex-wrap: wrap;
+
+      button.mat-stroked-button {
+        margin-right: 4px;
+        margin-bottom: 4px;
+      }
+
+      .input-actions {
+        mat-divider.mat-divider {
+          height: 40px;
+        }
+      }
+    }
+  }
+
+  .hide {
+    display: none !important;
+  }
+}

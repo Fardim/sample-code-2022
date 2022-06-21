@@ -1,0 +1,68 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" (click)="close()" iconFontType="light"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row">
+        <lib-text-line type="leading">New data scope</lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="minor" width="80px" type="major" (click)="save()" i18n="@@save">Save</lib-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <lib-banner status="info" text="The configured view is different to your selected view option. Would like to update to the original?">
+      </lib-banner>
+
+      <div class="f-col">
+        <lib-input label="Name" i18n-label="@@name" type="text"> </lib-input>
+      </div>
+
+      <div class="f-row system">
+        <div class="f-col system-fields-col">
+          <lib-search [formControl]="segmentFilterControl" i18n-placeholder="@@search" placeholder="Search filters"></lib-search>
+          <div class="f-row-spacer-half"></div>
+          <lib-section></lib-section>
+          <div class="f-row-spacer-half"></div>
+          <cdk-virtual-scroll-viewport itemSize="64" #virtualScroll class="filters-list" id="mat-tree">
+
+            <mat-list class="default-options">
+              <mat-accordion togglePosition="before" [multi]="true">
+                <ng-container *ngFor="let segment of filteredSelectedSegmentMappings | async;">
+                  <pros-segment-data
+                  [segment]="segment"
+                  [removable]="true"
+                  (fieldRemoved)="removeFields($event)"
+                  (fieldSelected)="addedSelectFields($event)"
+                  ></pros-segment-data>
+                </ng-container>
+              </mat-accordion>
+            </mat-list>
+
+            <lib-section></lib-section>
+
+            <mat-list class="options">
+              <mat-accordion togglePosition="before" [multi]="true">
+                <ng-container *ngFor="let segment of filteredSegmentMappings | async;">
+                  <pros-segment-data
+                  [segment]="segment"
+                  (fieldSelected)="selectFields($event)"
+                  ></pros-segment-data>
+                </ng-container>
+              </mat-accordion>
+            </mat-list>
+
+          </cdk-virtual-scroll-viewport>
+        </div>
+        <div class="col-spacer"></div>
+        <div class="f-col system-values-col">
+          <div class="f-col" *ngIf="selectedFilter.FIELDID">
+            <lib-textarea label="Value" [(ngModel)]="selectedFilter.VALUE1" (valueChange)="updateFilterValue($event)" i18n-label="@@value" type="text"> </lib-textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+<mat-card class="mat-elevation-z0 widget">
+    <div class="f-row breadcrum-toolbar">
+      <div #displayHeading
+        [libTooltip]="widgetHeader.widgetName" matTooltipPosition="right" [matTooltipDisabled]="false">
+        <lib-text-line type="leading" enableWrap="true">{{widgetHeader.widgetName}}</lib-text-line>
+      </div>
+      <div class="f-spacer"></div>
+      <lib-button type="plain" (click)="clearFilter()" *ngIf="showClearButton" iconFontType="light" icon="times"></lib-button>
+    </div>
+    <div class="row-spacer"></div>
+    <mat-card-content (click)="emitEvtFilterCriteria($event)">
+        <lib-text-line type="base">{{count | number}}</lib-text-line>
+    </mat-card-content>
+</mat-card>

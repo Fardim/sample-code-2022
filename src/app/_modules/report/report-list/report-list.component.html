@@ -1,0 +1,36 @@
+<div class="root">
+
+	<!-- BREADCRUMB-->
+	<div class="breadcrumb-wrapper">
+		<pros-breadcrumb [crumbs]="breadcrumb"></pros-breadcrumb>
+    </div>
+    
+    <mat-card class="container-show reportlist-container">
+        <mat-form-field>
+            <mat-label>Search Report Dashboard</mat-label>
+            <input matInput [formControl] ="searchReportListCtrl">
+        </mat-form-field>
+
+        <div class="f-col">
+            <mat-card class="mat-elevation-z4 reportlisting" *ngFor="let report of reportListOb | async">
+                <mat-toolbar-row>
+                    <lib-text-line type="leading">{{ report.reportName ? report.reportName : 'Untitled' }}</lib-text-line>
+                    <span class="f-spacer"></span>
+                    <button [disabled]="report.permission && !report.permission.isViewable" mat-icon-button matTooltip="Dashboard" [routerLink]="['/home', 'report', 'dashboard', report.reportId]">
+                        <mat-icon>dashboard</mat-icon>
+                    </button>
+                    <div class="f-col-spacer-half"></div>
+                    <button [disabled]="report.permission && !report.permission.isEditable" mat-icon-button matTooltip="Edit" [routerLink]="['/home', 'report', 'dashboard-builder', report.reportId]">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <div class="f-col-spacer-half"></div>
+                    <button [disabled]="report.permission && !report.permission.isDeleteable" mat-icon-button matTooltip="Delete" (click)="delete(report.reportId)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </mat-toolbar-row>
+            </mat-card>
+            <pros-add-tile text="Create new report dashboard" routerLink="/home/report/dashboard-builder/new"></pros-add-tile>
+        </div>
+    </mat-card>
+
+</div>

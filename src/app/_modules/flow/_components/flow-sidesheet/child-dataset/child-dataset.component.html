@@ -1,0 +1,41 @@
+<form [formGroup]="childForm">
+    <div class="f-col user-defined-set" [ngClass]="{'empty-space': type === 'nested', 'nested-row': nestedChildCount > 0}">
+        <div class="f-row defined-row">
+            <div class="col select-col udr-select-col"></div>
+            <!-- Dataset -->
+            <div class="col col-x5">
+                <mat-form-field appearance="outline">
+                    <input matInput placeholder="Select dataset" #childDatasetInputEl formControlName="dataSetId"
+                        [matAutocomplete]="moduleAutoCmp" />
+                    <mat-autocomplete class="mdo-autocomplete" (optionSelected)="optionSelected($event)"
+                        [displayWith]="getDatasetTitle.bind(this)" #moduleAutoCmp="matAutocomplete">
+                        <mat-option class="mdo-option" *ngFor="let ckbox of childDatasets" [value]="ckbox.childDatasetId">
+                            {{ckbox.childDescription}}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+            <!-- Form -->
+            <div class="col col-x5">
+                <mat-form-field appearance="outline">
+                    <input matInput placeholder="Select form" #childFormInputEl formControlName="formId"
+                        [matAutocomplete]="formAutoCmp">
+                    <mat-autocomplete class="mdo-autocomplete" #formAutoCmp="matAutocomplete"
+                        [displayWith]="getFormTitle.bind(this)" (optionSelected)="formSelected($event)">
+                        <mat-option *ngFor="let arr of childFormsList" class="mdo-option" [value]="arr.layoutId">
+                            {{arr.description}}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+            <!-- Actions -->
+            <div class="col">
+                <ng-template [ngIf]="type === 'primary'">
+                    <lib-button type="plain" icon="plus" iconFontType="light" (click)="add()" [disabled]="!isAllowAddNewChild"></lib-button>
+                </ng-template>
+                <lib-button type="plain" icon="link" iconFontType="light" libTooltip="Define applicable field values"></lib-button>
+                <lib-button type="plain" icon="trash-alt" iconFontType="light" libTooltip="Delete" (click)="remove()"></lib-button>
+            </div>
+        </div>
+    </div>
+</form>

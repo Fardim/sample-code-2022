@@ -1,0 +1,19 @@
+<div class="root">
+  <div class="f-col">
+    <mat-spinner *ngIf = "showRunning"></mat-spinner>
+    <button mat-fab disabled *ngIf = "!showRunning">{{totalCount | thousandconvertor}}
+      <button mat-mini-fab>
+        <mat-icon>check</mat-icon>
+      </button>
+    </button>
+    
+    <h2 class="mat-h2">The schema will be executed on {{totalCount | thousandconvertor}} records</h2>
+    <button mat-button color="primary">show preview data <i class="material-icons">open_in_new</i></button>
+  </div>
+  <div class="f-row">
+    <button mat-flat-button (click)="closeDialog()" >Go back and edit variant</button>
+    <button mat-flat-button>Scheduling</button>
+    <button mat-flat-button *ngIf = "showRunning" color="primary">Fetching ...</button>
+    <button mat-flat-button *ngIf = "!showRunning" (click)="scheduleSchema()" color="primary">Run on {{totalCount | thousandconvertor}} now</button>
+  </div>
+</div>

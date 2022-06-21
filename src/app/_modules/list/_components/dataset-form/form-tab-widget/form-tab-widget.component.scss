@@ -1,0 +1,88 @@
+div.root {
+  .static-field {
+    cursor: pointer;
+    margin-bottom: 8px;
+    padding: 6px 12px;
+
+    .image-uploader {
+      flex-wrap: wrap;
+      padding: 6px;
+      border-radius: 3px;
+      height: 36px;
+
+      .attachment-section {
+        align-items: stretch;
+        padding-left: 6px;
+
+        .attachment-icon {
+          width: 14px;
+          height: 14px;
+          margin-right: 6px;
+        }
+      }
+    }
+  }
+
+  .child-field {
+    margin-left: 20px;
+    margin-right: -6px;
+  }
+}
+
+.tab-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 6px;
+
+  .colunm-box {
+    width: 100%;
+    cursor: pointer;
+    border: 1px solid #e4ebf3;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 8px;
+
+    .col {
+      display: flex;
+      flex: 1 0 auto;
+      width: 1px;
+      align-items: center;
+      margin: 0 4px;
+
+      &.col-x4 {
+        flex: 4;
+      }
+
+      &.col-x5 {
+        flex: 5;
+      }
+
+      &.col-x6 {
+        flex: 6;
+      }
+
+      &.end-item {
+        justify-content: flex-end;
+        visibility: hidden;
+      }
+
+      &.center-item {
+        justify-content: center;
+      }
+    }
+  }
+
+  .field-description {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .colunm-box:hover {
+    .end-item {
+      visibility: visible;
+    }
+  }
+}

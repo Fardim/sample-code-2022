@@ -1,0 +1,54 @@
+<ng-container [ngSwitch]="inputType">
+    <!-- Input type number -->
+    <mat-form-field *ngSwitchCase="FIELD_TYPE.NUMBER" appearance="outline" prosClickStopPropagation class="edit-cell">
+        <input matInput type="number" step="any" class="mat-input" #input
+            (blur)="emitInputBlur($event.target.value)"
+            [value]="value">
+    </mat-form-field>
+
+    <!-- Input type Date and Date and time -->
+    <mat-form-field *ngSwitchCase="FIELD_TYPE.DATE" appearance="outline" prosClickStopPropagation class="edit-cell">
+        <input matInput [matDatepicker]="picker" class="mat-input" #input
+           (focus)="picker.open()"
+           [formControl]="dateControl">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker (closed)="datePanelClosed()">
+        </mat-datepicker>
+    </mat-form-field> 
+
+    <!-- Input type single select -->
+    <mat-form-field *ngSwitchCase="FIELD_TYPE.SINGLE_SELECT" appearance="outline" prosClickStopPropagation class="edit-cell">
+        <input matInput [matAutocomplete]="auto" class="mat-input" #input [formControl]="searchControl"
+               placeholder="Search"
+               (blur)="emitChngSelectValue($event)"
+               #trigger="matAutocompleteTrigger">
+               <div class="input-actions">
+                <mat-icon fontSet="mdo-icons">search</mat-icon>
+                <!-- <mat-icon fontSet="mdo-icons" class="info-arrow">menu-arrow1</mat-icon> -->
+            </div>
+            
+        <mat-autocomplete [displayWith]="singleSelectDisplayFn" #auto="matAutocomplete">
+            <mat-option class="mat-result-option" *ngFor="let option of filterdOptionsObs | async" 
+            [value]="option" libTooltip="{{ option.TEXT }}" matTooltipPosition="right"> {{ option.TEXT }} </mat-option>
+            <mat-option class="no-result" disabled>No results found</mat-option>  
+        </mat-autocomplete>
+    </mat-form-field> 
+
+    <!-- Input type multiple select -->
+    <mat-form-field *ngSwitchCase="FIELD_TYPE.MULTI_SELECT" appearance="outline" prosClickStopPropagation class="edit-cell">                                     
+        <mat-label>Select value</mat-label>
+        <mat-select #selectMultiple multiple [value]="value" #input
+                    (openedChange)="!selectMultiple.panelOpen ? formatMultiSelectValue(selectMultiple.value) : 0">
+            <mat-option *ngFor="let option of selectFieldOptions" 
+                    [value]="option.CODE" libTooltip="{{ option.TEXT }}" matTooltipPosition="right"> {{ option.TEXT }} </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <!-- Default input type text -->
+    <mat-form-field [ngStyle]="textAreaFieldHeight" *ngSwitchDefault appearance="outline" prosClickStopPropagation class="edit-cell text">
+            <textarea [ngStyle]="textAreaFieldHeight" matInput class="mat-input textarea" #input
+            (blur)="emitInputBlur($event.target.value)"
+            [value]="value" name="text" wrap="soft"></textarea>
+    </mat-form-field>
+</ng-container>
+

@@ -1,0 +1,56 @@
+.mapping-card {
+  width: 400px;
+  height: 300px;
+  border-radius: 3px;
+  padding: 12px;
+
+  .map-filters {
+    padding: 16px 0 8px 0;
+
+    .lib-search {
+      flex: 3;
+      margin-right: 8px;
+    }
+
+    .filter-actions {
+      flex: 1;
+      justify-content: flex-end;
+    }
+  }
+
+  .mapping-data {
+    height: 100%;
+    overflow: auto;
+
+    .column-box {
+      min-height: 44px;
+
+      &.column-box-head {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: white;
+        border-bottom: solid 1px #eee;
+      }
+
+      .col {
+        display: flex;
+        flex: 1 0 auto;
+        width: 1px;
+        align-items: center;
+        margin: 0 4px;
+        flex-wrap: wrap;
+
+        &.col-x3 {
+          flex: 3;
+        }
+
+        &.disabled {
+          cursor: default;
+          user-select: text;
+          opacity: 0.3;
+        }
+      }
+    }
+  }
+}

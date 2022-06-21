@@ -1,0 +1,62 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  width: 900px;
+
+  .breadcrum-toolbar {
+    padding: 8px 12px;
+    align-items: flex-start;
+
+    .mdo-constrained-right {
+      width: 100%;
+      margin-right: 0;
+    }
+  }
+
+  .sidesheetcontent-listing {
+    .mdo-justify {
+      margin: 0 16px;
+
+      .list-scroll {
+        height: calc(100vh - 102px);
+        overflow: auto;
+      }
+
+      .filters-list {
+        .lib-search {
+          width: 213px;
+          margin-right: 6px;
+        }
+      }
+
+      table.mat-table {
+        border-collapse: separate;
+
+        .mat-cell {
+          border-right: none;
+
+          &.right-align {
+            text-align: right;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 62px;
+      }
+    }
+  }
+}

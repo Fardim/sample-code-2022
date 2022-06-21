@@ -1,0 +1,28 @@
+.breadcrum-toolbar {
+  padding: 8px 0;
+}
+
+.submenu {
+  padding-left: 0;
+}
+
+.lib-search {
+  width: 240px;
+}
+
+.menu-container {
+  display: flex;
+  height: calc(100vh - 150px);
+  margin-top: 8px;
+  overflow: auto;
+}
+
+.viewport-scroll {
+  height: 300px;
+  margin-top: 15px;
+  min-height: 100%;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+}

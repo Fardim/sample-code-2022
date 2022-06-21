@@ -1,0 +1,43 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  width: 300px;
+
+  .breadcrum-toolbar {
+    padding: 8px 0;
+    background: transparent;
+
+    .mdo-constrained-right {
+      width: 100%;
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px);
+    overflow: auto;
+
+    .mdo-justify {
+      margin: 0 16px;
+
+      .error-listing {
+        margin: 4px 0;
+        align-items: flex-start;
+
+        .error-value {
+          line-height: 24px;
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 32px;
+      }
+    }
+  }
+}

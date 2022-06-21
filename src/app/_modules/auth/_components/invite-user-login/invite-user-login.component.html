@@ -1,0 +1,37 @@
+<div class="root">
+  <div class="f-col login-container">
+    <div class="login-logo">
+      <pros-svg-icon size="160" icon="MDO_LOGO" class="company-logo"></pros-svg-icon>
+    </div>
+    <div class="row-spacer"></div>
+    <mat-card class="f-col login-section">
+      <form [formGroup]="inviteUserForm">
+        <div class="display-heading">Set up your account</div>
+        <div class="f-col mdo-field">
+          <lib-banner *ngIf="showErrorBanner" status="error" [text]="bannerErrorMsg"></lib-banner>
+        </div>
+        <div class="f-col">
+          <lib-input label="Email" i18n-label="@@email" formControlName="email" type="text" [isRequired]="true">
+          </lib-input>
+          <div class="row-spacer"></div>
+          <lib-input label="Password" i18n-label="@@password" formControlName="password" [type]="passwordHandling.password.displayType" [isRequired]="true"
+            [hint]="getHint('password')" [hasError]="hasError['password']" [suffixIcon]="passwordHandling.password.eyeType" (afterSuffixBtnClick)="onSuffixBtnClickForPassWord('password')">
+          </lib-input>
+          <div class="row-spacer"></div>
+          <lib-input label="Verify password" i18n-label="@@verify_password" formControlName="verifyPassword" [type]="passwordHandling.verifyPassword.displayType" [isRequired]="true"
+            [hint]="getHint('verifyPassword')" [hasError]="hasError['verifyPassword']" [suffixIcon]="passwordHandling.verifyPassword.eyeType" (afterSuffixBtnClick)="onSuffixBtnClickForPassWord('verifyPassword')">
+          </lib-input>
+        </div>
+
+        <div class="row-spacer"></div>
+        <div class="f-col">
+          <lib-button type="major" *ngIf="!ishowLoader" class="submit-button" i18n="@@set_password_and_login" (click)="submitPassword()">Set password and login
+          </lib-button>
+          <lib-button type="minor" *ngIf="ishowLoader" width="100%">
+            <lib-spinner [type]="'minor'" size="25"></lib-spinner>
+          </lib-button>
+        </div>
+      </form>
+    </mat-card>
+  </div>
+</div>

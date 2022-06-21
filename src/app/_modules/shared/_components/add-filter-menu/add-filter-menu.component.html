@@ -1,0 +1,51 @@
+<div class="root f-col">
+    <mat-nav-list>
+        <ng-container *ngIf="!activateElement">
+            <div class="f-col">
+                <lib-search  class="search" placeholder="Search for fields" *ngIf="searchDrop.length > 0" prosClickStopPropagation
+                    (valueChange)="searchField($event)"></lib-search>
+            </div>
+
+            <mat-list-item *ngFor="let fld of metadaDrop" prosClickStopPropagation (click)="ctrlFlds(fld)">
+                <div class="mat-line" *ngIf="fld.fieldDescri !== null || fld.fieldDescri !== undefined">
+                    {{ fld.fieldDescri }}
+                </div> <span class="f-spacer"></span>
+                <mat-icon fontSet="mdo-icons"> arrow-right</mat-icon>
+            </mat-list-item>
+
+            <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" #tree>
+                <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding style="cursor: pointer;">
+                    <mat-list-item prosClickStopPropagation (click)="ctrlFlds(node.allData)">
+                        <div class="mat-line">
+                            {{node.name}}
+                        </div> <span class="f-spacer"></span><mat-icon fontSet="mdo-icons" class="arrow-right"> arrow-right</mat-icon>
+                    </mat-list-item>
+                </mat-tree-node>
+                <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
+                    <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
+                        <mat-icon class="mat-icon-rtl-mirror">
+                            {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                        </mat-icon>
+                    </button>
+                    {{node.name}}
+                </mat-tree-node>
+            </mat-tree>
+
+        </ng-container>
+
+        <div class="f-col" *ngIf="activateElement" prosClickStopPropagation>
+            <div class="f-row filter-header" prosClickStopPropagation>
+                <lib-button icon="arrow-left" (click)="prevState($event)"></lib-button>
+                <div class="mat-line" *ngIf="activateElement">
+                    {{ (activateElement.fieldDescri !== null) ? activateElement.fieldDescri : activateElement.fieldId }}
+                </div>
+            </div>
+
+            <pros-filter-values [moduleId]="moduleId" [fieldId]="activateElement ? activateElement.fieldId : ''"
+                (selectedValues)="emitAppliedFilter($event)" [checkedValue]="selectedValues"
+                [isSearchEnable]="isSearchEnable" [selectedDropValues]="dropValuesCode">
+            </pros-filter-values>
+
+        </div>
+    </mat-nav-list>
+</div>

@@ -1,0 +1,61 @@
+<div class="f-row date-fields">
+    <div class="f-col data-column">
+        <mat-list role="list" class="mdo-list" prosClickStopPropagation>
+            <mat-list-item [class.selected]="item === currentPickerType" *ngFor="let item of datePickerList"
+                (click)="updateDatePickerType(item)">
+                <div class="list-item">
+                    <lib-text-line type="base" class="text-line">{{ item }}
+                    </lib-text-line>
+                    <lib-button type="plain" icon="long-arrow-right"></lib-button>
+                </div>
+            </mat-list-item>
+            <mat-list-item [class.selected]="currentPickerType === 'Specific Date'"
+                (click)="updateDatePickerType('Specific Date')">
+                <div class="list-item">
+                    <lib-text-line type="base" class="text-line">Specific Date
+                    </lib-text-line>
+                    <lib-button type="plain" icon="long-arrow-right"></lib-button>
+                </div>
+            </mat-list-item>
+            <mat-list-item [class.selected]="currentPickerType === 'Date Range'"
+                (click)="updateDatePickerType('Date Range')">
+                <div class="list-item">
+                    <lib-text-line type="base" class="text-line">Date Range
+                    </lib-text-line>
+                    <lib-button type="plain" icon="long-arrow-right"></lib-button>
+                </div>
+            </mat-list-item>
+        </mat-list>
+    </div>
+
+    <span class="f-col-spacer-half"></span>
+    <div class="f-col data-column">
+        <ng-template [ngIf]="currentPickerType">
+            <mat-list class="date-picker-list" prosClickStopPropagation
+                *ngIf="currentPickerType !== 'Date Range' && currentPickerType !== 'Specific Date'">
+                <lib-radio-group layout="vertical" [options]="datePickerOptionsList" [formControl]="pickerCtrl"
+                    (valueChange)="updateFilterValue($event)" [name]="widgetId">
+                </lib-radio-group>
+            </mat-list>
+        </ng-template>
+    </div>
+</div>
+
+<ng-template
+    [ngIf]="currentPickerType === 'Date Range' || (dateCtrl.value && (currentPickerType !== 'Date Range' && currentPickerType !== 'Specific Date' && isDateShown()))">
+    <lib-date-time-range-picker  class="datepicker" prosClickStopPropagation [hideInput]="false" [emitDateOnSave]="true"   [enableTimeInput]='true'
+        [selectedDate]="getSelectedValue()" (valueChange)="dateRangeChanged($event)" [formControl]="dateCtrl">
+    </lib-date-time-range-picker>
+</ng-template>
+
+<ng-template [ngIf]="currentPickerType === 'Specific Date'">
+    <lib-date-time-picker class="datepicker" prosClickStopPropagation [hideInput]="false" [emitDateOnSave]="true"  [enableTimeInput]='true'
+        [selectedDate]="getSelectedValue()" (valueChange)="dateChanged($event)" [formControl]="dateCtrl">
+    </lib-date-time-picker>
+</ng-template>
+
+<ng-template [ngIf]="isFilterWidget">
+    <div class="filter-button-wrapper">
+        <lib-button type="minor" (click)="applyFilter()" i18n="@@apply">Apply</lib-button>
+    </div>
+</ng-template>

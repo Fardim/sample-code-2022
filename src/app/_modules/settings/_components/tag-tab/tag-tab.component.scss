@@ -1,0 +1,63 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  padding: 0 12px;
+
+  .breadcrum-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding-top: 8px;
+    min-height: 36px;
+  }
+
+  .lib-search {
+    width: 213px;
+    display: block;
+  }
+
+  .colunm-list {
+    height: calc(100vh - 112px);
+    overflow: auto;
+
+    .colunm-box {
+      padding: 6px;
+      border-bottom-width: 1px;
+      border-bottom-style: solid;
+
+      .col {
+        display: flex;
+        flex: 1 0 auto;
+        width: 1px;
+        align-items: center;
+        margin: 0 2px;
+        flex-wrap: wrap;
+
+        &.col-x4 {
+          flex: 4;
+          justify-content: flex-end;
+        }
+
+        &.col-x8 {
+          flex: 8;
+        }
+
+        .lib-input {
+          display: flex;
+          height: 36px;
+        }
+      }
+    }
+
+    .hide {
+      padding-left: 8px;
+      cursor: pointer;
+      display: none;
+    }
+
+    .hover-me:hover .hide {
+      display: block;
+    }
+  }
+}

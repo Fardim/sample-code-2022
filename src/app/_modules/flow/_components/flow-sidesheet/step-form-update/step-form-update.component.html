@@ -1,0 +1,146 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading">
+          Forms
+        </lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="major" width="80px" (click)="saveFormData()">Save</lib-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="mdo-justify">
+      <div class="f-col" *ngIf="isDataInvalid">
+        <lib-banner class="lib-banner" status="error">
+          Please enter valid value for dataset and form mapping.
+        </lib-banner>
+      </div>
+      <form [formGroup]="stepFormUpdateForm">
+        <mat-accordion>
+          <mat-expansion-panel class="mat-elevation-z0" togglePosition="before" expanded="true">
+            <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+              <mat-panel-title>
+                <lib-text-line type="base" weight="strong">Parent dataset <mat-icon fontSet="mdo-icons-light"
+                    libTooltip="Allows user to assign form to be displayed for the parent dataset when the flow is executed">
+                    question-circle</mat-icon>
+                </lib-text-line>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="f-col user-defined-set"
+              [ngClass]="{'nested-row': parentChildDataset && parentChildDataset.length > 0}">
+              <div class="f-row defined-row">
+                <div class="col select-col udr-select-col"></div>
+                <!-- Dataset -->
+                <div class="col col-x5">
+                  <mat-form-field appearance="outline">
+                    <input matInput placeholder="Select dataset" formControlName="parentDataset"
+                      [matAutocomplete]="moduleAutoCmp" />
+                    <mat-autocomplete class="mdo-autocomplete" [displayWith]="getTitleParent.bind(this)"
+                      #moduleAutoCmp="matAutocomplete">
+                      <mat-option class="mdo-option" *ngFor="let ckbox of filterableDatasetOb "
+                        (click)="parentOptionSelected(ckbox.moduleId,ckbox)" [value]="ckbox">
+                        {{ckbox.moduleDesc}}
+                      </mat-option>
+                    </mat-autocomplete>
+                  </mat-form-field>
+                </div>
+                <!-- Form -->
+
+                <div class="col col-x5">
+                  <mat-form-field appearance="outline">
+                    <input matInput placeholder="Select form" formControlName="parentForm"
+                      [matAutocomplete]="formAutoCmp">
+                    <mat-autocomplete class="mdo-autocomplete" #formAutoCmp="matAutocomplete"
+                      [displayWith]="getFormParent.bind(this)">
+                      <mat-option class="mdo-option" *ngFor="let obj of parentFormslist" [value]="obj">
+                        {{obj.description}}
+                      </mat-option>
+                    </mat-autocomplete>
+                  </mat-form-field>
+                </div>
+                <!-- Actions -->
+                <div class="col">
+                  <lib-button type="plain" icon="plus" iconFontType="light" (click)="addNewChild()" [disabled]="!isAllowAddNewParentChild">
+                  </lib-button>
+                  <lib-button type="plain" icon="link" iconFontType="light" libTooltip="Define applicable field values"></lib-button>
+                  <lib-button type="plain" icon="trash-alt" iconFontType="light" libTooltip="Delete">
+                  </lib-button>
+                </div>
+              </div>
+            </div>
+            <ng-container formArrayName="parentChildDataset"
+              *ngFor="let rowCon of parentChildDataset.controls; let i = index">
+              <div class="f-col">
+                <pros-child-dataset [formGroupName]="i" (removeDataset)="removeDataset($event, 'parent')" [index]="i"
+                  [parentDatasetId]="stepFormUpdateForm.value.parentDataset.moduleId" [childForm]="rowCon"
+                  [childDatasets]="parentNestedOptionList" type="nested"></pros-child-dataset>
+              </div>
+            </ng-container>
+            <ng-template [ngIf]="parentChildDataset && parentChildDataset.length > 0">
+              <div class="col-spacer"></div>
+              <div class="f-row button-add-block">
+                <lib-button (click)="addNewChild()" type="minor" icon="plus" iconFontType="light" rounded="true"
+                  [disabled]="!isAllowAddNewParentChild">
+                </lib-button>
+              </div>
+            </ng-template>
+          </mat-expansion-panel>
+        </mat-accordion>
+        <div class="f-row-spacer-half"></div>
+        <mat-accordion>
+          <mat-expansion-panel class="mat-elevation-z0" togglePosition="before" expanded="true">
+            <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+              <mat-panel-title>
+                <lib-text-line type="base" weight="strong">Child datasets <mat-icon fontSet="mdo-icons-light"
+                    libTooltip="Allows user to assign form to be displayed for the parent dataset when the flow is executed">
+                    question-circle</mat-icon>
+                </lib-text-line>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <ng-container formArrayName="childDataset" *ngFor="let rowCon of childDataset.controls; let i = index">
+              <div class="f-col overall-section" [ngClass]="{'connector-line': i !== (childDataset.controls.length-1)}"
+                [formGroupName]="i">
+                <pros-child-dataset formGroupName="childDatasetObj" (removeDataset)="removeDataset($event, 'child')"
+                  [index]="i" [parentDatasetId]="stepFormUpdateForm.value.parentDataset.moduleId" type="primary"
+                  (addDataset)="addDataset($event)"
+                  [nestedChildCount]="rowCon.controls?.nestedChildDatasetObj?.controls.length"
+                  [childDatasets]="childDatasetOptionList" [childForm]="rowCon.controls?.childDatasetObj"
+                  (loadNestedChildOptions)="loadNestedChildOptions($event)"
+                  [nestedDatasetOptions]="getNestedOptions(rowCon.controls?.childDatasetObj?.value?.formId)">
+                </pros-child-dataset>
+
+                <div formArrayName="nestedDataSet"
+                  *ngFor="let det of rowCon.controls?.nestedDataSet?.controls; let j=index">
+                  <div [formGroupName]="j">
+                    <pros-child-dataset formGroupName="nestedChildDatasetObj"
+                      (removeDataset)="removeDataset($event, 'nested_child', i)" [index]="j"
+                      [childForm]="det.controls?.nestedChildDatasetObj"
+                      [parentDatasetId]="stepFormUpdateForm.value.parentDataset.moduleId" type="nested"
+                      [childDatasets]="getNestedOptions(rowCon.controls?.childDatasetObj?.value?.formId)">
+                    </pros-child-dataset>
+                  </div>
+                </div>
+                <ng-template [ngIf]="getNestedChildCount(i)">
+                  <div class="col-spacer"></div>
+                  <div class="f-row button-add-block bottom">
+                    <lib-button (click)="addDataset(i)" type="minor" icon="plus" rounded="true" iconFontType="light"
+                      [disabled]="!isAllowAddNestedChild(i)">
+                    </lib-button>
+                  </div>
+                </ng-template>
+              </div>
+            </ng-container>
+            <div class="f-row-spacer-half"></div>
+            <lib-text-line class="cursor f-row add-new-row" textColor="link"
+              [ngClass]="{'disable': !isAllowAddNewChild}" (click)="addChildDataset()"> Add row</lib-text-line>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </form>
+    </div>
+  </div>
+</div>

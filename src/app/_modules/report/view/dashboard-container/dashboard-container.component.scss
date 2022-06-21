@@ -1,0 +1,13 @@
+.root {
+  height: calc(100% - 52px - 16px);
+  overflow: auto;
+  width: 100%;
+  position: relative;
+
+  .widget-main-container {
+    position: absolute;
+    margin-right: 8px;
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+}

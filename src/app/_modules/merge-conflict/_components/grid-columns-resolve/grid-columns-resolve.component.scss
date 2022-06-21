@@ -1,0 +1,29 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  padding: 0 12px;
+  width: 100vw;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  .conflict-data {
+    overflow: auto;
+    height: calc(100% - 36px - 16px);
+
+    table.mat-table {
+      tr.mat-header-row {
+        .mat-header-cell {
+          min-width: 200px;
+        }
+      }
+
+      tr.mat-row {
+        .mat-cell {
+          min-width: 200px;
+        }
+      }
+    }
+  }
+}

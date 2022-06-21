@@ -1,0 +1,107 @@
+<div class="f-col root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button icon="times" iconFontType="light" (afterClick)="close()" class="s-close"></lib-button>
+        <lib-text-line type="leading" enableWrap="true">
+            Duplicate records
+        </lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="major" (afterClick)="close()"> Ignore </lib-button>
+    </div>
+
+    <div class="sidesheetcontent-listing">
+        <div class="f-row filters-list" *ngIf="!showSkeleton">
+            <div class="f-col">
+                <lib-search i18n-placeholder="@@search" placeholder="Search" class="lib-search"></lib-search>
+            </div>
+        </div>
+        <div class="f-row-spacer-half"></div>
+
+        <div class="f-col" *ngIf="showSkeleton">
+            <lib-skeleton type="line-half"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line" ></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+        </div>
+
+        <div class="data-listing">
+            <table #table [class.hide-table]="showSkeleton" mat-table [dataSource]="dataSource" class="mat-elevation-z0">
+                <ng-container matColumnDef="_settings" sticky>
+                    <th mat-header-cell *matHeaderCellDef class="fixed-width-c1">
+                        <lib-button icon="cog" iconFontType="light" (click)="openTableColumnsSetting()"></lib-button>
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="fixed-width-c1 more-icon">
+                        <!-- <lib-button> Extend </lib-button> -->
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="score" sticky>
+                    <th mat-header-cell *matHeaderCellDef class="fixed-width-c2">
+                        Match
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="fixed-width-c2">
+                        {{ element.score.fieldData}} %
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="OBJECTNUMBER" sticky>
+                    <th mat-header-cell *matHeaderCellDef class="fixed-width-c2">
+                        Object Number
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="fixed-width-c2">
+                        <lib-text-line [textColor]="'link'">
+                            {{ element.OBJECTNUMBER.fieldData}}
+                        </lib-text-line>
+                    </td>
+                </ng-container>
+
+                <ng-template ngFor let-dynCol let-index="index" [ngForOf]="(displayedColumns | async)">
+                    <ng-template [ngIf]="isStaticCol(dynCol)" [ngIfElse]="dynamic">
+                        <!-- skip all static columns -->
+                    </ng-template>
+                    <ng-template #dynamic>
+                        <ng-container [matColumnDef]="dynCol">
+                            <th mat-header-cell *matHeaderCellDef class="fixed-width-c2">
+                                {{ getFieldDesc(dynCol) }}
+                            </th>
+                            <td mat-cell *matCellDef="let element" class="fixed-width-c2" [ngClass]="{'duplicated-field': isDuplicatedField(element, dynCol)}">
+                                <ng-container [ngSwitch]="getFieldType(dynCol)">
+                                    <!-- Date fields -->
+                                    <ng-container *ngSwitchCase="'DATEPICKER'">
+                                     {{ (element[dynCol] ? element[dynCol].fieldData || '' : '') | prosDatePipe: this.dateFormat }}
+                                    </ng-container>
+                                    <!-- HTML-EDITOR fields -->
+                                    <ng-container *ngSwitchCase="'HTML-EDITOR'">
+                                        {{ formatHtmlCell(element[dynCol] ? element[dynCol].fieldData || '' : '') }}
+                                    </ng-container>
+                                    <!-- Default -->
+                                    <ng-container *ngSwitchDefault>
+                                        {{ element[dynCol] ? element[dynCol].fieldData || '' : ''}}
+                                    </ng-container>
+                                </ng-container>
+                            </td>
+                        </ng-container>
+                    </ng-template>
+                </ng-template>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns | async; sticky: true"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns | async;"></tr>
+            </table>
+        </div>
+
+        <div class="f-row-spacer-half"></div>
+
+        <div class="f-row list-pagination">
+            <lib-pagination [currentPageIndex]="recordsPageIndex" [totalCount]="dataSource?.docLength" [pageSize]="recordsPageSize"
+                (pageChangeEvent)="onPageChange($event)">
+            </lib-pagination>
+            <span class="f-col-spacer-half"></span>
+            <lib-text-line type="base">{{ displayedRecordsRangeValue }}</lib-text-line>
+        </div>
+    </div>
+</div>

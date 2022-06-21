@@ -1,0 +1,11 @@
+.ql-container {
+  position: relative;
+  border-radius: 3px;
+
+  .editor-option {
+    position: absolute;
+    z-index: 1;
+    margin: 6px;
+    bottom: 0;
+  }
+}

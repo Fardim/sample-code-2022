@@ -1,0 +1,23 @@
+div.root {
+  height: 100%;
+  user-select: text;
+  padding: 0 16px;
+
+  .palette-list {
+    height: calc(100% - 36px - 16px * 4 - 36px);
+    overflow: auto;
+
+    mat-list.mat-list {
+      mat-list-item.mat-list-item {
+        border-bottom-style: solid;
+        border-bottom-width: 1px;
+
+        .colorpalettebox {
+          width: 36px;
+          height: 36px;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}

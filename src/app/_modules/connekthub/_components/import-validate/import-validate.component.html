@@ -1,0 +1,74 @@
+<div class="modal-wrapper">
+    <div class="f-row modal-header">
+        <lib-text-line type="leading" i18n="@@import_report">Import {{importType === 'DATASET' ? 'Dataset' : ''}}</lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    </div>
+    <div class="modal-body">
+        <!-- loader area -->
+        <ng-container *ngIf="showSkeleton">
+            <lib-skeleton type="line"></lib-skeleton>
+            <div class="row-spacer"></div>
+            <div class="row-spacer"></div>
+            <mat-card *ngFor="let a of [].constructor(3)" class="mat-elevation-z0 f-row colunm-box loading-state">
+            <div class="col col-x5">
+                <lib-skeleton class="w-100" type="line"></lib-skeleton>
+            </div>
+            <div class="col col-x5">
+                <lib-skeleton class="w-100" type="line"></lib-skeleton>
+            </div>
+            </mat-card>
+        </ng-container>
+        <!-- loader area -->
+        <lib-banner *ngIf="errorMsg" status="error" [text]="errorMsg"></lib-banner>
+        <lib-banner *ngIf="isDuplicate" status="info" [text]="warningMessage"></lib-banner>
+        
+        <!-- Upload Section -->
+        <!-- Table section -->
+        <!-- <table mat-table [dataSource]="dataSource" *ngIf="uploadLoader">
+            <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef><span i18n="@@description">Description</span></th>
+                <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+            </ng-container>
+            <ng-container matColumnDef="importedAt">
+                <th mat-header-cell *matHeaderCellDef><span i18n="@@import_date">Import date</span></th>
+                <td mat-cell *matCellDef="let element"> {{element.importedAt | date:'dd/MM/yyyy'}} </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table> -->
+
+        <table mat-table [dataSource]="importData" *ngIf="(importData && importData.length>0)||isDuplicate">
+            <ng-container matColumnDef="message">
+                <th mat-header-cell *matHeaderCellDef><span i18n="@@warning">Warning</span></th>
+                <td mat-cell *matCellDef="let element"> {{element.message}} </td>
+            </ng-container>
+            <ng-container matColumnDef="category">
+                <th mat-header-cell *matHeaderCellDef><span i18n="@@category">Category</span></th>
+                <td mat-cell *matCellDef="let element">
+                    <ng-container [ngSwitch]="element.category">
+                        <span *ngSwitchCase="'MODULE_EXIST'">
+                            Duplicate {{ importType === 'DATASET' ? 'dataset' : ''}}
+                        </span>
+                        <span *ngSwitchDefault>
+                            {{element.category}}
+                        </span>
+                    </ng-container>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumnsEror"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumnsEror;"></tr>
+        </table>
+        <!-- Table section -->
+    </div>
+    <div class="f-row modal-footer space-between">
+        <lib-button (click)="close()"  type="minor" i18n="@@close" width="80px">Close</lib-button>
+        <span class="f-spacer"></span>
+        <lib-button-group>
+            <lib-button type="minor"  *ngIf="isDuplicate" i18n="replace_existing" (click)="import(true,false)">Replace existing</lib-button>
+            <lib-button type="minor"  *ngIf="isDuplicate" i18n="duplicate_report" (click)="import(false,true)">Duplicate {{ importType === 'DATASET' ? 'dataset' : ''}}</lib-button>
+            <!-- <lib-button type="major" *ngIf="!isDuplicate" i18n="import">Import</lib-button> -->
+        </lib-button-group>
+          </div>
+</div>
+

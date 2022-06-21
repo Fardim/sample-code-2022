@@ -1,0 +1,50 @@
+.root {
+  .field-label {
+    margin-bottom: 6px;
+
+    mat-icon.mat-icon {
+      width: 12px;
+      font-size: 12px;
+      margin: 0 2px;
+    }
+  }
+
+  .colunm-box {
+    box-sizing: border-box;
+    padding: 4px 0;
+    min-height: 48px;
+
+    .col {
+      display: flex;
+      flex: 1 0 auto;
+      width: 1px;
+      align-items: center;
+      margin: 0 2px;
+      flex-wrap: wrap;
+
+      .lib-input {
+        width: 80%;
+        height: 36px;
+      }
+
+      &.col-x4 {
+        flex: 4;
+      }
+
+      &.col-x8 {
+        flex: 8;
+      }
+
+      &.mat-item-end {
+        justify-content: flex-end;
+      }
+
+      pros-form-input,
+      pros-map-mdo-field,
+      pros-form-input-autoselect,
+      .mat-form-item {
+        width: 100%;
+      }
+    }
+  }
+}

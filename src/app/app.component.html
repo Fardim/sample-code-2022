@@ -1,0 +1,23 @@
+<mat-sidenav-container>
+  <mat-sidenav #thirdSideNav mode="over" position="end" disableClose>
+    <router-outlet name="sb3"></router-outlet>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-sidenav-container>
+      <mat-sidenav #rightSideNav1 mode="over" position="end" disableClose>
+        <ng-container></ng-container>
+        <router-outlet name="outer"></router-outlet>
+      </mat-sidenav>
+      <mat-sidenav-content>
+        <mat-sidenav-container>
+          <mat-sidenav #rightSideNav mode="over" position="end" disableClose [ngClass]="matSidenavClasses">
+            <router-outlet name="sb"></router-outlet>
+          </mat-sidenav>
+          <mat-sidenav-content>
+            <router-outlet></router-outlet>
+          </mat-sidenav-content>
+        </mat-sidenav-container>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </mat-sidenav-content>
+</mat-sidenav-container>

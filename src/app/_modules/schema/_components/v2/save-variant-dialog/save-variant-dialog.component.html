@@ -1,0 +1,20 @@
+<div class="root f-col">
+  <div class="f-row breadcrum-toolbar">
+    <div class="display-heading-large">
+      {{ data.schemaInfo ? data.schemaInfo.schemaDescription : 'Untitled' }}
+    </div>
+    <span class="f-spacer"></span>
+    <lib-button (click)="dialogRef.close()" type="plain" iconFontType="light" icon="times"></lib-button>
+  </div>
+  <div class="row-spacer"></div>
+  <div class="f-col filter-fields">
+    <lib-input i18n-label="@@filter_name" label="Filter name" (valueChange)="variantNameChange($event)">
+    </lib-input>
+  </div>
+
+  <div class="f-row">
+    <lib-button i18n="@@cancel" (click)="dialogRef.close()" type="minor">Cancel</lib-button>
+    <span class="f-spacer"></span>
+    <lib-button [disabled]="!schemaVarInfo?.variantName" i18n="@@create" (click)="saveUpdateSchemaVariant()" type="major">Create</lib-button>
+  </div>
+</div>

@@ -1,0 +1,14 @@
+<h1 mat-dialog-title>
+    {{ data.title ? data.title : 'Delete confirmation'}} 
+</h1>
+
+<div mat-dialog-content>
+    <p> {{data.message ? data.message : 'Are you sure to delete this element ?'}} </p>
+</div>
+
+<div mat-dialog-actions align="end">
+    <button mat-raised-button (click)="onDismiss()" color="primary" >No</button>
+    <button mat-raised-button color="warn" (click)="onConfirm()">
+        <mat-icon>delete</mat-icon>Yes
+    </button>
+</div>

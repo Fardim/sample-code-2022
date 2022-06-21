@@ -1,0 +1,11 @@
+.mat-table {
+  width: 100%;
+
+  .mat-header-cell {
+    min-width: 90px;
+  }
+
+  .mat-header-cell:nth-child(1) {
+    min-width: 240px;
+  }
+}

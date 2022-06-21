@@ -1,0 +1,72 @@
+<div class="root">
+  <ng-template prosContainerRef #propertyContainerRef="prosContainerRef">
+  </ng-template>
+  <ng-template #defaultTemplate>
+    <div class="f-col sidesheetcontent-listing">
+      <div class="f-col mdo-justify">
+        <div class="f-col mdo-field">
+          <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@select_data_type">Data type
+          </lib-text-line>
+          <div class="mdo-field-input">
+            {{ selected }}
+            <input matInput placeholder="Type to search" #optionInput2 [formControl]="optionCtrl2"
+              [matAutocomplete]="auto2" />
+            <mat-icon matSuffix fontSet="mdo-icons">chevron-down</mat-icon>
+
+            <mat-autocomplete class="mdo-autocomplete" #auto2="matAutocomplete" (optionSelected)="selectSingle($event)">
+              <mat-option class="mdo-option" *ngFor="let opt of filteredOptions | async" [value]="opt">
+                {{ opt }}
+              </mat-option>
+            </mat-autocomplete>
+          </div>
+        </div>
+        <div class="f-col mdo-field">
+          <lib-text-line type="xsmall" weight="strong" class="field-label">Property </lib-text-line>
+          <div class="mdo-field-input">
+            {{ selected }}
+            <input matInput placeholder="Type to search" #optionInput2 [formControl]="optionCtrl2"
+              [matAutocomplete]="auto2" />
+            <mat-icon matSuffix fontSet="mdo-icons">chevron-down</mat-icon>
+
+            <mat-autocomplete class="mdo-autocomplete" #auto2="matAutocomplete" (optionSelected)="selectSingle($event)">
+              <mat-option class="mdo-option" *ngFor="let opt of filteredOptions | async" [value]="opt">
+                {{ opt }}
+              </mat-option>
+            </mat-autocomplete>
+          </div>
+        </div>
+        <div class="f-col mdo-field">
+          <lib-text-line type="xsmall" weight="strong" class="field-label">Property </lib-text-line>
+          <div class="mdo-field-input">
+            {{ selected }}
+            <input matInput placeholder="Type to search" #optionInput2 [formControl]="optionCtrl2"
+              [matAutocomplete]="auto2" />
+            <mat-icon matSuffix fontSet="mdo-icons">chevron-down</mat-icon>
+            <mat-autocomplete class="mdo-autocomplete" #auto2="matAutocomplete" (optionSelected)="selectSingle($event)">
+              <mat-option class="mdo-option" *ngFor="let opt of filteredOptions | async" [value]="opt">
+                {{ opt }}
+              </mat-option>
+            </mat-autocomplete>
+          </div>
+        </div>
+        <div class="f-col mdo-field">
+          <lib-text-line type="small" weight="strong" class="field-label">list value</lib-text-line>
+          <lib-segment class="f-col" [optionsList]="[
+                { label: 'Refrence', value: 'value1' },
+                { label: 'Custom', value: 'value2' }
+              ]" labelKey="label" valueKey="value"></lib-segment>
+        </div>
+        <div class="f-col mdo-field">
+          <lib-text-line type="small" weight="strong" class="field-label">list value</lib-text-line>
+          <lib-segment class="f-col" [optionsList]="[
+                { label: 'Refrence', value: 'value1' },
+                { label: 'Custom', value: 'value2' }
+              ]" labelKey="label" valueKey="value"></lib-segment>
+        </div>
+        <div class="row-spacer"></div>
+        <lib-button class="f-col" type="minor" icon="external-link-alt" iconPosition="after">Edit value &nbsp;
+        </lib-button>
+      </div>
+    </div>
+  </ng-template>
+</div>

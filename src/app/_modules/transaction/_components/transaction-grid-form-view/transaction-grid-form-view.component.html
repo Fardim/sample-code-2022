@@ -1,0 +1,112 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" (afterClick)="close()" iconFontType="light" icon="times"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" enableWrap="true">
+          Form view
+        </lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="major" width="80px" i18n="@@save" (afterClick)="save()">Save</lib-button>
+      </div>
+    </div>
+  </div>
+  <div class="f-col sidesheetcontent-listing">
+    <lib-empty-state *ngIf="!childMetadata?.length" class="f-row empty-block" primaryText="Nothing to see here" icon="order" [iconSize]="200">
+    </lib-empty-state>
+    <form [formGroup]="gridRowForm" class="f-col mdo-justify">
+      <div class="f-col">
+        <lib-banner *ngIf="showErrorBanner && gridRowForm.invalid" status="error" [text]="bannerErrorMsg"></lib-banner>
+      </div>
+      <div class="f-row-spacer-half"></div>
+      <ng-container *ngFor="let child of childMetadata">
+        <lib-input *ngIf="getFieldType(child.pickList) === 'TEXT'" [formControlName]="child.fieldId"
+          [afterBlur]="updateFormControlValue(child, gridRowForm.controls[child.fieldId])"
+          [label]="child?.fieldDescri || child?.description"
+          [hasError]="gridRowForm.controls[child.fieldId].invalid && !gridRowForm.controls[child.fieldId].pristine"
+          (valueChange)="setFieldValue(child.fieldId, $event, 'TEXT')">
+        </lib-input>
+
+        <div *ngIf="getFieldType(child.pickList) === 'TOGGLE'" class="f-col mdo-field">
+          <lib-text-line type="xsmall" weight="strong" class="field-label">{{child?.fieldDescri || child?.description}}
+          </lib-text-line>
+          <lib-slide-toggle labelPosition="before" [formControlName]="child.fieldId" theme="primary"
+            (toggleChange)="setFieldValue(child.fieldId, $event, 'TOGGLE')"></lib-slide-toggle>
+        </div>
+
+        <div *ngIf="getFieldType(child.pickList) === 'DATEPICKER'" class="f-col">
+          <lib-text-line type="xsmall" weight="strong" class="field-label">{{ child?.fieldDescri || child?.description
+            }}</lib-text-line>
+          <lib-date-picker [formControlName]="child.fieldId" [selectedDate]="gridRowForm.controls[child.fieldId]?.value"
+            prosCorrectedValue useWith="withSuffix" (valueChange)="setFieldValue(child.fieldId, $event, 'DATEPICKER')">
+          </lib-date-picker>
+        </div>
+
+        <div *ngIf="getFieldType(child.pickList) === 'HTML-EDITOR'" class="f-col">
+          <lib-text-line type="xsmall" weight="strong" class="field-label">{{ child?.fieldDescri || child?.description
+            }}</lib-text-line>
+          <pros-rich-text-editor [tabFieldId]="child.fieldId" [control]="gridRowForm.controls[child.fieldId]"
+            (valueChange)="setFieldValue(child.fieldId, $event, 'HTML-EDITOR')"></pros-rich-text-editor>
+        </div>
+
+        <div *ngIf="getFieldType(child.pickList) === 'CHECKBOX'" class="f-col mdo-field">
+          <lib-text-line type="xsmall" weight="strong" class="field-label">{{ child?.fieldDescri || child?.description
+            }}</lib-text-line>
+          <lib-checkbox [formControlName]="child.fieldId" theme="primary"
+            (valueChange)="setFieldValue(child.fieldId, $event, 'CHECKBOX')"></lib-checkbox>
+        </div>
+
+        <div *ngIf="getFieldType(child.pickList) === 'TEXTAREA'" class="f-col">
+          <lib-text-line type="xsmall" weight="strong" class="field-label">{{ child?.fieldDescri || child?.description
+            }}</lib-text-line>
+          <lib-textarea hint="You should use this for longer text content" [formControlName]="child.fieldId"
+            [afterBlur]="updateFormControlValue(child, gridRowForm.controls[child.fieldId])"
+            (valueChange)="setFieldValue(child.fieldId, $event, 'TEXTAREA')"></lib-textarea>
+        </div>
+
+        <div *ngIf="getFieldType(child.pickList) === 'DROPDOWN'" class="f-col">
+          <lib-text-line type="xsmall" weight="strong" class="field-label">{{ child?.fieldDescri || child?.description
+            }}</lib-text-line>
+          <pros-form-view-dropdown [moduleId]="moduleId" [fieldCtrl]="child"
+            [preselectedOptions]="gridRowForm.controls[child.fieldId]?.value"
+            (valueChange)="setFieldValue(child.fieldId, $event, 'DROPDOWN')"></pros-form-view-dropdown>
+        </div>
+
+        <div *ngIf="getFieldType(child.pickList) === 'RADIO'" class="f-col">
+          <lib-text-line type="xsmall" weight="strong" class="field-label">{{ child?.fieldDescri || child?.description
+            }}</lib-text-line>
+          <pros-form-view-radio-group [moduleId]="moduleId" [fieldId]="child.fieldId"
+            [control]="gridRowForm.controls[child.fieldId]"
+            (valueChange)="setFieldValue(child.fieldId, $event, 'RADIO')"></pros-form-view-radio-group>
+        </div>
+
+        <div *ngIf="getFieldType(child.pickList) === 'ATTACHMENT'" class="f-col">
+          <lib-text-line type="xsmall" weight="strong" class="field-label">{{ child?.fieldDescri || child?.description
+            }}</lib-text-line>
+          <pros-from-view-attachment [control]="gridRowForm.controls[child.fieldId]" [multiSelect]="child.isCheckList"
+            [fieldObj]="child" (valueChange)="setFieldValue(child.fieldId, $event, 'ATTACHMENT')">
+          </pros-from-view-attachment>
+        </div>
+
+        <div *ngIf="getFieldType(child.pickList) === 'URL'" class="f-col">
+          <lib-text-line type="xsmall" weight="strong" class="field-label">{{ child?.fieldDescri || child?.description
+            }}</lib-text-line>
+          <pros-transaction-url [control]="gridRowForm.controls[child.fieldId]" [controlName]="child.fieldId"
+            [moduleId]="moduleId" [fieldObj]="child" (valueChange)="setFieldValue(child.fieldId, $event , 'URL')">
+          </pros-transaction-url>
+        </div>
+
+        <div *ngIf="getFieldType(child.pickList) === 'TIMEPICKER'" class="f-col">
+          <lib-text-line type="xsmall" weight="strong" class="field-label">{{ child?.fieldDescri || child?.description
+            }}</lib-text-line>
+          <pros-transaction-time-picker [control]="gridRowForm.controls[child.fieldId]" [controlName]="child.fieldId"
+            [fieldObj]="child" [moduleId]="moduleId" [process]="process"
+            (valueChange)="setFieldValue(child.fieldId, $event , 'TIMEPICKER')">
+          </pros-transaction-time-picker>
+        </div>
+
+      </ng-container>
+    </form>
+  </div>
+</div>

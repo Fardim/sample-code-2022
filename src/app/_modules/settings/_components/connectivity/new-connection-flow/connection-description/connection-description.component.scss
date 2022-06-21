@@ -1,0 +1,15 @@
+.modal-wrapper {
+  .modal-body {
+    height: calc(100% - 120px);
+    overflow: auto;
+
+    .manually-dataset {
+      height: 100%;
+
+      .dataset-form {
+        width: 62%;
+        margin: 0 auto;
+      }
+    }
+  }
+}

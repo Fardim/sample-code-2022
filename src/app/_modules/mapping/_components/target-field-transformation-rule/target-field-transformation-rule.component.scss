@@ -1,0 +1,18 @@
+div.root {
+  height: 100%;
+
+  .empty-state-wrapper {
+    height: calc(100% - 180px);
+    justify-content: center;
+  }
+
+  .mdo-field {
+    .field-label {
+      margin-bottom: 6px;
+    }
+
+    .business-rule-title {
+      cursor: pointer;
+    }
+  }
+}

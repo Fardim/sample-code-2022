@@ -1,0 +1,21 @@
+.field-label {
+  margin-bottom: 6px;
+}
+
+.frequency-list {
+  flex-wrap: wrap;
+
+  .frequecy-checkbox {
+    width: calc(100% / 4);
+  }
+}
+
+.datepicker {
+  max-width: 200px;
+}
+
+.f-col {
+  .lib-segment {
+    margin-left: 1px;
+  }
+}

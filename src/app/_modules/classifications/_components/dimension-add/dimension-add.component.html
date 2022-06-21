@@ -1,0 +1,26 @@
+<div class="modal-wrapper">
+  <div class="f-row modal-header">
+    <lib-text-line type="leading" i18n="@@add_dimension">{{ this.dialogData.dimension ? 'Edit dimension' : 'Add dimension' }}</lib-text-line>
+    <lib-button icon="times" iconFontType="light" (click)="close()"></lib-button>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="f-col">
+        <lib-input label="Dimension name" type="text" i18n="@@Dimension_name" formControlName="dimension"
+          class="input-upper-case" inputPreventKey [keyList]="['Space']"
+          [isRequired]="true"
+          [hint]="form.controls.dimension.touched && form.controls.dimension.errors && form.controls.dimension.errors.required ? 'This is a required field' : ''"
+          [hasError]="form.controls.dimension.touched && form.controls.dimension.errors && form.controls.dimension.errors.required">
+        </lib-input>
+      </div>
+    </form>
+  </div>
+
+  <div class="f-row modal-footer space-between">
+    <lib-button i18n="@@cancel" (click)="close()">Cancel</lib-button>
+    <div class="f-row">
+      <lib-button i18n="@@save" type="major" (click)="saveDim()">Save</lib-button>
+    </div>
+  </div>
+</div>

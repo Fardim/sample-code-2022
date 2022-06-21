@@ -1,0 +1,179 @@
+<div class="f-row root">
+  <div class="left-container">
+    <div class="f-row breadcrum-toolbar">
+      <lib-text-line type="leading" i18n="@@new_package">New packages</lib-text-line>
+      <div class="f-spacer"></div>
+      <lib-button-group>
+        <lib-button type="plain" i18n="@@discard" (afterClick)="discard()">Discard</lib-button>
+        <lib-button type="major" i18n="@@save" (afterClick)="clickHandler(false)">Save</lib-button>
+        <lib-button type="major" i18n="@@publish" (afterClick)="clickHandler(true)">Publish</lib-button>
+      </lib-button-group>
+    </div>
+    <mat-drawer-container class="sideNav-container" [hasBackdrop]="'false'" cdkDropListGroup>
+      <mat-drawer #drawer [mode]="'side'" [opened]="isShowSideNav">
+        <lib-search placeholder="Search"></lib-search>
+        <div class="f-row-spacer-half"></div>
+
+        <div *ngFor="let item of treedata;" style="width: 160px;">
+          <mat-accordion>
+            <mat-expansion-panel hideToggle expanded="false">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon>chevron_right</mat-icon>
+                  {{getPackageName(item?.key)}}
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <div *ngFor="let items of item?.data" cdkDropList (cdkDropListDropped)="drop($event)">
+                <lib-filter-option cdkDrag [cdkDragData]="items" (mouseleave)="dragHoverEnd()"
+                  (cdkDragStarted)="dragStart()" (cdkDragReleased)="dragEnd(items, item?.key)">
+                  <div class="nodeName">
+                    <mat-icon fontSet="mdo-icons-light">{{getIcon(item?.key)}}</mat-icon>
+                    {{items[getPackageChildName(item?.key)]}}
+                  </div>
+                </lib-filter-option>
+              </div>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </div>
+
+      </mat-drawer>
+      <mat-drawer-content>
+        <div class="split-col"></div>
+        <div class="package-drop-area">
+          <div cdkDropList [cdkDropListData]="'done'" class="example-list" (cdkDropListDropped)="drop($event)">
+            <div class="drop-area" *ngIf="!selectedNodeItem.length">
+              <div class="title">
+                <lib-text-line type="base" enableWrap="true" i18n="@@drag_drop_message">
+                  Drag and drop business objects here to define the contents of the package
+                </lib-text-line>
+              </div>
+            </div>
+
+            <div class="f-row">
+              <div class="content-area">
+                <cdk-accordion multi="true">
+                  <cdk-accordion-item expanded="true" *ngFor="let item of selectedNodeItem; let index= index"
+                    #accordionItem="cdkAccordionItem" class="example-accordion-item" role="button" tabindex="0"
+                    [attr.id]="'accordion-header-' + index" [attr.aria-expanded]="accordionItem.expanded"
+                    [attr.aria-controls]="'accordion-body-' + index">
+                    <div class="example-accordion-item-header" (click)="accordionItem.toggle()">
+                      <div class="f-row">
+                        <lib-filter-option>
+                          <mat-icon fontSet="mdo-icons-light">{{ accordionItem.expanded ? 'angle-down' : 'angle-up' }}
+                          </mat-icon>
+                          {{ getPackageName(item.key)}}
+                        </lib-filter-option>
+                        <div class="f-spacer"></div>
+                        <lib-button [icon]="'ellipsis-h'" [matMenuTriggerFor]="actions" [type]="'plain'"></lib-button>
+                        <mat-menu #actions="matMenu" class="navigation-menu">
+                          <button mat-menu-item i18n="@@remove" (click)="removeSection(item?.key)">Remove</button>
+                        </mat-menu>
+                      </div>
+                    </div>
+                    <div class="example-accordion-item-body" role="region"
+                      [style.display]="accordionItem.expanded ? '' : 'none'" [attr.id]="'accordion-body-' + index"
+                      [attr.aria-labelledby]="'accordion-header-' + index">
+                      <div *ngFor="let i of item?.data">
+                        <pros-package-view (deleteNode)="deleteNode($event)" [data]="i"
+                          [packageIconName]="getIcon(item?.key)" [datasetname]="getPackageName(item?.key)"
+                          [childName]="i.data[getPackageChildName(item?.key)]"></pros-package-view>
+                      </div>
+                    </div>
+                  </cdk-accordion-item>
+                </cdk-accordion>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-drawer-content>
+    </mat-drawer-container>
+  </div>
+
+  <div class="properties-container">
+    <div class="f-row right-breadcrum-toolbar">
+      <lib-text-line type="leading" i18n="@@field_properties">Field properties</lib-text-line>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing">
+      <div class="f-col mdo-justify">
+        <div class="f-row">
+          <lib-slide-toggle labelPosition="after" (toggleChange)="toggleChange($event)" label="Publish as a new version"
+            theme="primary" i18n="@@publish_as_a_new_version"> </lib-slide-toggle>
+          <div class="f-spacer"></div>
+          <lib-button type="major" i18n="@@package" (click)="openExistingPackage()">Package</lib-button>
+        </div>
+
+        <div class="f-row-spacer-half"></div>
+
+        <div class="f-col">
+          <lib-input [isRequired]="true" [(ngModel)]="name" i18n="@@package_name" label="Package name"></lib-input>
+        </div>
+
+        <div class="f-col">
+          <lib-textarea i18n="@@description" [(ngModel)]="description" label="Description" [rows]="3" [cols]="10">
+          </lib-textarea>
+        </div>
+
+        <div class="col mdo-field">
+          <lib-text-line type="xsmall" weight="strong" i18n="@@tags">Tags</lib-text-line>
+          <div class="mdo-field-input">
+            <mat-chip-list #chipList></mat-chip-list>
+            <lib-chip-list>
+              <lib-chip *ngFor="let r of tags" [removable]="true" (removed)="remove(r)">{{r}}</lib-chip>
+              <input [formControl]="inpFrmCtrl" [matAutocomplete]="auto" [matChipInputFor]="chipList"
+                [matChipInputAddOnBlur]="'true'" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                (matChipInputTokenEnd)="add($event)" />
+            </lib-chip-list>
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+              <mat-option *ngFor="let tag of tagsList" [value]="tag">
+                {{tag}}
+              </mat-option>
+            </mat-autocomplete>
+          </div>
+        </div>
+
+        <div class="f-col mdo-field">
+          <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@image">Images</lib-text-line>
+          <div class="mdo-field-input import-files" [ngStyle]="{display: attachments.length ? 'none': ''}">
+            <input class="drag-input" accept="image/*" type="file" #fileInput [disabled]="disabled"
+              (change)="uploadAttachments($event.target.files)" multiple id="fileUpload" />
+            <div class="f-col-spacer-half"></div>
+            <div class="f-row cursor">
+              <lib-text-line type="base" textColor="secondary" i18n="@@drag_files_here_or">Drag files here
+                or&nbsp;</lib-text-line>
+              <lib-text-line type="base" textColor="link" i18n="@@browse">browse
+              </lib-text-line>
+              <lib-text-line textColor="secondary" type="base" i18n="@@to_upload">&nbsp;to upload
+              </lib-text-line>
+            </div>
+          </div>
+          <div *ngIf="attachments.length" class="f-row display-images">
+            <div class="f-col attachment-section" *ngFor="let attachment of attachments; let index = index">
+              <div class="f-row attachment" [ngClass]="{ hasError: attachment.uploadError }">
+                <img [src]="getAttachmentIcon(attachment?.block?.fileName)" class="attachment-icon" />
+                <span class="attachment-name"
+                  [libTooltip]="attachment?.block?.fileName.length > 25 ? attachment?.block?.fileName : ''">
+                  {{ truncateAttachmentName(attachment?.block?.fileName) }}</span>
+                <span class="f-spacer"></span>
+                <lib-button *ngIf="!disabled" class="lib-button" (click)="removeAttachment(index)" icon="times"
+                  type="plain">
+                </lib-button>
+              </div>
+            </div>
+            <mat-icon (click)="fileInput.click()">add</mat-icon>
+          </div>
+        </div>
+
+        <div class="f-col">
+          <lib-textarea i18n="@@what's_new" [(ngModel)]="whatsNew" label="What's new?" [rows]="3" [cols]="10">
+          </lib-textarea>
+        </div>
+
+        <div class="f-col">
+          <lib-input i18n="@@documentation_link`" [(ngModel)]="documentationLink" label="Documentation link">
+          </lib-input>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

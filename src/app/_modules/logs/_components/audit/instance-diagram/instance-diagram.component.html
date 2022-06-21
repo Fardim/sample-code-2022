@@ -1,0 +1,38 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+      <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+      <div class="col-spacer"></div>
+      <div class="f-col mdo-constrained-right">
+        <div class="f-row breadcrum-head">
+          <lib-text-line type="leading" i18n="@@process_instance_diagram">Process instace diagram</lib-text-line>
+          <span class="f-spacer"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="f-col ">
+
+        <ng-container *ngIf="loader">
+            <mat-list-item>
+                <div class="f-row notification-listing">
+                    <div class="f-col notify-row">
+                        <lib-skeleton type="line"></lib-skeleton>
+                        <lib-skeleton type="line"></lib-skeleton>
+                        <lib-skeleton type="line-half"></lib-skeleton>
+                    </div>                    
+                </div>
+            </mat-list-item>
+        </ng-container>
+
+        <div class="f-row empty-block" *ngIf="!svg && !loader">
+            <lib-empty-state icon="order" primaryText="Nothing to see here"
+                    secondaryText="Sonething went wrong, please check the process instance logs">
+            </lib-empty-state>
+        </div>
+
+        <div *ngIf="svg" [innerHTML]="svg"></div>
+    </div>
+
+</div>
+
+    

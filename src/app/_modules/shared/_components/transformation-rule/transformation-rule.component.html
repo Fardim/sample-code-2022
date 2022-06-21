@@ -1,0 +1,62 @@
+<!-- transformation rule start -->
+<form [formGroup]="form" class="root">
+        <div class="f-col mdo-field">
+            <lib-text-line class="field-label" type="xsmall" weight="strong"><span i18n="@@source_field">Source field</span>&nbsp;
+                <mat-icon fontSet="mdo-icons" iconFontType="solid" i18n-libTooltip="@@trans_source_field_tooltip" libTooltip="Select the fields to have the rule applied">question-circle</mat-icon>
+            </lib-text-line>
+            <mat-form-field appearance="outline">
+                <mat-chip-list class="f-row field-chip-list" #sourceChips>
+                    <lib-chip *ngIf="selectedSourceField" [removable]="true"
+                    (removed)="removeSourceField()" class="lib-chip">{{selectedSourceField[sourceFieldsObject.labelKey]}}</lib-chip>
+                    <input id="sourceFieldId" matInput class="mat-input" #sourceFieldInput [matAutocomplete]="autoSource" formControlName="sourceFld"
+                        [matChipInputFor]="sourceChips" [matChipInputSeparatorKeyCodes]="separatorKeysCodes">
+                </mat-chip-list>
+                <mat-autocomplete #autoSource="matAutocomplete" [displayWith]="displayFnSource.bind(this)"
+                    (optionSelected)="selectSourceField($event)">
+                    <mat-option *ngFor="let fieldItem of filteredSourceFields | async"
+                        [value]="fieldItem[sourceFieldsObject.valueKey]">
+                        {{fieldItem[sourceFieldsObject.labelKey]}}
+                    </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+            <mat-error *ngIf="submitted && selectedTargetFields.length === 0">
+                Please select the target fields
+            </mat-error>
+        </div>
+
+        <div class="f-col mdo-field">
+            <lib-text-line class="field-label" type="xsmall" weight="strong"><span i18n="@@target_fields">Target fields</span>&nbsp;
+                <mat-icon fontSet="mdo-icons" iconFontType="solid" i18n-libTooltip="@@trans_target_fields_tooltip" libTooltip="Select which field(s) will store the results">question-circle</mat-icon>
+                <span class="mandatory">*</span></lib-text-line>
+            <mat-form-field appearance="outline">
+                <mat-chip-list class="f-row field-chip-list" #targetChips>
+                    <lib-chip *ngFor="let field of selectedTargetFields;let i = index" [removable]="true"
+                    (removed)="removeTargetField(i)" class="lib-chip">{{field[targetFieldsObject.labelKey]}}</lib-chip>
+                    <input matInput id="targetFieldId" class="mat-input" #targetFieldInput [matAutocomplete]="autoTarget" formControlName="targetFld"
+                        [matChipInputFor]="targetChips" [matChipInputSeparatorKeyCodes]="separatorKeysCodes">
+                </mat-chip-list>
+                <mat-autocomplete #autoTarget="matAutocomplete" [displayWith]="displayFnTarget.bind(this)"
+                    (optionSelected)="selectTargetField($event)">
+                    <mat-option *ngFor="let fieldItem of filteredTargetFields | async"
+                        [value]="fieldItem[targetFieldsObject.valueKey]">
+                        {{fieldItem[targetFieldsObject.labelKey]}}
+                    </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+            <mat-error *ngIf="submitted && selectedTargetFields.length === 0">
+                Please select the target fields
+            </mat-error>
+        </div>
+
+        <div class="f-col">
+            <lib-text-line class="field-label" type="xsmall" weight="strong"><span i18n="@@extract_value">Extract value</span>&nbsp;
+                <mat-icon fontSet="mdo-icons" iconFontType="solid" i18n-libTooltip="@@extract_value_tooltip" libTooltip="Extracts the matching text from the source field and enters only the extracted value in the target fields.">question-circle</mat-icon></lib-text-line>
+            <lib-input formControlName="excludeScript" [value]="form.value.excludeScript"></lib-input>
+        </div>
+        <div class="f-col">
+            <lib-text-line class="field-label" type="xsmall" weight="strong"><span i18n="@@append_value">Append value</span>&nbsp;
+                <mat-icon fontSet="mdo-icons" iconFontType="solid" i18n-libTooltip="@@append_value_tooltip" libTooltip="Check the source field data to append to the target field data">question-circle</mat-icon></lib-text-line>
+            <lib-input formControlName="includeScript" [value]="form.value.includeScript"></lib-input>
+        </div>
+</form>
+<!-- transformation rule end -->

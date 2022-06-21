@@ -1,0 +1,26 @@
+mat-card.root {
+  height: 100%;
+  user-select: text;
+  padding: 0;
+  border: none;
+
+  .modal-wrapper {
+    .modal-body {
+      height: calc(100% - 120px);
+      overflow: auto;
+
+      .manually-dataset {
+        height: 100%;
+
+        .dataset-form {
+          width: 62%;
+          margin: 0 auto;
+
+          .field-label {
+            margin-bottom: 6px;
+          }
+        }
+      }
+    }
+  }
+}

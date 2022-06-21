@@ -1,0 +1,11 @@
+div.root {
+  height: 100%;
+
+  .hierarchy-name {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+}

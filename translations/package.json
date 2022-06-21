@@ -1,0 +1,16 @@
+{
+  "name": "translations",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "tran": "node index.js modular-height-343500 ./modular-height-343500-b0eaf6970896.json"
+  },
+  "author": "MDO",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/translate": "^6.3.1",
+    "fs": "0.0.1-security",
+    "xml2js": "^0.4.23"
+  }
+}

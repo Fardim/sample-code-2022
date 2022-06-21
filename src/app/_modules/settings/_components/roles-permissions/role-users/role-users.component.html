@@ -1,0 +1,40 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+          <div class="f-row breadcrum-head">
+            <lib-text-line type="leading">Users with role reviewer</lib-text-line>
+            <div class="f-spacer"></div>
+            <lib-search
+                class="lib-search"
+                i18n-placeholder="@@search"
+                placeholder="Search users"
+                [formControl]="roleUserCtrl"
+            >
+            </lib-search>
+          </div>
+        </div>
+    </div>
+  
+    <div class="f-col sidesheetcontent-listing">
+      <div class="mdo-justify">
+        <div *ngIf="isLoading" class="f-col">
+          <lib-skeleton-listmenu></lib-skeleton-listmenu>
+        </div>
+        <div class="f-row" *ngIf="!isLoading">
+          
+        </div>
+        <mat-list role="list" class="mdo-list">
+          <mat-list-item role="listitem" *ngFor="let user of userList" class="f-row">
+            <lib-text-line (click)="gotoUsers(element)" type="base">
+                {{user?.uname}}
+            </lib-text-line>
+          </mat-list-item>
+        </mat-list>
+  
+      </div>
+    </div>
+  
+  </div>
+  

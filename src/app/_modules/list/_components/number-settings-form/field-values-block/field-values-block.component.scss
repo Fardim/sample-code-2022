@@ -1,0 +1,13 @@
+.root {
+  .fld-val-blk {
+    justify-content: space-evenly;
+
+    .half {
+      width: 43%;
+    }
+  }
+
+  .invalid {
+    border: 1px solid #e03131;
+  }
+}

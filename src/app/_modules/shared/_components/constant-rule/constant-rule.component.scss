@@ -1,0 +1,108 @@
+.user-defined-set {
+  position: relative;
+  overflow: auto;
+
+  &::before {
+    display: block;
+    content: "";
+    height: 100%;
+    width: 1px;
+    position: absolute;
+    top: 0;
+    left: 16px;
+  }
+
+  .defined-row {
+    border-width: 1px;
+    border-style: solid;
+    align-items: center;
+    height: 54px;
+    margin: 0 0 16px 0;
+    border-radius: 3px;
+
+    div.col {
+      display: block;
+      flex: 1;
+      min-width: 0;
+      position: relative;
+      padding: 0 8px;
+
+      &:first-of-type,
+      &:last-of-type {
+        min-width: auto;
+        flex: 0 0 auto;
+        padding: 0;
+      }
+
+      &.select-col {
+        width: 68px;
+        height: 54px;
+        align-items: center;
+        display: flex;
+        z-index: 1;
+        justify-content: center;
+        text-align: center;
+      }
+    }
+  }
+
+  .button-add-block {
+    .user-defined-set {
+      position: relative;
+      padding: 0 0 0 8px;
+      overflow: auto;
+
+      &::before {
+        display: block;
+        content: "";
+        height: 100%;
+        width: 1px;
+        position: absolute;
+        top: 0;
+        left: 16px;
+      }
+
+      .defined-row {
+        border-width: 1px;
+        border-style: solid;
+        align-items: center;
+        height: 54px;
+        margin: 0 0 16px 0;
+        border-radius: 3px;
+
+        div.col {
+          display: block;
+          flex: 1;
+          min-width: 0;
+          position: relative;
+          padding: 0 8px;
+
+          &:first-of-type,
+          &:last-of-type {
+            min-width: auto;
+            flex: 0 0 auto;
+            padding: 0;
+          }
+
+          &.select-col {
+            width: 16px;
+            height: 54px;
+            align-items: center;
+            display: flex;
+            z-index: 1;
+            justify-content: center;
+            text-align: center;
+          }
+        }
+      }
+
+      .button-add-block {
+        margin-left: -8px;
+      }
+    }
+  }
+}
+
+.error-msg {
+  text-align: center;
+}

@@ -1,0 +1,103 @@
+<form>
+  <div class="f-col">
+    <div class="f-col">
+      <lib-input type="text" i18n-label="@@static_value" label="Static value" placeholder="Enter a value"
+        i18n-placeholder="@@enter_a_value">
+      </lib-input>
+    </div>
+
+    <div class="f-col mdo-field">
+      <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@select_data_type">Translation rule
+      </lib-text-line>
+      <div class="mdo-field-input">
+        <input matInput placeholder="Select data type" #optionsInput [formControl]="optionCtrl"
+          [matAutocomplete]="translationRuleAuto" />
+        <mat-autocomplete class="mdo-autocomplete" #translationRuleAuto="matAutocomplete"
+          (optionSelected)="onSelectTranslationRule($event)">
+          <mat-option>
+            <lib-text-line class="link-text" textColor="link" type="base" (click)="openTranslationRuleSidesheet(null)">
+              New Translation Rule
+            </lib-text-line>
+          </mat-option>
+          <mat-option [value]="currentTranslationRule.id">
+            <div class="f-row">
+              <span>
+                {{ currentTranslationRule?.rulename }}
+              </span>
+              <span class="f-spacer"></span>
+              <lib-button-group>
+                <lib-button type="plain" prosClickStopPropagation>{{ currentTranslationRule?.rulescount }}</lib-button>
+                <lib-button type="plain" icon="ellipsis-h" [matMenuTriggerFor]="translationRuleActionsMenu"
+                  prosClickStopPropagation></lib-button>
+              </lib-button-group>
+              <mat-menu #translationRuleActionsMenu="matMenu" class="navigation-menu">
+                <button mat-menu-item i18n="@@edit"
+                  (click)="openTranslationRuleSidesheet(currentTranslationRule.id)">Edit</button>
+                <button mat-menu-item i18n="@@remove">Delete</button>
+              </mat-menu>
+            </div>
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+    </div>
+
+    <div class="f-col mdo-field">
+      <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@select_data_type">Alternate number
+      </lib-text-line>
+      <div class="mdo-field-input">
+        <input matInput placeholder="Select data type" #optionsInput [formControl]="altnOptionCtrl"
+          [matAutocomplete]="altnAuto" />
+        <mat-autocomplete class="mdo-autocomplete" #altnAuto="matAutocomplete" (optionSelected)="onSelectALTN($event)">
+          <mat-option class="mdo-option" *ngFor="let data of altnFields" [value]="data?.key">
+            {{ data?.value }}
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+    </div>
+
+    <div class="f-col mdo-field">
+      <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@select_data_type">Date </lib-text-line>
+      <div class="mdo-field-input">
+        <input matInput placeholder="Select data type" #optionsInput [formControl]="dateOptionCtrl"
+          [matAutocomplete]="dateAuto" />
+        <mat-autocomplete class="mdo-autocomplete" #dateAuto="matAutocomplete" (optionSelected)="onSelectALTN($event)">
+          <mat-option class="mdo-option" *ngFor="let data of dateFormates" [value]="data">
+            {{ data }}
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+    </div>
+
+    <div class="f-row mdo-field">
+      <lib-slide-toggle labelposition="after" label="Object number" i18n-label="@@object_number" theme="primary">
+      </lib-slide-toggle>
+      &nbsp;
+      <mat-icon fontSet="mdo-icons-light" libTooltip="This property can be enabled to pass the MDO object number">
+        question-circle </mat-icon>
+    </div>
+
+    <div class="f-row mdo-field">
+      <lib-slide-toggle labelposition="after" label="Leading zeroes" i18n-label="@@leading_zeroes" theme="primary">
+      </lib-slide-toggle>
+      &nbsp;
+      <mat-icon fontSet="mdo-icons-light" libTooltip="Leading zeroes">
+        question-circle </mat-icon>
+    </div>
+
+    <div class="f-row mdo-field">
+      <lib-slide-toggle labelposition="after" label="Remove spaces" i18n-label="@@remove_spaces" theme="primary">
+      </lib-slide-toggle>
+      &nbsp;
+      <mat-icon fontSet="mdo-icons-light" libTooltip="This property can be enabled to remove the leading spaces from the value">
+        question-circle </mat-icon>
+    </div>
+
+    <div class="f-row mdo-field">
+      <lib-slide-toggle labelposition="after" label="Is DAXE enabled" i18n-label="@@is_daxe_enabled" theme="primary">
+      </lib-slide-toggle>
+      &nbsp;
+      <mat-icon fontSet="mdo-icons-light" libTooltip="This property can be enabled when a DAXE rule needs to be enabled for performing some transformation">
+        question-circle </mat-icon>
+    </div>
+  </div>
+</form>

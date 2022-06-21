@@ -1,0 +1,10 @@
+<div class="root">
+    <div class="f-row data-model">
+        <div [ngClass]="{'w-600': isPropertiesShow , 'w-100': !isPropertiesShow}">
+            <pros-data-model-hierarchical (showProperties)="showProperties($event)" ></pros-data-model-hierarchical>
+        </div>
+        <div *ngIf="isPropertiesShow" class="w-300">
+            <pros-data-model-properties (showProperties)="showProperties($event)"></pros-data-model-properties>
+        </div>
+    </div>
+</div>

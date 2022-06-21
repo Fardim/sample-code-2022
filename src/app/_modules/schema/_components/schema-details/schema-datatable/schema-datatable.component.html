@@ -1,0 +1,315 @@
+<!-- <mat-card class="root mat-elevation-z3">
+    <mat-toolbar class="header">
+        <mat-toolbar-row>
+            <h3 class="mat-h3">{{ schemaDetails.schemaDescription }} work area</h3>
+            <span class="f-spacer"></span>
+            <button mat-button color="primary" (click)="openStatusInfoDialog();">Status Info</button>
+        </mat-toolbar-row>
+    </mat-toolbar>
+    <mat-divider></mat-divider>
+    <div class="f-col">
+        <mat-card class="mat-elevation-z3">
+            <mat-tab-group class="status-nav" dynamicHeight selectedIndex="{{selectedTabIndex}}" disablePagination
+                disableRipple (selectedIndexChange)="loadSchameDataByStatus($event);">
+                <mat-tab *ngFor="let tab of tabs; let index = index" [disabled]="index === 5">
+                    <ng-template mat-tab-label>
+                        {{tab}}
+                        <mat-chip-list aria-label="Count">
+                            <mat-chip>{{ matChipCountLabel(index) }}</mat-chip>
+                        </mat-chip-list>
+                    </ng-template>
+                </mat-tab>
+            </mat-tab-group>
+            <ng-template
+                [ngIf]="((allMetaDataFields | async).hierarchy && (allMetaDataFields | async).hierarchy.length > 0) || (((allMetaDataFields | async).grids | keyvalue) && ((allMetaDataFields | async).grids | keyvalue).length > 0)">
+                <div class="row-spacer"></div>
+                <div class="f-row hierarchy-row"
+                    *ngIf="(allMetaDataFields | async).hierarchy && (allMetaDataFields | async).hierarchy.length > 0">
+                    <ng-template ngFor let-hierarchy [ngForOf]="(allMetaDataFields | async).hierarchy"
+                        [ngForTrackBy]="hierarchyTrackBy">
+                        <button (click)="applyHeirarchyField(hierarchy.heirarchyId, true)" mat-stroked-button
+                            *ngIf="selectedHierarchyIds.indexOf(hierarchy.heirarchyId) < 0">{{ hierarchy.heirarchyText }}</button>
+                        <button (click)="applyHeirarchyField(hierarchy.heirarchyId, false)" mat-flat-button
+                            color="primary"
+                            *ngIf="selectedHierarchyIds.indexOf(hierarchy.heirarchyId) >= 0">{{ hierarchy.heirarchyText }}</button>
+                    </ng-template>
+                </div>
+                <div class="f-row grid-row"
+                    *ngIf="((allMetaDataFields | async).grids | keyvalue) && ((allMetaDataFields | async).grids | keyvalue).length > 0">
+                    <ng-template ngFor let-grdFld [ngForOf]="(allMetaDataFields | async).grids | keyvalue">
+                        <button (click)="applyGridField(grdFld.key, true)" mat-stroked-button
+                            *ngIf="selectedGridIds.indexOf(grdFld.key) < 0">{{ grdFld.value.fieldDescri }}</button>
+                        <button (click)="applyGridField(grdFld.key, false)" mat-flat-button color="primary"
+                            *ngIf="selectedGridIds.indexOf(grdFld.key) >= 0">{{ grdFld.value.fieldDescri }}</button>
+                        <div class="f-col-spacer-half"></div>
+                    </ng-template>
+                </div>
+                <mat-divider></mat-divider>
+            </ng-template>
+            <div class="f-row settings-row"> -->
+                <!-- <mat-form-field>
+                    <input matInput placeholder="Filter comming soon.." disabled>
+                </mat-form-field> -->
+               <!--  <span class="f-spacer"></span>
+                <ng-template [ngIf]="submitReviewedBtn">
+                    <button [disabled]="collaboratorPermission" mat-flat-button color="primary"
+                        (click)="submitReviewedRecords()">Submit Review</button>
+                    <div class="f-col-spacer-half"></div>
+                </ng-template>
+                <button mat-flat-button color="primary" (click)="openTableColumnSettings()">Choose Columns</button>
+                <div class="f-col-spacer-half"></div>
+                <button mat-flat-button color="primary" (click)="downloadExecutionDetails()">Download</button>
+                <div class="f-col-spacer-half"></div>
+                <button *ngIf= "submitReviewedBtn" mat-icon-button [matMenuTriggerFor]="moremenu">
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #moremenu="matMenu">
+                    <button mat-menu-item (click)="uploadData()">Upload Data</button>
+                </mat-menu>
+            </div>
+            <div class="table-row">
+                <table mat-table [dataSource]="dataTableDataSource" matSort>
+
+                    <ng-container matColumnDef="row_more_action" sticky>
+                        <th mat-header-cell *matHeaderCellDef class="any-cell more-cell"
+                            [class.correctedCellHeader]="selectedTabIndex === 4"></th>
+                        <td mat-cell *matCellDef="let row" class="any-cell more-cell">
+
+                            <ng-template [ngIf]="selectedTabIndex === 4" [ngIfElse]="show_more_actions">
+                                <ng-template [ngIf]="row['isCorrectedRow']" [ngIfElse]="oldRecord">
+                                    <button mat-icon-button>
+                                        <mat-icon mat-icon-button class="row_new_icon">playlist_add</mat-icon>
+                                        New
+                                    </button>
+
+                                </ng-template>
+                                <ng-template #oldRecord>
+                                    <button mat-icon-button>
+                                        <mat-icon mat-icon-button class="row_old_icon">low_priority</mat-icon>
+                                        Old
+                                    </button>
+                                </ng-template>
+                            </ng-template>
+
+                            <ng-template #show_more_actions>
+                                <button mat-icon-button><mat-icon [matMenuTriggerFor]="actiontable">more_vert</mat-icon></button>
+                                <mat-menu #actiontable="matMenu">
+                                    <button mat-menu-item *ngFor="let action of matMenu">{{action}}</button>
+                                </mat-menu>
+                            </ng-template>
+
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="row_selection_check2box" sticky>
+                        <th mat-header-cell *matHeaderCellDef class="any-cell checkbox-cell">
+                            <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+                                [checked]="selection.hasValue() && isAllSelected()"
+                                [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                [aria-label]="checkboxLabel()">
+                            </mat-checkbox>
+                        </th>
+                        <td mat-cell *matCellDef="let row" class="any-cell checkbox-cell">
+                            <mat-checkbox color="primary" (click)="$event.stopPropagation()"
+                                (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)"
+                                [aria-label]="checkboxLabel(row)">
+                            </mat-checkbox>
+                        </td>
+                    </ng-container>
+
+                    SCORE COLUMN
+                    <ng-container matColumnDef="_score_weightage" sticky>
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header class="any-cell objnr-cell">
+                            Score
+                        </th>
+                        <td mat-cell *matCellDef="let row" class="any-cell objnr-cell">
+                            <div class="f-row score-cell">
+                                <mat-progress-bar mode="determinate" [value]="row['_score_weightage'].fieldData">
+                                </mat-progress-bar>
+                                <span class="f-col-spacer-half"></span>
+                               <span class="countscore">{{ row['_score_weightage'] ? row['_score_weightage'].fieldData : '' }}%</span>
+                            </div>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="OBJECTNUMBER" sticky>
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header class="any-cell objnr-cell">
+                            Object Number
+                        </th>
+                        <td mat-cell *matCellDef="let row" class="any-cell objnr-cell">
+                            {{ row['OBJECTNUMBER'] ? row['OBJECTNUMBER'].fieldData : '' }}
+                        </td>
+                    </ng-container>
+
+                    <ng-container
+                        *ngFor="let field of (allMetaDataFields | async).headers | keyvalue; trackBy: dataTableTrackByFun"
+                        [matColumnDef]="field.key">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header class="any-cell data-cell">
+                            {{ field.value.fieldDescri }}
+                        </th>
+
+                        <td mat-cell *matCellDef="let row; let rIndex = index;"
+                            (click)="editCurrentCell(field.key, rIndex);" class="any-cell data-cell"
+                            [class.errorCell]="hasError(row,field.key)"
+                            [class.correctedCell_New]="isCorrected(row, field.key, rIndex)"
+                            [class.correctedCell_Old]="isCorrectedOld(row, field.key, rIndex)"
+                            [matTooltip]="showErrorMessages(row,field.key)">
+                            <ng-template [ngIf]="isEditable(field.key,row) && collaboratorEditor"
+                                [ngIfElse]="headerFldTd">
+                                <span
+                                    id="view_{{field.key + '_' + rIndex}}">{{ row[field.key] ? row[field.key].fieldData : '' }}</span>
+                                <mat-form-field id="edit_{{field.key + '_' + rIndex}}" style="display: none;">
+                                    <input id="edit_inp_{{field.key + '_' + rIndex}}" matInput
+                                        value="{{ row[field.key] ? row[field.key].fieldData : '' }}"
+                                        (blur)="doCorrection(row, field.key, $event.target.value,rIndex)" />
+                                </mat-form-field>
+                            </ng-template>
+                            <ng-template #headerFldTd>
+                                {{ row[field.key] ? row[field.key].fieldData : '' }}
+                            </ng-template>
+                        </td>
+                    </ng-container>
+
+                    <ng-template ngFor let-hierarchy [ngForOf]="(allMetaDataFields | async).hierarchyFields | keyvalue">
+                        <ng-container *ngFor="let field of hierarchy.value | keyvalue; trackBy: dataTableTrackByFun"
+                            [matColumnDef]="hierarchy.key + '+' + field.key">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header class="any-cell data-cell">
+                                {{ field.value.fieldDescri }}
+                            </th>
+                            <td mat-cell *matCellDef="let row; let rIndex = index;"
+                                (click)="editCurrentCell(field.key, rIndex);" class="any-cell data-cell"
+                                [class.errorCell]="hasError(row,field.key)"
+                                [class.correctedCell_New]="isCorrected(row, field.key, rIndex)"
+                                [class.correctedCell_Old]="isCorrectedOld(row, field.key, rIndex)"
+                                [matTooltip]="showErrorMessages(row,field.key)">
+                                <ng-template [ngIf]="isEditable(field.key,row) && collaboratorEditor"
+                                    [ngIfElse]="hierarchyFld">
+                                    <span
+                                        id="view_{{field.key + '_' + rIndex}}">{{ row[field.key] ? row[field.key].fieldData : '' }}</span>
+                                    <mat-form-field id="edit_{{field.key + '_' + rIndex}}" style="display: none;">
+                                        <input id="edit_inp_{{field.key + '_' + rIndex}}" matInput
+                                            value="{{ row[field.key] ? row[field.key].fieldData : '' }}"
+                                            (blur)="doCorrection(row, field.key, $event.target.value,rIndex)" />
+                                    </mat-form-field>
+                                </ng-template>
+                                <ng-template #hierarchyFld>
+                                    {{ row[field.key] ? row[field.key].fieldData : '' }}
+                                </ng-template>
+                            </td>
+
+                        </ng-container>
+                    </ng-template>
+
+                    <ng-template ngFor let-grid [ngForOf]="(allMetaDataFields | async).gridFields | keyvalue">
+                        <ng-container *ngFor="let field of grid.value | keyvalue; trackBy: dataTableTrackByFun"
+                            [matColumnDef]="grid.key + '+' + field.key">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header class="any-cell data-cell">
+                                {{ field.value.fieldDescri }}
+                            </th>
+                            <td mat-cell *matCellDef="let row; let rIndex = index;"
+                                (click)="editCurrentCell(field.key, rIndex);" class="any-cell data-cell"
+                                [class.errorCell]="hasError(row,field.key)"
+                                [class.correctedCell_New]="isCorrected(row, field.key, rIndex)"
+                                [class.correctedCell_Old]="isCorrectedOld(row, field.key, rIndex)"
+                                [matTooltip]="showErrorMessages(row,field.key)">
+                                <ng-template [ngIf]="isEditable(field.key,row) && collaboratorEditor"
+                                    [ngIfElse]="hierarchyFld">
+                                    <span
+                                        id="view_{{field.key + '_' + rIndex}}">{{ row[field.key] ? row[field.key].fieldData : '' }}</span>
+                                    <mat-form-field id="edit_{{field.key + '_' + rIndex}}" style="display: none;">
+                                        <input id="edit_inp_{{field.key + '_' + rIndex}}" matInput
+                                            value="{{ row[field.key] ? row[field.key].fieldData : '' }}"
+                                            (blur)="doCorrection(row, field.key, $event.target.value,rIndex)" />
+                                    </mat-form-field>
+                                </ng-template>
+                                <ng-template #hierarchyFld>
+                                    {{ row[field.key] ? row[field.key].fieldData : '' }}
+                                </ng-template>
+                            </td>
+
+                        </ng-container>
+                    </ng-template>
+
+                    <ng-container matColumnDef="row_status" stickyEnd>
+                        <th mat-header-cell *matHeaderCellDef class="any-cell status-cell">
+                            Status</th>
+                        <td mat-cell *matCellDef="let row; let rIndex = index;" class="any-cell status-cell">
+                            <ng-template
+                                [ngIf]="row['row_status'] && row['row_status'].fieldData && selectedTabIndex !== 4">
+                                <mat-chip-list aria-label="Status selection">
+                                    <ng-template ngFor let-status [ngForOf]="(row['row_status'].fieldData.split(','))">
+                                        <mat-chip class="custom-chip" class="{{ dynamicChipColor(status) }}">
+                                            {{ status }}</mat-chip>
+                                    </ng-template>
+                                </mat-chip-list>
+                            </ng-template>
+
+                            <ng-template [ngIf]="(rIndex+1)%2 !=0 && selectedTabIndex === 4">
+
+                                <ng-template [ngIf]="row['isSubmitted']" [ngIfElse]="notsubmitted">
+                                    <button mat-icon-button matTooltip="Submitted" id="show_submitted_{{rIndex}}">
+                                        <mat-icon class="submitted_icon">cloud_done</mat-icon>
+                                    </button>
+                                    <button [disabled]="collaboratorPermission" mat-icon-button matTooltip="Un Reviewed"
+                                        id="show_unreviewd_{{rIndex}}" style="display: none;"
+                                        (click)="doReview(true, rIndex, row['OBJECTNUMBER'].fieldData);">
+                                        <mat-icon class="unreviewed_icon">check_circle_outline</mat-icon>
+                                    </button>
+                                    <button mat-icon-button matTooltip="Reviewed" id="show_reviewd_{{rIndex}}"
+                                        style="display: none;"
+                                        (click)="doReview(false, rIndex, row['OBJECTNUMBER'].fieldData);">
+                                        <mat-icon class="reviewed_icon">check_circle</mat-icon>
+                                    </button>
+                                </ng-template>
+
+                                <ng-template #notsubmitted>
+                                    <ng-template [ngIf]="row['isReviewed']" [ngIfElse]="notReviewed">
+                                        <button [disabled]="collaboratorPermission" mat-icon-button
+                                            matTooltip="Un Reviewed" id="show_unreviewd_{{rIndex}}"
+                                            style="display: none;"
+                                            (click)="doReview(true, rIndex, row['OBJECTNUMBER'].fieldData);">
+                                            <mat-icon class="unreviewed_icon">check_circle_outline</mat-icon>
+                                        </button>
+                                        <button mat-icon-button matTooltip="Reviewed" id="show_reviewd_{{rIndex}}"
+                                            (click)="doReview(false, rIndex, row['OBJECTNUMBER'].fieldData);">
+                                            <mat-icon class="reviewed_icon">check_circle</mat-icon>
+                                        </button>
+                                    </ng-template>
+                                    <ng-template #notReviewed>
+                                        <button [disabled]="collaboratorPermission" mat-icon-button
+                                            matTooltip="Un Reviewed" id="show_unreviewd_{{rIndex}}"
+                                            (click)="doReview(true, rIndex, row['OBJECTNUMBER'].fieldData);">
+                                            <mat-icon class="unreviewed_icon">check_circle_outline</mat-icon>
+                                        </button>
+                                        <button mat-icon-button matTooltip="Reviewed" id="show_reviewd_{{rIndex}}"
+                                            style="display: none;"
+                                            (click)="doReview(false, rIndex, row['OBJECTNUMBER'].fieldData);">
+                                            <mat-icon class="reviewed_icon">check_circle</mat-icon>
+                                        </button>
+                                    </ng-template>
+                                </ng-template>
+
+                                <button mat-icon-button matTooltip="Comming soon..">
+                                    <mat-icon color="primary">flash_on_circle_outline</mat-icon>
+                                </button>
+                            </ng-template>
+                        </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="displayedFields | async; sticky: true"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedFields | async"></tr>
+
+                    Group header
+                    <ng-container matColumnDef="groupHeader">
+                        <td colspan="999" mat-cell *matCellDef="let groupBy">{{ groupBy.objectNumber }}</td>
+                    </ng-container>
+
+                    <tr mat-row *matRowDef="let row; columns: ['groupHeader']; when: isGroup"> </tr>
+
+                </table>
+            </div>
+            <mat-paginator class="schema-pagination" [length]="dynamicPageSize" [pageSize]="40"
+                [pageSizeOptions]="[40, 60, 100]" showFirstLastButtons (page)="doPagination($event);">
+            </mat-paginator>
+        </mat-card>
+    </div>
+</mat-card> -->

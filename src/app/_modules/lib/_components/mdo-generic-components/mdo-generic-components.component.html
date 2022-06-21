@@ -1,0 +1,266 @@
+<!-- Search-Input -->
+<ng-template [ngIf]="componentName==='search'">
+    <pros-search-input [placeholder]="searchPlaceholder" (searchValue)=(getSearchValue($event))></pros-search-input>
+</ng-template>
+
+<!-- Form-Input -->
+<ng-template [ngIf]="componentName==='input'">
+    <pros-form-input [type]="type" [placeholder]="placeholder" [label]="label" [value]="value" [hint]="hint"
+        [isHelpIcon]="isHelpIcon" (valueChange)=(getValue($event))></pros-form-input>
+</ng-template>
+
+<!-- MDO-TabGroup -->
+<ng-template [ngIf]="componentName==='tabgroup'">
+    <mat-tab-group disableRipple="true">
+        <mat-tab>
+            <ng-template mat-tab-label>
+                Notification
+                <mat-chip-list class="mdo-tabchiplist">
+                    <mat-chip>40</mat-chip>
+                </mat-chip-list>
+            </ng-template>
+
+            Content 1
+        </mat-tab>
+
+        <mat-tab>
+            <ng-template mat-tab-label>
+                Job query
+                <mat-chip-list class="mdo-tabchiplist">
+                    <mat-chip>129</mat-chip>
+                </mat-chip-list>
+            </ng-template>
+
+            Content 2
+        </mat-tab>
+
+        <mat-tab>
+            <ng-template mat-tab-label>
+                Tasklist
+                <mat-chip-list class="mdo-tabchiplist">
+                    <mat-chip>87</mat-chip>
+                </mat-chip-list>
+            </ng-template>
+
+            Content 3
+        </mat-tab>
+    </mat-tab-group>
+</ng-template>
+
+<!-- MDO-NavTab -->
+<ng-template [ngIf]="componentName==='navtab'">
+    <nav mat-tab-nav-bar disableRipple="true">
+        <a mat-tab-link> Navbar 1
+            <mat-chip-list class="mdo-tabchiplist">
+                <mat-chip>40</mat-chip>
+            </mat-chip-list>
+        </a>
+        <a mat-tab-link> Navbar 2
+            <mat-chip-list class="mdo-tabchiplist">
+                <mat-chip>40</mat-chip>
+            </mat-chip-list>
+        </a>
+        <a mat-tab-link> Navbar 3
+            <mat-chip-list class="mdo-tabchiplist">
+                <mat-chip>40</mat-chip>
+            </mat-chip-list>
+        </a>
+    </nav>
+</ng-template>
+
+<!-- MDO-MatMenu -->
+<ng-template [ngIf]="componentName==='menu'">
+    <button mat-icon-button [matMenuTriggerFor]="menu">
+        <mat-icon>more_vert</mat-icon>
+    </button>
+
+    <mat-menu #menu="matMenu">
+        <mat-nav-list class="mdo-menu-nav">
+            <a mat-list-item class="mdo-menu-listitem">Material</a>
+            <a mat-list-item class="mdo-menu-listitem">Plant</a>
+            <a mat-list-item class="mdo-menu-listitem">Vendor</a>
+            <a mat-list-item class="mdo-menu-listitem">Service</a>
+            <mat-divider></mat-divider>
+            <a mat-list-item class="mdo-menu-listitem">Upload Dataset...</a>
+        </mat-nav-list>
+    </mat-menu>
+</ng-template>
+
+<!-- MDO-ProgressBar -->
+<ng-template [ngIf]="componentName==='progressbar'">
+    <mat-progress-bar mode="determinate" value="40" class="mdo-progress"></mat-progress-bar>
+</ng-template>
+
+<!-- MDO-Toggle -->
+<ng-template [ngIf]="componentName==='toggle'">
+    <mat-slide-toggle *ngIf="componentName==='toggle'" color="primary"></mat-slide-toggle>
+</ng-template>
+
+<!-- MDO-Chip -->
+<ng-template [ngIf]="componentName==='chip'">
+    <mat-chip-list>
+        <mat-chip disableRipple="true">11 warnings</mat-chip>
+        <mat-chip disableRipple="true">112 success</mat-chip>
+        <mat-chip disableRipple="true">3 error</mat-chip>
+        <mat-chip disableRipple="true" class="none-stats-chip">No stats</mat-chip>
+    </mat-chip-list>
+    <div class="row-spacer"></div>
+</ng-template>
+
+<!-- Applied Filter -->
+<ng-template [ngIf]="componentName==='applied-filter'">
+    <mat-chip-list>
+        <mat-chip class="mdo-filter-matchip" disableRipple="true" [matMenuTriggerFor]="appliedfiltermenu">
+            <label>Country:</label> <span class="info">All</span>
+            <mat-icon matChipRemove>clear</mat-icon>
+        </mat-chip>
+        <mat-menu #appliedfiltermenu="matMenu">
+            <mat-nav-list>
+                <pros-filter-values (selectedValues)=(output($event))></pros-filter-values>
+            </mat-nav-list>
+        </mat-menu>
+    </mat-chip-list>
+    <div class="row-spacer"></div>
+</ng-template>
+
+
+<!-- conditionally render the filter value component inside add filter -->
+<ng-template #filterValue>
+    <mat-icon (click)="show=!show">trending_flat</mat-icon>
+    <pros-filter-values></pros-filter-values>
+</ng-template>
+
+
+<!-- Add Filter -->
+<ng-template [ngIf]="componentName==='add-filter'">
+    <mat-chip-list>
+        <mat-chip class="mdo-filter-matchip" disableRipple="true" [matMenuTriggerFor]="addfiltermenu">
+            <mat-icon>filter_list</mat-icon>
+        </mat-chip>
+        <mat-menu #addfiltermenu="matMenu">.
+            <mat-nav-list (click)="$event.stopPropagation()">
+                <ng-template [ngIf]="show" [ngIfElse]="filterValue">
+                    <pros-add-filter-menu (arrowClick)=(showHide($event))></pros-add-filter-menu>
+                </ng-template>
+            </mat-nav-list>
+        </mat-menu>
+    </mat-chip-list>
+    <div class="row-spacer"></div>
+</ng-template>
+
+<!-- Checkbox -->
+<ng-template [ngIf]="componentName==='checkbox'">
+    <mat-checkbox color="primary"> Value</mat-checkbox>
+    <div class="row-spacer"></div>
+</ng-template>
+
+<!-- Radio button -->
+<ng-template [ngIf]="componentName==='radio'">
+    <mat-radio-group color="primary">
+        <mat-radio-button value="1">Value</mat-radio-button>
+    </mat-radio-group>
+    <div class="row-spacer"></div>
+</ng-template>
+
+<!-- Mat Range Slider -->
+<ng-template [ngIf]="componentName==='range-slider'">
+    <mat-slider color="primary"></mat-slider>
+    <div class="row-spacer"></div>
+</ng-template>
+
+<!-- Buttons -->
+<ng-template [ngIf]="componentName==='button'">
+    <div class="f-row">
+        <button mat-flat-button color="accent">Configure</button>
+        &nbsp;
+        <button mat-flat-button color="accent">Run <mat-icon>arrow_drop_down</mat-icon></button>
+        &nbsp;
+        <button mat-flat-button color="accent">
+            <mat-spinner diameter="16"></mat-spinner>
+        </button>
+        &nbsp;
+        <button mat-fab color="accent" class="mat-elevation-z0">
+            <mat-icon>more_horiz</mat-icon>
+        </button>
+    </div>
+    <div class="row-spacer"></div>
+</ng-template>
+
+<!-- MDO Table -->
+<ng-template [ngIf]="componentName==='table'">
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z0">
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>
+                <button mat-button>
+                    <mat-icon>settings</mat-icon>
+                </button>
+            </th>
+            <td mat-cell *matCellDef="let element">
+                <button mat-button>
+                    <mat-icon>more_horiz</mat-icon>
+                </button>
+            </td>
+        </ng-container>
+
+        <ng-container matColumnDef="position">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Material no. </th>
+            <td mat-cell *matCellDef="let element"> 123456 </td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Name <mat-icon>help_outline</mat-icon>
+            </th>
+            <td mat-cell *matCellDef="let element"> Alex</td>
+        </ng-container>
+
+        <ng-container matColumnDef="weight">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Weight </th>
+            <td mat-cell *matCellDef="let element"> 23094 </td>
+        </ng-container>
+
+
+        <ng-container matColumnDef="symbol">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Symbol </th>
+            <td mat-cell *matCellDef="let element"> {{element.symbol}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="errorcell">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Error </th>
+            <td mat-cell *matCellDef="let element" class="error-cell"></td>
+        </ng-container>
+
+        <ng-container matColumnDef="warningcell">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Warning </th>
+            <td mat-cell class="warning-cell" *matCellDef="let element"></td>
+        </ng-container>
+
+        <ng-container matColumnDef="successcell">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Success </th>
+            <td mat-cell class="success-cell" *matCellDef="let element"> </td>
+        </ng-container>
+
+        <ng-container matColumnDef="reviewcell">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Review </th>
+            <td mat-cell class="review-cell" *matCellDef="let element"> </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+    <div class="row-spacer"></div>
+</ng-template>
+
+<!-- MDO Mat-Accordion -->
+<ng-template [ngIf]="componentName==='accordion'">
+    <mat-accordion>
+        <mat-expansion-panel togglePosition="before" class="mat-elevation-z0">
+            <mat-expansion-panel-header expandedHeight="36px" collapsedHeight="36px">
+                <mat-panel-title>
+                    Accordion
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <p>I'm visible because I am open</p>
+        </mat-expansion-panel>
+    </mat-accordion>
+    <div class="row-spacer"></div>
+</ng-template>

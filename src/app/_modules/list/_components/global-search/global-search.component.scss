@@ -1,0 +1,27 @@
+.global-search {
+  width: 600px;
+  height: auto;
+  position: absolute;
+  overflow-x: auto;
+  overflow-y: hidden;
+  top: 95px;
+  left: 20px;
+  z-index: 110;
+
+  .filter-button {
+    align-items: baseline;
+  }
+
+  .filter-table {
+    overflow: auto;
+    width: 100%;
+    min-height: 100px;
+    max-height: 150px;
+
+    .loader {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}

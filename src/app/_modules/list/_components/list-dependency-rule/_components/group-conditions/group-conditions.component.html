@@ -1,0 +1,100 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button (click)="close()" icon="times" type="plain" iconFontType="light"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading" i18n="@@new_condition">New condition</lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-button type="major" (click)="save()" width="80px">Save</lib-button>
+            </div>
+        </div>
+    </div>
+    <div class="sidesheetcontent-listing">
+        <div class="mdo-justify">
+            <div class="f-col" *ngIf="!sourceisEmpty">
+                <lib-text-line weight="strong" type="xsmall" class="field-label">Source fields</lib-text-line>
+            </div>
+
+            <form *ngFor=" let item of sourceObject | keyvalue" class="user-defined-set">
+                <div class="f-row defined-row">
+                    <div class="col col-x8">
+                        <lib-text-line type="base" textColor="secondary">
+                            {{fieldNames[item.key]}} </lib-text-line>
+                    </div>
+                    <div class="col col-x8">
+                        <div class="mdo-field">
+                            <div class="mdo-field-input single-dropdown">
+                                <input matInput #sourceInputEl id={{item.key}} placeholder="Value" [matAutocomplete]="auto"
+                                    (change)="settSourceValueCondition($event,item.key)" value={{item.value.code}} />
+                            </div>
+                            <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete"
+                                (optionSelected)="sourceCodeselected($event)">
+                                <ng-container *ngFor="let drop of dropdowns">
+                                    <mat-option
+                                        class="mat-option mat-focus-indicator mdo-option  custome-mat-options-padding"
+                                        *ngIf="drop.fieldId==item.key"
+                                        [value]="drop.code+','+drop.text+','+drop.fieldId+','+drop.textRef">
+                                        {{drop.text}}
+                                    </mat-option>
+                                </ng-container>
+                            </mat-autocomplete>
+                        </div>
+                    </div>
+                    <div class="col col-x2"></div>
+                    <div class="col col-x8 end-items"></div>
+                </div>
+            </form>
+
+            <div class="f-col" *ngIf="!targetisEmpty">
+                <lib-text-line weight="strong" type="xsmall" class="field-label">Target fields</lib-text-line>
+            </div>
+
+            <form *ngFor="let item of targetObject | keyvalue" class="user-defined-set">
+                <div class="f-row defined-row">
+                    <div class="col col-x8">
+                        <lib-text-line type="base" textColor="secondary">{{fieldNames[item.key]}}</lib-text-line>
+                    </div>
+
+                    <div class="col col-x8">
+                        <div class="mdo-field">
+                            <div class="mdo-field-input single-dropdown">
+                                <input matInput #targetInputEl id={{item.key}}
+                                    (change)="settargetValueCondition($event,item.key)" placeholder="Value"
+                                    [matAutocomplete]="auto1" value={{item.value.code}} />
+                            </div>
+                            <mat-autocomplete class="mdo-autocomplete" #auto1="matAutocomplete"
+                                (optionSelected)="targetCodeselected($event)">
+                                <ng-container *ngFor="let drop of dropdowns">
+                                    <mat-option class="mdo-option" *ngIf="drop.fieldId==item.key"
+                                        [value]="drop.code+','+drop.text+','+drop.fieldId+','+drop.textRef">
+                                        {{drop.text}}
+                                    </mat-option>
+                                </ng-container>
+                            </mat-autocomplete>
+                        </div>  
+                    </div>
+
+                    <div class="col col-x2">
+                        <lib-slide-toggle [checked]="item.value.isDefault" [disabled]="false" labelPosition="before"
+                            theme="primary" matTooltip="Set as default" (toggleChange)="setasDefault($event,item.key)">
+                        </lib-slide-toggle>
+                    </div>
+
+                    <div class="col col-x8 end-items">
+                        <div class="f-row end-items">
+                            <ng-container *ngFor="let map of MappingObject">
+                                <ng-container *ngIf="map.property==item.value.property">
+                                    <ng-container *ngFor="let innermap of map.Object; let i=index">
+                                        <lib-button type="plain" [icon]="innermap.Icon" [iconFontType]="innermap.IconType"
+                                         (click)="SetValues(item.key,innermap.Value)"></lib-button>
+                                    </ng-container>
+                                </ng-container>
+                            </ng-container>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

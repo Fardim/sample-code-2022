@@ -1,0 +1,107 @@
+div.root {
+  padding: 0 16px;
+}
+
+.f-align-items-start {
+  align-items: flex-start;
+}
+
+.data-set-joins {
+  width: calc(100% - 260px);
+}
+
+.ml-auto {
+  margin-left: auto;
+}
+
+.selection-tabs {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+
+  .responsive-tablist {
+    overflow: hidden;
+    position: relative;
+  }
+
+  .tab-series {
+    text-align: center;
+    cursor: pointer;
+    margin: 0 2px;
+    padding: 10px 10px 10px 30px;
+    position: relative;
+    background-color: #f2f5f8;
+
+    &::after,
+    &::before {
+      content: ' ';
+      position: absolute;
+      top: 0;
+      left: 100%;
+      width: 0;
+      height: 0;
+      border-top: 22px solid transparent;
+      border-bottom: 22px solid transparent;
+      border-left: 17px solid #f2f5f8;
+      z-index: 2;
+    }
+
+    &::before {
+      right: auto;
+      left: 0;
+      border-left: 17px solid #fff;
+      z-index: 0;
+    }
+
+    &:first-child {
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+    }
+
+    &:first-child::before {
+      border: none;
+    }
+  }
+
+  .selected {
+    background-color: #e4ebf3;
+
+    &::after {
+      border-left: 17px solid #e4ebf3;
+    }
+  }
+
+  .tabs-list {
+    display: flex;
+    transition: all 0.5s ease-in-out;
+    position: relative;
+    left: 0;
+  }
+}
+
+.tab-scroll {
+  &.prev-tab {
+    margin-right: 4px;
+  }
+
+  &.next-tab {
+    margin-left: 5px;
+  }
+}
+
+.dataset-selector {
+  display: flex;
+  margin-top: 4rem;
+  justify-content: center;
+  align-items: center;
+
+  .table-selector {
+    height: 56px;
+  }
+}
+
+.virtual-dataset {
+  min-width: 265px;
+  padding-left: 10px;
+  margin-left: auto;
+}

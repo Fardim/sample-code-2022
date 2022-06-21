@@ -1,0 +1,54 @@
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { SharedModule } from '@modules/shared/shared.module';
+import { Store } from '@ngrx/store';
+import { of } from 'rxjs';
+import { AppMaterialModuleForSpec } from 'src/app/app-material-for-spec.module';
+
+import { ExpandableTextBlockComponent } from './expandable-text-block.component';
+
+describe('ExpandableTextBlockComponent', () => {
+  let component: ExpandableTextBlockComponent;
+  let fixture: ComponentFixture<ExpandableTextBlockComponent>;
+
+  const storeMock = {
+    select: jasmine.createSpy().and.returnValue(of({
+      messages: [],
+      connected: false,
+      loadingState: 'loading',
+      errorText: '',
+      channelId: 'e6e3d836-00b1-489e-a642-0395377ce276'
+    })),
+    dispatch: jasmine.createSpy(),
+    pipe: jasmine.createSpy().and.returnValue((of({
+      messages: [],
+      connected: true,
+      loadingState: 'loaded',
+      errorText: '',
+      channelId: 'e6e3d836-00b1-489e-a642-0395377ce276'
+    })))
+  };
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: [ExpandableTextBlockComponent],
+      imports: [AppMaterialModuleForSpec, SharedModule],
+      providers: [
+        {
+          provide: Store,
+          useValue: storeMock
+        }
+      ]
+    })
+      .compileComponents();
+  }));
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(ExpandableTextBlockComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

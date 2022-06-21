@@ -1,0 +1,29 @@
+<div class="root">
+    <form [formGroup]="templateFormGrp">
+        <div class="f-row breadcrum-toolbar">
+            <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+            <div class="col-spacer"></div>
+            <lib-text-line type="leading" i18n="@@select_template">Select a template</lib-text-line>
+        </div>
+        <div class="f-col sidesheetcontent-listing">
+            <div class="f-col mdo-justify">
+                <div class="f-col mdo-field">
+                    <lib-text-line type="xsmall" class="field-label" weight="strong" i18n="@@template_name">Template
+                        name</lib-text-line>
+                    <div class="mdo-field-input">
+                        <input matInput placeholder="Search template" i18n-placeholder="@@type_to_search"
+                            formControlName="templateName" [matAutocomplete]="templateAuto" />
+                        <mat-icon matSuffix fontSet="mdo-icons" class="autocomplete-icon">{{ getDropdownPos(templateAuto) }}</mat-icon>
+                        <mat-autocomplete class="mdo-autocomplete" #templateAuto
+                            (optionSelected)="updateTemplate($event)">
+                            <mat-option class="mdo-option" *ngFor="let opt of filteredTemplates | async"
+                                [value]="opt._id">
+                                {{opt.desc}}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

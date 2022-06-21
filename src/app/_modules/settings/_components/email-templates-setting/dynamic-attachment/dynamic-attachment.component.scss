@@ -1,0 +1,30 @@
+.colunm-box {
+  min-height: 48px;
+  align-items: center;
+
+  &.rule-border-row {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+  }
+
+  .col {
+    display: flex;
+    flex: 1 0 auto;
+    width: 1px;
+    align-items: center;
+
+    &.col-x8 {
+      flex: 8;
+      margin: 0 6px;
+    }
+
+    &.mat-item-end {
+      justify-content: flex-end;
+    }
+
+    .mdo-field {
+      width: 100%;
+      margin-bottom: 0;
+    }
+  }
+}

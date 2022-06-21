@@ -1,0 +1,133 @@
+<div class="root">
+  <div class="f-row-spacer-half"></div>
+  <div class="f-row">
+    <lib-chip-list class="filters-list">
+      <lib-search
+        class="lib-search"
+        i18n-placeholder="@@search"
+        placeholder="Search privileges"
+        (valueChange)="searchFieldSub.next($event)"
+      >
+      </lib-search>
+      <lib-chip label="Administration" i18n-label="@@administration" type="info" (click)="filterData('Administration')" ></lib-chip>
+      <lib-chip label="Content Management" i18n-label="@@content" type="info" (click)="filterData('Content_Management')"></lib-chip>
+      <lib-chip label="Execution" i18n-label="@@execution" type="info" (click)="filterData('Execution')"></lib-chip>
+    </lib-chip-list>
+  </div>
+  <div *ngIf="rolesDataFetching" class="f-col">
+    <lib-skeleton-table></lib-skeleton-table>
+  </div>
+
+  <div class="f-col role-container" *ngIf="!rolesDataFetching">
+    <table *ngIf="dataSource" mat-table [dataSource]="dataSource" matSort class="mat-elevation-z0 default-table">
+      <!-- info Column -->
+      <ng-container matColumnDef="description" sticky>
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element; index as i">
+          <lib-button type="plain" icon="question-circle" matTooltip="{{ element['description'] }}"></lib-button>
+        </td>
+      </ng-container>
+
+      <!-- Checkbox Column -->
+      <ng-container matColumnDef="_select" sticky>
+        <th mat-header-cell *matHeaderCellDef>
+          <lib-checkbox
+            prosClickStopPropagation
+            [checked]="selection.hasValue() && isAllSelected()"
+            (valueChange)="masterToggle()"
+          >
+          </lib-checkbox>
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <lib-checkbox prosClickStopPropagation [checked]="selection.isSelected(row)" (valueChange)="toggle($event, row)">
+          </lib-checkbox>
+        </td>
+      </ng-container>
+
+      <!-- Privilege Column -->
+      <ng-container matColumnDef="privilege">
+        <th mat-header-cell *matHeaderCellDef>Privilege</th>
+        <td mat-cell *matCellDef="let element; index as i">
+          {{ element.privilege }}
+        </td>
+      </ng-container>
+
+      <!-- category Column -->
+      <ng-container matColumnDef="category">
+        <th mat-header-cell *matHeaderCellDef>Category</th>
+        <td mat-cell *matCellDef="let element">
+          <lib-chip [label]="element.category | replaceUnderscorePipe" type="info"></lib-chip>
+        </td>
+      </ng-container>
+
+      <!-- default-value Column -->
+      <ng-container matColumnDef="actions_allowed">
+        <th mat-header-cell *matHeaderCellDef>Actions allowed</th>
+        <td mat-cell *matCellDef="let element">
+          <div
+            class="f-row"
+            style="justify-content: flex-end; align-items: flex-start"
+            *ngIf="selection.isSelected(element)"
+            [matMenuTriggerFor]="privilegeOptionMenu"
+          >
+            <lib-button
+              type="plain"
+              iconFontType="solid"
+              icon="caret-down"
+              [innerHTML]="getAllowedActions(element)"
+              style="text-align: right"
+            >
+              <!-- {{getAllowedActions(element)}} -->
+            </lib-button>
+            <div class="col-spacer"></div>
+            <mat-icon>arrow_drop_down</mat-icon>
+
+            <mat-menu #privilegeOptionMenu="matMenu" xPosition="after" class="filter-menudropdown">
+              <lib-filter-dropdown class="chip-filters">
+                <div class="dropdown-options-wrapper f-col">
+                  <div class="dropdown-options-inner-container">
+                    <div class="options">
+                      <lib-filter-option prosClickStopPropagation *ngFor="let item of element['privilege_options']">
+                        <lib-checkbox
+                          [label]="item.text"
+                          prosClickStopPropagation
+                          [checked]="isPrivilegeSelected(element, item)"
+                          (valueChange)="setAllowedPrivilege(element, item)"
+                        ></lib-checkbox>
+                      </lib-filter-option>
+                    </div>
+                  </div>
+                </div>
+              </lib-filter-dropdown>
+            </mat-menu>
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- data_restrictions Column -->
+      <ng-container matColumnDef="data_restrictions">
+        <th mat-header-cell *matHeaderCellDef>Data Restrictions</th>
+        <td mat-cell *matCellDef="let element">
+          <div class="f-row" style="justify-content: center; align-items: flex-start;">
+            <div class="relative" *ngIf="element['canRestrictData']">
+              <lib-button
+                [icon]="'filter'"
+                [iconFontType]="'light'"
+                [type]="'plain'"
+                [iconPosition]="'after'"
+                (afterClick)="gotoDataRestriction(element)"
+              >
+              </lib-button>
+              <div class="absolute-blue-dot" *ngIf="element['has_data_restrictions']"></div>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+
+    <div class="f-row-spacer-half"></div>
+  </div>
+</div>

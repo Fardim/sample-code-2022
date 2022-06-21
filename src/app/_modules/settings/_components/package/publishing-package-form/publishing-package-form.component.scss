@@ -1,0 +1,10 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  padding: 30px;
+
+  .w-95 {
+    width: 95%;
+  }
+}

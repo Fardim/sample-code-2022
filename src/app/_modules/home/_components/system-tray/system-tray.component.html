@@ -1,0 +1,208 @@
+<div class="root">
+        <div class="f-row breadcrum-toolbar">
+            <lib-button (click)="close()" icon="times" type="plain" iconFontType="light"></lib-button>
+            <div class="col-spacer"></div>
+            <div class="f-col mdo-constrained-right">
+                <div class="f-row breadcrum-head">
+                    <lib-text-line i18n="@@system_tray" type="leading">
+                        {{ showNotifications ? 'Notifications' : 'Jobs'}}
+                    </lib-text-line>
+                </div>
+            </div>
+        </div>
+
+        <div class="f-col sidesheetcontent-listing">
+            <div class="f-col mdo-justify">
+                <div *ngIf="showNotifications; else showJobs" class="notification-container">
+                    <div class="f-row empty-block" *ngIf="notifications.length === 0">
+                        <lib-empty-state icon="notification" primaryText="Nothing to see here"
+                        secondaryText="You don't have any notifications"></lib-empty-state>
+                    </div>
+
+                    <mat-nav-list class="notification-list" prosInfiniteScroll bufferPercentage="20"
+                        (scrollEnd)="paginateNotification()">
+                        <ng-container *ngIf="!notifications.length && loader">
+                            <lib-skeleton-table></lib-skeleton-table>
+                        </ng-container>
+
+                        <mat-list-item *ngFor="let notification of notifications;trackBy: trackByFn;">
+                            <div class="f-row notification-listing">
+                                <div class="f-col notify-row">
+                                    <ng-template [ngIf]="!notification.showMore" [ngIfElse]="withoutTruncate">
+                                        <lib-text-line type="base" weight="strong" textColor="primary">
+                                            {{notification.headerText}}
+                                        </lib-text-line>
+
+                                        <lib-text-line type="xsmall" textColor="secondary" enableWrap="true">
+                                            {{notification.contentText}}
+                                        </lib-text-line>
+
+                                        <div class="f-row" *ngIf="notification.downloadLink">
+                                            <lib-text-line class="cursor" type="xsmall" textColor="link"
+                                                (click)="download(notification.downloadLink)">Click here</lib-text-line>
+                                            &nbsp;
+                                            <lib-text-line type="xsmall" textColor="secondary">to download</lib-text-line>
+                                        </div>
+
+                                        <a *ngIf="(notification.downloadLink && notification.downloadLink.length > 96)|| (notification.contentText && notification.contentText.length > 96)"
+                                            (click)="notification.showMore = !notification.showMore">
+                                            <mat-icon fontSet="mdo-icons" class="mat-expand-icon">chevron-right
+                                            </mat-icon>
+                                        </a>
+
+                                        <lib-text-line type="xsmall" textColor="secondary" enableWrap="true"
+                                            class="timetext">
+                                            {{notification.sendTime | date:"dd
+                                            MMM
+                                            hh:mm:ss" }}
+                                        </lib-text-line>
+                                    </ng-template>
+                                    <ng-template #withoutTruncate>
+                                        <div class="notify-content expand-content">
+                                            <lib-text-line type="xsmall" textColor="secondary">{{notification.contentText}}
+                                            </lib-text-line>
+                                            <lib-text-line type="xsmall" textColor="secondary"
+                                                (click)="download(notification.downloadLink)">
+                                                {{notification.downloadLink}}</lib-text-line>
+                                        </div>
+                                        <a *ngIf="(notification.downloadLink && notification.downloadLink.length > 96) || (notification.contentText && notification.contentText.length > 96)"
+                                            (click)="notification.showMore = !notification.showMore">
+                                            <mat-icon fontSet="mdo-icons" class="mat-expand-icon">chevron-down
+                                            </mat-icon>
+                                        </a>
+                                    </ng-template>
+                                </div>
+                                <div class="f-row">
+                                    <ng-template [ngIf]="notification.senderUid || notification.senderMail"
+                                        [ngIfElse]="showUserProfile">
+                                        <lib-avatar
+                                            [initials]="notification.senderUid ? notification.senderUid[0] : notification.senderMail[0]">
+                                        </lib-avatar>
+                                    </ng-template>
+
+                                    <ng-template #showUserProfile>
+                                        <lib-avatar>
+                                            <mat-icon fontSet="mdo-icons-light">user</mat-icon>
+                                        </lib-avatar>
+                                    </ng-template>
+                                    <span class="f-col-spacer-half"></span>
+                                    <lib-button (click)="deleteNotification(notification.id)" type="plain" icon="trash-alt"
+                                        iconFontType="light" prosClickStopPropagation></lib-button>
+                                </div>
+                            </div>
+                        </mat-list-item>
+
+                        <ng-container *ngIf="loader">
+                            <mat-list-item>
+                                <div class="f-row notification-listing">
+                                    <div class="f-col notify-row">
+                                        <lib-skeleton type="line"></lib-skeleton>
+                                        <lib-skeleton type="line-half"></lib-skeleton>
+                                    </div>
+                                    <div class="f-col-spacer-half"></div>
+                                    <lib-skeleton type="avatar"></lib-skeleton>
+                                    <div class="f-col-spacer-half"></div>
+                                    <lib-skeleton type="button"></lib-skeleton>
+                                </div>
+                            </mat-list-item>
+                        </ng-container>
+                    </mat-nav-list>
+                </div>
+
+                <ng-template #showJobs >
+                    <ng-container *ngIf="isJobsLoading">
+                        <lib-skeleton-table></lib-skeleton-table>
+                    </ng-container>
+                    <ng-container *ngIf="!(!jobQueueData || jobQueueData?.length === 0)">
+                        <div class="f-row">
+                            <lib-chip-list class="filters-list">
+                                <lib-search class="lib-search" placeholder="Search" #schemaSearchInput
+                                    [formControl]="searchControl"></lib-search>
+                                <lib-chip label="Status:" type="info">All</lib-chip>
+                                <lib-chip label="Start at:" type="info">All</lib-chip>
+                                <lib-chip label="User:" type="info">All</lib-chip>
+                            </lib-chip-list>
+                        </div>
+
+                        <div class="jobs-table">
+                            <table mat-table [dataSource]="dataSource" matSort>
+                                <ng-container matColumnDef="jobName">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header> Job </th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <div class="jobs-name-container">
+                                            <lib-text-line [enableWrap]="false"
+                                                [ngClass]="{ 'cancelled-job': element.status === 'cancelled'}" type="base"
+                                                textColor="link">{{element.jobName}}.</lib-text-line>
+                                            <div class="f-row job-name-col"  *ngIf="element.responseData && element.responseData.dmsReferenceId">
+                                                <lib-text-line class="text-line cursor" textColor="link" (click)="downloadTaxonomy(element.responseData.dmsReferenceId, 'Class_Taxonomy.csv')">Click here</lib-text-line>
+                                                <lib-text-line class="text-line" [enableWrap]="false"> to download taxonomy.</lib-text-line>
+                                            </div>    
+                                            <lib-text-line [enableWrap]="false" type="xsmall" textColor="secondary">
+                                                {{element.jobName}}</lib-text-line>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="status">
+                                    <th mat-header-cell *matHeaderCellDef class="center-item"> Status </th>
+                                    <td mat-cell *matCellDef="let element" class="center-item">
+                                        <div class="cell-align">
+                                            <lib-label [status]="getLabelStatus(element.status)"
+                                            text="{{element.status | titlecase}}"></lib-label>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="startTime">
+                                    <th mat-header-cell *matHeaderCellDef class="end-item">Start at </th>
+                                    <td mat-cell *matCellDef="let element" class="end-item">
+                                        <lib-text-line type="base" *ngIf="element.startTime !== '-'; else novalue1">
+                                            {{element.startTime | date: 'short'}}</lib-text-line>
+                                        <ng-template #novalue1>-</ng-template>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="endTime">
+                                    <th mat-header-cell *matHeaderCellDef class="end-item"> Finish at </th>
+                                    <td mat-cell *matCellDef="let element" class="end-item">
+                                        <ng-container *ngIf="element.status !== 'running'; else showRunning">
+                                            <lib-text-line type="base" *ngIf="element.endTime !== '-'; else novalue">
+                                                {{element.endTime | date: 'short'}}</lib-text-line>
+                                            <ng-template #novalue>-</ng-template>
+                                        </ng-container>
+                                        <ng-template #showRunning>
+                                            <lib-spinner type="minor" [size]="20"></lib-spinner>
+                                        </ng-template>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="userName">
+                                    <th mat-header-cell *matHeaderCellDef></th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <lib-avatar initials="{{element.userName | nameShort}}"></lib-avatar>
+                                    </td>
+                                </ng-container>
+                                <ng-container matColumnDef="enableCancel">
+                                    <th mat-header-cell *matHeaderCellDef></th>
+                                    <td mat-cell *matCellDef="let element">
+                                        <lib-button [matMenuTriggerFor]="actionMenu" icon="ellipsis-h">
+                                        </lib-button>
+                                        <mat-menu #actionMenu>
+                                            <lib-filter-option (click)="cancel(element)">Cancel</lib-filter-option>
+                                        </mat-menu>
+                                    </td>
+                                </ng-container>
+                                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                            </table>
+                        </div>
+        
+                    </ng-container>
+                
+                    <div class="f-row empty-block">
+                        <ng-container *ngIf="!isJobsLoading && jobQueueData?.length === 0">
+                            <lib-empty-state icon="order" primaryText="Nothing to see here"
+                                secondaryText="Your jobs list is empty, create new jobs to see their status">
+                            </lib-empty-state>
+                        </ng-container>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+</div>

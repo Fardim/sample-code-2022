@@ -1,0 +1,29 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+      <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+      <div class="col-spacer"></div>
+      <div class="mdo-constrained-right">
+          <div class="f-row breadcrum-head">
+              <lib-text-line type="leading" i18n="@@display_criteria"> Display criteria </lib-text-line>
+              <span class="f-col-spacer-half"></span>
+              <span class="f-spacer"></span>
+              <lib-button type="major" i18n="@@save" (click)="save()" width="80px">Save</lib-button>
+          </div>
+      </div>
+  </div>
+  <div class="f-col sidesheetcontent-listing">
+      <div class="f-col mdo-justify">
+        <pros-blocks-hierarchy
+          [operatorsList]="operatorList"
+          [sourceList]="fieldsList"
+          [initialSrcList]="initialFieldsList"
+          [targetListMetaData]="metataData"
+          [blocksGrp]="criteriaForm"
+          [blocksList]="existingBloks"
+          [showRegex]="true"
+          [submitted]="submitted"
+          (updateFldList)="updateFldList($event)"
+        ></pros-blocks-hierarchy>
+      </div>
+  </div>
+</div>

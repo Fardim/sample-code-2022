@@ -1,0 +1,18 @@
+.data-table {
+  table.mat-table {
+    width: 100%;
+    overflow: auto;
+    border-collapse: separate;
+
+    td.mat-cell {
+      border-right: none;
+      min-width: 140px;
+
+      .lib-input {
+        display: block;
+        height: 36px;
+        width: 100%;
+      }
+    }
+  }
+}

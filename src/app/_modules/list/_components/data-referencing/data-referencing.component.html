@@ -1,0 +1,102 @@
+<div class="root">
+   <div class="f-row breadcrum-toolbar">
+      <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+      <div class="col-spacer"></div>
+      <div class="f-row mdo-constrained-right">
+         <lib-text-line type="leading">Reference rules</lib-text-line>
+         <span class="f-spacer"></span>
+         <lib-button type="major" width="80px" i18n="@@save"
+            (afterClick)="save()">Save</lib-button>
+      </div>
+   </div>
+   <div class="f-col sidesheetcontent-listing">
+      <div class="f-col mdo-justify">
+         <form [formGroup]="form">
+            <ng-container formArrayName="rules">
+               <div cdkDropList (cdkDropListDropped)="dropRule($event)">
+                   <div *ngFor="let item of rules.controls; let i = index"
+                       class="f-row colunm-box rule-border-row" cdkDrag>
+                       <ng-container [formGroupName]="i">
+                           <div class="col col-x2 action-drag">
+                               <lib-button cdkDragHandle icon="grip-lines" iconFontType="light"></lib-button>
+                           </div>
+                           <!-- module -->
+                           <div class="col col-x8">
+                               <div class="mdo-field" [class.has-error]="submitted && item.controls?.dataset.invalid">
+                                   <div class="mdo-field-input">
+                                      <input matInput #datasetInputEl #srcDatasetAutoTrigger="matAutocompleteTrigger"
+                                          placeholder="Search dataset"
+                                          [matAutocomplete]="srcDatasetAuto" 
+                                          formControlName="dataset" 
+                                          (keyup)="datasetSearchSub.next(datasetInputEl.value)"
+                                          (click)="isInitializing=true; initDatasetList()"/>
+                                     <mat-icon matSuffix fontSet="mdo-icons-light" class="autocomplete-icon">chevron-down</mat-icon>
+                                      <mat-autocomplete class="mdo-autocomplete" #srcDatasetAuto="matAutocomplete" 
+                                         [displayWith]="displayDatasetFn" (optionSelected)="selectRefDataset(i)">
+                                         <ng-template [ngIf]="!isInitializing">
+                                            <mat-option *ngFor="let dataset of datasetListObs | async" 
+                                               [value]="{datasetId: dataset.moduleId, datasetDesc: dataset.moduleDesc}">
+                                                   {{ dataset.moduleDesc }}
+                                            </mat-option>
+                                         </ng-template>
+                                      </mat-autocomplete>
+                                  </div>
+                                  <mat-error>
+                                    <mat-error *ngIf="submitted && item.controls?.dataset?.errors?.required">
+                                       <lib-text-line type="small"> This is required</lib-text-line>
+                                    </mat-error>
+                                    <mat-error *ngIf="submitted && item.controls?.dataset?.errors?.datasetError">
+                                       <lib-text-line type="small">Select a valid option</lib-text-line>
+                                    </mat-error>
+                                 </mat-error>
+                               </div>
+                           </div>
+                           <div class="col col-x8">
+                                <div class="mdo-field" [class.has-error]="submitted && item.controls?.fldCtrl.invalid">
+                                    <div class="mdo-field-input">
+                                       <input matInput #fieldInputEl #srcFldAutoTrigger="matAutocompleteTrigger" 
+                                           placeholder="Search field"
+                                           [matAutocomplete]="srcFldAuto" 
+                                           formControlName="fldCtrl"
+                                           (keyup)="fieldSearchSub.next({s: fieldInputEl.value, rowIndex: i})"
+                                           (click)="isInitializing=true; initFieldsList(i)"/>
+                                           <mat-icon matSuffix fontSet="mdo-icons-light" class="autocomplete-icon">chevron-down</mat-icon>
+                                           <!-- (optionSelected)="selectRefField($event, fieldInputEl, i)" -->
+                                       <mat-autocomplete class="mdo-autocomplete" #srcFldAuto="matAutocomplete" 
+                                          [displayWith]="displayFieldFn">
+                                          <ng-template [ngIf]="!isInitializing">
+                                             <mat-optgroup *ngFor="let group of fieldsListObs | async">
+                                                 <div [libTooltip]="group.fieldDescri" matTooltipPosition="right" class="custom-opt-grp-header">{{ group.fieldDescri }}</div>
+                                                 <ng-container *ngFor="let child of group.childs">
+                                                     <mat-option *ngIf="canSelectField(i, child.fieldId)" [libTooltip]="child.fieldDescri" matTooltipPosition="right" [value]="child">
+                                                         {{ child.fieldDescri }}
+                                                     </mat-option>
+                                                 </ng-container>
+                                             </mat-optgroup>
+                                          </ng-template>
+                                       </mat-autocomplete>
+                                   </div>
+                                   <mat-error>
+                                    <mat-error *ngIf="submitted && item.controls?.fldCtrl.errors?.required">
+                                       <lib-text-line type="small"> This is required</lib-text-line>
+                                    </mat-error>
+                                    <mat-error *ngIf="submitted && item.controls?.fldCtrl.errors?.fieldError">
+                                       <lib-text-line type="small"> Select a valid option </lib-text-line>
+                                    </mat-error>
+                                 </mat-error>
+                                </div>
+
+                           </div>
+                           <div class="col mat-item-end">
+                               <lib-button (click)="removeRule(i)" icon="trash-alt" iconFontType="light">
+                               </lib-button>
+                           </div>
+                       </ng-container>
+                   </div>
+               </div>
+            </ng-container>
+         </form>
+         <lib-button type="minor" i18n="@@Add_rule" (afterClick)="addRule()">Add rule</lib-button>
+      </div>
+  </div>
+</div>

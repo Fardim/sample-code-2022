@@ -1,0 +1,26 @@
+<div class="root virtual-dataset-details f-col" [ngClass]="{'existed-group-details': hasGroupDetails}">
+  <div class="f-row">
+    <mat-panel-title>
+      <lib-text-line type="base" weight="strong">{{virtualDatasetDetails?.vdName || 'My Virtual Dataset'}}</lib-text-line>
+    </mat-panel-title>
+    <lib-button-group>
+      <lib-button type="minor" icon="cog" class="cog-icon" (click)="editDataset(virtualDatasetDetails?.vdId)"></lib-button>
+
+      <lib-button type="minor" icon="ellipsis-h" class="ellipsis-icon" [matMenuTriggerFor]="moreMenu"></lib-button>
+      <mat-menu #moreMenu="matMenu" class="navigation-menu">
+        <lib-filter-option>Sync data</lib-filter-option>
+        <lib-filter-option>Schedule sync</lib-filter-option>
+        <lib-filter-option (click)="deleteVirtualDataset(virtualDatasetDetails)">Delete</lib-filter-option>
+      </mat-menu>
+    </lib-button-group>
+  </div>
+  <div class="empty-state" *ngIf="!hasGroupDetails">
+    <lib-empty-state class="lib-empty-state" primaryText="Nothing to see here" secondaryText="Your dataset doesn't have any fields. Would you like to add fields
+        by editing the dataset?" icon="table" iconSize="200">
+      <lib-button class="edit-dataset-button" type="minor" iconFontType="solid" (click)="editDataset(virtualDatasetDetails?.vdId)">Edit dataset</lib-button>
+    </lib-empty-state>
+  </div>
+  <ng-template [ngIf]="hasGroupDetails">
+    <p class="centered-text">Virtual Dataset Group Details</p>
+  </ng-template>
+</div>

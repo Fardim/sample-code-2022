@@ -1,0 +1,79 @@
+<div class="f-col condition-listing">
+    <form [formGroup]="frmGroup">
+        <div class="f-row condition-flex" formArrayName="frmArray"
+            *ngFor="let item of frmArray.controls; let i = index">
+            <ng-container [formGroupName]="i">
+                <mat-form-field appearance="outline">
+                    <mat-label>Condition Name</mat-label>
+                    <input matInput formControlName="conditionDesc">
+                </mat-form-field>
+                <div class="col-spacer"></div>
+                <pros-br-conditional-fields [schemaId]="schemaId" [moduleId]="moduleId" isRequired="true"
+                (evtOnchange)="changeConditionalField($event, i)"></pros-br-conditional-fields>
+
+                <div class="col-spacer"></div>
+                <!-- <mat-form-field appearance="outline">
+                    <mat-label>Operator</mat-label>
+                    <input placeholder="Operator" aria-label="Number" matInput formControlName="operator"
+                        [matAutocomplete]="auto1">
+                    <mat-autocomplete #auto1="matAutocomplete" (optionSelected)="operatorSelectionChng($event,i)">
+                        <mat-option *ngFor="let operator of conditionalOperatorsOb | async" [value]="operator">
+                            {{ operator }}
+                        </mat-option>
+                    </mat-autocomplete>
+                </mat-form-field> -->
+                <pros-udr-condition-operators
+                [conditionalOperators] = "conditionalOperators"
+                (afterSelect) ="operatorSelectionChng($event,i)"
+                >
+                </pros-udr-condition-operators>
+                <div class="col-spacer"></div>
+
+                <!-- Fields for range -->
+                <ng-template [ngIf]="item.value.showRangeFld">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Start Value</mat-label>
+                        <input matInput formControlName="conditionFieldStartValue">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>End Value</mat-label>
+                        <input matInput formControlName="conditionFieldEndValue">
+                    </mat-form-field>
+                </ng-template>
+
+                <!-- if picklist is 1 then render autocomplete dropdown-->
+                <ng-template [ngIf]="!item.value.showRangeFld">
+                    <ng-template [ngIf]="item.value && item.value.fields.picklist === '1'" [ngIfElse]="elseBlock">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Comparison Value</mat-label>
+                            <input matInput placeholder="Selection dropdown" formControlName="conditionFieldValue"
+                                [matAutocomplete]="dropValAuto" (keyup)="onKey($event)">
+                            <mat-autocomplete #dropValAuto="matAutocomplete" [displayWith]="dropValDisplayWith"
+                                (optionSelected)="selectComparisonValue($event,i)">
+                                <mat-option *ngFor="let dropVal of dropValuesOb | async" [value]="dropVal">
+                                    {{ dropVal.TEXT }}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </ng-template>
+
+                    <ng-template #elseBlock>
+                        <mat-form-field appearance="outline">
+                            <mat-label>Comparison Value</mat-label>
+                            <input matInput formControlName="conditionFieldValue">
+                        </mat-form-field>
+                    </ng-template>
+                </ng-template>
+                <div class="col-spacer"></div>
+                <button mat-icon-button color="warn" (click)="remove(i)">
+                    <mat-icon>remove_circle</mat-icon>
+                </button>
+            </ng-container>
+        </div>
+    </form>
+    <mat-card-actions>
+        <button mat-flat-button color="primary" (click)="addCondition()">Add condition</button>
+    </mat-card-actions>
+</div>
+<div class="row-spacer"></div>

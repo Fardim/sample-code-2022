@@ -1,0 +1,51 @@
+mat-card.root {
+  padding: 0 16px;
+  user-select: text;
+  width: 600px;
+
+  .breadcrum-toolbar {
+    align-items: center;
+    padding-top: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    min-height: 40px;
+
+    .display-heading-large {
+      font-size: 1.2rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .mdo-constrained-right {
+      align-items: center;
+      width: 100%;
+
+      button.mat-flat-button {
+        min-width: auto;
+      }
+    }
+  }
+
+  .mdo-justify {
+    .temp-field {
+      margin-bottom: 16px;
+
+      mat-label {
+        font-weight: 500;
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
+
+@media (min-width: 1200px) {
+  .mdo-justify {
+    margin: 0 54px;
+  }
+
+  .mdo-constrained-right {
+    margin-right: 54px;
+  }
+}

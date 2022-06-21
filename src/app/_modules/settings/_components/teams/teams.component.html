@@ -1,0 +1,84 @@
+<div class="root">
+    <div class="f-row-spacer-half"></div>
+    <div class="f-row">
+        <lib-text-line type="leading">Team</lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-slide-toggle label="Show as org chart" labelPosition="before" theme="primary"></lib-slide-toggle>
+        <div class="col-spacer"></div>
+        <div class="col-spacer"></div>
+        <lib-button type="minor">Invite</lib-button>
+    </div>
+    <div class="row-spacer"></div>
+
+    <lib-chip-list class="mdo-chip-list">
+        <lib-search placeholder="Search team"></lib-search>
+        <div class="f-col-spacer-half"></div>
+        <lib-chip label="Status:" type="info">All</lib-chip>
+        <lib-chip label="Role:" type="info">All</lib-chip>
+    </lib-chip-list>
+
+    <div class="row-spacer"></div>
+
+    <div class="f-col">
+        <div class="f-row colunm-box rule-border-row">
+            <div class="col col-x4">
+                <lib-text-line type="base" weight="strong">User</lib-text-line>
+            </div>
+            <div class="col col-x4">
+                <lib-text-line type="base" weight="strong">Status</lib-text-line>
+            </div>
+            <div class="col col-x4">
+                <lib-text-line type="base" weight="strong">Role</lib-text-line>
+            </div>
+            <div class="col end-items"></div>
+        </div>
+       
+        <div class="f-row colunm-box rule-border-row">
+            <div class="col col-x4">
+                <lib-avatar class="lib-avatar" initials="RG"></lib-avatar>
+                <lib-text-line type="base" textColor="info">Rick Woods</lib-text-line>
+            </div>
+            <div class="col col-x4">
+                <lib-label text="Active" suffixIcon="caret-down" status="success"></lib-label>
+            </div>
+            <div class="col col-x4">
+                <lib-label text="Admin" suffixIcon="caret-down"></lib-label>
+            </div>
+            <div class="col end-items">
+                <lib-button type="plain" icon="ellipsis-h"></lib-button>
+            </div>
+        </div>
+
+        <div class="f-row colunm-box rule-border-row">
+            <div class="col col-x4">
+                <lib-avatar class="lib-avatar" initials="SG"></lib-avatar>
+                <lib-text-line type="base" textColor="info">Steve Graham</lib-text-line>
+            </div>
+            <div class="col col-x4">
+                <lib-label text="Inactive" suffixIcon="caret-down" status="error"></lib-label>
+            </div>
+            <div class="col col-x4">
+                <lib-label text="User" suffixIcon="caret-down"></lib-label>
+            </div>
+            <div class="col end-items">
+                <lib-button type="plain" icon="ellipsis-h"></lib-button>
+            </div>
+        </div>
+
+        <div class="f-row colunm-box rule-border-row">
+            <div class="col col-x4">
+                <lib-avatar class="lib-avatar" initials="?"></lib-avatar>
+                <lib-text-line type="base">as@email.com</lib-text-line>
+            </div>
+            <div class="col col-x4">
+                <lib-label text="Pending invitation" status="warning"></lib-label>
+            </div>
+            <div class="col col-x4">
+                <lib-label text="Manager" suffixIcon="caret-down"></lib-label>
+            </div>
+            <div class="col end-items">
+                <lib-button type="plain" icon="ellipsis-h"></lib-button>
+            </div>
+        </div>
+    </div>
+</div>

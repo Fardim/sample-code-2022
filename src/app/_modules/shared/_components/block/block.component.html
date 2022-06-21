@@ -1,0 +1,184 @@
+<form [formGroup]="blockCtrl">
+    <div class="single-block f-col user-defined-set">
+        <div class="f-row defined-row">
+            <!-- condition type -->
+            <div class="col select-col udr-select-col">
+                <lib-text-line type="base" textColor="secondary"> {{ getConditionName() }} </lib-text-line>
+                <lib-button type="plain" rounded="true" icon="caret-down" iconFontType="solid" class="udr-change" [matMenuTriggerFor]="UDRMenu" *ngIf="canChangeCondition"></lib-button>
+                <mat-menu #UDRMenu="matMenu" class="navigation-menu">
+                    <button mat-menu-item *ngFor="let condition of possibleConditions" (click)="updateCondition(condition)">{{ condition }}</button>
+                </mat-menu>
+            </div>
+        
+            <!-- source field -->
+            <div class="col f-col mdo-field" [class.has-error]="submitted && blockCtrl.controls.sourceFldCtrl.errors?.required">
+                <div *ngIf="showBadge"
+                    matBadge prosStatusBadge class="field-badge"
+                    badgeIcon="info"
+                    [statusBadgePosition]="{ top: 0, right: -11 }"
+                    badgeIconFont="solid"
+                    badgeType="" [matMenuTriggerFor]="regex" libTooltip="Apply regex">
+                </div>
+                <div class="mdo-field-input single-dropdown">
+                    <input matInput #sourceInputEl
+                        [matAutocomplete]="srcFldAuto" 
+                        formControlName="sourceFldCtrl" 
+                        (click)="updateFldList('sourceList')"
+                        [libTooltip]="getFieldTooltip('source')"
+                        [placeholder]="isShowOldValue ? 'Field' : ''"
+                    />
+                    <mat-autocomplete class="mdo-autocomplete" #srcFldAuto="matAutocomplete" (optionSelected)="selectSrcFld($event, sourceInputEl)" [displayWith]="displayFn">
+                        <ng-container *ngIf="(showResultCount || blockCtrl.value.preSelectedSourceFld === 'RESULT_COUNT')">
+                            <mat-option libTooltip="Result Count" matTooltipPosition="right" [value]="resultCntField">
+                                Result count
+                            </mat-option>
+                        </ng-container>
+                        <mat-optgroup *ngFor="let group of sourceFldListObs | async">
+                            <div [libTooltip]="group.fieldDescri" matTooltipPosition="right" class="custom-opt-grp-header">{{ group.fieldDescri }}</div>
+                            <ng-container *ngFor="let child of group.childs">
+                                <mat-option [libTooltip]="child.fieldDescri" matTooltipPosition="right" [value]="child">
+                                    {{ child.fieldDescri }}
+                                </mat-option>
+                            </ng-container>
+                        </mat-optgroup>
+                    </mat-autocomplete>
+                </div>
+            </div>
+        
+            <!-- old value -->
+            <ng-container *ngIf="isShowOldValue && blockCtrl.value.operator !== 'EMPTY' && blockCtrl.value.operator !== 'NOT_EMPTY'">
+                <ng-container *ngIf="showOldValueControl && !isResultCount()">
+                    <div class="col f-col value-ctrl" 
+                        [class.range-col]="blockCtrl.value.operator === 'RANGE'"
+                        *ngIf="blockCtrl.value.operator !== 'EMPTY' && blockCtrl.value.operator !== 'NOT_EMPTY'"
+                    >
+                        <div class="f-row">
+                            <pros-udr-value-control
+                                [metataData]="oldListMetaData"
+                                [fieldId]="blockCtrl.controls.preSelectedSourceFld?.value"
+                                [placeholder]="getFieldTooltip('old')"
+                                [value]="blockCtrl.value.preSelectedOldFld"
+                                [operator]="blockCtrl.controls.operator"
+                                [range]="blockCtrl.value.operator === 'RANGE'"
+                                [rangeValue]="{start: blockCtrl.value.conditionFieldStartValue, end: blockCtrl.value.conditionFieldEndValue}"
+                                [oldValueInfo]="blockCtrl.controls.oldValueInfo?.value"
+                                [conditionalFieldValueCtrl]="blockCtrl.controls.oldFldCtrl?.value"
+                                [isLookupRule]="true"
+                                [parentMetadata]="parentMetadata"
+                                [moduleId]="moduleId"
+                                [isShowOldValue]="isShowOldValue"
+                                (valueChange)="setOldComparisonValue($event)">
+                            </pros-udr-value-control>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="!showOldValueControl && !isResultCount()">
+                    <div class="col f-col value-ctrl" [class.range-col]="blockCtrl.value.operator === 'RANGE'">
+                        <div class="f-row" *ngIf="blockCtrl.value.operator !== 'RANGE'">
+                            <lib-input [formControl]="blockCtrl.controls.preSelectedOldFld" [value]="blockCtrl.value.preSelectedOldFld" placeholder="Comparison value" [hasError]="submitted && blockCtrl.controls.preSelectedOldFld.errors?.required" [libTooltip]="blockCtrl.value.preSelectedOldFld"></lib-input>
+                        </div>
+                        <div *ngIf="blockCtrl.value.operator === 'RANGE'">
+                            <lib-input class="val-input" [formControl]="blockCtrl.controls.conditionFieldStartValue" [value]="blockCtrl.value.conditionFieldStartValue" placeholder="Start value" [hasError]="submitted && blockCtrl.controls.conditionFieldStartValue.errors?.required" [libTooltip]="blockCtrl.value.conditionFieldStartValue"></lib-input>
+                            <lib-input class="val-input" [formControl]="blockCtrl.controls.conditionFieldEndValue" [value]="blockCtrl.value.conditionFieldEndValue" placeholder="End value" [hasError]="submitted && blockCtrl.controls.conditionFieldEndValue.errors?.required" [libTooltip]="blockCtrl.value.conditionFieldEndValue"></lib-input>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="isResultCount()">
+                    <div class="col f-col value-ctrl" [class.range-col]="blockCtrl.value.operator === 'RANGE'">
+                        <div class="f-row" *ngIf="blockCtrl.value.operator !== 'RANGE'">
+                            <lib-input type="number" [formControl]="blockCtrl.controls.preSelectedOldFld" [value]="blockCtrl.value.preSelectedOldFld" placeholder="Comparison value" [hasError]="submitted && blockCtrl.controls.preSelectedOldFld  .errors?.required"></lib-input>
+                        </div>
+                        <div *ngIf="blockCtrl.value.operator === 'RANGE'">
+                            <lib-input type="number" class="val-input" [formControl]="blockCtrl.controls.conditionFieldStartValue" [value]="blockCtrl.value.conditionFieldStartValue" placeholder="Start value" [hasError]="submitted && blockCtrl.controls.conditionFieldStartValue.errors?.required" [libTooltip]="blockCtrl.value.conditionFieldStartValue"></lib-input>
+                            <lib-input type="number" class="val-input" [formControl]="blockCtrl.controls.conditionFieldEndValue" [value]="blockCtrl.value.conditionFieldEndValue" placeholder="End value" [hasError]="submitted && blockCtrl.controls.conditionFieldEndValue.errors?.required" [libTooltip]="blockCtrl.value.conditionFieldEndValue"></lib-input>
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-container>
+
+            <!-- operator -->
+            <div class="col f-col mdo-field" *ngIf="!isShowOldValue" [class.has-error]="submitted && blockCtrl.controls.operator.errors?.required">
+                <div class="mdo-field-input single-dropdown">
+                    <input matInput [matAutocomplete]="operatorAuto" formControlName="operator" (click)="operatorsListFiltered = operatorsList" #operatorInputEl [libTooltip]="getFieldTooltip('operator')"/>
+                    <mat-autocomplete [displayWith]="displayOperatorFn" class="mdo-autocomplete" #operatorAuto="matAutocomplete" (optionSelected)="selectOperator($event, operatorInputEl)">
+                        <mat-optgroup *ngFor="let group of operatorsListFiltered" [label]="group.desc">
+                            <ng-container *ngFor="let child of group.childs">
+                                <mat-option [matTooltip]="displayOperatorFn(child)" matTooltipPosition="right" [value]="child" *ngIf="canDisplay(child)">
+                                    {{displayOperatorFn(child)}}
+                                </mat-option>
+                            </ng-container>
+                        </mat-optgroup>
+                    </mat-autocomplete>
+                </div>
+            </div>
+
+            <!-- comparison value -->
+            <ng-container *ngIf="blockCtrl.value.operator !== 'EMPTY' && blockCtrl.value.operator !== 'NOT_EMPTY'">
+                <ng-container *ngIf="showTargetValueControl && !isResultCount()">
+                    <div class="col f-col value-ctrl" 
+                        [class.range-col]="blockCtrl.value.operator === 'RANGE'"
+                        *ngIf="blockCtrl.value.operator !== 'EMPTY' && blockCtrl.value.operator !== 'NOT_EMPTY'"
+                    >
+                        <div class="f-row">
+                            <pros-udr-value-control 
+                                [metataData]="targetListMetaData"
+                                [fieldId]="blockCtrl.controls.preSelectedSourceFld?.value"
+                                [placeholder]="getFieldTooltip('target')"
+                                [value]="blockCtrl.value.preSelectedTargetFld"
+                                [operator]="blockCtrl.controls.operator"
+                                [range]="blockCtrl.value.operator === 'RANGE'"
+                                [rangeValue]="{start: blockCtrl.value.conditionFieldStartValue, end: blockCtrl.value.conditionFieldEndValue}"
+                                [targetInfo]="blockCtrl.controls.targetInfo?.value"
+                                [oldValueInfo]="blockCtrl.controls.oldValueInfo?.value"
+                                [conditionalFieldValueCtrl]="blockCtrl.controls.targetFldCtrl?.value"
+                                [isLookupRule]="true"
+                                [parentMetadata]="parentMetadata"
+                                [moduleId]="moduleId"
+                                [isShowOldValue]="isShowOldValue"
+                                (valueChange)="setComparisonValue($event)">
+                            </pros-udr-value-control>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="!showTargetValueControl && !isResultCount()">
+                    <div class="col f-col value-ctrl" [class.range-col]="blockCtrl.value.operator === 'RANGE'">
+                        <div class="f-row" *ngIf="blockCtrl.value.operator !== 'RANGE'">
+                            <lib-input [formControl]="blockCtrl.controls.preSelectedTargetFld" [value]="blockCtrl.value.preSelectedTargetFld" placeholder="Comparison value" [hasError]="submitted && blockCtrl.controls.preSelectedTargetFld.errors?.required" [libTooltip]="blockCtrl.value.preSelectedTargetFld"></lib-input>
+                        </div>
+                        <div *ngIf="blockCtrl.value.operator === 'RANGE'">
+                            <lib-input class="val-input" [formControl]="blockCtrl.controls.conditionFieldStartValue" [value]="blockCtrl.value.conditionFieldStartValue" placeholder="Start value" [hasError]="submitted && blockCtrl.controls.conditionFieldStartValue.errors?.required" [libTooltip]="blockCtrl.value.conditionFieldStartValue"></lib-input>
+                            <lib-input class="val-input" [formControl]="blockCtrl.controls.conditionFieldEndValue" [value]="blockCtrl.value.conditionFieldEndValue" placeholder="End value" [hasError]="submitted && blockCtrl.controls.conditionFieldEndValue.errors?.required" [libTooltip]="blockCtrl.value.conditionFieldEndValue"></lib-input>
+                        </div>
+                    </div>
+                </ng-container>
+                <ng-container *ngIf="isResultCount()">
+                    <div class="col f-col value-ctrl" [class.range-col]="blockCtrl.value.operator === 'RANGE'">
+                        <div class="f-row" *ngIf="blockCtrl.value.operator !== 'RANGE'">
+                            <lib-input type="number" [formControl]="blockCtrl.controls.preSelectedTargetFld" [value]="blockCtrl.value.preSelectedTargetFld" placeholder="Comparison value" [hasError]="submitted && blockCtrl.controls.preSelectedTargetFld.errors?.required"></lib-input>
+                        </div>
+                        <div *ngIf="blockCtrl.value.operator === 'RANGE'">
+                            <lib-input type="number" class="val-input" [formControl]="blockCtrl.controls.conditionFieldStartValue" [value]="blockCtrl.value.conditionFieldStartValue" placeholder="Start value" [hasError]="submitted && blockCtrl.controls.conditionFieldStartValue.errors?.required" [libTooltip]="blockCtrl.value.conditionFieldStartValue"></lib-input>
+                            <lib-input type="number" class="val-input" [formControl]="blockCtrl.controls.conditionFieldEndValue" [value]="blockCtrl.value.conditionFieldEndValue" placeholder="End value" [hasError]="submitted && blockCtrl.controls.conditionFieldEndValue.errors?.required" [libTooltip]="blockCtrl.value.conditionFieldEndValue"></lib-input>
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-container>
+        
+            <!-- action menu -->
+            <div class="col">
+                <lib-button [matMenuTriggerFor]="menu" type="plain" icon="ellipsis-h" i18n-libTooltip="@@udrmenu_tooltip" libTooltip="Add a subsequent child logic or delete the condition">
+                </lib-button>
+            </div>
+            <mat-menu #menu="matMenu" class="navigation-menu">
+                <button i18n="@@add_rule" mat-menu-item (click)="addblock('parent')">Add rule</button>
+                <button i18n="@@add_child_rule" mat-menu-item (click)="addblock('child')" *ngIf="!isShowOldValue">Add sub-rule</button>
+                <button i18n="@@delete" mat-menu-item (click)="removeBlock()" *ngIf="isDeletable()">Delete</button>
+            </mat-menu>
+        </div>
+    </div>
+    <mat-menu #regex="matMenu">
+        <div class="field-badge-dropdown" prosClickStopPropagation>
+            <lib-textarea [rows]="4" label="Enter regex" formControlName="regexCtrl"></lib-textarea>
+        </div>
+    </mat-menu>
+</form>

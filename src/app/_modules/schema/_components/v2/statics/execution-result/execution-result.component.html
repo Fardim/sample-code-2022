@@ -1,0 +1,15 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <div class="display-heading-large">Schema execution results</div>
+  </div>
+  <div class="row-spacer"></div>
+    <div class="f-col excution-chart">
+      <canvas baseChart
+        [datasets]="barChartData"
+        [labels]="barChartLabels"
+        [options]="barChartOptions"
+        [plugins]="barChartPlugins"
+        [legend]="barChartLegend">
+      </canvas>
+    </div>
+</div>

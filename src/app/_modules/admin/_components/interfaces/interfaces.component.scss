@@ -1,0 +1,46 @@
+mat-form-field.filtersearch {
+  width: 100%;
+}
+
+.root-AdminTable {
+  height: 500px;
+  overflow: auto;
+
+  table {
+    width: 100%;
+
+    td.mat-column-star {
+      width: 30px;
+      padding-left: 8px;
+    }
+
+    th.mat-column-position,
+    td.mat-column-position {
+      padding-left: 12px;
+    }
+
+    .mat-table-sticky:first-child {
+      border-right: 1px solid #e0e0e0;
+    }
+
+    .direction-fab {
+      width: 20px;
+      height: 20px;
+      box-shadow: none;
+      vertical-align: middle;
+      background: #f5f8fc;
+
+      .mat-button-wrapper {
+        padding: 0 !important;
+      }
+
+      mat-icon {
+        font-size: 14px;
+        width: 16px;
+        height: 16px;
+        position: relative;
+        top: -10px;
+      }
+    }
+  }
+}

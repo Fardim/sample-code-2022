@@ -1,0 +1,26 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <ng-container [ngSwitch]="importType">
+          <lib-text-line *ngSwitchCase="PackageType.DASHBOARD" type="leading" enableWrap="true"> ConnektHub / Interface
+            packages </lib-text-line>
+          <lib-text-line *ngSwitchDefault type="leading" enableWrap="true"> ConnektHub / Schema </lib-text-line>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <lib-skeleton type="line" *ngIf="loading"></lib-skeleton>
+
+      <pros-connekthub-login *ngIf="loginForm && !loading" (hasLogined)="loginForm = false; getPackagesAndUserImportLogs()">
+      </pros-connekthub-login>
+
+      <pros-connekthub-packages class="connekthub-packages" *ngIf="!loginForm && !loading" [packages]="packages" [filterOption]="true"
+        [getOption]="true" (emitGetPackage)="getPackage($event)" [importType]="importType"></pros-connekthub-packages>
+    </div>
+  </div>
+</div>

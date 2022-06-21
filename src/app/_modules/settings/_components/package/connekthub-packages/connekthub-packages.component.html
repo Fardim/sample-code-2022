@@ -1,0 +1,59 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+      <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+      <div class="col-spacer"></div>
+      <div class="f-col mdo-constrained-right">
+        <div class="f-row breadcrum-head">
+          <lib-text-line type="leading" i18n="@@package">Package</lib-text-line>
+        </div>
+      </div>
+    </div>
+  
+    <div class="f-col sidesheetcontent-listing">
+      <div class="f-col mdo-justify">
+        <div class="f-row">
+          <lib-chip-list class="filters-list">
+            <lib-search class="lib-search" i18n="@@search" placeholder="Search team"
+            (valueChange)="searchPackage.next($event)"></lib-search>
+          </lib-chip-list>
+        </div>
+        <div class="f-row-spacer-half"></div>
+        <div class="package-block" *ngFor="let package of connekthubPackageList">
+          <mat-card class="mat-elevation-z0">
+            <div class="f-row package-toolbar-heading">
+              <div>
+                <lib-text-line type="leading">{{package?.name}}</lib-text-line>
+                <div class="f-row">
+                  <lib-text-line textColor="disabled" type="base">{{package?.createdByUser}}</lib-text-line>
+                  <div class="f-col-spacer-half"></div>
+                  <lib-text-line textColor="disabled" type="base">|</lib-text-line>
+                  <div class="f-col-spacer-half"></div>
+                  <lib-text-line textColor="disabled" type="base">{{package?.createdDate | date: 'dd.MM.YYYY'}}</lib-text-line>
+                </div>
+              </div>
+                <lib-button *ngIf="selectedPackage !== package?.id" type="minor" i18n="@@select" (click)="importPackage(package)" width="60px">Get</lib-button>
+                <lib-button *ngIf="selectedPackage === package?.id" type="minor" width="60px">
+                  <lib-spinner [type]="'minor'" size="25"></lib-spinner>
+                </lib-button>
+            </div>
+            <div class="row-spacer"></div>
+            <lib-text-line type="base" enableWrap="true">{{package?.brief}}</lib-text-line>
+            <div class="row-spacer"></div>
+            <div class="f-row">
+              <div class="f-row" *ngFor="let img of package?.imageUrls">
+                <img src="{{img}}" class="image" alt="">
+                <div class="f-col-spacer-half"></div>
+              </div>
+            </div>
+            <div class="row-spacer"></div>
+            <div class="f-row">
+              <div class="f-row" *ngFor="let tag of package?.tags">
+                <lib-label text="{{tag}}" appearance="solid"></lib-label>
+                <div class="f-col-spacer-half"></div>
+              </div>
+            </div>
+          </mat-card>    
+        </div>
+      </div>
+    </div>
+  </div>

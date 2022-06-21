@@ -1,0 +1,96 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading">Export interfaces</lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-button type="major" width="80px" (click)="export()">
+                    <ng-container *ngIf="isExport; else publishTemplate">Export</ng-container>
+                    <ng-template #publishTemplate>Publish</ng-template>
+                </lib-button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="f-col sidesheetcontent-listing" *ngIf="interfaces">
+        <div class="f-col mdo-justify">
+            <div class="f-col">
+                <lib-banner status="success" *ngIf="exportChkSuccessful">
+                    Thanks for taking the time to contribute to the community. We will inform you when your dashboard is
+                    available on the ConnektHub library!
+                    <mat-icon fontSet="mdo-icons-light" class="cursor" (click)="exportChkSuccessful = false">times
+                    </mat-icon>
+                </lib-banner>
+                <lib-banner text="Banner" status="info" *ngIf="!exportChkSuccessful"
+                    text="Select the interfaces from the list below to publish it to Conekthub.">
+                </lib-banner>
+            </div>
+
+            <div class="f-row">
+                <lib-chip-list class="mdo-chip-list">
+                    <lib-search placeholder="Search" (valueChange)="search($event)" class="lib-search"></lib-search>
+                </lib-chip-list>
+            </div>
+
+            <div class="f-row-spacer-half"></div>
+
+            <table mat-table [dataSource]="interfaces" matSort class="mat-elevation-z0">
+                <!-- Select Column -->
+                <ng-container matColumnDef="select">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <lib-checkbox (valueChange)="masterToggle()" [checked]="selection.hasValue() && isAllSelected()"
+                            [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+                        </lib-checkbox>
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        <lib-checkbox [checked]="selection.isSelected(element)" [aria-label]="checkboxLabel(element)"
+                            (valueChange)="selection.toggle(element)">
+                        </lib-checkbox>
+                    </td>
+                </ng-container>
+
+                <!-- Field ID Column -->
+                <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Interface name</th>
+                    <td mat-cell *matCellDef="let element; index as i">
+                        {{element.name}}
+                    </td>
+                </ng-container>
+
+                <!-- Field description Column -->
+                <ng-container matColumnDef="dataset">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Dataset name</th>
+                    <td mat-cell *matCellDef="let element"> {{element.dataset}} </td>
+                </ng-container>
+
+                <!-- default-value Column -->
+                <ng-container matColumnDef="type">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+                    <td mat-cell *matCellDef="let element">{{element.type}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="flows">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Flows</th>
+                    <td mat-cell *matCellDef="let element">{{element.flows}}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+                    <td mat-cell *matCellDef="let element">
+                        <lib-label *ngIf="element.status == 'Active'; else Inactive" status="success">{{element.status}}
+                        </lib-label>
+                        <ng-template #Inactive>
+                            <lib-label status="error">{{element.status}}</lib-label>
+                        </ng-template>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedInterfaceColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedInterfaceColumns;"></tr>
+            </table>
+        </div>
+    </div>
+</div>

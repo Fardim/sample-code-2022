@@ -1,0 +1,36 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+          <div class="f-row breadcrum-head">
+            <lib-text-line type="leading">New role</lib-text-line>
+            <div class="f-spacer"></div>
+            <lib-button *ngIf="!roleSaving" type="major" (click)="checkForm()" width="80px">Save</lib-button>
+            <lib-spinner *ngIf="roleSaving" type="minor" [size]="36"></lib-spinner>
+          </div>
+        </div>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing">
+
+        <form [formGroup]="roleForm">
+            <div class="f-col mdo-justify">
+                <div class="f-row-spacer-half"></div>
+                <div class="f-col">
+                    <lib-input label="Role name" type="text" maxLength="40" placeholder="Enter role name (upto 40 chars)" [isRequired]="true" formControlName="roleName"
+                    [hint]="(roleForm.controls.roleName?.touched && roleForm.controls.roleName?.errors && roleForm.controls.roleName.errors?.required) ? 'Name is required' : ((roleForm.controls.roleName.touched && roleForm.controls.roleName.errors && roleForm.controls.roleName.errors.maxLength) ? 'Role name should be upto 40 characters.' : '')"
+                    [hasError]="roleForm.controls.roleName.touched && roleForm.controls.roleName.errors && roleForm.controls.roleName.errors.required || (roleForm.controls.roleName.touched && roleForm.controls.roleName.errors && roleForm.controls.roleName.errors.maxLength)"></lib-input>
+                </div>
+                <div class="f-col">
+                    <lib-input label="Details" placeholder="Enter role details" formControlName="details"></lib-input>
+                </div>
+
+                <div class="f-row-spacer-half"></div>
+                <pros-role-privilege [roleId]="roleId" [roleData]="null" (updatedPrivilege)="updatedPrivilege($event)"></pros-role-privilege>
+            </div>
+        </form>
+
+    </div>
+
+</div>

@@ -1,0 +1,96 @@
+<mat-card class="root mat-elevation-z0">
+  <div class="modal-wrapper">
+    <div class="f-row modal-header">
+      <lib-text-line type="leading">New dataset/Bring over/SAP CPI/SAP table</lib-text-line>
+      <lib-button icon="times" iconFontType="light" (click)="close()"></lib-button>
+    </div>
+
+    <div class="modal-body">
+      <div class="f-col manually-dataset">
+        <div class="f-col scrollable-form-area">
+          <form [formGroup]="tableForm">
+            <div class="f-col" *ngIf="!!errortext">
+              <lib-banner status="error" [text]="errortext"></lib-banner>
+            </div>
+    
+            <div class="f-col mdo-field">
+              <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@storeDataIn">Store data in </lib-text-line>
+              <lib-segment [optionsList]="storeData" formControlName="datasetType"> </lib-segment>
+            </div>
+    
+            <div class="f-row search-and-scope-container" *ngIf="tableForm.controls.datasetType.value === 'NEW_DATASET'">
+              <lib-input class="dataset-search" label="Dataset name" [isRequired]="true" type="text" i18n-label="@@dataset_name" formControlName="datasetName"
+                [hint]="(tableForm.controls.datasetName.touched && tableForm.controls.datasetName.errors && tableForm.controls.datasetName.errors.required) ? 'This is a required field' : ''"
+                [hasError]="tableForm.controls.datasetName.touched && tableForm.controls.datasetName.errors && tableForm.controls.datasetName.errors.required">
+              </lib-input>
+    
+              <div class="f-col-spacer-half"></div>
+    
+              <div class="f-col mdo-field">
+                <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@scope">Scope</lib-text-line>
+                <lib-chip [disabled]="!mdoMappings.length" class="mdo-filter-matbutton" disableRipple="true" (click)="openDataScope()">
+                  <mat-icon fontSet="mdo-icons-light">filter</mat-icon>
+                </lib-chip>
+             </div>
+            </div>
+    
+            <div class="f-row search-and-scope-container" *ngIf="tableForm.controls.datasetType.value === 'EXISTING_DATASET'">
+              <pros-dataset-search class="dataset-search"
+                [isRequired]="true"
+                formControlName="datasetName"
+                i18n-label="@@dataset_name"
+                label="Dataset name"
+                labelKey="moduleName" valueKey="moduleId"
+                error="(tableForm.controls.datasetName.touched && tableForm.controls.datasetName.errors && tableForm.controls.datasetName.errors.required) ? 'This is a required field' : ''"
+                [hasError]="tableForm.controls.datasetName.touched && tableForm.controls.datasetName.errors && tableForm.controls.datasetName.errors.required"
+                [availableOptions]="dataSetModules"
+                (selectionChange)="tableForm.controls.moduleId.setValue($event)">
+              </pros-dataset-search>
+    
+              <div class="f-col-spacer-half"></div>
+    
+              <div class="f-col mdo-field">
+                <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@scope">Scope</lib-text-line>
+                <lib-chip class="mdo-filter-matbutton" disableRipple="true" (click)="openDataScope()">
+                  <mat-icon fontSet="mdo-icons-light">filter</mat-icon>
+                </lib-chip>
+             </div>
+            </div>
+    
+            <div class="row-spacer"></div>
+    
+            <div class="flex-container" *ngIf="tableForm.controls.datasetType.value === 'EXISTING_DATASET'">
+              <pros-mapping-wrapper class="existing-mapping-wrapper"
+                  [mappingSourceLoader]="mappingSourceLoader"
+                  [mappingTargetLoader]="mappingTargetLoader"
+                  [sourceFields]="sourceFields"
+                  [targetFields]="targetFields"
+                  [existingMapping]="existingMapping"
+                  (updateTargetMapping)="updateMappedTarget($event);"
+                  [reloadMappingData]="mappingTargetLoader"
+              ></pros-mapping-wrapper>
+            </div>
+    
+            <div class="flex-container" [style.height]="!!errortext? 'calc(435px - 71px)': '435px'" *ngIf="tableForm.controls.datasetType.value === 'NEW_DATASET'">
+              <pros-new-mapping class="new-mapping-wrapper"
+                [tableName]="tableMappingData?.tableName"
+                [mdoMappings]="mdoMappings"
+                [mappingLoader]="mappingSaveLoader"
+                (mappingUpdated)="setUpdatedmapping($event);"
+              ></pros-new-mapping>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="f-row modal-footer space-between">
+      <lib-button type="plain" [disabled]="mappingSaveLoader" (afterClick)="onCancelClick()" i18n="@@cancel">Cancel</lib-button>
+      <span class="f-spacer"></span>
+      <div class="f-row">
+        <lib-button type="plain" i18n="@@back" [disabled]="mappingSaveLoader" (afterClick)="back();">Back</lib-button>
+        <lib-button type="major" i18n="@@done" [disabled]="!tableForm.valid || mappingSaveLoader" (afterClick)="saveMappings()">Done</lib-button>
+      </div>
+    </div>
+  </div>
+</mat-card>

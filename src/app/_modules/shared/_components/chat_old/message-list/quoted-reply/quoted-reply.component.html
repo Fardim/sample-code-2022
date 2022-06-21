@@ -1,0 +1,27 @@
+<div class="reply-message root">
+    <div class="f-col reply-message-info reply-box">
+        <div class="f-row">
+            <lib-text-line type="base" weight="strong" class="lib-text">
+            {{messageDetail?.replyForMsg?.fromUserInfo?.senderName}}&nbsp;&nbsp;</lib-text-line>
+            <lib-text-line type="xsmall" textColor="secondary" class="lib-text">
+                {{messageDetail?.replyForMsg?.time}}
+            </lib-text-line>
+        </div>
+        <lib-text-line type="base" class="reply-message-text" textColor="secondary"
+        [innerHTML]="messageDetail?.replyForMsg.messageText" enableWrap="true"></lib-text-line>
+        <!-- <lib-text-line type="base" class="reply-message-text extra-reply-text" textColor="secondary" *ngIf="messageDetail?.replyForMsg.isTextTruncated">...</lib-text-line> -->
+        <div class="f-row">
+            <div class="attachment-section f-row" *ngIf="messageDetail?.attachmentType === 'file'">
+                <pros-file-item *ngFor="let file of messageDetail?.attachement"
+                  [name]="file.attachmentName"
+                  [serial]="file.sno"
+                  [downloadable]="true">
+                </pros-file-item>
+            </div>
+            <div class="attachment-object" *ngIf="messageDetail?.attachmentType === 'object'">
+                <lib-text-line type="base" enableWrap="true" [innerHTML]="attachmentText">
+                </lib-text-line>
+            </div>
+        </div>
+    </div>
+  </div>

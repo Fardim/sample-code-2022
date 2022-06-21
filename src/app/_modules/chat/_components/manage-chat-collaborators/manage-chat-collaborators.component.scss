@@ -1,0 +1,36 @@
+div.modal-wrapper {
+  .search-container {
+    padding: 0 12px;
+  }
+
+  .modal-body {
+    height: 266px;
+    overflow-y: auto;
+
+    .empty-state-wrapper {
+      width: 75%;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    .collaborator-info {
+      height: 46px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+
+      .user-section {
+        .avatar {
+          margin-right: 12px;
+        }
+      }
+
+      .action {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+  }
+}

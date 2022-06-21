@@ -1,0 +1,121 @@
+div.root {
+  user-select: text;
+  padding: 0 16px;
+  height: 100%;
+  overflow: hidden;
+
+  .col-heading {
+    padding: 0 8px;
+  }
+
+  .report-builder {
+    height: calc(100% - 16px * 2 - 32px);
+
+    .builder-container {
+      height: calc(100% - 52px - 32px);
+      justify-content: space-between;
+      border-width: 1px;
+      border-style: solid;
+
+      .widget-col {
+        width: 200px;
+        overflow: auto;
+        position: relative;
+        border-right-width: 1px;
+        border-right-style: solid;
+        height: 100%;
+      }
+
+      .builder-board {
+        width: calc(100% - 200px);
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0;
+        position: relative;
+        overflow-x: scroll;
+        background: radial-gradient(#e0e0e0 1px, transparent 1px) 0 0;
+        background-position: 5px 5px;
+        border-radius: 0;
+        height: 100%;
+      }
+
+      .adjust-property {
+        width: calc(100% - 450px);
+      }
+
+      .property-col {
+        width: 350px;
+        height: 100%;
+        overflow: auto;
+        border-left-width: 1px;
+        border-left-style: solid;
+
+        mat-expansion-panel {
+          border-radius: 0;
+
+          mat-expansion-panel-header {
+            padding: 0 16px;
+
+            .panel-title {
+              font-weight: 500;
+            }
+          }
+
+          mat-expansion-panel-body {
+            padding: 0 16px;
+          }
+        }
+
+        .fields-col {
+          padding: 0 16px;
+
+          .f-col {
+            flex: 1;
+          }
+
+          mat-label {
+            font-weight: 500;
+            font-size: 0.7rem;
+            line-height: 14px;
+          }
+
+          mat-form-field.mat-form-field {
+            margin-bottom: 8px;
+
+            .input-actions {
+              mat-divider.mat-divider {
+                height: 40px;
+              }
+            }
+          }
+
+          .image-algin {
+            align-items: baseline;
+
+            .upload-mat-form {
+              flex: 1;
+            }
+          }
+        }
+
+        .add-button {
+          justify-content: flex-end;
+        }
+      }
+    }
+  }
+}
+
+.widget-drag {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 0 8px;
+
+  .widget-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    margin-right: 16px;
+  }
+}

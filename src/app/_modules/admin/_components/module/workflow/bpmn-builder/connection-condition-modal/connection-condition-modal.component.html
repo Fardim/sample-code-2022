@@ -1,0 +1,130 @@
+<mat-card class="root mat-elevation-z0">
+    <div class="f-row breadcrum-toolbar">
+        <div class="display-heading-large"> Conditions config </div>
+        <span class="f-spacer"></span>
+        <button mat-icon-button (click)="onCancelClick()">
+            <mat-icon>clear</mat-icon>
+        </button>
+    </div>
+    <mat-progress-bar value="30"></mat-progress-bar>
+    <div class="row-spacer"></div>
+
+        <form [formGroup]="conditionsForm">
+            <table mat-table [dataSource]="dataSource" formArrayName="conditions">
+                <!-- Row definitions -->
+                <tr mat-header-row *matHeaderRowDef="displayColumns"></tr>
+                <tr mat-row *matRowDef="let row; let i = index; columns: displayColumns;"></tr>
+
+                <!-- Column definitions -->
+                <ng-container matColumnDef="action">
+                    <th mat-header-cell *matHeaderCellDef> Action </th>
+                    <td mat-cell *matCellDef="let row; let index = index; let isFirst = first" [formGroupName]="index">
+                        <div class="f-row action-cell">
+                            <ng-container *ngIf="isFirst">
+                                <button mat-mini-fab color="primary" (click)="addCondition()" class="item">
+                                    <mat-icon>playlist_add</mat-icon>
+                                </button>
+                                <span class="f-col-spacer-half"></span>
+                            </ng-container>
+                            <ng-container *ngIf="!isFirst">
+                                <button mat-mini-fab color="primary" (click)="removeCondition()" class="item">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                                <span class="f-col-spacer-half"></span>
+                                <mat-form-field class="operator" appearance="outline">
+                                    <mat-select formControlName="rowOperator">
+                                        <mat-option value="&&"> And </mat-option>
+                                        <mat-option value="||"> Or </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </ng-container>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="field">
+                    <th mat-header-cell *matHeaderCellDef> Field </th>
+                    <td mat-cell *matCellDef="let row; let index = index" [formGroupName]="index">
+
+                        <mat-form-field appearance="outline">
+                            <input type="text" aria-label="Number" matInput [matAutocomplete]="selectField"
+                                formControlName="field">
+                            <mat-icon matSuffix>search</mat-icon>
+                            <mat-autocomplete #selectField="matAutocomplete" [displayWith]="getFieldOptionText">
+                                <mat-option *ngFor="let field of filteredFields[index] | async" [value]="field.id"
+                                    #matOption (click)="fieldSelected(matOption.selected, field, row)">
+                                    {{field.label}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="operator">
+                    <th mat-header-cell *matHeaderCellDef> Operator </th>
+                    <td mat-cell *matCellDef="let row; let index = index" [formGroupName]="index">
+                        <mat-form-field appearance="outline">
+                            <mat-select formControlName="operator">
+
+                                <mat-option *ngFor="let op of getFieldOperators(row.value.field)" 
+                                    [value]="op.value"> {{op.label}} </mat-option>
+
+                                <!-- <ng-container [ngSwitch]="row.value.datatype">
+                                    <ng-container *ngSwitchCase="FIELD_DATA_TYPE.NUMERIC">
+                                        <mat-option *ngFor="let op of NUMERIC_OPERATORS" [value]="op.value">
+                                            {{op.label}} </mat-option>
+                                    </ng-container>
+                                    <ng-container *ngSwitchDefault>
+                                        <mat-option *ngFor="let op of STRING_OPERATORS" [value]="op.value">
+                                            {{op.label}} </mat-option>
+                                    </ng-container>
+                                </ng-container> -->
+                        
+                            </mat-select>
+                        </mat-form-field>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="value">
+                    <th mat-header-cell *matHeaderCellDef> Value </th>
+                    <td mat-cell *matCellDef="let row; let index = index" [formGroupName]="index">
+
+                        <ng-container [ngSwitch]="row.value.picklist">
+
+                            <mat-form-field *ngSwitchCase="FIELD_TYPE.Input" appearance="outline">
+                                <!-- <mat-label> Value </mat-label> -->
+                                <input matInput formControlName="value">
+                            </mat-form-field>
+
+                            <mat-form-field *ngSwitchCase="FIELD_TYPE.Select" appearance="outline">
+                                <!-- <mat-label> Select value</mat-label> -->
+                                <input type="text" aria-label="Number" matInput [matAutocomplete]="selectValue"
+                                    formControlName="value">
+                                <mat-icon matSuffix>search</mat-icon>
+                                <mat-autocomplete #selectValue="matAutocomplete" [displayWith]="getOptionText">
+                                    <mat-option *ngFor="let option of row.value.filteredOptions | async"
+                                        [value]="option">
+                                        {{option.TEXT}}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </mat-form-field>
+
+                            <mat-form-field *ngSwitchDefault appearance="outline">
+                                <!-- <mat-label> Value </mat-label> -->
+                                <input matInput formControlName="value" placeholder="value">
+                            </mat-form-field>
+                        </ng-container>
+
+                    </td>
+                </ng-container>
+
+            </table>
+
+        </form>
+
+<div mat-dialog-actions align="end">
+    <button mat-button (click)="onCancelClick()">Cancel</button>
+    <button mat-button [mat-dialog-close]="conditionsForm.value" cdkFocusInitial>Ok</button>
+</div>
+</mat-card>

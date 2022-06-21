@@ -1,0 +1,47 @@
+<div class="cpi-hierarchy">
+  <div class="f-col mdo-field">
+    <!-- label -->
+    <mat-label class="mdo-field-label">
+      Hierarchy
+      <mat-icon fontSet="mdo-icons-light">question-circle</mat-icon>
+    </mat-label>
+    <!-- input container -->
+    <div class="mdo-field-input">
+      <!-- chip list -->
+      <lib-chip-list>
+        <ng-container *ngFor="let opt of selectedOptions; let i = index">
+          <ng-container *ngIf="i <= limit - 1">
+            <lib-chip [removable]="true" (removed)="remove(opt)">{{ opt }}</lib-chip>
+          </ng-container>
+        </ng-container>
+        <lib-chip *ngIf="hasLimit()">+{{ selectedOptions.length - limit }}</lib-chip>
+        <input matInput placeholder="Type to search" #optionInput [formControl]="optionCtrl" [matAutocomplete]="auto" />
+      </lib-chip-list>
+      <!-- autocomplete -->
+      <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" (optionSelected)="selected($event)">
+        <mat-option class="mdo-option" *ngFor="let opt of filteredOptions | async" [value]="opt">
+          {{ opt }}
+        </mat-option>
+        <mat-option *ngIf="!availableOptions?.length" class="mdo-option" disabled>
+          No data found
+        </mat-option>
+      </mat-autocomplete>
+    </div>
+    <!-- hint -->
+    <mat-hint class="mdo-field-hint">This is an example hint</mat-hint>
+  </div>
+
+  <div class="defined-set">
+    <!-- label -->
+    <div class="f-row label">
+        <lib-text-line weight="strong" type="small">Plant and storage</lib-text-line>
+    </div>
+    <!-- input container -->
+    <div class="defined-row">
+      <pros-dropdown-filter class="select"></pros-dropdown-filter>
+      <pros-dropdown-filter class="select"></pros-dropdown-filter>
+    </div>
+    <!-- hint -->
+    <mat-hint class="mdo-field-hint">This is an example hint</mat-hint>
+  </div>
+</div>

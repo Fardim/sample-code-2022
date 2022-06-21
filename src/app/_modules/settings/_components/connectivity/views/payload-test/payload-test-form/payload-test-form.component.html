@@ -1,0 +1,60 @@
+<div class="collapsible">
+  <div class="f-row colunm-box" *ngIf="!openAutoGrid">
+    <div class="col col-x8">
+      <lib-text-line type="small" weight="strong" i18n="@@value">Element name</lib-text-line>
+    </div>
+    <div class="col col-x8">
+      <lib-text-line type="small" weight="strong">Value</lib-text-line>
+    </div>
+  </div>
+
+  <form [formGroup]="formGroup" class="user-defined-set">
+    <mat-accordion togglePosition="before">
+      <div formArrayName="payloadTestData">
+        <div *ngFor="let structure of payloadTestData.controls; let i = index; let last = last;">
+          <ng-container [formGroupName]="i">
+            <mat-expansion-panel class="mat-elevation-z0" [expanded]="step === i" (opened)="setStep(i)" >
+              <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+                <mat-panel-title>
+                  {{structure.value.structureName}}
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+
+              <div formArrayName="structureFields">
+                <div class="f-col" *ngFor="let field of getTestData(i).controls; let i1 = index;">
+                  <ng-container [formGroupName]="i1">
+                    <div class="f-row colunm-box" *ngIf="getFieldType(field.value, structure.value.structureFieldList) !== 'GRID' else gridTemplate">
+                      <div class="col col-x8">
+                        <lib-text-line type="base">{{field.value.fieldName}}</lib-text-line>
+                      </div>
+                      <div class="col col-x8">
+                        <lib-input class="lib-input" [placeholder]="field.value.fieldName"
+                          [value]="field.value.fieldValue" formControlName="fieldValue">
+                        </lib-input>
+                      </div>
+                    </div>
+
+                    <ng-template #gridTemplate>
+                      <div class="f-row colunm-box">
+                        <div class="col col-x8">
+                          <lib-text-line type="base">{{field.value.fieldName}}</lib-text-line>
+                          <span class="f-col-spacer-half"></span>
+                          <lib-text-line type="base" textColor="link" class="cursor" (click)="addGridRow(i,i1,field)">New row</lib-text-line>
+                        </div>
+                      </div>
+                      <div class="f-row colunm-box">
+                        <div class="col col-x16">
+                        <pros-payload-test-table formControlName="childFields"></pros-payload-test-table>
+                        </div>
+                      </div>
+                    </ng-template>
+                  </ng-container>
+                </div>
+              </div>
+            </mat-expansion-panel>
+          </ng-container>
+        </div>
+      </div>
+    </mat-accordion>
+  </form>
+</div>

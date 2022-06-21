@@ -1,0 +1,414 @@
+<div class="f-col root" [ngClass]="{'has-border': !isSubGrid && !expansionview}">
+    <ng-container *ngIf="!expansionview; else showexpansionview">
+        <ng-template [ngIf]="!isSubGrid">
+            <lib-banner status="error" *ngIf="uploadError.status && uploadError.message" [text]="uploadError.message">
+            </lib-banner>
+            <div class="f-row">
+                <lib-text-line type="leading" enableWrap="true">
+                    {{ getFieldDesc() }}
+                </lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button-group>
+                    <lib-button type="plain" icon="expand-alt" iconFontType="light" [disabled]="isFieldReadOnly" (afterClick)="openExpansionView()">
+                    </lib-button>
+                    <lib-button *ngIf="checkForVisibility('addRow')" type="plain" icon="plus" iconFontType="light" [disabled]="isFieldReadOnly || checkForVisibility('defaultRowCnt')" (afterClick)="openFormViewSC()">
+                    </lib-button>
+                    <lib-button type="plain" [matMenuTriggerFor]="navigation" icon="ellipsis-h">
+                    </lib-button>
+                    <mat-menu #navigation="matMenu" class="navigation-menu">
+                        <button mat-menu-item i18n="@@Download_template" *ngIf="checkForVisibility('import')"
+                            [disabled]="isFieldReadOnly"
+                            (click)="downloadTemplate()"> Download template </button>
+                        <div *ngFor="let permission of gridPermission.permissionList">
+                            <button mat-menu-item [disabled]="isFieldReadOnly" *ngIf="permission === 'export' || (permission === 'import' && checkForVisibility('import'))" (click)="openPermissionMenu(0, permission)"> {{getPermissionLabel(permission)}} </button>
+                        </div>
+                        <input type="file" #file_attach style="display: none;"/>
+                    </mat-menu>
+                </lib-button-group>
+            </div>
+            <div class="f-row-spacer-half"></div>
+            <lib-chip-list *ngIf="dataSource?.gridRowLength">
+                <lib-search class="lib-search" (valueChange)="searchSub.next({searchText: $event, isSubgrid: false})" i18n-placeholder="@@search"
+                  placeholder="Search">
+                </lib-search>
+            </lib-chip-list>
+            <div class="f-row-spacer-half"></div>
+        </ng-template>
+
+        <div class="f-col data-listing">
+            <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortChange($event)"
+            class="mat-elevation-z0" *ngIf="dataSource?.docLength()">
+                <ng-container matColumnDef="_select" sticky>
+                    <th mat-header-cell *matHeaderCellDef>
+                        <div class="f-row">
+                            <lib-checkbox (valueChange)="masterToggle()" [checked]="(selection.hasValue() && isAllSelected()) || process === 'copy'"
+                                [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+                            </lib-checkbox>
+                        </div>
+                    </th>
+                    <td mat-cell *matCellDef="let element; let i = index" (click)="$event.stopPropagation()">
+                        <lib-checkbox (valueChange)="selection.toggle({element,i})" [checked]="selection.isSelected(element) || process === 'copy'"
+                            [aria-label]="checkboxLabel(element)"></lib-checkbox>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="_settings" sticky>
+                    <th mat-header-cell *matHeaderCellDef>
+                        <!-- <lib-button icon="cog"></lib-button> -->
+                    </th>
+                    <td mat-cell *matCellDef="let element; let i = index" (click)="$event.stopPropagation()">
+                        <lib-button *ngIf="process !== 'view' || process !== 'copy'" type="plain" [matMenuTriggerFor]="row_actions" [disabled]="isFieldReadOnly"
+                            icon="ellipsis-h">
+                        </lib-button>
+                        <mat-menu #row_actions="matMenu" class="navigation-menu">
+                            <div *ngFor="let permission of gridPermission.permissionList">
+                                <button mat-menu-item *ngIf="showRowMenu.includes(permission)" (click)="openPermissionMenu(i, permission, element)"> {{getPermissionLabel(permission)}} </button>
+                            </div>
+                        </mat-menu>
+                    </td>
+                </ng-container>
+                <!-- Dynamic columns -->
+                <ng-template ngFor let-dynCol let-index="index" [ngForOf]="(displayedColumns | async)">
+                    <ng-template [ngIf]="isStaticCol(dynCol)" [ngIfElse]="dynamic">
+                        <!-- skip all static columns -->
+                    </ng-template>
+                    <ng-template #dynamic>
+                        <ng-container [matColumnDef]="dynCol">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                               <p *ngIf="!checkForVisibility('removeMultipleRow')">{{ getColumnDesc(dynCol) }}</p>
+                               <lib-button type="plain" *ngIf="checkForVisibility('removeMultipleRow')" (click)="deleteMultipleRows()">Remove</lib-button>
+                            </th>
+
+                            <td mat-cell *matCellDef="let element; let i=index" prosCorrectedValue [displayValue]="getOldValue(element[dynCol])" useWith="tableGrid">
+                                <pros-formatted-table-cell
+                                    [cellValue]="element[dynCol]?.fieldData"
+                                    [fieldType]="getFieldType(dynCol)"
+                                    *ngIf="!isExpansionViewOpen || (isExpansionViewOpen && (!element[dynCol]?.isEdited || getFieldType(dynCol) !== 'TEXT')); else editMode"
+                                    (dblclick)='formattedCellClick(i,element[dynCol])'
+                                ></pros-formatted-table-cell>
+
+                                <ng-template #editMode>
+                                    <ng-container [ngSwitch]="getFieldType(dynCol)">
+                                        <!-- Default Text control -->
+                                        <lib-input *ngSwitchDefault
+                                            [value]="getFieldValue(i,dynCol)"
+                                            (valueChange)="setFieldValue(dynCol, $event, 'TEXT', i)"
+                                            (afterBlur)="element[dynCol].isEdited ? afterInputBlur(element[dynCol],i, element) : ''"
+                                        ></lib-input>
+                                    </ng-container>
+                                </ng-template>
+                            </td>
+                        </ng-container>
+                    </ng-template>
+                </ng-template>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns | async; sticky: true"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns | async;" [ngClass]="{'selected': row?.UUID?.fieldData?.length && (activeRowId === row?.UUID?.fieldData[0]?.c?.toString()) && !isSubGrid}"
+                (click)="rowClicked(row)"></tr>
+            </table>
+            <div class="f-row empty-block">
+            <lib-empty-state *ngIf="!dataSource?.docLength() || dataSource?.docLength() == 0"
+                primaryText="Nothing to see here"
+                [secondaryText]="process !== 'view' && process !== 'copy' ? 'No row exits. Please add a row' : ''"
+                icon="table"
+                [iconSize]="200"
+            >
+                <lib-button *ngIf="checkForVisibility('addRow')" type="minor" (afterClick)="openFormViewSC()"  [disabled]="isSubGrid && (!parentRowId || isFieldReadOnly || process === 'view' || process === 'copy')">Add row</lib-button>
+            </lib-empty-state>
+        </div>
+        </div>
+        <div class="f-row-spacer-half"></div>
+        <span class="f-col-spacer-half"></span>
+        <div class="f-row" *ngIf="dataSource?.docLength()" [ngClass]="{'expansion-view-pagination': isExpansionViewOpen}">
+            <lib-pagination [currentPageIndex]="getPageIndex()" [totalCount]="dataSource?.docLength()" [pageSize]="pageSize"
+                (pageChangeEvent)="onPageChange($event)">
+            </lib-pagination>
+        </div>
+        <div *ngIf="subGridFields.length" class="sub-grids">
+            <div class="row-spacer"></div>
+             <div class="f-row">
+                <lib-text-line type="base" enableWrap="true">
+                    Header (key info)
+                    <lib-button type="plain" icon="caret-down" iconFontType="solid">
+                    </lib-button>
+                </lib-text-line>
+                <span class="f-col-spacer-half"></span>
+                <span class="f-spacer"></span>
+                <lib-button-group>
+                   <lib-button type="plain" icon="plus" iconFontType="light" *ngIf="checkForVisibility('addRow','subGrid')" [disabled]="!activeRowId || isFieldReadOnly || process === 'view' || process === 'copy'"
+                    (afterClick)="openMultiFieldFormView(setActiveSubGridData)">
+                </lib-button>
+                <lib-button type="plain" [disabled]="!activeRowId || isFieldReadOnly || process === 'view' || process === 'copy'" [matMenuTriggerFor]="navigation" icon="ellipsis-h">
+                </lib-button>
+                <mat-menu #navigation="matMenu" class="navigation-menu">
+                    <div *ngIf="activeRowId && !isFieldReadOnly && process !== 'view' && process !== 'copy'">
+                        <button mat-menu-item i18n="@@Download_template" *ngIf="checkForVisibility('import','subGrid')" (click)="downloadSubGridTemplate()"> Download template </button>
+                        <div *ngFor="let permission of subGridPermission.childPermissions">
+                            <button mat-menu-item [disabled]="isFieldReadOnly" *ngIf="permission === 'export' || (permission === 'import' && checkForVisibility('import','subGrid'))" (click)="openSubGridPermissionMenu(permission)"> {{getPermissionLabel(permission)}} </button>
+                        </div>
+                    </div>
+                </mat-menu>
+                </lib-button-group>
+            </div>
+            <lib-tab-group [disableRipple]="true" (selectedIndexChange)="gridTabViewChange($event, false)">
+                <ng-template ngFor let-subGrid [ngForOf]="subGridFields">
+                    <lib-tab [label]="subGrid.fieldDescri">
+                        <div class="f-col" *ngIf="dataSource?.getSubGridDataLength(subGrid) && activeRowId">
+                            <lib-chip-list>
+                                <lib-search class="lib-search" [formControl]="searchControl" (valueChange)="searchSub.next({searchText: $event, isSubgrid: true})" i18n-placeholder="@@search"
+                                placeholder="Search"></lib-search>
+                            </lib-chip-list>
+                        </div>
+                        <pros-transaction-grid [tabDetails]="tabDetails" [fieldObj]="subGrid" [layoutId]="layoutId" [flowId]="flowId" [stepId]="stepId"
+                          [moduleId]="moduleId" [isSubGrid]="true" [parentRowId]="activeRowId" [subGridSearchTerm]="subGridSearchTerm">
+                        </pros-transaction-grid>
+                    </lib-tab>
+                </ng-template>
+            </lib-tab-group>
+        </div>
+    </ng-container>
+    <ng-template #showexpansionview>
+        <div class="expansion-view">
+            <lib-tab-group [disableRipple]="true" (selectedIndexChange)="gridTabViewChange($event, true)">
+                <lib-tab [label]="getFieldDesc()">
+                    <div class="f-row">
+                        <div class="f-col" *ngIf="dataSource?.gridRowLength">
+                            <lib-chip-list>
+                                <lib-search class="lib-search" [formControl]="searchControl" (valueChange)="searchSub.next({searchText: $event, isSubgrid: false})" i18n-placeholder="@@search"
+                                  placeholder="Search">
+                                </lib-search>
+                            </lib-chip-list>
+                        </div>
+                        <span class="f-spacer"></span>
+                        <div class="f-col">
+                            <lib-button-group>
+                                <lib-button *ngIf="checkForVisibility('addRow')" type="plain" icon="plus" iconFontType="light" [disabled]="isFieldReadOnly || checkForVisibility('defaultRowCnt')" (afterClick)="openFormViewSC()">
+                                </lib-button>
+                                <lib-button type="plain" [matMenuTriggerFor]="navigation" icon="ellipsis-h">
+                                </lib-button>
+                                <mat-menu #navigation="matMenu" class="navigation-menu">
+                                    <button mat-menu-item i18n="@@Download_template" *ngIf="checkForVisibility('import')"
+                                        [disabled]="isFieldReadOnly"
+                                        (click)="downloadTemplate()"> Download template </button>
+                                    <div *ngFor="let permission of gridPermission.permissionList">
+                                        <button mat-menu-item [disabled]="isFieldReadOnly" *ngIf="permission === 'export' || (permission === 'import' && checkForVisibility('import'))" (click)="openPermissionMenu(0,permission)"> {{getPermissionLabel(permission)}} </button>
+                                    </div>
+                                    <input type="file" #file_attach style="display: none;"/>
+                                </mat-menu>
+                            </lib-button-group>
+                        </div>
+                    </div>
+                    <div class="f-col data-listing expansion-view-data-listing">
+                        <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z0" (matSortChange)="sortChange($event)">
+                            <ng-container matColumnDef="_select" sticky>
+                                <th mat-header-cell *matHeaderCellDef>
+                                    <lib-checkbox (valueChange)="masterToggle()" [checked]="selection.hasValue() && isAllSelected()"
+                                        [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+                                    </lib-checkbox>
+                                </th>
+                                <td mat-cell *matCellDef="let element" (click)="$event.stopPropagation()">
+                                    <lib-checkbox (valueChange)="selection.toggle(element)" [checked]="selection.isSelected(element)"
+                                        [aria-label]="checkboxLabel(element)"></lib-checkbox>
+                                </td>
+                            </ng-container>
+            
+                            <ng-container matColumnDef="_settings" sticky>
+                                <th mat-header-cell *matHeaderCellDef>
+            
+                                </th>
+                                <td mat-cell *matCellDef="let element; let i = index" (click)="$event.stopPropagation()">
+                                    <lib-button *ngIf="process !== 'view'" type="plain" [matMenuTriggerFor]="row_actions" [disabled]="isFieldReadOnly"
+                                        icon="ellipsis-h">
+                                    </lib-button>
+                                    <mat-menu #row_actions="matMenu" class="navigation-menu">
+                                        <button mat-menu-item i18n="@@Edit" (click)="openFormViewSC(i, element)" *ngIf="checkForVisibility('editRow')"> Edit </button>
+                                        <button mat-menu-item i18n="@@Duplicate" (click)="duplicateRow(i)"> Duplicate </button>
+                                        <button mat-menu-item i18n="@@Remove" (click)="deleteRow(i)"> Remove </button>
+                                    </mat-menu>
+                                </td>
+                            </ng-container>
+                            <!-- Dynamic columns -->
+                            <ng-template ngFor let-dynCol let-index="index" [ngForOf]="(displayedColumns | async)">
+                                <ng-template [ngIf]="isStaticCol(dynCol)" [ngIfElse]="dynamic">
+                                    <!-- skip all static columns -->
+                                </ng-template>
+                                <ng-template #dynamic>
+                                    <ng-container [matColumnDef]="dynCol">
+                                        <ng-container *ngIf="dynCol === 'action'">
+                                            <th mat-header-cell *matHeaderCellDef>
+                                                Actions
+                                            </th>
+                                            <td mat-cell *matCellDef="let element; let i=index">
+                                                <ng-template [ngIf]="element.inlineEdit">
+                                                    <lib-button type="plain" iconFontType="light" icon="check"
+                                                        (afterClick)="validateRowChanges(i, element)"></lib-button>
+                                                    <lib-button type="plain" iconFontType="light" icon="times"
+                                                        (afterClick)="discardRowChanges(i, element)"></lib-button>
+                                                </ng-template>
+                                            </td>
+                                        </ng-container>
+                                        <ng-container *ngIf="dynCol !== 'action'">
+                                            <th mat-header-cell *matHeaderCellDef mat-sort-header>
+                                                {{ getColumnDesc(dynCol) }}
+                                            </th>
+                                            <td mat-cell *matCellDef="let element; let i=index" prosCorrectedValue [displayValue]="getOldValue(element[dynCol])" useWith="tableGrid">
+            
+                                                <ng-container *ngIf="!element.inlineEdit; else editMode">
+                                                    <pros-formatted-table-cell
+                                                        *ngIf="!element[dynCol]?.isEdited || getFieldType(dynCol) !== 'TEXT'; else editMode"
+                                                        (dblclick)='formattedCellClick(i,element[dynCol])'
+                                                        [cellValue]="element[dynCol]?.fieldData"
+                                                        [fieldType]="getFieldType(dynCol)"
+                                                    ></pros-formatted-table-cell>
+                                                </ng-container>
+                                                <ng-template #editMode>
+                                                    <ng-container [ngSwitch]="getFieldType(dynCol)">
+                                                        <!-- TOGGLE -->
+                                                        <div *ngSwitchCase="'TOGGLE'"  class="f-col mdo-field">
+                                                            <lib-slide-toggle
+                                                              labelPosition="before"
+                                                              [checked]="getFieldValue(i,dynCol)"
+                                                              theme="primary"
+                                                              (toggleChange)="setFieldValue(dynCol, $event, 'TOGGLE', i)"
+                                                            ></lib-slide-toggle>
+                                                        </div>
+            
+                                                        <!-- DATE -->
+                                                        <div *ngSwitchCase="'DATEPICKER'" class="f-col">
+                                                            <lib-date-picker
+                                                                [selectedDate]="getFieldValue(i,dynCol)"
+                                                                useWith="withSuffix"
+                                                                (valueChange)="setFieldValue(dynCol, $event, 'DATEPICKER', i)"
+                                                            ></lib-date-picker>
+                                                        </div>
+            
+                                                        <!-- HTML-EDITOR -->
+                                                        <div *ngSwitchCase="'HTML-EDITOR'" class="f-col">
+                                                            <pros-rich-text-editor
+                                                                [value]="getFieldValue(i,dynCol)"
+                                                                [tabFieldId]="dynCol"
+                                                                (valueChange)="setFieldValue(dynCol, $event, 'HTML-EDITOR', i)"
+                                                            ></pros-rich-text-editor>
+                                                        </div>
+            
+                                                        <!-- CHECKBOX -->
+                                                        <div *ngSwitchCase="'CHECKBOX'" class="f-col mdo-field">
+                                                            <lib-checkbox
+                                                                [checked]="getFieldValue(i,dynCol)"
+                                                                theme="primary"
+                                                                (valueChange)="setFieldValue(dynCol, $event, 'CHECKBOX', i)"
+                                                            ></lib-checkbox>
+                                                        </div>
+            
+                                                        <!-- TEXTAREA -->
+                                                        <div *ngSwitchCase="'TEXTAREA'" class="f-col">
+                                                            <lib-textarea
+                                                              hint="You should use this for longer text content"
+                                                              [value]="getFieldValue(i,dynCol)"
+                                                              (valueChange)="setFieldValue(dynCol, $event, 'TEXTAREA', i)"
+                                                            ></lib-textarea>
+                                                        </div>
+            
+                                                        <!--  DROPDOWN -->
+                                                        <div *ngSwitchCase="'DROPDOWN'" class="f-col">
+                                                            <pros-form-view-dropdown
+                                                              [moduleId]="moduleId"
+                                                              [fieldCtrl]="getFieldDetailsById(dynCol)"
+                                                              [preselectedOptions]="getFieldValue(i,dynCol)"
+                                                              (valueChange)="setFieldValue(dynCol, $event, 'DROPDOWN', i)"
+                                                            ></pros-form-view-dropdown>
+                                                        </div>
+            
+                                                        <!-- Default Text control -->
+                                                        <lib-input *ngSwitchDefault
+                                                            [value]="getFieldValue(i,dynCol)"
+                                                            (valueChange)="setFieldValue(dynCol, $event, 'TEXT', i)"
+                                                            (afterBlur)="element[dynCol].isEdited ? afterInputBlur(element[dynCol],i, element) : ''"
+                                                        ></lib-input>
+                                                    </ng-container>
+                                                </ng-template>
+                                            </td>
+                                        </ng-container>
+                                    </ng-container>
+                                </ng-template>
+                            </ng-template>
+            
+                            <!-- Action columns -->
+                            <ng-container matColumnDef="_action">
+                                <th mat-header-cell *matHeaderCellDef></th>
+                                <td mat-cell *matCellDef="let element; let i = index" (click)="$event.stopPropagation()">
+                                    <lib-button *ngIf="process !== 'view'" type="plain" [matMenuTriggerFor]="row_actions" [disabled]="isFieldReadOnly"
+                                        icon="ellipsis-h">
+                                    </lib-button>
+                                    <mat-menu #row_actions="matMenu" class="navigation-menu">
+                                        <button mat-menu-item i18n="@@Edit" (click)="openFormViewSC(i, element)" *ngIf="checkForVisibility('editRow')"> Edit </button>
+                                        <button mat-menu-item i18n="@@Duplicate" (click)="duplicateRow(i)"> Duplicate </button>
+                                        <button mat-menu-item i18n="@@Remove" (click)="deleteRow(i)"> Remove </button>
+                                    </mat-menu>
+                                </td>
+                            </ng-container>
+            
+                            <tr class="mat-row" *matNoDataRow>
+                              <td class="no-result mat-cell" [colSpan]="(displayedColumns | async).length">
+                                <lib-empty-state
+                                  primaryText="No row exist"
+                                  [secondaryText]="process !== 'view' ? 'Please add a row' : ''"
+                                  icon="table"
+                                  [iconSize]="100"
+                                >
+                                  <lib-button *ngIf="checkForVisibility('addRow')" type="minor" (afterClick)="openFormViewSC()"  [disabled]="isSubGrid && (!parentRowId || isFieldReadOnly || process === 'view')">Add row</lib-button>
+                                </lib-empty-state>
+                              </td>
+                            </tr>
+            
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns | async; sticky: true"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns | async;" [ngClass]="{'selected': row?.UUID?.fieldData?.length && (activeRowId === row?.UUID?.fieldData[0]?.c?.toString()) && !isSubGrid}"
+                            (click)="rowClicked(row)"></tr>
+                        </table>
+                    </div>
+                    <div class="f-row-spacer-half"></div>
+                    <span class="f-col-spacer-half"></span>
+                    <div class="f-row expansion-view-pagination">
+                        <lib-pagination [currentPageIndex]="pageIndex" [totalCount]="dataSource?.docLength()" [pageSize]="pageSize"
+                            (pageChangeEvent)="onPageChange($event)">
+                        </lib-pagination>
+                    </div>
+                </lib-tab>
+                <ng-template ngFor let-subGrid [ngForOf]="subGridFields">
+                    <lib-tab [label]="subGrid.fieldDescri">
+                        <div class="f-row">
+                            <div class="f-col" *ngIf="dataSource?.getSubGridDataLength(subGrid) && activeRowId">
+                                <lib-chip-list>
+                                    <lib-search class="lib-search" [formControl]="searchControl" (valueChange)="searchSub.next({searchText: $event, isSubgrid: true})" i18n-placeholder="@@search"
+                                      placeholder="Search">
+                                    </lib-search>
+                                </lib-chip-list>
+                            </div>
+                            <span class="f-col-spacer-half"></span>
+                            <span class="f-spacer"></span>
+                            <div class="f-col">
+                                <lib-button-group>
+                                    <lib-button type="plain" icon="plus" iconFontType="light" *ngIf="checkForVisibility('addRow','subGrid')" [disabled]="!activeRowId || isFieldReadOnly || process === 'view'"
+                                     (afterClick)="openMultiFieldFormView(setActiveSubGridData)">
+                                 </lib-button>
+                                 <lib-button type="plain" [disabled]="!activeRowId || isFieldReadOnly || process === 'view'" [matMenuTriggerFor]="navigation" icon="ellipsis-h">
+                                 </lib-button>
+                                 <mat-menu #navigation="matMenu" class="navigation-menu">
+                                     <div *ngIf="activeRowId && !isFieldReadOnly && process !== 'view'">
+                                         <button mat-menu-item i18n="@@Download_template" *ngIf="checkForVisibility('import','subGrid')" (click)="downloadSubGridTemplate()"> Download template </button>
+                                         <div *ngFor="let permission of subGridPermission.childPermissions">
+                                             <button mat-menu-item [disabled]="isFieldReadOnly" *ngIf="permission === 'export' || (permission === 'import' && checkForVisibility('import','subGrid'))" (click)="openSubGridPermissionMenu(permission)"> {{getPermissionLabel(permission)}} </button>
+                                         </div>
+                                     </div>
+                                 </mat-menu>
+                                 </lib-button-group>
+                            </div>
+                        </div>
+
+                        <pros-transaction-grid [tabDetails]="tabDetails" [fieldObj]="subGrid" [layoutId]="layoutId"  [flowId]="flowId" [stepId]="stepId"
+                            [moduleId]="moduleId" [isSubGrid]="true" [parentRowId]="activeRowId" [subGridSearchTerm]="subGridSearchTerm" [isExpansionViewOpen]="true">
+                        </pros-transaction-grid>
+                    </lib-tab>
+                </ng-template>
+            </lib-tab-group>
+        </div>
+    </ng-template>
+</div>

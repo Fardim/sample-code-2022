@@ -1,0 +1,153 @@
+<div class="root">
+    <!-- <ng-container *ngIf="submitError.status">
+        <pros-error-state></pros-error-state>
+    </ng-container> -->
+    <ng-container *ngIf="isSyncSuccessful.msgType">
+        <div class="f-row-spacer-half"></div>
+        <div class="dashboard-row">
+            <lib-banner class="full-width" [status]=isSyncSuccessful.msgType>
+                <div class="f-row w-100">
+                    <lib-text-line type="base" class="f-row w-100 inline-text">
+                        {{ isSyncSuccessful.msg }}
+                        <lib-text-line *ngIf="isSyncSuccessful.msg.includes('file')" type="base" class="link" textColor="link" (click)="openSystemTray('jobs')">Click here</lib-text-line> to see the progress
+                    </lib-text-line>
+                    <mat-icon fontSet="mdo-icons-light" class="cursor" (click)="isSyncSuccessful.msgType = ''">times</mat-icon>
+                </div>
+            </lib-banner>
+        </div>
+    </ng-container>
+
+    <div class="f-row" *ngIf="!showSkeleton && !submitError.status">
+
+        <lib-text-line type="leading">{{classType?.className}}</lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-button i18n="@@maintain_dependency" (click)="openDialog('DEPENDENCY')">Maintain dependency</lib-button>
+        <lib-button icon="ellipsis-h" [matMenuTriggerFor]="menu"></lib-button>
+        <!--For Menu Options -->
+        <mat-menu #menu class="navigation-menu">
+            <button mat-menu-item i18n="@@sync_now" (click)="onSync()" *ngIf="classType.enableSync">
+                Sync now
+            </button>
+            <button mat-menu-item i18n="@@schedule_sync" (click)="openScheduleSyncDialog()">
+                Schedule sync
+            </button>
+            <button *ngIf="!classType?.enableSync" mat-menu-item i18n="@@edit" (click)="openDialog()">
+                Edit
+            </button>
+            <button mat-menu-item [matMenuTriggerFor]="uploadAndDownloadMenu">
+                <span>Upload and Download</span>
+                <mat-menu #uploadAndDownloadMenu class="navigation-menu">
+                    <button mat-menu-item (click)="uploadCSV()">Upload Taxonomy</button>
+                    <button mat-menu-item [matMenuTriggerFor]="downloadTaxonomyMenu">Download Taxonomy
+                        <mat-menu #downloadTaxonomyMenu class="navigation-menu">
+                            <button mat-menu-item (click)="downloadTaxonomy('en')">Class & Characteristics (English)</button>
+                            <button mat-menu-item  [matMenuTriggerFor]="langsMenu">
+                                Class & Characteristics (Other language)
+
+                                <mat-menu #langsMenu="matMenu" class="navigation-menu" >
+                                    <span *ngFor="let lang of filteredLangList | async">
+                                        <button mat-menu-item (click)="downloadTaxonomy(lang)">{{lang}}</button> 
+                                    </span>
+                                    
+                                </mat-menu>
+
+                            </button>
+                        </mat-menu>
+
+
+                    </button>
+                    <button mat-menu-item (click)="downloadCSV()">Download Template</button>
+                </mat-menu>
+            </button>
+            <mat-divider></mat-divider>
+            <button  mat-menu-item i18n="@@edit" (click)="openTranslateDialog()">
+                Translate Content
+            </button>
+            <mat-divider></mat-divider>
+            <button mat-menu-item [matMenuTriggerFor]="deleteMenu">
+                <span i18n="@@delete">
+                  Delete
+                </span>
+                <mat-menu #deleteMenu class="navigation-menu">
+                    <button mat-menu-item i18n="@@delete_class_type" (click)="deleteDialog('classtype')">Delete class type</button>
+                    <button mat-menu-item i18n="@@delete_all_classes" (click)="deleteDialog('classes')">Delete all classes</button>
+                </mat-menu>
+            </button>
+        </mat-menu>
+    </div>
+    <input type="file" class="hide-input" (change)="fileChange($event)" multiple="false" id="uploadFileCtrl" />
+    <div class="f-row-spacer-half"></div>
+    
+    <pros-toolbar-skeleton *ngIf="showSkeleton"></pros-toolbar-skeleton>
+    <lib-skeleton-vertical-table *ngIf="showSkeleton"></lib-skeleton-vertical-table>
+    <!-- <lib-skeleton *ngIf="showSkeleton" type="line"></lib-skeleton>
+    <lib-skeleton *ngIf="showSkeleton" type="line"></lib-skeleton>
+    <lib-skeleton *ngIf="showSkeleton" type="line"></lib-skeleton>
+    <lib-skeleton *ngIf="showSkeleton" type="line"></lib-skeleton> -->
+
+    <ng-container *ngIf="!showSkeleton && !submitError.status">
+        <div class="f-row data-row">
+            <lib-text-line type="base" weight="strong" i18n="@@class_type" class="class-cell class-header-cell"> Class type </lib-text-line>
+            <lib-text-line type="base" class="class-cell">{{classType?.classType}}</lib-text-line>
+        </div>
+
+        <div class="f-row data-row">
+            <lib-text-line type="base" weight="strong" i18n="@@name" class="class-cell class-header-cell"> Name </lib-text-line>
+            <lib-text-line type="base" class="class-cell">{{classType?.className}}</lib-text-line>
+        </div>
+
+        <div class="f-row data-row" [ngClass]="{'data-set' : classType?.description?.length}">
+            <lib-text-line type="base" weight="strong" i18n="@@description" class="class-cell class-header-cell"> Description </lib-text-line>
+            <lib-text-line type="base" class="class-cell">
+                <div [innerHtml]="classType?.description"></div>
+            </lib-text-line>
+        </div>
+
+        <div class="f-row data-row">
+            <lib-text-line type="base" weight="strong" i18n="@@no_of_class_maintained" class="class-cell class-header-cell"> No. of classes maintained </lib-text-line>
+            <lib-text-line type="base" class="class-cell">{{classType?.count || 0}}</lib-text-line>
+        </div>
+
+        <div class="f-row data-row">
+            <lib-text-line type="base" weight="strong" i18n="@@enable_for_description_generation" class="class-cell class-header-cell"> Enable for description generation </lib-text-line>
+            <lib-text-line type="base" class="class-cell">
+                <lib-slide-toggle class="toggle-col" theme="primary" [(ngModel)]="classType.nountype" disabled=true></lib-slide-toggle>
+                <!-- <lib-checkbox theme="primary" [checked]="classType?.nountype" disabled=true></lib-checkbox> -->
+            </lib-text-line>
+        </div>
+
+        <div class="f-row data-row">
+            <lib-text-line type="base" weight="strong" i18n="@@enable_sync" class="class-cell class-header-cell"> Enable sync </lib-text-line>
+            <lib-text-line type="base" class="class-cell">
+                <lib-slide-toggle class="toggle-col" theme="primary" [(ngModel)]="classType.enableSync" disabled=true></lib-slide-toggle>
+                <!-- <lib-checkbox theme="primary" [checked]="classType?.enableSync" disabled=true></lib-checkbox> -->
+            </lib-text-line>
+        </div>
+
+        <div class="f-row data-row">
+            <lib-text-line type="base" weight="strong" i18n="@@allows_multiple_classifications" class="class-cell class-header-cell"> Allows multiple classifications </lib-text-line>
+            <lib-text-line type="base" class="class-cell">
+                <lib-slide-toggle class="toggle-col" theme="primary" [(ngModel)]="classType.allowMultipleclass" disabled=true></lib-slide-toggle>
+                <!-- <lib-checkbox theme="primary" [checked]="classType?.allowMultipleclass" disabled=true></lib-checkbox> -->
+            </lib-text-line>
+        </div>
+
+        <div class="f-row data-row">
+            <lib-text-line type="base" weight="strong" i18n="@@system" class="class-cell class-header-cell"> System </lib-text-line>
+            <lib-text-line type="base" class="class-cell">
+                {{ cpiConnection?.connectionName }}
+            </lib-text-line>
+        </div>
+
+        <div class="f-row data-row" [ngClass]="{'data-set' : relatedDatasets?.length}">
+            <lib-text-line type="base" weight="strong" i18n="@@related_datasets" class="class-cell class-header-cell"> Related datasets </lib-text-line>
+            <lib-text-line type="base" class="class-cell">
+                <div #filterContainer>
+                    <ng-template ngFor let-item [ngForOf]="relatedDatasets">
+                        <lib-label *ngIf="item?.moduleDesc" class="lib-chips" text="{{item?.moduleDesc}}" appearance="solid" status=""></lib-label>&nbsp;
+                    </ng-template>
+                </div>
+            </lib-text-line>
+        </div>
+    </ng-container>
+</div>

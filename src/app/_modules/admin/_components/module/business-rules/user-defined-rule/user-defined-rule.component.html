@@ -1,0 +1,96 @@
+<div class="rulesfields">
+    <div class="f-row">
+        <mat-form-field appearance="outline">
+            <mat-label>Business rule name</mat-label>
+            <input matInput [formControl]="udrDescFrmCtrl">
+        </mat-form-field>
+    </div>
+
+    <!-- conditional form fields -->
+    <!-- <pros-udr-condition-form
+    [schemaId]="schemaId"
+    [moduleId]="moduleId"
+    (evtAfterSaved) = "fetchConditionList($event)"
+    ></pros-udr-condition-form> -->
+
+    <div class="f-row condition-container">
+        <mat-card class="mat-elevation-z0 f-col condition-col">
+            <div class="f-row">
+                <span class="heading-h2">Conditions List</span>
+                <span class="f-spacer"></span>
+                <button *ngIf="!expandPanel" mat-button color="primary" (click)="openAllPanels()">Expand All</button>
+                <button *ngIf="expandPanel" mat-button color="primary" (click)="closeAllPanels()">Collapse All</button>
+            </div>
+
+            <div class="f-col condition-accordion">
+                <mat-form-field class="rule-name">
+                    <mat-label>Search block</mat-label>
+                    <input matInput [formControl]="searchBlockCtrl">
+                </mat-form-field>
+
+                <mat-accordion class="mat-elevation-z0" #accordion="matAccordion" [multi]="true">
+                    <mat-expansion-panel *ngFor="let list of conditionListOb | async">
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                {{ list.blockDesc }}
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <mat-panel-description>
+                            <p> {{ prepareConditionDesc(list) }}</p>
+                            <button mat-button color="warn" prosClickStopPropagation
+                                (click)="deleteConditionaBlock(list.id)">Delete</button>
+                        </mat-panel-description>
+                    </mat-expansion-panel>
+                </mat-accordion>
+            </div>
+
+        </mat-card>
+        <mat-divider [vertical]="true"></mat-divider>
+        <div class="selectedblock-col">
+            <div *ngIf="enableBlock">
+                <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+                    <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle matTreeNodePadding>
+                        {{node.item}}
+                    </mat-tree-node>
+
+                    <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding>
+                        <pros-udr-condition-control [condotionList]="conditionList"
+                            [selectedBlocks]="selectedBlocks[flatNodeMap.get(node).nodeId]"
+                            (evtSelected)="assignConBlocks($event, node)">
+                        </pros-udr-condition-control>
+                    </mat-tree-node>
+
+                    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
+                        <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'toggle ' + node.filename">
+                            <mat-icon class="mat-icon-rtl-mirror">
+                                {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                            </mat-icon>
+                        </button>
+                        <span class="condition-row-heading"> {{node.item}} </span>
+                        <span class="f-spacer"></span>
+                        <button mat-button color="primary" (click)="addNewItem(node, 'AND')"> Create And </button>
+                        <button mat-button color="primary" (click)="addNewItem(node, 'OR')"> Create OR </button>
+                        <button mat-icon-button matTooltip="Delete Block" (click)="deleteBlock(node)">
+                            <mat-icon class="delete-action"> delete </mat-icon>
+                        </button>
+                    </mat-tree-node>
+                </mat-tree>
+            </div>
+
+
+            <div class="f-col nullstate" *ngIf="!enableBlock">
+                <button mat-fab disabled>
+                    <mat-icon color="primary">filter_none</mat-icon>
+                </button>
+                <p>Create add/or block for condition apply. Then you can drap and drop and make more block for
+                    condition flieds </p>
+                <div class="f-row">
+                    <button mat-button color="primary" (click)="createBlock('AND')">Create and block</button>
+                    <span class="f-col-spacer-half"></span>
+                    <button mat-button color="primary" (click)="createBlock('OR')">Create or block</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row-spacer"></div>

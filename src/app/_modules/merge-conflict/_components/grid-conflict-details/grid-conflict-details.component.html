@@ -1,0 +1,124 @@
+<ng-container *ngIf="grid">
+    <mat-expansion-panel class="mat-elevation-z0 cr-expanded" [expanded]="true" togglePosition="before">
+        <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+            <mat-panel-title class="f-row">
+                {{ grid.fieldDesc }} - &nbsp; <lib-text-line textColor="link" [matMenuTriggerFor]="gridConflictMenu" 
+                    i18n="@@conflicts_only" prosClickStopPropagation> {{ ACTIVE_GRID_VIEW[grid.activeView] ? ACTIVE_GRID_VIEW[grid.activeView].title : 'Conflicts only' }}
+                    <mat-icon fontSet="mdo-icons-solid">sort-down</mat-icon>
+                </lib-text-line>
+                <mat-menu #gridConflictMenu="matMenu">
+                    <button mat-menu-item i18n="@@conflicts_only" (click)="grid.activeView=0"> Conflicts only </button>
+                    <button mat-menu-item i18n="@@cr_only" (click)="grid.activeView=1"> CR only </button>
+                    <button mat-menu-item i18n="@@base_record" (click)="grid.activeView=2"> Base record </button>
+                </mat-menu>
+                <span class="f-spacer"></span>
+                <lib-button type="plain" icon="question-circle" 
+                    [libTooltip]="ACTIVE_GRID_VIEW[grid.activeView] ? ACTIVE_GRID_VIEW[grid.activeView].helpText : ACTIVE_GRID_VIEW[0].helpText">
+                </lib-button>
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <table class="mat-table no-hover">
+            <tr class="mat-header-row">
+                <th class="mat-header-cell actions-cell"></th>
+                <th class="mat-header-cell actions-cell"></th>
+                <th class="mat-header-cell actions-cell"></th>
+                <th class="mat-header-cell" *ngFor="let field of grid.fields"> 
+                    {{ field.fieldDesc }} 
+                </th>
+            </tr>
+            <ng-container [ngSwitch]="grid.activeView">
+                <!-- Conflicts only view -->
+                <ng-container *ngSwitchDefault>
+                    <!-- Changed records -->
+                    <tr class="mat-row" *ngFor="let record of grid.conflict.changed; let index=index">
+                        <td class="mat-cell actions-cell">
+                            <div class="f-row summary-cell">
+                                <lib-text-line i18n="@@changed">Changed</lib-text-line>
+                            </div>
+                        </td>
+                        <td class="mat-cell actions-cell">
+                            <lib-button type="plain" icon="external-link-alt"
+                                (click)="openColumnResolveSC(record)"></lib-button>
+                        </td>
+                        <td class="mat-cell actions-cell">
+                            <div class="f-col">
+                                <lib-text-line i18n="@@Base">Base</lib-text-line>
+                                <div class="f-row-spacer-half"></div>
+                                <lib-text-line i18n="@@CR">CR</lib-text-line>
+                            </div>
+                        </td>
+                        <td class="mat-cell" *ngFor="let field of grid.fields">
+                            <div class="f-col">
+                                <lib-text-line> {{ getGridFieldValue(record, field.fieldId, 'base') }} </lib-text-line>
+                                <div class="f-row-spacer-half"></div>
+                                <lib-text-line> {{ getGridFieldValue(record, field.fieldId, 'cr') }} </lib-text-line>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- Removed from Base -->
+                    <tr class="mat-row" *ngFor="let record of grid.conflict.deleted">
+                        <td class="mat-cell">
+                            <div class="f-row summary-cell">
+                                <lib-text-line i18n="@@deleted">Deleted</lib-text-line>
+                                <span class="f-col-spacer-half"></span>
+                                <lib-checkbox label="Retain" [(ngModel)]="record._action.isRetain"
+                                    (valueChange)="notifyDecisionChange()"></lib-checkbox>
+                            </div>
+                        </td>
+                        <td class="mat-cell actions-cell"></td>
+                        <td class="mat-cell actions-cell"></td>
+                        <td class="mat-cell" *ngFor="let field of grid.fields">
+                            <lib-text-line> {{ getGridFieldValue(record, field.fieldId, 'cr') }} </lib-text-line>
+                        </td>
+                    </tr>
+                </ng-container>
+                <!-- CR only view -->
+                <ng-container *ngSwitchCase="1">
+                    <!-- New on CR -->
+                    <tr class="mat-row" *ngFor="let record of grid.cr.newRow">
+                        <td class="mat-cell">
+                            <div class="f-row summary-cell">
+                                <lib-text-line i18n="@@new"> New </lib-text-line>
+                                <span class="f-col-spacer-half"></span>
+                                <lib-checkbox label="Retain" [(ngModel)]="record._action.isRetain"
+                                    (valueChange)="notifyDecisionChange()"></lib-checkbox>
+                            </div>
+                        </td>
+                        <td class="mat-cell" *ngFor="let field of grid.fields">
+                            <lib-text-line> {{ getGridFieldValue(record, field.fieldId, 'cr') }} </lib-text-line>
+                        </td>
+                    </tr>
+                    <!-- Deleted on CR -->
+                    <tr class="mat-row" *ngFor="let record of grid.cr.deleted">
+                        <td class="mat-cell">
+                            <div class="f-row summary-cell">
+                                <lib-text-line i18n="@@deleted"> Deleted </lib-text-line>
+                                <span class="f-col-spacer-half"></span>
+                                <lib-checkbox label="Retain" disabled="true"></lib-checkbox>
+                            </div>
+                        </td>
+                        <td class="mat-cell" *ngFor="let field of grid.fields">
+                            <lib-text-line> {{ getGridFieldValue(record, field.fieldId, 'cr') }} </lib-text-line>
+                        </td>
+                    </tr>
+                </ng-container>
+                <!-- Base only view -->
+                <ng-container *ngSwitchCase="2">
+                    <!-- New on Base -->
+                    <tr class="mat-row" *ngFor="let record of grid.base.newRow">
+                        <td class="mat-cell">
+                            <div class="f-row summary-cell">
+                                <lib-text-line i18n="@@new"> New </lib-text-line>
+                                <span class="f-col-spacer-half"></span>
+                                <lib-checkbox label="Retain" checked="true" disabled="true"></lib-checkbox>
+                            </div>
+                        </td>
+                        <td class="mat-cell" *ngFor="let field of grid.fields">
+                            <lib-text-line> {{ getGridFieldValue(record, field.fieldId, 'base') }} </lib-text-line>
+                        </td>
+                    </tr>
+                </ng-container>
+            </ng-container>
+        </table>
+    </mat-expansion-panel>
+</ng-container>

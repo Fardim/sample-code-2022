@@ -1,0 +1,56 @@
+<mat-card class="root mat-elevation-z0">
+  <div class="modal-wrapper">
+    <div class="f-row modal-header">
+      <lib-text-line type="leading">New dataset/Bring over/SAP CPI</lib-text-line>
+      <lib-button icon="times" iconFontType="light" (click)="onCancelClick()"></lib-button>
+    </div>
+    <div class="modal-body">
+      <div class="f-col manually-dataset">
+        <form [formGroup]="loginForm" class="f-col dataset-form">
+          <div class="row-spacer"></div>
+          <div class="f-col">
+            <lib-banner status="info" text="Please enter the credentials provided in the email."></lib-banner>
+          <lib-banner status="error" *ngIf="!!loginFormErrMsg" [text]="loginFormErrMsg"></lib-banner>
+          </div>
+          <div class="f-col">
+            <lib-input label="Hostname URL" [isRequired]="true" type="text" i18n-label="@@hostnameURL"
+              formControlName="hostnameURL"
+              [hint]="(loginForm.controls.hostnameURL.touched && loginForm.controls.hostnameURL.errors && loginForm.controls.hostnameURL.errors.required) ? 'This is a required field' : ''"
+              [hasError]="loginForm.controls.hostnameURL.touched && loginForm.controls.hostnameURL.errors && loginForm.controls.hostnameURL.errors.required">
+            </lib-input>
+          </div>
+
+          <div class="f-col">
+            <lib-input label="Username" [isRequired]="true" i18n-label="@@username" type="text"
+              formControlName="username"
+              [hint]="(loginForm.controls.username.touched && loginForm.controls.username.errors && loginForm.controls.username.errors.required) ? 'This is a required field' : ''"
+              [hasError]="loginForm.controls.username.touched && loginForm.controls.username.errors && loginForm.controls.username.errors.required">
+            </lib-input>
+          </div>
+
+          <div class="f-col">
+            <lib-input label="Password" [isRequired]="true" type="password" i18n-label="@@password"
+              formControlName="userPassword"
+              [hint]="(loginForm.controls.userPassword.touched && loginForm.controls.userPassword.errors && loginForm.controls.userPassword.errors.required) ? 'This is a required field' : ''"
+              [hasError]="loginForm.controls.userPassword.touched && loginForm.controls.userPassword.errors && loginForm.controls.userPassword.errors.required">
+            </lib-input>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="f-row modal-footer space-between">
+      <lib-button type="plain" width="80px" [disabled]="loginLoader" (afterClick)="onCancelClick()" i18n="@@cancel">
+        Cancel</lib-button>
+      <span class="f-spacer"></span>
+      <div class="f-row">
+        <lib-button type="plain" width="80px" i18n="@@back" [disabled]="loginLoader" (afterClick)="back()">Back
+        </lib-button>
+        &nbsp;
+        <lib-button type="major" width="80px" i18n="@@next" [disabled]="loginLoader" (afterClick)="next()">Next
+        </lib-button>
+      </div>
+    </div>
+  </div>
+</mat-card>
+

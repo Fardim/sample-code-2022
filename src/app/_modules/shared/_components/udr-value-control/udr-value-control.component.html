@@ -1,0 +1,95 @@
+<ng-container *ngIf="displayControl==='text' || displayControl==='number'">
+    <ng-template [ngIf]="!range" [ngIfElse]="textRangeField">
+        <mat-form-field appearance="outline">
+            <input matInput [formControl]="searchFldCtl" 
+            [placeholder]="placeholder" [libTooltip]="placeholder" class="lib-input" [matAutocomplete]="fieldsCtrl">
+            <mat-autocomplete [displayWith]="fldDisplayWith.bind(this)" class="mdo-autocomplete"
+                #fieldsCtrl="matAutocomplete" (optionSelected)="selected($event,true)">
+                <!-- field selction part-->
+                <ng-container *ngIf="operatorType!=='length' && !isShowOldValue">
+                    <mat-optgroup  *ngFor="let object of fieldsObs | async">
+                        <div [libTooltip]="object.fieldDescri" matTooltipPosition="right" class="custom-opt-grp-header">{{ object.fieldDescri }}</div>
+                        <mat-option *ngFor="let fld of object.childs" [value]="fld"  matTooltip="{{fld.fieldDescri}}" matTooltipPosition="right">
+                            {{fld.fieldDescri}}
+                        </mat-option>  
+                    </mat-optgroup>
+                </ng-container>
+            </mat-autocomplete>
+        </mat-form-field>
+    </ng-template>
+    <ng-template #textRangeField>
+        <lib-input [type]="displayControl" [value]="rangeValue?.start" (valueChange)="inputChanged($event, 'start')"
+            [placeholder]="placeholder" [libTooltip]="placeholder" class="lib-input" [libTooltip]="rangeValue?.start">
+        </lib-input>
+        <span class="f-col-spacer-half"></span>
+        <lib-input [type]="displayControl" [value]="rangeValue?.end" (valueChange)="inputChanged($event, 'end')"
+            [placeholder]="placeholder" [libTooltip]="placeholder" class="lib-input" [libTooltip]="rangeValue?.end">
+        </lib-input>
+    </ng-template>
+</ng-container>
+<ng-container *ngIf="displayControl==='date'">
+    <ng-template [ngIf]="!range" [ngIfElse]="dateRangeField">
+        <lib-date-picker [selectedDate]="dateValue" (valueChange)="dateChanged($event, true)" class="lib-input"></lib-date-picker>
+    </ng-template>
+    <ng-template #dateRangeField>
+        <lib-date-range-picker [selectedDate]="dateRangeValue" (valueChange)="dateChanged($event, true)" class="lib-input">
+        </lib-date-range-picker>
+    </ng-template>
+</ng-container>
+<ng-container *ngIf="displayControl==='datetime'">
+    <ng-template [ngIf]="!range" [ngIfElse]="dateTimeRangeField">
+        <lib-date-time-picker [selectedDate]="dateValue" (valueChange)="dateChanged($event)" class="lib-input"></lib-date-time-picker>
+    </ng-template>
+    <ng-template #dateTimeRangeField>
+        <lib-date-time-range-picker [selectedDate]="dateRangeValue" (valueChange)="dateChanged($event)" class="lib-input">
+        </lib-date-time-range-picker>
+    </ng-template>
+
+</ng-container>
+<ng-container *ngIf="displayControl==='time'">
+    <ng-template [ngIf]="!range" [ngIfElse]="timeRangeField">
+        <lib-time-picker [selectedDate]="dateValue" (timeChange)="dateChanged($event)" class="lib-input"></lib-time-picker>
+    </ng-template>
+    <ng-template #timeRangeField>
+        <lib-time-range-picker [selected]="selectedTimeRange" [enableTimeInput]="true"
+            (valueChange)="timeRangeChanged($event)" class="lib-input"></lib-time-range-picker>
+    </ng-template>
+</ng-container>
+
+<ng-template [ngIf]="displayControl==='dropdown' || displayControl==='radio'">
+    <mat-form-field appearance="outline">
+        <input matInput [value]="dropdownValue" (input)="dropdownChanged($event.target.value)"
+            [matAutocomplete]="fieldsCtrl" [placeholder]="placeholder" [libTooltip]="placeholder">
+        <mat-autocomplete [displayWith]="dropdownTextByCode.bind(this)" class="mdo-autocomplete"
+            #fieldsCtrl="matAutocomplete" (optionSelected)="selected($event)">
+            <mat-optgroup *ngIf="fieldList.length > 0" label="Dropdown value">
+                <ng-container *ngFor="let fld of fieldList">
+                    <mat-option class="mdo-option" [value]="fld.code" [matTooltip]="fld.text" matTooltipPosition="right">
+                        {{fld.text}}
+                    </mat-option>
+                </ng-container>
+            </mat-optgroup>
+
+            <!-- field selction part-->
+            <ng-template [ngIf]="!isShowOldValue && !hideTargetFieldsList">
+                <mat-optgroup *ngFor="let object of fieldsObs | async">
+                    <div [libTooltip]="object.fieldDescri" matTooltipPosition="right" class="custom-opt-grp-header">{{ object.fieldDescri }}</div>
+                    <mat-option *ngFor="let fld of object.childs" [value]="fld"  matTooltip="{{fld.fieldDescri}}" matTooltipPosition="right">
+                        {{fld.fieldDescri}}
+                    </mat-option>
+                </mat-optgroup>
+            </ng-template>
+
+        </mat-autocomplete>
+    </mat-form-field>
+</ng-template>
+
+<ng-container *ngIf="displayControl==='checkbox'">
+    <lib-checkbox [checked]="value==='true'" (valueChange)="checkboxChanged($event)"></lib-checkbox>
+</ng-container>
+<!-- Placeholder element to display while loading-->
+<ng-template [ngIf]="!displayControl">
+    <mat-form-field appearance="outline">
+        <input matInput disabled value="" placeholder="">
+    </mat-form-field>
+</ng-template>

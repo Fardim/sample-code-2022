@@ -1,0 +1,46 @@
+<ng-template [ngIf]="!isFilterWidget" [ngIfElse]="filterWidget">
+    <div class="lib-input" [matMenuTriggerFor]="datasearch" #trigger="matMenuTrigger" (click)="onFocus()">
+        <lib-input disabled="true" *ngIf="isTableFilter === 'true'" [formControl]="appliedFltrCtrl"></lib-input>
+        <lib-search [formControl]="appliedFltrCtrl" [placeholder]="placeholder" *ngIf="isTableFilter === 'false'">
+        </lib-search>
+    </div>
+    <mat-menu #datasearch="matMenu">
+        <div class="f-col multipickradio" prosClickStopPropagation>
+            <div class="menu-spacing">
+                <lib-search [formControl]="fltrCtrl" [placeholder]="placeholder"></lib-search>
+            </div>
+            <div class="multiselect-radio">
+                <lib-radio-group [options]="optionList" layout="vertical" [formControl]="control" labelPosition="before" [name]="formFieldId">
+                </lib-radio-group>
+            </div>
+            <div class="filter-button-wrapper">
+                <lib-button type="minor" (click)="trigger.closeMenu();applyFilter()" i18n="@@apply">
+                    Apply</lib-button>
+            </div>
+        </div>
+    </mat-menu>
+</ng-template> 
+<ng-template #filterWidget>
+    <div class="f-col multipickradio" prosClickStopPropagation>
+        <div class="menu-spacing">
+            <lib-search [formControl]="fltrCtrl" [placeholder]="placeholder"></lib-search>
+        </div>
+        <ng-template [ngIf]='!isFilterSiderSheet' [ngIfElse]="filterSider">
+            <div class="multiselect-radio"  prosInfiniteScroll bufferPercentage="20" (scrollEnd)="onScroll()">
+                <lib-radio-group [options]="optionList" layout="vertical" [formControl]="control" labelPosition="after" [widgetId]="widgetId">
+                </lib-radio-group>
+            </div>
+            <div class="filter-button-wrapper">
+                <lib-button type="minor" (click)="applyFilter()" i18n="@@apply">
+                    Apply
+                </lib-button>
+            </div>
+        </ng-template>
+        <ng-template #filterSider>
+            <div class="multiselect-radio" prosInfiniteScroll bufferPercentage="20" (scrollEnd)="onScroll()">
+                <lib-radio-group [options]="optionList" (valueChange)="applyFilter($event)" layout="vertical" [formControl]="control" labelPosition="after" [name]="widgetId">
+                </lib-radio-group>
+            </div>
+        </ng-template>
+    </div>
+</ng-template>

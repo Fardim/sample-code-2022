@@ -1,0 +1,59 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button (click)="close()" iconFontType="light" type="plain" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading">Generate download link</lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button type="major"  *ngIf="selectedUsers.length > 0" (click)="saveReportDownloadUserList()">Confirm</lib-button>
+            </div>
+        </div>
+    </div>
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify" [formGroup]="addwidgetSubsFrmGrp">
+            <div class="f-col">
+                 <div class="f-col mdo-field">
+                    <!-- input container -->
+                    <div class="mdo-field-input">
+                        <input matInput #loosefoucs placeholder="Type Prospecta email or name to generate a download link"
+                            #optionsInput (focus)="getCollaboratorPermission('', 0)" formControlName="addUsersFilter"
+                            [matAutocomplete]="addUsersFilterAuto" />
+                        <!-- autocomplete -->
+                        <mat-autocomplete class="mdo-autocomplete" #addUsersFilterAuto="matAutocomplete"
+                            [displayWith]="displayWith" (optionSelected)="onSelectUser($event)">
+                            <mat-option class="mdo-option" *ngFor="let data of collaborators" [value]="data">
+                                {{data.description}}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </div>
+                </div>
+
+                <mat-card  *ngIf="selectedEmail" class="f-row mat-elevation-z0 message-alert">
+                    <span>Selected user email ({{selectedEmail}}) is not valid</span>
+                </mat-card>
+
+                <div class="f-row">
+                    <lib-text-line class="cursor" type="xsmall" (click)="addMyselfInSelectedList()" textColor="link">Add myself</lib-text-line>
+                    <div class="col-spacer"></div>
+                    <lib-text-line class="cursor" type="xsmall" textColor="link">Added subscribers ({{selectedUsers.length}})</lib-text-line>
+                </div>
+            </div>
+            <div class="row-spacer"></div>
+            <mat-nav-list>
+                <ng-template ngFor let-selcoll [ngForOf]="selectedUsers">
+                    <mat-list-item>
+                        <div class="f-row download-list">
+                            <mat-card-header>
+                                <div mat-card-avatar>{{(selcoll.description)[0]}}</div>
+                            </mat-card-header>
+                            <lib-text-line type="base">{{selcoll.description}}</lib-text-line>
+                            <span class="f-spacer"></span>
+                            <lib-button (click)="remove(selcoll)" type="plain" icon="trash-alt"></lib-button>
+                        </div>
+                    </mat-list-item>
+                </ng-template>
+            </mat-nav-list>
+        </div>
+    </div>
+</div>

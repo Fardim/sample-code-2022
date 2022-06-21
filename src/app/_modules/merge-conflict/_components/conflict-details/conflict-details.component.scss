@@ -1,0 +1,64 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  padding: 0 12px;
+  // width: 768px;
+  overflow: hidden;
+
+  .conflict-data {
+    align-items: flex-start;
+    height: 100%;
+    overflow: hidden;
+
+    .cr-records {
+      width: 220px;
+      height: calc(100% - 36px - 16px);
+    }
+
+    .conflict-details {
+      overflow: auto;
+      height: calc(100% - 36px - 16px);
+      padding-left: 12px;
+
+      .cr-expanded {
+        border-radius: 0;
+
+        .mat-expansion-panel-header {
+          padding: 0 12px;
+
+          .mat-panel-title {
+            margin: 0;
+          }
+        }
+
+        .cr-expanded-data {
+          border-top: 1px solid;
+        }
+      }
+
+      table.mat-table {
+        width: 100%;
+
+        tr.mat-row:hover {
+          background-color: unset;
+        }
+
+        .lib-radio {
+          height: 32px;
+        }
+
+        .second-level {
+          padding-left: 30px;
+        }
+
+        .third-level {
+          padding-left: 60px;
+        }
+
+        .fourth-level {
+          padding-left: 80px;
+        }
+      }
+    }
+  }
+}

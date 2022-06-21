@@ -1,0 +1,136 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  width: 668px;
+
+  .breadcrum-toolbar {
+    padding: 8px 16px;
+
+    .mdo-constrained-right {
+      width: 100%;
+      align-items: center;
+
+      .breadcrum-head {
+        width: 100%;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px);
+    overflow: auto;
+
+    .mdo-justify {
+      margin: 0 16px;
+
+      .mf-database {
+        display: flex;
+        height: 450px;
+
+        .mf-list-container {
+          padding: 0;
+          height: 450px;
+          flex: 3;
+
+          .mf-list-toolbar {
+            padding: 24px;
+          }
+        }
+
+        .division-map {
+          flex: 1;
+          display: flex;
+        }
+      }
+
+      .fieldlist-map {
+        width: 94px;
+        align-items: center;
+        margin: 16px 22px;
+
+        .mapconnect-button {
+          border-radius: 50%;
+          z-index: 2;
+        }
+
+        &::before {
+          content: '';
+          border-bottom-width: 1px;
+          border-bottom-style: solid;
+          width: 100%;
+          position: relative;
+          top: 19px;
+        }
+
+        .connections {
+          position: relative;
+          display: flex;
+          width: 100%;
+
+          &::before,
+          &::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            border-width: 1px;
+            border-style: solid;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            z-index: 2;
+          }
+        }
+      }
+
+      .mf-checkbox-list {
+        height: calc(100% - 124px);
+        overflow: auto;
+        padding: 0 24px;
+        flex: 1;
+
+        .checklist-rows {
+          flex: 1;
+          align-items: flex-start;
+          position: relative;
+
+          .mf-list-row {
+            border-width: 1px;
+            border-style: solid;
+            border-radius: 3px;
+            padding: 6px;
+            margin-bottom: 8px;
+            position: relative;
+          }
+
+          .add-map-field {
+            position: absolute;
+            right: -11px;
+            top: 10px;
+          }
+        }
+      }
+
+      .ext-lib-button {
+        width: 220px;
+        display: flex;
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 66px;
+      }
+    }
+  }
+}

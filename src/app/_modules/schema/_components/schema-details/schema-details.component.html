@@ -1,0 +1,442 @@
+<div class="mat-elevation-z0 root">
+  <div class="f-row breadcrum-toolbar">
+      <ng-template [ngIf]="schemaInfo">
+          <lib-text-line type="leading">
+            {{ schemaInfo.moduleDescription ? schemaInfo.moduleDescription : 'Module' }} /
+            {{ schemaInfo.schemaDescription ? schemaInfo.schemaDescription : 'Untitled'}} / {{variantName}}
+          </lib-text-line>
+          <lib-button type="plain" iconFontType="solid" [matMenuTriggerFor]="menu" icon="caret-down"></lib-button>
+          <mat-menu #menu="matMenu" class="navigation-menu">
+              <button mat-menu-item (click)="variantChange('0')">Entire dataset</button>
+              <ng-container *ngIf="dataScope && dataScope.length">
+                  <button mat-menu-item *ngFor="let scope of dataScope" (click)="variantChange(scope.variantId)">
+                      {{ scope.variantName ? scope.variantName : 'Unknown'}}
+                  </button>
+              </ng-container>
+              <mat-divider></mat-divider>
+              <button mat-menu-item (click)="openDataScopeSideSheet()">
+                  <mat-icon fontSet="mdo-icons-light" class="mat-menu-icon">plus</mat-icon> Add data scope
+              </button>
+          </mat-menu>
+      </ng-template>
+      <div class="col-spacer"></div>
+      <div class="f-spacer"></div>
+      <div class="f-row">
+          <span class="counts">230 errors</span>
+          <span class="counts">114 warnings</span>
+          <span class="counts">22 corrections</span>
+      </div>
+      <div class="col-spacer"></div>
+      <div class="f-row">
+          <lib-button-group>
+              <lib-button type="minor" iconPosition="before" icon="square-root-alt" iconFontType="light" (click)="openSummarySideSheet()">
+                  Check data </lib-button>
+              <lib-button type="minor" icon="chart-line" iconFontType="light" (click)="openExecutionTrendSideSheet()"></lib-button>
+              <lib-button type="minor" [matMenuTriggerFor]="moreactionfile" icon="ellipsis-h"></lib-button>
+          </lib-button-group>
+          <mat-menu #moreactionfile="matMenu" class="navigation-menu">
+              <button mat-menu-item (click)="downloadExecutionDetails()">Export to CSV</button>
+              <button mat-menu-item (click)="uploadCorrectedData()">Import from CSV</button>
+          </mat-menu>  
+      </div>
+  </div>
+  <ng-template [ngIf]="isInRunning" [ngIfElse]="schemaInfoTemplate">
+      <pros-schema-progress [schemaId]="schemaId"></pros-schema-progress>
+  </ng-template>
+  <ng-template #schemaInfoTemplate>
+      <!-- <nav mat-tab-nav-bar>
+      <a mat-tab-link [active]="activeTab === 'error'" (click)="changeTabStatus('error')">
+          Error
+          <mat-chip-list class="mdo-tabchiplist">
+              <mat-chip>{{ (statics && statics.errorCnt) ? statics.errorCnt : 0 }}</mat-chip>
+          </mat-chip-list>
+      </a>
+      <a mat-tab-link [active]="activeTab === 'success'" (click)="changeTabStatus('success')">
+          Success
+          <mat-chip-list class="mdo-tabchiplist">
+              <mat-chip>{{ (statics && statics.successCnt) ? statics.successCnt : 0 }}</mat-chip>
+          </mat-chip-list>
+      </a>
+      <a mat-tab-link [active]="activeTab === 'review'" (click)="changeTabStatus('review')">
+          Ready for review
+          <mat-chip-list class="mdo-tabchiplist">
+              <mat-chip>{{ (statics && statics.correctedCnt) ? statics.correctedCnt : 0 }}</mat-chip>
+          </mat-chip-list>
+      </a>
+  </nav> -->
+      <div class="f-row filter-container">
+          <!-- Filter here...-->
+          <mat-chip-list>
+              <lib-search i18n-placeholder="@@search" placeholder="Search..." (value)="inlineSearchSubject.next($event);">
+              </lib-search>
+
+              <mat-chip class="mdo-filter-matchip" disableRipple="true" (click)="changeTabStatus('error')">
+                  Errors &nbsp; <span class="chip-text-error">{{ (statics && statics.errorCnt) ? statics.errorCnt : 0
+                      }}</span>
+              </mat-chip>
+              <mat-chip class="mdo-filter-matchip" disableRipple="true" (click)="changeTabStatus('success')">
+                  Success &nbsp; <span class="chip-text-success">{{ (statics && statics.successCnt) ?
+                      statics.successCnt : 0 }}</span>
+              </mat-chip>
+              <mat-chip class="mdo-filter-matchip" disableRipple="true" (click)="changeTabStatus('review')">
+                  Corrections &nbsp; <span class="chip-text-correct">{{ (statics && statics.correctedCnt) ?
+                      statics.correctedCnt : 0 }}</span>
+              </mat-chip>
+              <ng-template ngFor let-ctrl [ngForOf]="filterCriteria | async">
+                  <ng-template [ngIf]="ctrl.type !== 'INLINE'">
+                      <mat-chip class="mdo-filter-matchip" disableRipple="true"
+                          [matMenuTriggerFor]="appliedfiltermenu" (click)="loadDropValues(ctrl)">
+                          {{ ctrl.filterCtrl ? ctrl.filterCtrl.fldCtrl.fieldDescri : 'Unknown' }}:
+                          &nbsp;
+                          <ng-template [ngIf]="ctrl.filterCtrl.selectedValues.length > 1" [ngIfElse]="showText">
+                              <span class="chip-text-correct">
+                                  {{ prepareTextToShow(ctrl) }}
+                              </span>
+                          </ng-template>
+                          <ng-template #showText>
+                              <span class="chip-text-correct">
+                                  <!-- {{ ctrl.filterCtrl ? (ctrl.filterCtrl.selectedValeus[0].TEXT ? ctrl.filterCtrl.selectedValeus[0].TEXT : ctrl.filterCtrl.selectedValeus[0].CODE) : ''}} -->
+                                  {{ prepareTextToShow(ctrl)}}
+                              </span>
+                          </ng-template>
+                          <mat-icon matChipRemove (click)="removeAppliedFilter(ctrl)">clear</mat-icon>
+                      </mat-chip>
+                      <!-- Append dynamic filter MatMenu -->
+                      <mat-menu #appliedfiltermenu="matMenu">
+                          <pros-filter-values [moduleId]="moduleId"
+                              [fieldId]="loadDopValuesFor ? loadDopValuesFor.fieldId : ''"
+                              [checkedValue]="loadDopValuesFor ? loadDopValuesFor.checkedValue : []"
+                              (selectedValues)="updateFilterCriteria($event)">
+                          </pros-filter-values>
+                      </mat-menu>
+                  </ng-template>
+              </ng-template>
+
+              <!-- Add filter control -->
+              <mat-chip class="mdo-filter-matchip" disableRipple="true" [matMenuTriggerFor]="addfiltermenu"
+                  (click)="reInilize = !reInilize">
+                  <mat-icon fontSet="mdo-icons-light">filter</mat-icon>
+              </mat-chip>
+              <!-- Add filter control MatMenu -->
+              <mat-menu #addfiltermenu="matMenu">
+                  <pros-add-filter-menu [moduleId]="moduleId" (evtReadyForApply)="makeFilterControl($event)"
+                      [reInilize]="reInilize" [alreadySelectedValues]="filterCriteria.getValue()">
+                  </pros-add-filter-menu>
+              </mat-menu>
+              <!-- More control -->
+              <mat-chip class="mdo-filter-matchip" disableRipple="true" [matMenuTriggerFor]="moreFilterMenu">
+                  <mat-icon fontSet="mdo-icons">ellipsis-h</mat-icon>
+              </mat-chip>
+              <!-- More control MatMenu -->
+              <mat-menu #moreFilterMenu="matMenu" class="navigation-menu">
+                  <button mat-menu-item (click)="opnDialogSaveVariant()">Save as...</button>
+                  <button mat-menu-item (click)="resetAppliedFilter()">Reset</button>
+              </mat-menu>
+          </mat-chip-list>
+      </div>
+
+      <div class="f-row-spacer-half"></div>
+
+      <div class="f-row listing-container" #listingContainer>
+          <div class="f-col listset-navigation" [style.width.px]="widthOfSchemaNav"
+              (window:mouseup)="setStatus($event, 0)" (mousedown)="setStatus($event, 1)" #navscroll>
+              <div class="nav-tree">
+                  <mat-accordion>
+                      <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" expanded="expanded">
+                          <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+                              <mat-panel-title>
+                                  <div class="expand-title">Header</div>
+                                  <span class="f-spacer"></span>
+                                  <div class="default-badge">22</div>
+                              </mat-panel-title>
+                          </mat-expansion-panel-header>
+                          <mat-accordion>
+                              <mat-expansion-panel togglePosition="before" class="mat-elevation-z0"
+                                  expanded="expanded">
+                                  <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px"
+                                      class="undertree-expansion-panel">
+                                      <mat-panel-title>
+                                          <div class="expand-title">Plant data</div>
+                                          <span class="f-spacer"></span>
+                                          <div class="default-badge">12</div>
+                                      </mat-panel-title>
+                                  </mat-expansion-panel-header>
+
+                                  <mat-nav-list role="navigation" class="tree-nav-list">
+                                      <mat-list-item class="f-row understep-two">
+                                          <div mat-line> Valuation data </div>
+                                          <span class="f-spacer"></span>
+                                          <div class="default-badge">0</div>
+                                      </mat-list-item>
+                                      <mat-list-item class="f-row understep-two">
+                                          <div mat-line> Valuation data </div>
+                                          <span class="f-spacer"></span>
+                                          <div class="default-badge">0</div>
+                                      </mat-list-item>
+                                  </mat-nav-list>
+                              </mat-expansion-panel>
+                          </mat-accordion>
+                          <mat-accordion>
+                              <mat-expansion-panel hideToggle class="mat-elevation-z0">
+                                  <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px"
+                                      class="undertree-expansion-panel">
+                                      <mat-panel-title>
+                                          <div class="expand-title">Language table</div>
+                                          <span class="f-spacer"></span>
+                                          <div class="default-badge">12</div>
+                                      </mat-panel-title>
+                                  </mat-expansion-panel-header>
+                              </mat-expansion-panel>
+
+                              <mat-expansion-panel hideToggle class="mat-elevation-z0">
+                                  <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px"
+                                      class="undertree-expansion-panel">
+                                      <mat-panel-title>
+                                          <div class="expand-title">Alt unit of measure</div>
+                                          <span class="f-spacer"></span>
+                                          <div class="default-badge">12</div>
+                                      </mat-panel-title>
+                                  </mat-expansion-panel-header>
+                              </mat-expansion-panel>
+                          </mat-accordion>
+                      </mat-expansion-panel>
+                  </mat-accordion>
+              </div>
+
+              <div class="split-panel-mark" (click)="toggleSideBar()">
+                  <mat-icon fontSet="mdo-icons">{{arrowIcon}}</mat-icon>
+              </div>
+          </div>
+
+          <div class="f-col listset-grid" [ngStyle]="{'width':'calc(100% - ' +widthOfSchemaNav + 'px - 24px)' }"
+              (scroll)="onTableScroll($event)">
+              <div class="listset-text">Header</div>
+              <!-- if have data then render table -->
+              <ng-template [ngIf]="showTableLoading" [ngIfElse]="showdata">
+                  <pros-table-loading [columnCount]="displayedFields.length">
+                  </pros-table-loading>
+              </ng-template>
+              <ng-template #showdata>
+                  <div class="f-row action-iconbtns"
+                      *ngIf="activeTab && activeTab === 'review' && selection.selected.length !== 0">
+                      <ng-template [ngIf]="(isReviewer || isApprover) && isGlobalActionsEnabled">
+                          <lib-button (click)="resetRec('','all')" type="minor">Reject</lib-button>
+                          <lib-button type="plain" (click)="approveRecords('all')" > Approve </lib-button>
+                      </ng-template>
+                      <lib-button  click)="selection.clear()" type="plain" type="minor"> Unselect </lib-button>
+                  </div>
+                  <div class="f-col datasource">
+                      <mat-table [dataSource]="dataSource" matSort>
+                          <ng-container matColumnDef="_select_columns" sticky>
+                              <mat-header-cell *matHeaderCellDef>
+                                  <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+                                      [checked]="selection.hasValue() && isAllSelected()"
+                                      [indeterminate]="selection.hasValue() && !isAllSelected()">
+                                  </mat-checkbox>
+                              </mat-header-cell>
+                              <mat-cell *matCellDef="let row">
+                                  <mat-checkbox color="primary" (click)="$event.stopPropagation()"
+                                      (change)="$event ? selection.toggle(row) : null"
+                                      [checked]="selection.isSelected(row)">
+                                  </mat-checkbox>
+                              </mat-cell>
+                          </ng-container>
+                          <!-- <ng-container matColumnDef="row_more_action" sticky>
+                          <mat-header-cell *matHeaderCellDef>
+                              <button mat-button (click)="openTableColumnSettings()">
+                                  <mat-icon fontSet="mdo-icons">cog</mat-icon>
+                              </button>
+                          </mat-header-cell>
+                          <mat-cell *matCellDef="let element">
+                              <button mat-button>
+                                  <mat-icon fontSet="mdo-icons">more</mat-icon>
+                              </button>
+                          </mat-cell>
+                      </ng-container> -->
+                          <ng-container matColumnDef="_assigned_buckets" sticky>
+                              <mat-header-cell *matHeaderCellDef></mat-header-cell>
+                              <mat-cell *matCellDef="let element">
+                                  <mat-card-header>
+                                      <div mat-card-avatar>
+                                          {{ userDetails ? (userDetails.firstName ?
+                                          userDetails.firstName.substring(0,1).toUpperCase() : '') : '' }}{{
+                                          userDetails ? (
+                                          userDetails.lastName ? userDetails.lastName.substring(0,1).toUpperCase() :
+                                          '') : '' }}
+                                      </div>
+                                  </mat-card-header>
+                              </mat-cell>
+                          </ng-container>
+                          <ng-container matColumnDef="_score_weightage" sticky>
+                              <mat-header-cell *matHeaderCellDef> Score &nbsp;<mat-icon fontSet="mdo-icons-light">
+                                      question-circle</mat-icon>
+                              </mat-header-cell>
+                              <mat-cell *matCellDef="let element">
+                                  <div class="f-row progress-cell">
+                                      <mat-progress-bar mode="determinate"
+                                          value="{{ element['_score_weightage'] ? element['_score_weightage'].fieldData : '0' }} "
+                                          class="f-col"></mat-progress-bar>
+                                      <span class="f-col-spacer-half"></span>
+                                      <span>
+                                          {{ element['_score_weightage'] ? element['_score_weightage'].fieldData : ''
+                                          }}%
+                                      </span>
+                                  </div>
+                              </mat-cell>
+                          </ng-container>
+                          <ng-container matColumnDef="_row_actions" sticky>
+                              <mat-header-cell *matHeaderCellDef>
+                                  <lib-button type="plain" (click)="openTableColumnSettings()" icon="cog" iconFontType="light">
+                                  </lib-button>
+                              </mat-header-cell>
+                              <mat-cell *matCellDef="let element">
+                                  <div class="f-row action-iconbtns" *ngIf="!element['OBJECTNUMBER'].isReviewed">
+                                      <!-- Secondary actions -->
+                                      <!-- <button mat-fab color="accent" *ngIf="secondaryActions.length"
+                                          [matMenuTriggerFor]="secondaryActionsMenu">
+                                          <mat-icon fontSet="mdo-icons">more</mat-icon>
+                                      </button> -->
+                                      <lib-button  type="plain" icon="more" *ngIf="secondaryActions.length" [matMenuTriggerFor]="secondaryActionsMenu"></lib-button>
+                                      <mat-menu #secondaryActionsMenu="matMenu" class="navigation-menu">
+                                          <ng-container *ngFor="let sAction of secondaryActions">
+                                              <button mat-menu-item
+                                                  *ngIf="(activeTab === 'review' || sAction.isCustomAction) && hasActionPermission(sAction)"
+                                                  (click)="doAction(sAction, element)">
+                                                  <mat-icon
+                                                      *ngIf="!sAction.isCustomAction && (sAction.actionViewType=== TableActionViewType.ICON || sAction.actionViewType=== TableActionViewType.ICON_TEXT)"
+                                                      fontSet="mdo-icons-light" class="mat-menu-icon">
+                                                      {{ sAction.actionIconLigature }}
+                                                  </mat-icon>
+                                                  <ng-template
+                                                      [ngIf]="(sAction.actionViewType === TableActionViewType.TEXT) || (sAction.actionViewType === TableActionViewType.ICON_TEXT)">
+                                                      {{ sAction.actionText }}
+                                                  </ng-template>
+                                              </button>
+                                          </ng-container>
+                                      </mat-menu>
+                                      <!-- Primary actions -->
+                                      <ng-container *ngFor="let pAction of primaryActions">
+                                          <button
+                                              *ngIf="(activeTab === 'review' || pAction.isCustomAction) && hasActionPermission(pAction)"
+                                              mat-flat-button color="accent" (click)="doAction(pAction, element)">
+                                              <mat-icon
+                                                  *ngIf="(pAction.actionViewType=== TableActionViewType.ICON || pAction.actionViewType=== TableActionViewType.ICON_TEXT)"
+                                                  fontSet="mdo-icons-light">
+                                                  {{ pAction.actionIconLigature }}
+                                              </mat-icon>
+                                              <ng-template
+                                                  [ngIf]="pAction.actionViewType=== TableActionViewType.TEXT || pAction.actionViewType=== TableActionViewType.ICON_TEXT">
+                                                  {{ pAction.actionText }}
+                                              </ng-template>
+                                          </button>
+                                      </ng-container>
+                                  </div>
+                              </mat-cell>
+                          </ng-container>
+                          <ng-container matColumnDef="OBJECTNUMBER" sticky>
+                              <mat-header-cell *matHeaderCellDef>
+                                  <!-- Add class on headercell "coll-visible" -->
+                                  <div mat-sort-header>Object Number</div>
+                                  <span class="f-spacer"></span>
+                                  <!-- Collapse splite start here -->
+                                  <ng-template>
+                                      <mat-icon fontSet="mdo-icons" class="collapse-icon">chevron-right</mat-icon>
+                                  </ng-template>
+                                  <!-- Collapse splite end here -->
+
+                              </mat-header-cell>
+                              <mat-cell *matCellDef="let element">
+                                  <!-- add class in mat-cell "vertical-cell" -->
+                                  {{ element['OBJECTNUMBER'] ? element['OBJECTNUMBER'].fieldData : '' }}
+                                  <!-- Collapse rowspan splites start here -->
+                                  <ng-template>
+                                      <div class="verticalsub-text">
+                                          <!-- text comes here  -->
+                                      </div>
+                                  </ng-template>
+                                  <!-- Collapse rowspan splites end here -->
+                              </mat-cell>
+                          </ng-container>
+                          <!-- load dynamic columns-->
+                          <ng-template ngFor let-dynCols [ngForOf]="(displayedFields | async)">
+                              <ng-template
+                                  [ngIf]="(dynCols === 'row_more_action') || (dynCols === '_assigned_buckets') || (dynCols === '_row_actions') ||  ( dynCols === '_select_columns') ||   (dynCols === '_score_weightage') || (dynCols === 'OBJECTNUMBER')"
+                                  [ngIfElse]="other">
+                                  <!-- skip all static columns -->
+                              </ng-template>
+                              <ng-template #other>
+                                  <ng-container [matColumnDef]="dynCols">
+                                      <mat-header-cell *matHeaderCellDef>
+                                          <div mat-sort-header>{{ metadataFldLst[dynCols] ?
+                                              metadataFldLst[dynCols].fieldDescri : 'Unknown' }}</div>
+                                      </mat-header-cell>
+                                      <mat-cell *matCellDef="let element; let rIndex = index;"
+                                          [class.error-cell]="element[dynCols] ? element[dynCols].isInError : false"
+                                          (click)="editCurrentCell(dynCols,element, rIndex, containerRef)">
+                                          <div class="f-col grid-cell-editable">
+                                              <div class="mdo-form-input f-col" style="display: none;"
+                                                  id="inpctrl_{{ dynCols + '_' + rIndex }}">
+                                                  <!-- container to hold input field when cell gets edited  -->
+                                                  <ng-template prosContainerRef #containerRef="prosContainerRef">
+                                                  </ng-template>
+                                              </div>
+                                              <ng-template [ngIf]="element[dynCols] && element[dynCols].isCorrected"
+                                                  [ngIfElse]="normalCell">
+                                                  <ng-template
+                                                      [ngIf]="element[dynCols].oldData !== element[dynCols].fieldData"
+                                                      [ngIfElse]="other">
+                                                      <div class="f-col">
+                                                          <span id="viewctrl_{{ dynCols + '_' + rIndex }}">
+                                                              {{ element[dynCols] ? formatCellData(dynCols,
+                                                              element[dynCols].fieldData) : '' }}
+                                                          </span>
+                                                          <span>
+                                                              {{ element[dynCols] ? formatCellData(dynCols,
+                                                              element[dynCols].oldData) : '' }}
+                                                          </span>
+                                                      </div>
+                                                  </ng-template>
+                                                  <ng-template #other>
+                                                      <span id="viewctrl_{{ dynCols + '_' + rIndex }}">
+                                                          {{ element[dynCols] ? formatCellData(dynCols,
+                                                          element[dynCols].fieldData) :
+                                                          '' }}
+                                                      </span>
+                                                  </ng-template>
+                                              </ng-template>
+                                              <ng-template #normalCell>
+                                                  <div class="f-col">
+                                                      <span id="viewctrl_{{ dynCols + '_' + rIndex }}">
+                                                          {{ element[dynCols] ? formatCellData(dynCols,
+                                                          element[dynCols].fieldData) :
+                                                          '' }}
+                                                      </span>
+                                                      <span class="error-message">
+                                                          {{ element[dynCols] ? element[dynCols].errorMsg : '' }}
+                                                      </span>
+                                                  </div>
+                                              </ng-template>
+                                          </div>
+                                      </mat-cell>
+                                  </ng-container>
+                              </ng-template>
+                          </ng-template>
+                          <!-- load header for actions-->
+                          <ng-container matColumnDef="review_actions_header">
+                              <mat-header-cell *matHeaderCellDef [attr.colspan]="displayedFields.getValue().length">
+                                  <div class="f-row action-iconbtns">
+                                      <lib-button (click)="approveRecords('all')" type="minor" icon="check" iconFontType="light"> Approve </lib-button>
+                                      <lib-button (click)="selection.clear()" type="minor" icon="times" iconFontType="light"> Unselect </lib-button>
+                                  </div>
+                              </mat-header-cell>
+                          </ng-container>
+                          <!-- <mat-header-row *matHeaderRowDef="tableHeaderActBtn; sticky: true"></mat-header-row> -->
+                          <mat-header-row *matHeaderRowDef="displayedFields | async; sticky: true"></mat-header-row>
+                          <mat-row *matRowDef="let row; columns: displayedFields | async;"></mat-row>
+                      </mat-table>
+                  </div>
+              </ng-template>
+          </div>
+      </div>
+  </ng-template>
+</div>

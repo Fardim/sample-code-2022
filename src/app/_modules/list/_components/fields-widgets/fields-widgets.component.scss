@@ -1,0 +1,80 @@
+.widget-dynamic-row {
+  align-items: center;
+
+  .colunm-box {
+    box-sizing: border-box;
+    display: flex;
+    padding: 8px 8px;
+    margin: 6px;
+    width: 100%;
+    max-width: 500px;
+    cursor: pointer;
+
+    .col {
+      display: flex;
+      flex: 1 0 auto;
+      width: 1px;
+      align-items: center;
+      margin: 0 4px;
+
+      &.col-x4 {
+        flex: 4;
+      }
+
+      &.col-x5 {
+        flex: 5;
+      }
+
+      &.col-x6 {
+        flex: 6;
+
+        .min {
+          min-width: 40px;
+          min-height: 24px;
+        }
+      }
+
+      &.end-item {
+        justify-content: flex-end;
+        visibility: hidden;
+      }
+
+      .fields-icons {
+        width: 24px;
+      }
+    }
+
+    .lib-input {
+      height: 36px;
+    }
+
+    &.loading-state {
+      .col-x6,
+      .col-x4 {
+        .w-100 {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .colunm-box:hover {
+    .end-item {
+      visibility: visible;
+    }
+  }
+}
+
+.cdk-drag-preview {
+  display: flex;
+  justify-content: space-around;
+}
+
+.define-fieldsdata {
+  align-items: flex-start;
+  justify-content: space-around;
+
+  .define-fieldlist {
+    flex: 1;
+  }
+}

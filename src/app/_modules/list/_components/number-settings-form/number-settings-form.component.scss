@@ -1,0 +1,89 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  width: 600px;
+
+  .breadcrum-toolbar {
+    padding: 8px 12px;
+
+    .mdo-constrained-right {
+      align-items: center;
+      width: 100%;
+      margin-right: 0;
+
+      .breadcrum-head {
+        width: 100%;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px);
+    overflow: auto;
+    overflow-x: hidden;
+
+    .mdo-justify {
+      margin: 0 16px;
+
+      .field-label {
+        margin-bottom: 6px;
+      }
+
+      .label-icon {
+        font-size: 12px;
+      }
+
+      .toggle-col {
+        margin-right: 12px;
+      }
+    }
+  }
+
+  .multi-field-val {
+    .fld-section-header {
+      justify-content: space-between;
+    }
+  }
+
+  .fld-val-row {
+    height: 40px;
+    padding-left: 17px;
+
+    .fld-val-blk {
+      width: 31%;
+
+      &.half {
+        width: 46%;
+      }
+
+      .field-title {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        max-width: 85%;
+      }
+    }
+  }
+
+  .fld-values {
+    max-height: 600px;
+    overflow: auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 62px;
+      }
+    }
+  }
+}

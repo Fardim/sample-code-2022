@@ -1,0 +1,36 @@
+<div class="hierarchy-blocks">
+    <ng-container *ngTemplateOutlet="BlockList; context:{$implicit: getFormArray(blocksGrp, 'blocks')}"></ng-container>
+    <div class="f-row">
+        <lib-button class="add-col" type="minor" rounded="true" icon="plus" iconFontType="light" i18n-libTooltip="@@udr_addrow_tooltip" libTooltip="Add another logic or condition  to rule by selecting AND / OR" (click)="addBlock({type: 'parent'}, getFormArray(blocksGrp, 'blocks'))"></lib-button>
+    </div>
+</div>
+
+<ng-template #BlockList let-blocks>
+    <ng-container *ngFor="let block of blocks.controls; let i = index">
+        <pros-block 
+            [operatorsList]="operatorsList" 
+            [blockCtrl]="block" 
+            (addNewBlock)="addBlock($event, blocks)" 
+            (deleteBlock)="removeBlock(blocks, i)" 
+            [sourceFldList]="sourceList"
+            (updateList)="updateList($event)"
+            [oldListMetaData]="oldListMetaData"
+            [targetListMetaData]="targetListMetaData"
+            (updateParallelCondition)="updateParallelCondition($event, blocks)"
+            [canChangeCondition]="i === 0"
+            [blocksGrp]="blocksGrp"
+            [showRegex]="showRegex"
+            [parentMetadata]="parentMetadata"
+            [initialSrcList]="initialSrcList"
+            [isNewModule]="isNewModule"
+            [showResultCount]="showResultCount"
+            [submitted]="submitted"
+            [moduleId]="moduleId"
+            [isShowOldValue]="isShowOldValue"
+            [blockNotMandatory]="blockNotMandatory"
+        ></pros-block>
+        <div class="child-padding">
+            <ng-container *ngTemplateOutlet="BlockList; context:{$implicit: getFormArray(block, 'childs')}"></ng-container>
+        </div>
+    </ng-container>
+</ng-template>

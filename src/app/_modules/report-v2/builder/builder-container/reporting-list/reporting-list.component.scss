@@ -1,0 +1,62 @@
+.mat-table {
+  overflow-x: scroll;
+}
+
+.mat-cell,
+.mat-header-cell {
+  word-wrap: initial;
+  line-break: unset;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+mat-card.widget {
+  box-sizing: border-box;
+  padding: 8px;
+  height: 100%;
+
+  .view-table {
+    height: 100%;
+  }
+
+  mat-card-content {
+    height: calc(100% - 36px - 46px);
+    overflow: auto;
+
+    .root-table {
+      table.mat-table {
+        width: 100%;
+        border-collapse: separate;
+
+        .mat-header-cell:first-of-type,
+        .mat-cell:first-of-type {
+          max-width: 40px;
+          min-width: 40px;
+        }
+      }
+    }
+
+    .lib-input,
+    pros-form-single-select {
+      height: 36px;
+      font-weight: normal;
+      display: block;
+    }
+
+    mat-paginator {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
+  }
+}
+
+.clear {
+  position: absolute;
+  right: 0;
+  top: 9px;
+}
+
+.hide {
+  display: none;
+}

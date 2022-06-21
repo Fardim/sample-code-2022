@@ -1,0 +1,351 @@
+<mat-card class="class-widget mat-elevation-z0" *ngIf="fieldObj?.fieldType === 'CLASS_TYPE'">
+    <div class="f-row">
+        <pros-transaction-static-text
+            [staticTextBody]="fieldObj?.fieldCtrl?.dataType === 'CLASS_TYPE' ? 'Characteristics detail' : 'Class Data'">
+        </pros-transaction-static-text>
+        <span class="f-spacer"></span>
+        <lib-button icon="expand-alt" iconFontType="light"></lib-button>
+    </div>
+
+    <div class="f-row-spacer-half"></div>
+
+    <div class="f-col">
+        <lib-text-line type="xsmall" weight="strong" class="field-label">
+            {{fieldObj?.fieldType === 'CLASS_TYPE' ? 'Select class':'Class'}}
+        </lib-text-line>
+
+        <input [formControl]="control" type="hidden" />
+        <div prosCorrectedValue useWith="withSuffix">
+            <div class="f-col mdo-field">
+                <ng-container *ngIf="fieldObj?.fieldType === 'CLASS_TYPE'">
+                    <mat-form-field appearance="outline" class="multi-select" [matMenuTriggerFor]="flowNavigationList">
+                        <mat-chip-list class="f-row field-chip-list" #chipList>
+                            <lib-chip *ngFor="let field of selectedOptions;let i = index" removable="true"
+                                class="lib-chip" (removed)="remove(i)">
+                                {{field.description}}
+                            </lib-chip>
+                            <input matInput placeholder="Search and add class" #optionsInput class="mat-input" disabled>
+                        </mat-chip-list>
+                        <mat-menu #flowNavigationList="matMenu" xPosition="after" class="navigation-menu">
+                            <ng-template matMenuContent let-triggerFrom="triggerFrom" let-docId="docId">
+                                <div class="dropdown-search-wrapper">
+                                    <lib-search placeholder="Search" prosClickStopPropagation
+                                        [formControl]="classSearchControl">
+                                    </lib-search>
+                                </div>
+                                <div class="dropdown-options-wrapper f-col">
+                                    <!-- When using virtual scroll this DIV can be replaced by cdk-virtual-scroll-viewport -->
+                                    <div class="dropdown-options-inner-container">
+                                        <!--  section for options -->
+                                        <div class="options">
+                                            <lib-filter-option *ngFor="let opt of optionList" [value]="opt"
+                                                (click)="selected(opt, false)">
+                                                <lib-checkbox [checked]="isItemChecked(opt)" [disabled]="false"
+                                                    [label]="opt.description">
+                                                </lib-checkbox>
+                                            </lib-filter-option>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </mat-menu>
+                        <lib-button matSuffix *ngIf="selectedOptions?.length" (click)="removeAll()" icon="times" iconFontType="light"
+                            prosClickStopPropagation>
+                        </lib-button>
+                        <lib-button icon="chevron-down" matSuffix prosClickStopPropagation>
+                        </lib-button>
+                    </mat-form-field>
+                </ng-container>
+
+                <ng-container *ngIf="fieldObj?.fieldCtrl?.dataType === 'CLASSSELECT'">
+                    <mat-form-field appearance="outline" class="multi-select" [matMenuTriggerFor]="flowNavigationList">
+                        <input matInput placeholder="Search and add class" [formControl]="classControl" #optionsInput
+                            class="mat-input" disabled>
+
+                        <mat-menu #flowNavigationList="matMenu" xPosition="after" class="navigation-menu">
+                            <ng-template matMenuContent let-triggerFrom="triggerFrom" let-docId="docId">
+                                <div class="dropdown-search-wrapper">
+                                    <lib-search placeholder="Search" prosClickStopPropagation
+                                        [formControl]="classSearchControl">
+                                    </lib-search>
+                                </div>
+                                <div class="dropdown-options-wrapper f-col">
+                                    <!-- When using virtual scroll this DIV can be replaced by cdk-virtual-scroll-viewport -->
+                                    <div class="dropdown-options-inner-container">
+                                        <!--  section for options -->
+                                        <div class="options">
+                                            <lib-filter-option *ngFor="let opt of optionList | async" [value]="opt"
+                                                (click)="selected(opt, true)">
+                                                {{
+                                                opt.text
+                                                }}
+                                            </lib-filter-option>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </mat-menu>
+                        <button *ngIf="classControl?.value" (click)="removeAll(true)" mat-icon-button matSuffix
+                            prosClickStopPropagation>
+                            <mat-icon fontSet="mdo-icons-light">times</mat-icon>
+                        </button>
+                        <button mat-icon-button matSuffix prosClickStopPropagation>
+                            <mat-icon fontSet="mdo-icons-light">angle-down</mat-icon>
+                        </button>
+                    </mat-form-field>
+                </ng-container>
+                <!-- hint -->
+                <mat-hint class="mdo-field-hint">Changing the class from the list will delete the classification data
+                    maintained for the old class</mat-hint>
+            </div>
+        </div>
+
+        <div class="f-col">
+            <lib-search placeholder="Search" class="lib-search" prosClickStopPropagation [formControl]="classSearch">
+            </lib-search>
+        </div>
+
+        <div class="f-col class-list">
+            <mat-accordion>
+                <mat-expansion-panel togglePosition="before" class="mat-elevation-z0"
+                    *ngFor="let class of selectedOptions" [expanded]="true">
+                    <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+                        <mat-panel-title class="f-row">
+                            <lib-text-line type="base" weight="strong">{{class.description}}</lib-text-line>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="f-col table-loader" *ngIf="showSkeleton">
+                        <lib-skeleton-table></lib-skeleton-table>
+                    </div>
+                    <div class="f-col data-listing">
+                        <table #table mat-table [ngStyle]="{ display: showSkeleton || !hasData ? 'none' : '' }"
+                            [dataSource]="class.dataSource" matSort class="mat-elevation-z0">
+                            <ng-container matColumnDef="characteristics">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Characteristics
+                                </th>
+                                <td mat-cell *matCellDef="let element; let i = index"
+                                    (click)="$event.stopPropagation()">
+                                    {{element.charDesc}}
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="value">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    Value
+                                </th>
+                                <td mat-cell *matCellDef="let element; let i = index"
+                                    (click)="$event.stopPropagation()">
+                                    <ng-container *ngIf="element.fieldType === 'TEXT'">
+                                        <div class="class-input">
+                                            <lib-input value="Value" [(ngModel)]="element.value"
+                                                (ngModelChange)="updateCharacteristics()"></lib-input>
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngIf="element.valueType === 'range'">
+                                        <div class="range-picker">
+                                            <lib-input value="Value" [(ngModel)]="element.value"
+                                                (ngModelChange)="updateCharacteristics()"></lib-input>
+                                            <lib-input value="Value" [(ngModel)]="element.value"
+                                                (ngModelChange)="updateCharacteristics()"></lib-input>
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngIf="element.fieldType === 'DROPDOWN'">
+                                        <!-- single select example -->
+                                        <div class="f-col mdo-field">
+                                            <!-- input container -->
+                                            <div class="mdo-field-input">
+                                                {{Selected}}
+                                                <input matInput placeholder="Type to search" #optionsInput
+                                                    [formControl]="optionCtrl" [matAutocomplete]="auto" />
+                                                <!-- autocomplete -->
+                                                <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete"
+                                                    (optionSelected)="selectSingle($event,element)">
+                                                    <mat-option class="mdo-option" *ngFor="let opt of filteredOptions"
+                                                        [value]="opt">
+                                                        {{opt}}
+                                                    </mat-option>
+                                                </mat-autocomplete>
+                                            </div>
+                                        </div>
+                                    </ng-container>
+                                    <ng-container *ngIf="element.fieldType === 'DATE'">
+                                        <lib-date-picker [disabled]="false" [enableTimeInput]="false"
+                                            [emitDateOnSave]="false" [hideInput]="false" [minDate]="minDate"
+                                            [maxDate]="maxDate" [selectedDate]="selectedDate" [isRequired]="false"
+                                            [isReadOnly]="false" [hasError]="false"
+                                            (valueChange)="valueChange($event, element)"
+                                            (afterBlur)="afterBlur($event)"></lib-date-picker>
+                                    </ng-container>
+
+                                    <ng-container *ngIf="element.fieldType === 'TIME'">
+                                        <lib-time-picker (timeChange)="valueChange($event, element)">
+                                        </lib-time-picker>
+                                    </ng-container>
+
+                                    <ng-container *ngIf="element.fieldType === 'CURRENCY'">
+                                        <lib-input value="Value" [(ngModel)]="element.value"
+                                            (ngModelChange)="updateCharacteristics()"></lib-input>
+                                    </ng-container>
+
+                                    <ng-container *ngIf="element.fieldType === 'RICH TEXT EDITOR'">
+                                        <pros-rich-text-editor class="rich-editor" [control]="htmlEditorControl" [tabFieldId]="editorId"
+                                            (valueChange)="editorValueChange($event, element)"></pros-rich-text-editor>
+                                    </ng-container>
+                                </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="UoM">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    UoM
+                                </th>
+                                <td mat-cell *matCellDef="let element; let i = index"
+                                    (click)="$event.stopPropagation()">
+                                    <div class="class-input" *ngIf="element?.defaultUoM && element?.defaultUoM?.length">
+                                        <div class="mdo-field-input">
+                                            <mat-form-field appearance="outline" class="multi-select">
+                                                <input matInput placeholder="Value" #optionsInput
+                                                    [matAutocomplete]="auto" [(ngModel)]="element.uomValue" />
+                                                <!-- autocomplete -->
+                                                <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete">
+                                                    <mat-option class="mdo-option"
+                                                        *ngFor="let uom of element.defaultUoM" [value]="uom">
+                                                        {{uom}}
+                                                    </mat-option>
+                                                </mat-autocomplete>
+                                                <button mat-icon-button matSuffix prosClickStopPropagation>
+                                                    <mat-icon fontSet="mdo-icons-light">angle-down</mat-icon>
+                                                </button>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                                [ngClass]="{'selected': activeRowId === row?.UUID?.fieldData[0]?.c?.toString() && !isSubGrid}"
+                                (click)="rowClicked(row)"></tr>
+                        </table>
+                        <ng-container *ngIf="!showSkeleton && !hasData">
+                            <lib-empty-state icon="table" [iconSize]="200" primaryText="Nothing to see here"
+                                secondaryText="No classes are available.">
+                            </lib-empty-state>
+                        </ng-container>
+                    </div>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </div>
+    </div>
+</mat-card>
+
+<mat-card class="class-widget mat-elevation-z0" *ngIf="fieldObj?.fieldType === 'CLASS'">
+    <div class="f-col">
+        <lib-text-line type="xsmall" weight="strong" class="field-label">
+            {{fieldObj?.fieldType === 'CLASS_TYPE' ? 'Select class':'Class'}}
+        </lib-text-line>
+        <input [formControl]="control" type="hidden" />
+        <div prosCorrectedValue useWith="withSuffix">
+            <div class="f-col mdo-field">
+                <mat-form-field appearance="outline" class="multi-select">
+                    <input matInput placeholder="Class" [(ngModel)]="fieldObj.description" #classInput class="mat-input"
+                        disabled>
+                </mat-form-field>
+            </div>
+            <lib-section text="Characteristics"></lib-section>
+            <div class="f-row" *ngFor="let element of selectedOptions[0]?.dataSource?.filteredData; let i = index">
+                <div class="f-col mdo-field">
+                    <lib-text-line type="xsmall" weight="strong" class="field-label">
+                        Characteris {{i+1}}
+                    </lib-text-line>
+                    <ng-container *ngIf="element.fieldType === 'TEXT'">
+                        <div class="class-input">
+                            <lib-input value="Value" [(ngModel)]="element.value"
+                                (ngModelChange)="updateCharacteristics()">
+                            </lib-input>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="element.valueType === 'range'">
+                        <div class="range-picker">
+                            <lib-input value="Value" [(ngModel)]="element.value"
+                                (ngModelChange)="updateCharacteristics()">
+                            </lib-input>
+                            <lib-input value="Value" [(ngModel)]="element.value"
+                                (ngModelChange)="updateCharacteristics()">
+                            </lib-input>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="element.fieldType === 'DROPDOWN'">
+                        <!-- single select example -->
+                        <div class="f-col mdo-field">
+                            <!-- label -->
+                            <mat-label class="mdo-field-label">Single select example</mat-label>
+                            <!-- input container -->
+                            <div class="mdo-field-input">
+                                {{Selected}}
+                                <input matInput placeholder="Type to search" #optionsInput [formControl]="optionCtrl"
+                                    [matAutocomplete]="auto" />
+                                <!-- autocomplete -->
+                                <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete"
+                                    (optionSelected)="selectSingle($event,element)">
+                                    <mat-option class="mdo-option" *ngFor="let opt of filteredOptions" [value]="opt">
+                                        {{opt}}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </div>
+                            <!-- hint -->
+                            <mat-hint class="mdo-field-hint">This is an example hint</mat-hint>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="element.fieldType === 'DATE'">
+                        <lib-date-picker [disabled]="false" [enableTimeInput]="false" [emitDateOnSave]="false"
+                            [hideInput]="false" [minDate]="minDate" [maxDate]="maxDate" [selectedDate]="selectedDate"
+                            [isRequired]="false" [isReadOnly]="false" label="Enter Date" [hasError]="false"
+                            (valueChange)="valueChange($event, element)" (afterBlur)="afterBlur($event)">
+                        </lib-date-picker>
+                    </ng-container>
+                    <ng-container *ngIf="element.fieldType === 'TIME'">
+                        <lib-time-picker (timeChange)="valueChange($event, element)">
+                        </lib-time-picker>
+                    </ng-container>
+                    <ng-container *ngIf="element.fieldType === 'CURRENCY'">
+                        <lib-input value="Value" [(ngModel)]="element.value" (ngModelChange)="updateCharacteristics()">
+                        </lib-input>
+                    </ng-container>
+                    <ng-container *ngIf="element.fieldType === 'RICH TEXT EDITOR'">
+                        <pros-rich-text-editor [control]="htmlEditorControl" [tabFieldId]="editorId"
+                            (valueChange)="editorValueChange($event, element)"></pros-rich-text-editor>
+                    </ng-container>
+                </div>
+                <span class="f-spacer"></span>
+                <div class="f-col">
+                    <div class="class-input" *ngIf="element?.defaultUoM && element?.defaultUoM?.length">
+                        <lib-text-line type="xsmall" weight="strong" class="field-label">
+                            UOM
+                        </lib-text-line>
+                        <!-- single select example -->
+                        <div class="mdo-field">
+                            <!-- label -->
+                            <!-- input container -->
+                            <div class="mdo-field-input">
+                                <mat-form-field appearance="outline" class="multi-select">
+                                    <input matInput placeholder="Value" #optionsInput [matAutocomplete]="auto"
+                                        [(ngModel)]="element.uomValue" />
+                                    <!-- autocomplete -->
+                                    <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete">
+                                        <mat-option class="mdo-option" *ngFor="let uom of element.defaultUoM"
+                                            [value]="uom">
+                                            {{uom}}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                    <button mat-icon-button matSuffix prosClickStopPropagation>
+                                        <mat-icon fontSet="mdo-icons-light">angle-down</mat-icon>
+                                    </button>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</mat-card>

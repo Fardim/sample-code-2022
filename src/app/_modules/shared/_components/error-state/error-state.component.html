@@ -1,0 +1,45 @@
+<div class="f-col state-container">
+    <div><img [src]="iconPath" [width]="iconWidth"></div>    
+    <ng-container [ngSwitch]="errorCode">
+        <ng-template [ngSwitchDefault]>
+            <div class="messages">
+                <lib-text-line type="base" textColor="error" class="spacer"> Oops! something is not right. Please </lib-text-line>
+                &nbsp;<lib-text-line type="base" textColor="link" class="spacer cursor" onclick="window.open(`https://www.prospecta.com/support/`,`_blank`)"> click here </lib-text-line>&nbsp;
+                <lib-text-line type="base" textColor="error" class="spacer"> to notify support. </lib-text-line>
+            </div>
+        </ng-template>
+
+        <ng-template [ngSwitchCase]="'ES_SHARDS'">
+            <div class="messages">
+                <lib-text-line type="base" textColor="error" class="spacer"> Oops! something is not right. Please </lib-text-line>
+                &nbsp;<lib-text-line type="base" textColor="link" class="spacer cursor" (click)="createQueueAndRerunSchema()"> click here </lib-text-line>&nbsp;
+                <lib-text-line type="base" textColor="error" class="spacer"> to re-run schema. </lib-text-line>
+            </div>
+        </ng-template>
+        
+        <ng-template [ngSwitchCase]="'RMQ_NOT_FOUND'">
+            <div class="messages">
+                <lib-text-line type="base" textColor="error" class="spacer"> Oops! something is not right. Please </lib-text-line>
+                &nbsp;<lib-text-line type="base" textColor="link" class="spacer cursor" (click)="createQueueAndRerunSchema()"> click here </lib-text-line>&nbsp;
+                <lib-text-line type="base" textColor="error" class="spacer"> to re-run schema. </lib-text-line>
+            </div>
+        </ng-template>
+
+        <ng-template [ngSwitchCase]="'RMQ_STUCK'">
+            <div class="messages">
+                <lib-text-line type="base" textColor="error" class="spacer"> Oops! something is not right. Please </lib-text-line>
+                &nbsp;<lib-text-line type="base" textColor="link" class="spacer cursor" (click)="createQueueAndRerunSchema()"> click here </lib-text-line>&nbsp;
+                <lib-text-line type="base" textColor="error" class="spacer"> to re-run schema. </lib-text-line>
+            </div>
+        </ng-template>
+
+        <ng-template [ngSwitchCase]="'RMQ_TIMEOUT'">
+            <div class="messages">
+                <lib-text-line type="base" textColor="error" class="spacer"> Oops! something is not right. Please </lib-text-line>
+                &nbsp;<lib-text-line type="base" textColor="link" class="spacer cursor" (click)="createQueueAndRerunSchema()"> click here </lib-text-line>&nbsp;
+                <lib-text-line type="base" textColor="error" class="spacer"> to re-run schema. </lib-text-line>
+            </div>
+        </ng-template>
+
+    </ng-container>   
+</div>

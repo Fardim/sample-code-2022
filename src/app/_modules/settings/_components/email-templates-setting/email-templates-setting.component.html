@@ -1,0 +1,115 @@
+<div class="root email-template">
+
+  <div *ngIf="!showSkeleton" class="f-col">
+  <div class="f-row breadcrum-toolbar">
+    <lib-text-line type="leading">Email templates</lib-text-line>
+    <div class="f-spacer"></div>
+    <lib-button (click)="newTemplates()" type="minor">New template</lib-button>
+  </div>
+
+  <div class="filter-header">
+    <!-- filters  -->
+    <pros-email-templates-filters [reqParam]="reqParam" (emitReqParam)="emitReqParam($event)">
+    </pros-email-templates-filters>
+  </div>
+  </div>
+  <div class="f-row-spacer-half"></div>
+    
+  <div class="f-col root" *ngIf="showSkeleton">
+      <pros-toolbar-skeleton></pros-toolbar-skeleton>
+      <div class="f-col table-loader">
+          <lib-skeleton-table></lib-skeleton-table>
+      </div>
+  </div>
+
+  <div class="f-col" *ngIf="showTableSkeleton">
+    <lib-skeleton-table></lib-skeleton-table>
+  </div>
+
+  <div class="table-container">
+    <!-- If state is not null  -->
+    <ng-container>
+      <table [ngClass]="{'hide-table': !showTableSkeleton && !dataSource?.docLength()}" [ngStyle]="{ 'display': showSkeleton || showTableSkeleton ? 'none' : '' }" mat-table [dataSource]="dataSource"
+        class="mat-elevation-z0 email-table">
+        <!--- Note that these columns can be defined in any order.
+                  The actual rendered columns are set as a property on the row definition" -->
+
+        <!-- Position Column -->
+        <ng-container matColumnDef="action">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let element">
+            <lib-button class="actionbtn" type="plain" icon="ellipsis-h" [matMenuTriggerFor]="actions"></lib-button>
+            <mat-menu #actions="matMenu" class="navigation-menu">
+              <button (click)="editTemplate(element)" mat-menu-item i18n="@@edit">Edit</button>
+              <button (click)="deleteTemplate(element)" mat-menu-item i18n="@@delete">Delete</button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="templateName">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let element">
+            <lib-text-line class="link-text" textColor="link" (click)="editTemplate(element)">
+              {{ element.templateName }}
+            </lib-text-line>
+          </td>
+        </ng-container>
+
+        <!-- Templates Type Column -->
+        <ng-container matColumnDef="templateType">
+          <th mat-header-cell *matHeaderCellDef>Template type</th>
+          <td mat-cell *matCellDef="let element">{{ element.templateType }}</td>
+        </ng-container>
+
+        <!-- Related flows Column -->
+        <ng-container matColumnDef="RelatedFlow">
+          <th mat-header-cell *matHeaderCellDef>Related flows</th>
+          <td mat-cell *matCellDef="let element">
+            <lib-label *ngIf="element?.RelatedFlow" text="{{ element?.RelatedFlow }}" appearance="solid"></lib-label>
+          </td>
+        </ng-container>
+
+        <!-- Modified on Column -->
+        <ng-container matColumnDef="modifiedDate">
+          <th mat-header-cell *matHeaderCellDef>Modified on</th>
+          <td mat-cell *matCellDef="let element">{{ element.modifiedDate }}</td>
+        </ng-container>
+
+        <!-- Modified by Column -->
+        <ng-container matColumnDef="modifiedUser">
+          <th mat-header-cell *matHeaderCellDef>Modified by</th>
+          <td mat-cell *matCellDef="let element">
+            <div class="f-row" *ngIf="element?.modifiedUser || element.createdUser">
+              <lib-avatar 
+                [initials]="getInitials(element?.modifiedUser || element.createdUser)" 
+                [editable]="false" 
+                [online]="false" 
+                [matTooltip]="element.modifiedUser || element.createdUser"
+              ></lib-avatar>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </ng-container>
+
+    <!-- if state is null  -->
+    <ng-container>
+      <div class="f-row empty-block" *ngIf="this.showTableSkeleton === false && this.totalCount === 0">
+        <lib-empty-state class="f-col load-empty" primaryText="Nothing to see here" icon="search" iconSize="200"
+          secondaryText="Your search did not return any results, try modifying your search">
+        </lib-empty-state>
+      </div>
+    </ng-container>
+  </div>
+  <div class="f-row-spacer-half"></div>
+  <div class="f-row" [ngClass]="{'hide-table': !showTableSkeleton && !dataSource?.docLength()}" [ngStyle]="{ 'display': showSkeleton || showTableSkeleton ? 'none' : '' }">
+    <lib-pagination [currentPageIndex]="pageIndex" [totalCount]="totalCount" [pageSize]="pageSize"
+      (pageChangeEvent)="onPageChange($event)">
+    </lib-pagination>
+    <lib-text-line type="base">{{ displayedRecordsRange }}</lib-text-line>
+  </div>
+</div>

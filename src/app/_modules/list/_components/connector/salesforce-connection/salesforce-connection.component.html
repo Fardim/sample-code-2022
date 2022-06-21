@@ -1,0 +1,29 @@
+<div *ngIf="showBanner">
+  <lib-banner status="warning">
+    <lib-text-line [innerHtml]="errorMessage"></lib-text-line>
+    <span class="f-spacer"></span>
+    <lib-button type="plain" iconFontType="light" (click)="showBanner = false;">Close</lib-button>
+  </lib-banner>
+</div>
+<div class="root f-row">
+  <div class="f-col authorize-container" *ngIf="!loader">
+    <lib-text-line type="leading" weight="strong">Salesforce connector requires authorization to connect to data
+    </lib-text-line>
+    <div class="row-spacer"></div>
+    <lib-button type="major" (click)="authorise();" i18n="@@authorise">Authorise</lib-button>
+  </div>
+
+  <div class="f-col loader" *ngIf="loader">
+    <lib-spinner></lib-spinner>
+    <lib-text-line type="base" i18n="@@establishingConnection">Establishing connection...</lib-text-line>
+  </div>
+
+  <div class="f-row dataset-button">
+    <lib-button type="plain" (click)="onCancelClick(false)" i18n="@@cancel">Cancel</lib-button>
+    <span class="f-spacer"></span>
+    <div class="f-row">
+      <lib-button type="plain" (click)="back();connectorService.updateNextStep(-1)" i18n="@@back" *ngIf="!loader">Back</lib-button>
+    </div>
+  </div>
+</div>
+

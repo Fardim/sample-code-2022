@@ -1,0 +1,193 @@
+div.root {
+  padding: 0 16px;
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+
+  .schema-title {
+    flex-grow: 1;
+    display: flex;
+    flex-shrink: 1;
+    overflow: hidden;
+
+    .lib-text-line {
+      width: 100%;
+      display: flex;
+    }
+
+    .title {
+      display: flex;
+      width: 100%;
+      align-items: center;
+    }
+
+    .slash {
+      margin: 0 4px;
+    }
+
+    .section {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      flex-grow: 0;
+      flex-shrink: 1;
+    }
+  }
+
+  .schema-actions {
+    align-items: center;
+    display: flex;
+    flex-grow: 0;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .breadcrum-toolbar {
+    padding-top: 8px;
+    overflow: hidden;
+  }
+
+  .mat-divider {
+    height: 100%;
+  }
+
+  .mdo-filter-matchip {
+    margin: 0 4px 4px 0;
+  }
+
+  .dataset-grid {
+    height: calc(100% - 44px - 60px - 50px);
+    align-items: flex-start;
+
+    .dataset-grid-navigation {
+      height: 100%;
+      border-right-width: 1px;
+      border-right-style: solid;
+      position: relative;
+
+      pros-group-data-table {
+        height: calc(100% - 96px);
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      .split-panel-mark {
+        border-radius: 50%;
+        position: absolute;
+        right: -10px;
+        top: 20px;
+        cursor: pointer;
+        z-index: 2;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 16px;
+
+        mat-icon.mat-icon {
+          width: 9px;
+          font-size: 8px;
+        }
+      }
+    }
+
+    .dataset-grid-listing {
+      padding-left: 12px;
+      height: 100%;
+      width: calc(100% - 340px - 13px);
+
+      .lib-search {
+        width: 213px;
+        margin: 0 4px 4px 0;
+      }
+
+      .data {
+        overflow: auto;
+        height: calc(100% - 44px - 24px - 40px - 40px);
+
+        .admin-buttons {
+          position: sticky;
+          left: 0;
+        }
+
+        table.mat-table {
+          border-collapse: separate;
+
+          .edit-mode {
+            border-width: 1px;
+            border-style: solid;
+          }
+
+          .mat-header-cell,
+          .mat-cell {
+            min-width: 160px;
+            max-width: 160px;
+          }
+
+          .mat-column-select {
+            min-width: 38px;
+          }
+
+          .mat-column-action {
+            border-right: none;
+            min-width: 115px;
+            max-width: 180px;
+
+            &.action-buttons-width {
+              max-width: 330px;
+
+              .action-iconbtns {
+                margin: 0 0.5px;
+
+                .more-btn {
+                  margin-right: 1px;
+                }
+
+                .custom-actions {
+                  display: block;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  max-width: 80px;
+                }
+              }
+            }
+          }
+
+          .text-correction {
+            text-decoration: line-through;
+          }
+        }
+      }
+    }
+  }
+
+  .filter-row {
+    flex-wrap: wrap;
+  }
+}
+
+.rule-status-list {
+  background: #324358;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  max-height: 300px;
+  padding: 8px 9px;
+  box-sizing: border-box;
+
+  .rule-status-row {
+    display: flex;
+    flex-direction: row;
+    padding: 8px 9px;
+    color: #fff;
+
+    .status-circle {
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      border: 1px solid #fff;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+  }
+}

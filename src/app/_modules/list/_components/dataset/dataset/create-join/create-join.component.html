@@ -1,0 +1,83 @@
+<div class="root">
+  <div class="row-spacer"></div>
+  <div class="f-row f-align-items-start">
+    <div class="f-col data-set-joins">
+      <div class="f-row">
+        <lib-text-line type="leading">{{virtualDatasetDetails?.vdName}}</lib-text-line>
+        <span class="f-spacer"></span>
+        <div class="ml-auto">
+
+          <lib-button-group>
+            <lib-button type="minor">Discard</lib-button>
+            <lib-button type="major" (click)="saveJoin()">Save</lib-button>
+            <lib-button type="major" icon="ellipsis-h" class="ellipsis-icon" [matMenuTriggerFor]="moreMenu">
+            </lib-button>
+            <mat-menu #moreMenu="matMenu" class="navigation-menu">
+              <lib-filter-option>Sync data</lib-filter-option>
+              <lib-filter-option>Schedule sync</lib-filter-option>
+              <lib-filter-option>Delete</lib-filter-option>
+            </mat-menu>
+          </lib-button-group>
+
+        </div>
+        <div class="f-row-spacer-half"></div>
+      </div>
+      <div class="selection-tabs">
+        <lib-button type="minor" icon="chevron-left" [rounded]="true" class="tab-scroll prev-tab"
+          (afterClick)="tabScrollPrevClick()" [disabled]="tabScroll.disablePrev"></lib-button>
+        <div class="responsive-tablist">
+          <div class="tabs-list" #tabsListRef>
+            <div class="f-row tab-series" *ngFor="let item of virtualDatasetDetails?.groupDetails; let idx = index" (click)="setSelectedStepData(item)" [ngClass]="{ selected: selectedStepData === item }">
+              <lib-text-line type="base" class="tab-line-text">{{item?.groupName}}</lib-text-line>
+              <div class="f-col">
+                <mat-icon fontSet="mdo-icons" [matMenuTriggerFor]="actionMenu">ellipsis-h</mat-icon>
+                <mat-menu #actionMenu="matMenu" class="navigation-menu">
+                  <lib-filter-option (click)="editDmlType(idx)">Edit</lib-filter-option>
+                  <lib-filter-option (click)="deleteDmlType(idx)">Delete</lib-filter-option>
+                </mat-menu>
+              </div>
+            </div>
+          </div>
+        </div>
+        <lib-button type="minor" icon="chevron-right" [rounded]="true" class="tab-scroll next-tab" (afterClick)="tabScrollNextClick()" [disabled]="tabScroll.disableNext"></lib-button>
+        <lib-button type="plain" icon="plus" class="add-tab" [matMenuTriggerFor]="seriesMenu"></lib-button>
+        <mat-menu #seriesMenu="matMenu" class="navigation-menu series-menu">
+          <lib-filter-option (click)="updateDmlTypeList('Join')">Join</lib-filter-option>
+          <lib-filter-option (click)="updateDmlTypeList('Transformation')">Transformation</lib-filter-option>
+        </mat-menu>
+      </div>
+      <div class="dataset-selector f-col">
+        <div class="table-selector">
+          <pros-dataset-selector *ngIf="!isTablesSelectionComplete()" (selected)="onDatasetSelect($event)" [items]="transJoins"></pros-dataset-selector>
+        </div>
+        <pros-join-step *ngIf="isAnyTableSelected && tables" [tables]="tables" [columns]="columns" [filterCounts]="filterCounts" (deleteTable)="deleteTable($event.index, $event.table)" (filterClicked)="onFilterClick($event)"></pros-join-step>
+      </div>
+    </div>
+    <div class="f-col virtual-dataset">
+      <div class="f-row">
+        <lib-text-line type="leading">Edit dataset</lib-text-line>
+        <span class="f-spacer"></span>
+      </div>
+      <form [formGroup]="virtualDatasetForm">
+        <div class="f-col mdo-field">
+          <lib-banner *ngIf="showErrorBanner" status="error" [text]="formErrMsg"></lib-banner>
+        </div>
+
+        <div class="f-col">
+          <lib-input label="Dataset name" i18n-label="@@dataset_name" formControlName="vdName" type="text"
+            [isRequired]="true"
+            [hint]="(virtualDatasetForm.controls.vdName.touched && virtualDatasetForm.controls.vdName.errors && virtualDatasetForm.controls.vdName.errors.required) ? 'This is a required field' : ''"
+            [hasError]="virtualDatasetForm.controls.vdName.touched && virtualDatasetForm.controls.vdName.errors && virtualDatasetForm.controls.vdName.errors.required">
+          </lib-input>
+        </div>
+
+        <div class="f-col">
+          <lib-textarea label="Dataset description" i18n-label="@@dataset_description" formControlName="vdDescription"
+            type="textarea" placeholder="Enter the value">
+          </lib-textarea>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</div>

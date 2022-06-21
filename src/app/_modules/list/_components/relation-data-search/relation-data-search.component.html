@@ -1,0 +1,65 @@
+<lib-search [matMenuTriggerFor]="datasearch" placeholder="search..."></lib-search>
+<mat-menu #datasearch="matMenu">
+    <lib-filter-dropdown>
+        <div class="dropdown-search-wrapper">
+            <lib-text-line type="leading" textColor="primary">Module</lib-text-line>
+        </div>
+        <lib-section></lib-section>
+        <div class="dropdown-options-wrapper f-col">
+            <div class="dropdown-options-inner-container">
+                <mat-list class="options">
+                    <mat-list-item>
+                        <lib-text-line type="base">Customer</lib-text-line>
+                        <div class="f-spacer"></div>
+                        <lib-text-line type="base">10</lib-text-line>
+                        <span class="f-col-spacer-half"></span>
+                        <lib-button type="plain" icon="long-arrow-alt-right"></lib-button>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <lib-text-line type="base">Material</lib-text-line>
+                        <div class="f-spacer"></div>
+                        <lib-text-line type="base">3</lib-text-line>
+                        <span class="f-col-spacer-half"></span>
+                        <lib-button type="plain" icon="long-arrow-alt-right"></lib-button>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <lib-text-line type="base">Plant</lib-text-line>
+                        <div class="f-spacer"></div>
+                        <lib-text-line type="base">0</lib-text-line>
+                        <span class="f-col-spacer-half"></span>
+                        <lib-button type="plain" icon="long-arrow-alt-right"></lib-button>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <lib-text-line type="base">Purchase Order</lib-text-line>
+                        <div class="f-spacer"></div>
+                        <lib-text-line type="base">0</lib-text-line>
+                        <span class="f-col-spacer-half"></span>
+                        <lib-button type="plain" icon="long-arrow-alt-right"></lib-button>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <lib-text-line type="base">Service</lib-text-line>
+                        <div class="f-spacer"></div>
+                        <lib-text-line type="base">0</lib-text-line>
+                        <span class="f-col-spacer-half"></span>
+                        <lib-button type="plain" icon="long-arrow-alt-right"></lib-button>
+                    </mat-list-item>
+                </mat-list>
+            </div>
+        </div>
+    </lib-filter-dropdown>
+</mat-menu>
+
+<!---------advanced-search-button-------------->
+
+<!-- <mat-card class="f-col mat-elevation-z2 filter-search">
+    <div class="f-row">
+      <lib-button type="plain">
+        <strong>Material Number</strong>
+      </lib-button>
+      <div class="f-spacer"></div>
+      <lib-button iconFontType="solid" icon="sliders-h"></lib-button>
+    </div>
+    <div class="f-row-spacer-half"></div>
+    <lib-textarea [rows]="3" prosClickStopPropagation></lib-textarea>
+    <lib-button class="filter-button" type="minor">Apply</lib-button>
+</mat-card> -->

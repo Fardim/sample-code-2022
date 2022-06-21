@@ -1,0 +1,27 @@
+<mat-form-field>
+    <mat-chip-list
+    #chipList aria-label="Module selection">
+        <mat-chip *ngFor="let condition of selectedBlocks; let i = index"
+        [selectable]="'true'"
+        [removable]="'true'"
+        (removed)="remove(condition)">
+            {{condition.blockDesc}}
+            <mat-icon matChipRemove>cancel</mat-icon>
+        </mat-chip>
+        <input 
+        placeholder="Add condition block"
+        aria-label="Number"
+        matInput
+        [matAutocomplete]="conditionBlockAuto"
+        [matChipInputFor]="chipList"
+        [matChipInputAddOnBlur]="'true'"
+        [formControl]="inpFrmCtrl"
+        (matChipInputTokenEnd)="add($event)">
+    </mat-chip-list>
+
+    <mat-autocomplete #conditionBlockAuto="matAutocomplete" (optionSelected)="optionSelected($event)">
+        <mat-option *ngFor="let condition of condotionListOb | async" [value]="condition">
+            {{ condition.blockDesc }}
+        </mat-option>
+    </mat-autocomplete>
+</mat-form-field>

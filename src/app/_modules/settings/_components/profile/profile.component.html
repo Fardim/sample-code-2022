@@ -1,0 +1,301 @@
+<div class="root">
+  <!-- <span [ngClass]="{'f-row-spacer-half' : selectedUserFromTeamsUsername === ''}"></span> -->
+  <div class="f-row breadcrum-toolbar" *ngIf="selectedUserFromTeamsUsername === ''">
+    <ng-container *ngIf="directProfile">
+      <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+      <div class="col-spacer"></div>
+    </ng-container>
+    <lib-text-line type="leading" i18n="@@profile">Profile</lib-text-line>
+  </div>
+  <div class="f-row-spacer-half"></div>
+  <lib-tab-group disableRipple="true">
+    <lib-tab label="Personal details" i18n-label="@@personal_details">
+      <!-- Skeleton UI -->
+      <div class="tabs-content">
+        <lib-banner *ngIf="formErrMsg" [text]="formErrMsg" status="error"></lib-banner>
+        <div class="f-row profile-skeleton" *ngIf="showSkeleton">
+          <div class="f-col w-40p">
+            <lib-skeleton type="avatar"></lib-skeleton>
+          </div>
+          <div class="f-col w-60p">
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <div class="f-row">
+              <lib-skeleton type="button"></lib-skeleton>
+              <lib-skeleton type="button"></lib-skeleton>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!showSkeleton">
+          <div class="f-row profile-data">
+            <div class="avatar">
+              <lib-avatar size="large" [editable]="true" *ngIf="this.currentUserDetails.avtarURL && this.currentUserDetails.avtarURL.length>0"
+
+                (avatarChange)="ChangeAvatar($event)" [srcPicture]="this.currentUserDetails.avtarURL">
+  
+              </lib-avatar>
+  
+              <lib-avatar size="large" [editable]="true" *ngIf="!this.currentUserDetails.avtarURL || this.currentUserDetails.avtarURL.length<=0"
+  
+                [initials]="getInitials()" (avatarChange)="ChangeAvatar($event)"></lib-avatar>
+            </div>
+  
+            <div class="entry-fields">
+              <form [formGroup]="settingsForm">
+                <lib-input label="Username" i18n-label="@@username" formControlName="userName" type="text">
+                </lib-input>
+  
+                <lib-input label="First name" i18n-label="@@first_name" formControlName="firstName" type="text"
+                  [isRequired]="true" (afterBlur)="submitForm()" (click)="updateForm = false"
+                  [hint]="(settingsForm.controls.firstName.touched && settingsForm.controls.firstName.errors && settingsForm.controls.firstName.errors.required) ? 'This is a required field' : ''"
+                  [hasError]="settingsForm.controls.firstName.touched && settingsForm.controls.firstName.errors && settingsForm.controls.firstName.errors.required">
+                </lib-input>
+  
+                <lib-input label="Last name" [isRequired]="true" i18n-label="@@last_name" formControlName="lastName" type="text"
+                  (afterBlur)="submitForm()" (click)="updateForm = false" [hint]="(settingsForm.controls.lastName.touched && settingsForm.controls.lastName.errors && settingsForm.controls.lastName.errors.required) ? 'This is a required field' : ''"
+                  [hasError]="settingsForm.controls.lastName.touched && settingsForm.controls.lastName.errors && settingsForm.controls.lastName.errors.required">
+                </lib-input>
+  
+                <lib-input label="Preferred name" i18n-label="@@preferred_name" formControlName="preferredName"
+                  type="text" [isRequired]="true" (afterBlur)="submitForm()" (click)="updateForm = false"
+                  [hint]="(settingsForm.controls.preferredName.touched && settingsForm.controls.preferredName.errors && settingsForm.controls.preferredName.errors.required) ? 'This is a required field' : ''"
+                  [hasError]="settingsForm.controls.preferredName.touched && settingsForm.controls.preferredName.errors && settingsForm.controls.preferredName.errors.required">
+                </lib-input>
+  
+                <lib-input label="Phone number" i18n-label="@@phone_number" formControlName="phone" type="number"
+                  [isRequired]="true" (afterBlur)="submitForm()" (click)="updateForm = false"
+                  [hint]="(settingsForm.controls.phone.touched && settingsForm.controls.phone.errors && settingsForm.controls.phone.errors.required) ? 'This is a required field' : ''"
+                  [hasError]="settingsForm.controls.phone.touched && settingsForm.controls.phone.errors && settingsForm.controls.phone.errors.required">
+                </lib-input>
+  
+                <lib-input label="Primary email address" i18n-label="@@primary_email_address"
+                  formControlName="primaryEmail" type="email" [isRequired]="true" (afterBlur)="submitForm()"
+                  (click)="updateForm = false"
+                  [hint]="(settingsForm.controls.primaryEmail.touched && settingsForm.controls.primaryEmail.errors && settingsForm.controls.primaryEmail.errors.required) ? 'This is a required field' : ((settingsForm.controls.primaryEmail.touched && settingsForm.controls.primaryEmail.errors && settingsForm.controls.primaryEmail.errors.email) ? 'Please Enter Valid Email' : '')"
+                  [hasError]="(settingsForm.controls.primaryEmail.touched && settingsForm.controls.primaryEmail.errors && settingsForm.controls.primaryEmail.errors.required) || (settingsForm.controls.primaryEmail.touched && settingsForm.controls.primaryEmail.errors && settingsForm.controls.primaryEmail.errors.email)">
+                </lib-input>
+  
+                <lib-input label="Secondary email address" i18n-label="@@secondary_email_address"
+                  formControlName="secondaryEmail" type="email" (afterBlur)="submitForm()" (click)="updateForm = false"
+                  [hint]="(settingsForm.controls.secondaryEmail.touched && settingsForm.controls.secondaryEmail.errors && settingsForm.controls.secondaryEmail.errors.email) ? 'Please Enter Valid Email' : ''"
+                  [hasError]="settingsForm.controls.secondaryEmail.touched && settingsForm.controls.secondaryEmail.errors && settingsForm.controls.secondaryEmail.errors.email">
+                </lib-input>
+              </form>
+              <lib-button-group *ngIf="selectedUserFromTeamsUsername === ''">
+                <lib-button type="minor" i18n="@@change_password" (afterClick)="openChangePasswordDialog()">
+                  Change password...</lib-button>
+                <lib-button type="minor" i18n="@@digital_signature" (afterClick)="openDigitalSignatureSideSheet()">Digital
+                  signature
+                </lib-button>
+              </lib-button-group>
+            </div>
+  
+          </div>
+        </div>
+      </div>
+    </lib-tab>
+
+    <lib-tab label="Language & format" i18n-label="@@language_format">
+      <lib-banner *ngIf="langFormErrMsg" [text]="langFormErrMsg" status="error"></lib-banner>
+      <form [formGroup]="languageSettingsForm" class="f-col tabs-content">
+        <div class="f-col mdo-field">
+          <lib-text-line class="field-label" weight="strong" type="xsmall" i18n="@@language">Language</lib-text-line>
+          <div class="mdo-field-input">
+            <input matInput placeholder="Type to search" i18n-placeholder="@@type_to_search" formControlName="language"
+              [matAutocomplete]="lang" />
+            <mat-icon matSuffix fontSet="mdo-icons" class="autocomplete-icon">{{ getDropdownPos(lang) }}</mat-icon>
+            <mat-autocomplete class="mdo-autocomplete" #lang (optionSelected)="updateLanguageSettings('language', $event)">
+              <mat-option class="mdo-option" *ngFor="let opt of filteredLangList | async" [value]="opt">
+                {{opt}}
+              </mat-option>
+            </mat-autocomplete>
+          </div>
+        </div>
+
+        <div class="f-col mdo-field">
+          <lib-text-line class="field-label" weight="strong" type="xsmall" i18n="@@timezone">Time zone</lib-text-line>
+          <div class="mdo-field-input">
+            <input matInput placeholder="Type to search" i18n-placeholder="@@type_to_search" formControlName="timeZone"
+              [matAutocomplete]="timeZone" />
+            <mat-icon matSuffix fontSet="mdo-icons" class="autocomplete-icon">{{ getDropdownPos(timeZone) }}</mat-icon>
+            <mat-autocomplete class="mdo-autocomplete" #timeZone (optionSelected)="updateLanguageSettings('timeZone', $event)">
+              <mat-option class="mdo-option" *ngFor="let opt of filteredTimeZoneList | async" [value]="opt">
+                {{opt}}
+              </mat-option>
+            </mat-autocomplete>
+          </div>
+        </div>
+
+        <div class="f-col">
+          <pros-date-format-dropdown formControlName="dateFormat" [labelKey]="'label'" [valueKey]="'value'" (selectionChange)="updateLanguageSettings('dateFormat', $event)" ></pros-date-format-dropdown>
+        </div>
+
+        <div class="f-col mdo-field">
+          <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="time_format">Time format
+          </lib-text-line>
+          <!-- <lib-radio-group [options]="timeFormatOptions" layout="vertical" formControlName="timeFormat" (valueChange)="updateLanguageSettings('timeFormat', $event)"></lib-radio-group> -->
+          <lib-segment [optionsList]="timeFormatOptions" labelKey="key" valueKey="value" formControlName="timeFormat" (valueChange)="updateLanguageSettings('timeFormat', $event)"></lib-segment>
+        </div>
+
+        <div class="f-col">
+          <lib-section text="Number format"></lib-section>
+          <div class="row-spacer"></div>
+        </div>
+
+        <div class="f-col">
+          <pros-select formControlName="numberFormat" label="Grouping/thousand separator"
+            [labelKey]="'label'" [valueKey]="'value'" 
+            [hasError]="languageSettingsForm.controls.grouping?.errors" [availableOptions]="thousandSeparator"
+            (selectionChange)="updateLanguageSettings('numberFormat', $event)">
+          </pros-select>
+        </div>
+
+        <div class="f-col">
+          <pros-select formControlName="decimal" label="Decimal separator"
+            [labelKey]="'label'" [valueKey]="'value'" 
+            hint="Decimal separator can not be the same as grouping/thousand separator"
+            [hasError]="languageSettingsForm.controls.decimal?.errors" [availableOptions]="decimalSeparator"
+            (selectionChange)="updateLanguageSettings('decimal', $event)">
+          </pros-select>
+        </div>
+
+        <lib-text-line type="small" weight="strong">
+          Based on the number format you selected, number will be displayed as
+          {{10000 | numberTransform:{
+          decimalCharacter: languageSettingsForm.controls.decimal.value,
+          separator: languageSettingsForm.controls.grouping.value,
+          decimalPlaces: 2 }
+          }}
+        </lib-text-line>
+      </form>
+    </lib-tab>
+
+    <lib-tab label="Working hours">
+      <div class="f-col tabs-content">
+        <div class="f-row colunm-box">
+          <div class="col"></div>
+          <div class="col col-x4">
+            <lib-text-line type="base" weight="strong">Day</lib-text-line>
+          </div>
+          <div class="col col-x4">
+            <lib-text-line type="base" weight="strong">Start</lib-text-line>
+          </div>
+          <div class="col col-x4">
+            <lib-text-line type="base" weight="strong">End</lib-text-line>
+          </div>
+        </div>
+
+        <div class="f-row colunm-box">
+          <div class="col">
+            <lib-checkbox theme="primary"></lib-checkbox>
+          </div>
+          <div class="col col-x4">
+            <lib-text-line type="base">Monday</lib-text-line>
+          </div>
+          <div class="col col-x4">
+            <lib-input class="lib-input"></lib-input>
+          </div>
+          <div class="col col-x4">
+            <lib-input class="lib-input"></lib-input>
+          </div>
+        </div>
+
+        <div class="f-row colunm-box">
+          <div class="col">
+            <lib-checkbox theme="primary"></lib-checkbox>
+          </div>
+          <div class="col col-x4">
+            <lib-text-line type="base">Tuesday</lib-text-line>
+          </div>
+          <div class="col col-x4">
+            <lib-input class="lib-input"></lib-input>
+          </div>
+          <div class="col col-x4">
+            <lib-input class="lib-input"></lib-input>
+          </div>
+        </div>
+
+        <div class="f-row colunm-box">
+          <div class="col">
+            <lib-checkbox theme="primary"></lib-checkbox>
+          </div>
+          <div class="col col-x4">
+            <lib-text-line type="base">Wednesday</lib-text-line>
+          </div>
+          <div class="col col-x4">
+            <lib-input class="lib-input"></lib-input>
+          </div>
+          <div class="col col-x4">
+            <lib-input class="lib-input"></lib-input>
+          </div>
+        </div>
+
+        <div class="f-row colunm-box">
+          <div class="col">
+            <lib-checkbox theme="primary"></lib-checkbox>
+          </div>
+          <div class="col col-x4">
+            <lib-text-line type="base">Thursday</lib-text-line>
+          </div>
+          <div class="col col-x4">
+            <lib-input class="lib-input"></lib-input>
+          </div>
+          <div class="col col-x4">
+            <lib-input class="lib-input"></lib-input>
+          </div>
+        </div>
+
+        <div class="f-row colunm-box">
+          <div class="col">
+            <lib-checkbox theme="primary"></lib-checkbox>
+          </div>
+          <div class="col col-x4">
+            <lib-text-line type="base">Friday</lib-text-line>
+          </div>
+          <div class="col col-x4">
+            <lib-input class="lib-input"></lib-input>
+          </div>
+          <div class="col col-x4">
+            <lib-input class="lib-input"></lib-input>
+          </div>
+        </div>
+
+        <div class="f-row colunm-box">
+          <div class="col">
+            <lib-checkbox theme="primary"></lib-checkbox>
+          </div>
+          <div class="col col-x4">
+            <lib-text-line type="base">Saturday</lib-text-line>
+          </div>
+          <div class="col col-x4">
+            <lib-input class="lib-input"></lib-input>
+          </div>
+          <div class="col col-x4">
+            <lib-input class="lib-input"></lib-input>
+          </div>
+        </div>
+
+        <div class="f-row colunm-box">
+          <div class="col">
+            <lib-checkbox theme="primary"></lib-checkbox>
+          </div>
+          <div class="col col-x4">
+            <lib-text-line type="base">Sunday</lib-text-line>
+          </div>
+          <div class="col col-x4">
+            <lib-input class="lib-input"></lib-input>
+          </div>
+          <div class="col col-x4">
+            <lib-input class="lib-input"></lib-input>
+          </div>
+        </div>
+      </div>
+    </lib-tab>
+  </lib-tab-group>
+</div>

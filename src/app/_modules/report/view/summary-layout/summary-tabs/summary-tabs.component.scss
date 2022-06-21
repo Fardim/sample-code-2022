@@ -1,0 +1,40 @@
+.general-container {
+  padding: 0;
+  margin-bottom: 8px;
+  overflow: auto;
+
+  mat-expansion-panel {
+    .mat-expansion-panel-header {
+      padding-left: 16px;
+      font-weight: 500;
+    }
+
+    .summary-tile {
+      padding: 0 32px;
+
+      .item-grid-list {
+        display: flex;
+        flex-wrap: wrap;
+
+        .grid-tile {
+          display: flex;
+          flex: 0 0 50%;
+          min-height: 50px;
+
+          > div {
+            width: 100%;
+
+            .item-tile {
+              flex-grow: 1;
+              margin: 10px;
+
+              .lib-line {
+                flex: 2;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,156 @@
+.field-label {
+  margin-bottom: 6px;
+}
+
+.mdo-field {
+  .slider-row {
+    flex: 1;
+
+    .lib-slider {
+      height: 48px;
+      width: 100%;
+    }
+
+    .percentage {
+      width: 36px;
+    }
+  }
+
+  mat-icon.mat-icon {
+    width: 12px;
+    font-size: 12px;
+  }
+
+  mat-expansion-panel.confining-fields {
+    border-radius: 0;
+
+    .mat-expansion-panel-header {
+      padding: 0;
+
+      mat-panel-title {
+        width: 100%;
+        margin-right: 0;
+
+        .expand-title {
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+}
+
+.colunm-box {
+  box-sizing: border-box;
+  min-height: 48px;
+
+  .col {
+    display: flex;
+    flex: 1 0 auto;
+    width: 1px;
+    align-items: center;
+    padding: 8px 0;
+
+    &.action-drag {
+      max-width: 60px;
+    }
+
+    &.col-x2 {
+      flex: 2;
+    }
+
+    &.col-x4 {
+      flex: 4;
+    }
+
+    &.col-x8 {
+      flex: 8;
+      justify-content: center;
+    }
+
+    .slider-row {
+      flex: 1;
+
+      .lib-slider {
+        height: 48px;
+        width: 180px;
+      }
+    }
+
+    &.mat-item-end {
+      justify-content: flex-end;
+    }
+
+    .mat-head-icon {
+      font-size: 12px;
+      width: 12px;
+    }
+
+    .cursor {
+      cursor: pointer;
+    }
+  }
+}
+
+.user-defined-set {
+  position: relative;
+  padding: 0 0 0 8px;
+  overflow: auto;
+
+  &::before {
+    display: block;
+    content: "";
+    height: 100%;
+    width: 1px;
+    position: absolute;
+    top: 0;
+    left: 16px;
+  }
+
+  .defined-row {
+    border-width: 1px;
+    border-style: solid;
+    align-items: center;
+    height: 54px;
+    margin: 0 0 16px 0;
+    border-radius: 3px;
+
+    div.col {
+      display: block;
+      flex: 1;
+      min-width: 0;
+      position: relative;
+      padding: 0 8px;
+
+      &:first-of-type,
+      &:last-of-type {
+        min-width: auto;
+        flex: 0 0 auto;
+        padding: 0;
+      }
+
+      &.select-col {
+        width: 16px;
+        height: 54px;
+        align-items: center;
+        display: flex;
+        z-index: 1;
+        justify-content: center;
+        text-align: center;
+      }
+
+      &.slider-col {
+        flex: 2;
+      }
+    }
+
+    div.col.f-col.mdo-field {
+      margin-bottom: 0;
+    }
+  }
+
+  .button-add-block {
+    margin-left: -8px;
+  }
+}

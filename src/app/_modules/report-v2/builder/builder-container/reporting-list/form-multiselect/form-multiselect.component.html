@@ -1,0 +1,47 @@
+<ng-template [ngIf]="!isFilterWidget || isFilterSiderSheet" [ngIfElse]="globalFilter">
+    <div class="f-col mdo-field multiselect-input" [id]="formFieldInfo?.fields" [matMenuTriggerFor]="datasearch"
+        #trigger="matMenuTrigger" (click)="onFocus()">
+        <div class="mdo-field-input" *ngIf="isTableFilter === 'true'">
+            <span [id]="'input-'+formFieldInfo?.fields" *ngIf="selectedMultiSelectData && selectedMultiSelectData.length"></span>
+            <span [id]="'additional-'+formFieldInfo?.fields"
+                *ngIf="selectedMultiSelectData && selectedMultiSelectData.length > 1"></span>
+        </div>
+        <div class="dropdown-search-wrapper" *ngIf="isTableFilter === 'false'">
+            <lib-search [formControl]="control" placeholder="search..."></lib-search>
+        </div>
+    </div>
+    <mat-menu #datasearch="matMenu">
+        <div class="f-col multipickcheck" prosClickStopPropagation>
+            <div class="f-col menu-spacing">
+                <lib-search [formControl]="control" [placeholder]="placeholder"></lib-search>
+            </div>
+            <mat-list class="multiselect-checkbox">
+                <mat-list-item *ngFor="let opt of optionList">
+                    <lib-checkbox [label]="getLabel(opt)" [checked]="isChecked(opt.CODE)" [value]="opt.CODE"
+                        [id]="opt.CODE" (valueChange)="selectionChangeHandler(opt.CODE,opt.TEXT)">
+                    </lib-checkbox>
+                </mat-list-item>
+            </mat-list>
+            <div class="filter-button-wrapper">
+                <lib-button type="minor" (click)="trigger.closeMenu();applyFilter()" i18n="@@apply">Apply</lib-button>
+            </div>
+        </div>
+    </mat-menu>
+</ng-template>
+<ng-template #globalFilter>
+    <div class="f-col multipickcheck" prosClickStopPropagation>
+        <div class="f-col menu-spacing">
+            <lib-search [formControl]="control" [placeholder]="placeholder"></lib-search>
+        </div>
+        <mat-list class="multiselect-checkbox" prosInfiniteScroll bufferPercentage="20" (scrollEnd)="onScroll()">
+            <mat-list-item *ngFor="let opt of optionList" matTooltip="{{getLabel(opt)}}" matTooltipPosition="right">
+                <lib-checkbox [label]="getLabel(opt)" [checked]="isChecked(opt.CODE)" [value]="opt.CODE" [id]="opt.CODE"
+                    (valueChange)="selectionChangeHandler(opt.CODE,opt.TEXT)">
+                </lib-checkbox>
+            </mat-list-item>
+        </mat-list>
+        <div class="filter-button-wrapper">
+            <lib-button type="minor" (click)="applyFilter()" i18n="@@apply">Apply</lib-button>
+        </div>
+    </div>
+</ng-template>

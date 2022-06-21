@@ -1,0 +1,31 @@
+<ng-template [ngIf]="isFilterWidget == false || isFilterSiderSheet" [ngIfElse]="globalFilter">
+    <div class="f-col mdo-field">
+        <div class="mdo-field-input">
+            <input matInput placeholder="Type to search" #optionsInput [formControl]="control" [matAutocomplete]="auto" [placeholder]="placeholder" matTooltip="" matTooltipPosition="right" (click)="onFocus()" />
+            <mat-autocomplete class="mdo-autocomplete" (optionSelected)="selectSingleDropDownValue()" #auto="matAutocomplete" [displayWith]="getDisplayText.bind(this)">
+                <ng-template [ngIf]="!isFetchingData">
+                    <mat-option class="mdo-option" *ngFor="let opt of this.optionList" [value]="opt" matTooltip="{{ getDisplayText(opt) }}">
+                        {{ getDisplayText(opt) }}
+                    </mat-option>
+                </ng-template>
+                <ng-template [ngIf]="isFetchingData">
+                    <mat-option class="mdo-option" *ngFor="let a of [].constructor(4)">
+                        <lib-skeleton type="line"></lib-skeleton>
+                    </mat-option>
+                </ng-template>
+            </mat-autocomplete>
+        </div>
+    </div>
+</ng-template>
+<ng-template #globalFilter>
+    <div class="f-col multipickcheck" prosClickStopPropagation>
+        <div class="f-col menu-spacing">
+            <lib-search [formControl]="control" [placeholder]="placeholder"></lib-search>
+        </div>
+        <mat-list class="multiselect-checkbox" prosInfiniteScroll bufferPercentage="20" (scrollEnd)="onScroll()">
+            <button mat-menu-item *ngFor="let opt of optionList" (click)="selectSingleDropDownValue(opt)" [libTooltip]="getDisplayText(opt)" matTooltipPosition="right">
+        {{ getDisplayText(opt) }}
+      </button>
+        </mat-list>
+    </div>
+</ng-template>

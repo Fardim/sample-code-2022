@@ -1,0 +1,115 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  overflow-x: auto;
+  width: 900px;
+
+  .breadcrum-toolbar {
+    padding: 8px 12px;
+
+    .mdo-constrained-right {
+      width: 100%;
+      margin-right: 0;
+    }
+  }
+
+  .colunm-box {
+    margin: 4px 4px;
+    min-height: 48px;
+
+    .col {
+      display: flex;
+      flex: 1 0 auto;
+      width: 1px;
+      align-items: center;
+
+      .lib-input {
+        height: 36px;
+        width: 100%;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: 100%;
+    overflow: auto;
+    overflow-x: hidden;
+
+    .mdo-justify {
+      margin: 0 16px;
+      align-items: flex-start;
+      height: 100%;
+
+      .label-icon {
+        font-size: 13px;
+        width: 13px;
+      }
+
+      .condition-filter-nav {
+        width: 200px;
+        height: 100%;
+        border-right-width: 1px;
+        border-right-style: solid;
+        padding-right: 12px;
+        margin-right: 12px;
+
+        mat-list.mat-list {
+          height: calc(100% - 76px);
+          overflow: auto;
+
+          mat-list-item.mat-list-item {
+            .text-line {
+              width: 100%;
+            }
+
+            .sub-text-line {
+              display: flex;
+              overflow: hidden;
+              width: 100%;
+            }
+          }
+        }
+      }
+
+      .condition-value {
+        width: calc(100% - 220px);
+        padding-bottom: 50px;
+
+        .row-space {
+          height: 4px;
+        }
+
+        .field-label {
+          padding-bottom: 6px;
+
+          mat-icon.mat-icon {
+            width: 12px;
+            font-size: 12px;
+            margin-left: 3px;
+          }
+        }
+
+        .field-partition {
+          flex: 1;
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 62px;
+      }
+    }
+  }
+}

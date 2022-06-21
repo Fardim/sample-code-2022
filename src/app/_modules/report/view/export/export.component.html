@@ -1,0 +1,20 @@
+<div class="modal-wrapper">
+    <div class="f-row modal-header">
+        <lib-text-line type="leading" i18n="@@export_report">Export report</lib-text-line>
+        <lib-button icon="times" (click)="close()" iconFontType="light"></lib-button>
+    </div>
+    <lib-banner *ngIf="errorMsg" status="error" [text]="errorMsg"></lib-banner>
+    <div class="modal-body">
+        <lib-banner *ngIf="reportNameCtrl.errors?.required" status="error" text="Please enter a report name">
+        </lib-banner>
+        <lib-banner *ngIf="reportNameCtrl.errors?.maxlength" status="error"
+            text="Report name can't be more than 100 in length"></lib-banner>
+        <lib-input [formControl]="reportNameCtrl" [maxLength]="maxReportNameLength"
+        [hasError]="reportNameCtrl.invalid" label="Report"  i18n-label="@@report"></lib-input>
+    </div>
+    <div class="f-row modal-footer space-between">
+        <lib-button (click)="close()" type="minor" i18n="@@cancel">Cancel</lib-button>
+        <span class="f-spacer"></span>
+        <lib-button type="major" (click)="onConfirm()" color="primary" i18n="@@confirm" [disabled]="reportNameCtrl.invalid">Confirm</lib-button>
+    </div>
+</div>

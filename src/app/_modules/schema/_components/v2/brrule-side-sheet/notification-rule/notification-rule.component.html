@@ -1,0 +1,38 @@
+<form [formGroup]="notificationRuleFormGroup" class="notification-rule">
+    <mat-accordion multi="true">
+        <!-- Rule settings -->
+        <mat-expansion-panel #panel="matExpansionPanel" [expanded]="true" togglePosition="before" class="mat-elevation-z0">
+            <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+                <lib-text-line weight="strong">Rule settings</lib-text-line>
+            </mat-expansion-panel-header>
+
+            <div class="f-col mdo-field">
+                <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@trigger">Trigger</lib-text-line>
+                <lib-segment class="lib-segment" formControlName="trigger" [optionsList]="notificationTrigger" labelKey="label" valueKey="value">
+                </lib-segment>
+            </div>
+
+            <pros-event-trigger formControlName="eventRuleSetting"></pros-event-trigger>
+
+            <div class="f-col mdo-field" *ngIf="notificationRuleFormGroup.get('trigger')?.value === 'DATE'">
+                <pros-date-trigger [sourceFieldsObject]="sourceFieldsObject" formControlName="dateRuleSetting"></pros-date-trigger>
+            </div>
+
+            <pros-field-value-trigger *ngIf="notificationRuleFormGroup.get('trigger')?.value === 'FIELD'" formControlName="fieldValueRuleSetting"></pros-field-value-trigger>
+
+            <div class="f-col mdo-field" *ngIf="notificationRuleFormGroup.get('trigger')?.value === 'EMAIL'">
+                <pros-email-trigger formControlName="emailRuleSetting" [sourceFieldsObject]="sourceFieldsObject"></pros-email-trigger>
+            </div>
+
+            <div class="f-col mdo-field" *ngIf="notificationRuleFormGroup.get('trigger')?.value === 'UDR'">
+                <pros-custom-trigger formControlName="customRuleSetting"></pros-custom-trigger>
+            </div>
+        </mat-expansion-panel>
+
+        <!-- Notification settings -->
+        <pros-notification-settings formControlName="notificationSetting"></pros-notification-settings>
+
+        <!-- Recipients -->
+        <pros-recipients formControlName="Recipients"></pros-recipients>
+    </mat-accordion>
+</form>

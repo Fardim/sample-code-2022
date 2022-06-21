@@ -1,0 +1,271 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading">Number setting</lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button type="major" width="80px" i18n="@@save" (click)="save();$event.stopPropagation()">Save</lib-button>
+            </div>
+        </div>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing" (scroll)="closeDropdowns(emptyEl)">
+        <div class="f-col mdo-justify">
+            <lib-banner status="error" [text]="errorMsg" *ngIf="errorMsg"></lib-banner>
+            <form [formGroup]="numberSettingsForm">
+                <span class="f-row-spacer-half" #emptyEl></span>
+
+                <!-- Rule Name -->
+                <div class="f-col">
+                    <lib-input [isRequired]="true" label="Rule name" formControlName="ruleName" maxLength="40" [hasError]="submitted && numberSettingsForm.controls.ruleName.invalid"></lib-input>
+                </div>
+
+                <!-- Description -->
+                <div class="f-col">
+                    <lib-textarea placeholder="Rule detail" label="Details" formControlName="description" [rows]="4" [maxLength]="2000"></lib-textarea>
+                </div>
+
+                <!-- Criteria Field -->
+                <div class="f-col mdo-field">
+                    <lib-text-line type="xsmall" class="field-label" weight="strong"[textColor]="submitted && !selectedCriteriaFields.length ? 'error' : 'default'">Criteria fields to define number settings<span class="mandatory">*</span></lib-text-line>
+                    <div class="mdo-field-input">
+                        <mat-chip-list #chipList></mat-chip-list>
+                        <lib-chip-list>
+                          <lib-chip *ngFor="let field of selectedCriteriaFields;let i = index" [removable]="true" class="lib-chip" (removed)="modifyCriteriaFields('remove', null, i)">
+                            {{field.description}}
+                            </lib-chip>
+                            <input matInput id="fieldsInput" #fieldsInput class="mat-input" [matAutocomplete]="auto" formControlName="fields" [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes">
+                        </lib-chip-list>
+                        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="modifyCriteriaFields('add', $event, null)" [displayWith]="displayFn.bind(this)">
+                            <mat-option class="mat-result-option" *ngFor="let fieldItem of filteredFldsList | async" [disabled]="!fieldItem.fieldId" [value]="fieldItem.fieldId">
+                                {{fieldItem.description || 'Untitled'}}
+                            </mat-option>
+                        </mat-autocomplete>
+                      </div>
+
+                    <mat-hint class="mdo-field-hint"><lib-text-line type="small" textColor="secondary">Maximum 3 fields can be selected</lib-text-line></mat-hint>
+                </div>
+
+                <lib-section text="Field values"></lib-section>
+
+                <!-- Field Name -->
+                <div class="f-col mdo-field" *ngIf="selectedCriteriaFields.length <= 1">
+                    <lib-text-line type="xsmall" class="field-label" weight="strong" [textColor]="(submitted && !selectedFieldDropValues.length && selectedCriteriaFields.length <= 1) ? 'error' : 'default'">Field name<span class="mandatory">*</span></lib-text-line>
+                    <div class="mdo-field-input">
+                        <mat-chip-list #chipList1></mat-chip-list>
+                        <lib-chip-list>
+                            <lib-chip *ngFor="let field of selectedFieldDropValues;let i = index" [removable]="true" class="lib-chip" (removed)="removeFieldVal(i)">
+                                {{field.text}}
+                            </lib-chip>
+                            <input matInput id="fieldsInput1" #fieldsInput1 class="mat-input" [matAutocomplete]="auto1" formControlName="fieldValue" [matChipInputFor]="chipList1" [matChipInputSeparatorKeyCodes]="separatorKeysCodes">
+                        </lib-chip-list>
+                        <mat-autocomplete #auto1="matAutocomplete" (optionSelected)="selectFieldValue($event)" [displayWith]="displayFn.bind(this)">
+                            <ng-template [ngIf]="(filteredFldDropValues | async)?.length !== 0" [ngIfElse]="noSortOption">
+                                <mat-option class="mat-result-option" *ngFor="let fieldItem of filteredFldDropValues | async" [disabled]="!fieldItem.code" [value]="fieldItem.code">
+                                    {{fieldItem.text}}
+                                </mat-option>
+                              </ng-template>
+                              <ng-template #noSortOption>
+                                <mat-option disabled>No data found</mat-option>
+                              </ng-template>
+                        </mat-autocomplete>
+                      </div>
+                </div>
+
+                <div class="f-col">
+                    <lib-input type="number" [isRequired]="true" label="Range start" formControlName="rangeStart" [hasError]="submitted && numberSettingsForm.controls.rangeStart.invalid"></lib-input>
+                </div>
+
+                <div class="f-col">
+                    <lib-input type="number" [isRequired]="true" label="Range end" formControlName="rangeEnd" [hasError]="submitted && numberSettingsForm.controls.rangeEnd.invalid"></lib-input>
+                </div>
+
+                <!-- Length -->
+                <div class="f-col">
+                    <lib-input type="number" [isRequired]="true" label="Length" formControlName="length" [hasError]="submitted && numberSettingsForm.controls.length.invalid"></lib-input>
+                </div>
+
+                <!-- Prefix -->
+                <div class="f-row mdo-field">
+                    <lib-slide-toggle class="toggle-col" [disabled]="currentNumberSettingId" [checked]="numberSettingsForm.get('prefixType').value === 'VALUE'"
+                    (toggleChange)="staticPrefixToggle($event)"
+                    theme="primary">
+                    </lib-slide-toggle>
+
+                    <lib-text-line type="xsmall" weight="strong" class="label-icon" i18n="@@description_generation">Static prefix <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                            libTooltip="Toggle to switch between static text or fields from the dataset.">
+                            question-circle</mat-icon>
+                    </lib-text-line>
+                </div>
+
+                <div class="f-col" *ngIf="numberSettingsForm.get('prefixType').value === 'VALUE'; else prefixDropdownInput">
+                    <lib-input [isRequired]="true" label="Prefix" formControlName="prefix"  [hasError]="submitted && numberSettingsForm.controls.prefix.invalid" [hint]="(submitted && numberSettingsForm.controls.prefix?.errors?.pattern) ? 'Prefix cannot contain special characters' : ''" [labelIconTooltip]="currentNumberSettingId ? prefixHelpTxt : ''"></lib-input>
+                </div>
+
+                <ng-template #prefixDropdownInput>
+                    <div class="f-col mdo-field" *ngIf="numberSettingsForm.get('prefixType').value === 'FIELD'" [class.has-error]="submitted && numberSettingsForm.controls.prefixField.invalid">
+                        <lib-text-line type="xsmall" class="field-label" weight="strong">Prefix</lib-text-line>
+                        <div class="mdo-field-input">
+                           <input matInput #prefixFieldInputEl
+                               [disabled]="currentNumberSettingId"
+                               [matAutocomplete]="prefixDropdownTrigger"
+                               (keyup)="fieldSearchSub.next({s: prefixFieldInputEl.value, inputType: 'prefix'})"
+                               (click)="initFieldsList(prefixFieldInputEl.value,'prefix')"
+                               formControlName="prefixField"
+                               class="mdo-field-input" />
+                               <mat-icon fontSet="mdo-icons-light" class="autocomplete-icon mdo-dropdown-icon" matSuffix>{{prefixMenuOpen? 'chevron-up': 'chevron-down'}}</mat-icon>
+                           <mat-autocomplete class="mdo-autocomplete" #prefixDropdownTrigger="matAutocomplete" (opened)="prefixMenuOpen = true" (closed)="prefixMenuOpen = false"
+                              [displayWith]="displayFieldFn">
+                                <mat-optgroup *ngFor="let group of prefixListObs | async">
+                                    <div [libTooltip]="group.fieldDescri" matTooltipPosition="right" class="custom-opt-grp-header">{{ group.fieldDescri }}</div>
+                                    <ng-container *ngFor="let child of group.childs">
+                                        <mat-option [libTooltip]="child.fieldDescri" matTooltipPosition="right" [value]="child">
+                                            {{ child.fieldDescri }}
+                                        </mat-option>
+                                    </ng-container>
+                                </mat-optgroup>
+                           </mat-autocomplete>
+                       </div>
+                       <mat-error>
+                        <!-- <mat-error *ngIf="submitted && numberSettingsForm.controls.prefixField.errors?.required"> -->
+                           <lib-text-line type="small"> This is required</lib-text-line>
+                        </mat-error>
+                     <!-- </mat-error> -->
+                    </div>
+                </ng-template>
+
+                <!-- Suffix -->
+                <div class="f-row mdo-field">
+                    <lib-slide-toggle class="toggle-col" [disabled]="currentNumberSettingId" [checked]="numberSettingsForm.get('suffixType').value === 'VALUE'" label=""
+                    theme="primary" (toggleChange)="staticSuffixToggle($event)">
+                    </lib-slide-toggle>
+
+                    <lib-text-line type="xsmall" weight="strong">Static suffix <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                            libTooltip="Toggle to switch between static text or fields from the dataset.">
+                            question-circle</mat-icon>
+                    </lib-text-line>
+                </div>
+
+                <div class="f-col" *ngIf="numberSettingsForm.get('suffixType').value === 'VALUE'; else suffixDropdownInput">
+                    <lib-input label="Suffix" formControlName="suffix" [hasError]="submitted && numberSettingsForm.controls.suffix.invalid" [hint]="(submitted && numberSettingsForm.controls.suffix?.errors?.pattern) ? 'suffix cannot contain special characters' : ''" [labelIconTooltip]="currentNumberSettingId ? prefixHelpTxt : ''"></lib-input>
+                </div>
+
+                <ng-template #suffixDropdownInput>
+                    <div class="f-col mdo-field" *ngIf="numberSettingsForm.get('suffixType').value === 'FIELD'" [class.has-error]="submitted && numberSettingsForm.controls.suffixField.invalid">
+                        <lib-text-line type="xsmall" class="field-label" weight="strong">Suffix<span class="mandatory">*</span></lib-text-line>
+                        <div class="mdo-field-input" [ngClass]="{'mdo-disabled': currentNumberSettingId}">
+                           <input matInput #fieldInputEl
+                               [matAutocomplete]="suffixDropdownTrigger"
+                               formControlName="suffixField"
+                               (keyup)="fieldSearchSub.next({s: fieldInputEl.value, inputType: 'suffix'})"
+                               (click)="initFieldsList(fieldInputEl.value,'suffix')"
+                               class="mdo-field-input" />
+                               <mat-icon fontSet="mdo-icons-light" class="autocomplete-icon mdo-dropdown-icon" matSuffix>{{suffixMenuOpen? 'chevron-up': 'chevron-down'}}</mat-icon>
+                           <mat-autocomplete class="mdo-autocomplete" #suffixDropdownTrigger="matAutocomplete" (opened)="suffixMenuOpen = true" (closed)="suffixMenuOpen = false"
+                              [displayWith]="displayFieldFn">
+                                <mat-optgroup *ngFor="let group of suffixListObs | async">
+                                    <div [libTooltip]="group.fieldDescri" matTooltipPosition="right" class="custom-opt-grp-header">{{ group.fieldDescri }}</div>
+                                    <ng-container *ngFor="let child of group.childs">
+                                        <mat-option [libTooltip]="child.fieldDescri" matTooltipPosition="right" [value]="child">
+                                            {{ child.fieldDescri }}
+                                        </mat-option>
+                                    </ng-container>
+                                </mat-optgroup>
+                           </mat-autocomplete>
+                       </div>
+                       <mat-error>
+                        <mat-error *ngIf="submitted && numberSettingsForm.controls.suffixField.errors?.required">
+                           <lib-text-line type="small"> This is required</lib-text-line>
+                        </mat-error>
+                     </mat-error>
+                    </div>
+                </ng-template>
+
+                <div class="f-col mdo-field">
+                    <lib-text-line type="xsmall" class="field-label" weight="strong">Maintain generated number in a field</lib-text-line>
+                    <div class="mdo-field-input">
+                       <input matInput
+                           [matAutocomplete]="alternateFieldDropdown"
+                           formControlName="altnField">
+                           <mat-icon fontSet="mdo-icons-light" class="autocomplete-icon" matSuffix>{{generatedNumberMenuOpen? 'chevron-up': 'chevron-down'}}</mat-icon>
+                        <mat-autocomplete class="mdo-autocomplete" #alternateFieldDropdown="matAutocomplete" (opened)="generatedNumberMenuOpen = true" (closed)="generatedNumberMenuOpen = false"
+                          [displayWith]="displayFieldFn">
+                            <mat-option class="mat-result-option" *ngFor="let fieldItem of alternateNumberFieldObs | async" [disabled]="!fieldItem.fieldId" [value]="fieldItem">
+                                {{fieldItem.fieldDescri || 'Untitled'}}
+                            </mat-option>
+                        </mat-autocomplete>
+                   </div>
+                </div>
+
+                <!-- Default number setting -->
+                <div class="f-row mdo-field">
+                    <lib-slide-toggle theme="primary" formControlName="isDefaultSetting" class="toggle-col"> </lib-slide-toggle>
+                    <lib-text-line type="xsmall" weight="strong">Set as a default number setting rule
+                    </lib-text-line>
+                </div>
+
+                <!-- Multiple Field Values -->
+                <div class="multi-field-val" *ngIf="selectedCriteriaFields.length > 1">
+                    <div class="f-row fld-section-header">
+                        <div class="f-col">
+                            <lib-search class="lib-search" i18n-placeholder="@@search" placeholder="Search" (valueChange)="searchFieldVal.next($event)"></lib-search>
+                        </div>
+                        <div class="f-col">
+                            <lib-button type="plain" icon="ellipsis-h" (click)="$event.stopPropagation()" [matMenuTriggerFor]="actionMenu">
+                            </lib-button>
+                            <mat-menu #actionMenu="matMenu" class="navigation-menu">
+                              <button mat-menu-item (click)="exportTemplate()" i18n="@@export_template">Export template</button>  
+                              <button mat-menu-item (click)="uploadInput.click()" i18n="@@import_from_csv">Import from CSV</button>
+                              <input class="file-input" type="file" id="uploader" #uploadInput (change)="fileChange($event, uploadInput)" prosClickStopPropagation style="display: none;"/>
+                              <button mat-menu-item (click)="exportToCSV()" i18n="@@export_to_csv">Export to CSV</button>
+                            </mat-menu>
+                        </div>
+                    </div>
+                    <div class="f-row-spacer-half"></div>
+                    <div class="f-row fld-val-row">
+                        <div class="f-col fld-val-blk" [class.half]="selectedCriteriaFields.length === 2">
+                            <lib-text-line type="base" weight="strong">
+                                <div class="field-title" [libTooltip]="selectedCriteriaFields[0].description">{{ selectedCriteriaFields[0].description }}</div>
+                            </lib-text-line>
+                        </div>
+                        <div class="f-col fld-val-blk" [class.half]="selectedCriteriaFields.length === 2">
+                            <lib-text-line type="base" weight="strong">
+                                <div class="field-title" [libTooltip]="selectedCriteriaFields[1].description">{{ selectedCriteriaFields[1].description }}</div>
+                            </lib-text-line>
+                        </div>
+                        <div class="f-col fld-val-blk" *ngIf="selectedCriteriaFields.length > 2">
+                            <lib-text-line type="base" weight="strong">
+                                <div class="field-title" [libTooltip]="selectedCriteriaFields[2].description">{{ selectedCriteriaFields[2].description }}</div>
+                            </lib-text-line>
+                        </div>
+                    </div>
+                    <lib-section></lib-section>
+                    <div class="fld-values">
+                        <ng-container *ngFor="let formGrp of fieldValuesForm.controls; index as i; last as lastVal">
+                                <pros-field-values-block
+                                    [moduleId]="moduleId"
+                                    [selectedFields]="selectedCriteriaFields"
+                                    (delete)="deleteBlock(i)"
+                                    [dropValuesField1]="fieldDropValuesList[0] || []"
+                                    [dropValuesField2]="fieldDropValuesList[1] || []"
+                                    [dropValuesField3]="fieldDropValuesList[2] || []"
+                                    [fieldValuesGrp]="formGrp"
+                                    [submitted]="submitted"
+                                ></pros-field-values-block>
+                                <lib-section *ngIf="!lastVal"></lib-section>
+                        </ng-container>
+                    </div>
+                    <div class="f-row-spacer-half"></div>
+                    <div class="f-row add-btn">
+                        <div class="f-col-spacer-half"></div>
+                        <lib-text-line class="cursor" textColor="link" type="base" (click)="addBlocks()">
+                            <mat-icon fontSet="mdo-icons-light">plus</mat-icon>&nbsp;Add row
+                        </lib-text-line>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+.field-badge {
+  height: 22px;
+  width: 22px;
+  z-index: 1;
+  top: -8px;
+  right: 11px;
+  position: absolute;
+  cursor: pointer;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.field-badge-dropdown {
+  padding: 8px;
+}

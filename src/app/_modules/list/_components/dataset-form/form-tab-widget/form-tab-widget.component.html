@@ -1,0 +1,258 @@
+<div class="root" cdkAccordionItem #accordionItem="cdkAccordionItem">
+  <ng-container [ngSwitch]="tabFields?.fieldType">
+    <!-- Static text -->
+    <ng-container *ngSwitchCase="'TEXT'">
+      <mat-card class="mat-elevation-z0 f-row static-field">
+        <div class="f-row">
+          <div class="icon">
+            <lib-text-line class="field-text" type="base" weight="strong" prosClickStopPropagation> Textarea </lib-text-line>
+          </div>
+          <span class="f-spacer"></span>
+          <lib-button type="plain" [matMenuTriggerFor]="remove" icon="ellipsis-h"></lib-button>
+          <mat-menu #remove="matMenu" class="navigation-menu">
+            <button [disabled]="tabsList?.length < 2" mat-menu-item [matMenuTriggerFor]="sectionsListMenu">Move to section</button>
+            <button (click)="delete(tabFields?.tabFieldUuid)" mat-menu-item>Remove</button>
+          </mat-menu>
+          <mat-menu #sectionsListMenu="matMenu" class="navigation-menu">
+            <ng-container *ngFor="let tab of tabsList; let tabIndex = index">
+              <button mat-menu-item *ngIf="tabIndex !== parentTabIndex" (click)="moveToSection(tabIndex)">{{ tab.tabText }}</button>
+            </ng-container>
+          </mat-menu>
+        </div>
+        <div class="f-col mdo-form-field">
+          <pros-rich-text-editor
+            [control]="htmlEditorControl"
+            [tabFieldId]="editorId"
+            (valueChange)="editorValueChange($event)"
+          ></pros-rich-text-editor>
+        </div>
+      </mat-card>
+    </ng-container>
+
+    <!-- Image -->
+    <ng-container *ngSwitchCase="'IMAGE'">
+      <mat-card class="mat-elevation-z0 f-row static-field">
+        <div class="f-row">
+          <lib-text-line class="field-text" type="base" weight="strong" prosClickStopPropagation> Image </lib-text-line>
+          <span class="f-spacer"></span>
+          <div class="action">
+            <lib-button type="plain" [matMenuTriggerFor]="remove" icon="ellipsis-h"></lib-button>
+            <mat-menu #remove="matMenu" class="navigation-menu">
+              <button [disabled]="tabsList?.length < 2" mat-menu-item [matMenuTriggerFor]="sectionsListMenu">Move to section</button>
+              <button (click)="delete(tabFields?.tabFieldUuid)" mat-menu-item>Remove</button>
+            </mat-menu>
+            <mat-menu #sectionsListMenu="matMenu" class="navigation-menu">
+              <ng-container *ngFor="let tab of tabsList; let tabIndex = index">
+                <button mat-menu-item *ngIf="tabIndex !== parentTabIndex" (click)="moveToSection(tabIndex)">{{ tab.tabText }}</button>
+              </ng-container>
+            </mat-menu>
+          </div>
+        </div>
+        <div class="f-row image-uploader" (dragover)="dragOver($event)" (drop)="onFileDrop($event)">
+          <div (click)="fileInput.click()" *ngIf="!hasAttachment; else withAttachment">
+            <lib-text-line type="base" textColor="secondary">
+              Drag image here or <span class="input-link">browse</span> to upload
+            </lib-text-line>
+          </div>
+          <ng-template #withAttachment>
+            <div class="f-col attachment-section">
+              <div class="f-row" [ngClass]="{ hasError: uploadError }">
+                <div class="f-row" (click)="fileInput.click()">
+                  <img [src]="getAttachmentIcon()" class="attachment-icon" />
+                  <lib-text-line type="base">{{
+                    tabFields?.description || (tabFields?.metadata?.length && tabFields?.metadata[0]?.description)
+                  }}</lib-text-line>
+                </div>
+                <lib-button class="lib-button" (click)="removeAttachment()" icon="times" type="plain"></lib-button>
+              </div>
+              <mat-progress-bar *ngIf="uploading" mode="indeterminate"></mat-progress-bar>
+            </div>
+          </ng-template>
+          <input type="file" style="display: none" #fileInput (change)="uploadFile($event.target.files)" />
+        </div>
+      </mat-card>
+    </ng-container>
+    <ng-container *ngSwitchCase="'CLASS TYPE'">
+      <div class="tab-container">
+        <mat-card class="mat-elevation-z0 f-row colunm-box">
+          <div class="col" (click)="onSelectField(tabFields)">
+            <mat-icon fontSet="mdo-icons-light">{{ tabFields?.icon }}</mat-icon>
+          </div>
+
+          <div class="col col-x6" (click)="onSelectField(tabFields)">
+            <lib-text-line
+              [libTooltip]="tabFields?.description || (tabFields?.metadata?.length && tabFields?.metadata[0]?.description)"
+              class="field-description"
+              type="base"
+              prosClickStopPropagation
+              (click)="tabFields.editMode = true"
+            >
+              {{ tabFields?.description || (tabFields?.metadata?.length && tabFields?.metadata[0]?.description) }}
+            </lib-text-line>
+            <lib-button *ngIf="tabFields?.childs?.length" style="visibility: visible !important" (click)="accordionItem.toggle()">
+              <mat-icon> {{ accordionItem.expanded ? 'expand_more' : 'chevron_right' }} </mat-icon>
+            </lib-button>
+          </div>
+
+          <div class="col col-x6 center-item">
+            <lib-label text="{{ tabFields?.fieldType | titlecase }}" iconFontType="solid"></lib-label>
+          </div>
+
+          <div class="col col-x6">
+            <lib-button
+              [disabled]="tabFields.isReadOnly"
+              type="plain"
+              (click)="isHidden(tabFields)"
+              *ngIf="!tabFields.isHidden"
+              icon="eye" iconFontType="light"
+            ></lib-button>
+            <lib-button
+              [disabled]="tabFields.isReadOnly"
+              type="plain"
+              (click)="isHidden(tabFields)"
+              *ngIf="tabFields.isHidden"
+              icon="eye-slash" iconFontType="light"
+            ></lib-button>
+
+            <lib-button
+              [disabled]="tabFields.isHidden"
+              type="plain"
+              (click)="isReadOnly(tabFields)"
+              *ngIf="!tabFields.isReadOnly"
+              icon="lock-open-alt" iconFontType="light"
+            ></lib-button>
+            <lib-button
+              [disabled]="tabFields.isHidden"
+              type="plain"
+              (click)="isReadOnly(tabFields)"
+              *ngIf="tabFields.isReadOnly"
+              icon="lock" iconFontType="light"
+            ></lib-button>
+
+            <lib-button
+              type="plain"
+              icon="star-of-life" iconFontType="light"
+              [ngClass]="{ 'is-mandatory': tabFields.isMandatory }"
+              (click)="tabFields.isMandatory = !tabFields.isMandatory"
+            ></lib-button>
+          </div>
+
+          <div class="col end-item">
+            <lib-button *ngIf="!isChildField" type="plain" [matMenuTriggerFor]="remove" icon="ellipsis-h"></lib-button>
+            <mat-menu #remove="matMenu" class="navigation-menu">
+              <button [disabled]="tabsList?.length < 2" mat-menu-item [matMenuTriggerFor]="sectionsListMenu">Move to section</button>
+              <button (click)="delete(tabFields?.tabFieldUuid)" mat-menu-item>Remove</button>
+            </mat-menu>
+            <mat-menu #sectionsListMenu="matMenu" class="navigation-menu">
+              <ng-container *ngFor="let tab of tabsList; let tabIndex = index">
+                <button mat-menu-item *ngIf="tabIndex !== parentTabIndex" (click)="moveToSection(tabIndex)">{{ tab.tabText }}</button>
+              </ng-container>
+            </mat-menu>
+          </div>
+        </mat-card>
+      </div>
+      <ng-template [ngIf]="accordionItem.expanded">
+        <div class="child-field">
+          <div cdkDropList [cdkDropListData]="tabFields?.childs" (cdkDropListDropped)="dropChildField($event)">
+            <div *ngFor="let item of tabFields?.childs;" cdkDragBoundary=".child-field" cdkDrag [cdkDragData]="item">
+              <pros-form-tab-widget [parentTabIndex]="parentTabIndex" [parentFieldId]="tabFields?.fieldId" [tabFields]="item" [isChildField]="true"></pros-form-tab-widget>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+      <div class="tab-container">
+        <mat-card class="mat-elevation-z0 f-row colunm-box" (click)="onSelectField(tabFields)">
+          <div class="col">
+            <mat-icon fontSet="mdo-icons-light">{{ tabFields?.icon }}</mat-icon>
+          </div>
+
+          <div class="col col-x6">
+            <lib-text-line
+              [libTooltip]="tabFields?.description || (tabFields?.metadata?.length && tabFields?.metadata[0]?.description)"
+              class="field-description"
+              type="base"
+              (click)="tabFields.editMode = true"
+            >
+              {{ tabFields?.description || (tabFields?.metadata?.length && tabFields?.metadata[0]?.description) }}
+            </lib-text-line>
+            <lib-button prosClickStopPropagation *ngIf="tabFields?.childs?.length" style="visibility: visible !important" (click)="accordionItem.toggle()">
+              <mat-icon> {{ accordionItem.expanded ? 'expand_more' : 'chevron_right' }} </mat-icon>
+            </lib-button>
+          </div>
+
+          <div class="col col-x6 center-item">
+            <lib-label text="{{ fieldType | titlecase }}" iconFontType="solid"></lib-label>
+          </div>
+
+          <div class="col col-x6" prosClickStopPropagation>
+            <lib-button
+              [disabled]="tabFields.isReadOnly"
+              type="plain"
+              (click)="isHidden(tabFields)"
+              *ngIf="!tabFields.isHidden"
+              icon="eye" iconFontType="light"
+              libTooltip="Hide the field"
+            ></lib-button>
+            <lib-button
+              [disabled]="tabFields.isReadOnly"
+              type="plain"
+              (click)="isHidden(tabFields)"
+              *ngIf="tabFields.isHidden"
+              icon="eye-slash" iconFontType="light"
+              libTooltip="Make visible"
+            ></lib-button>
+
+            <lib-button
+              [disabled]="tabFields.isHidden"
+              type="plain"
+              (click)="isReadOnly(tabFields)"
+              *ngIf="!tabFields.isReadOnly"
+              icon="lock-open-alt" iconFontType="light"
+              libTooltip="Lock the field"
+            ></lib-button>
+            <lib-button
+              [disabled]="tabFields.isHidden"
+              type="plain"
+              (click)="isReadOnly(tabFields)"
+              *ngIf="tabFields.isReadOnly"
+              icon="lock" iconFontType="light"
+              libTooltip="Unlock the field"
+            ></lib-button>
+
+            <lib-button
+              type="plain"
+              icon="star-of-life" iconFontType="light"
+              [ngClass]="{ 'is-mandatory': tabFields.isMandatory }"
+              (click)="tabFields.isMandatory = !tabFields.isMandatory"
+              libTooltip="Make it mandatory"
+            ></lib-button>
+          </div>
+
+          <div class="col end-item" prosClickStopPropagation>
+            <lib-button *ngIf="!isChildField" type="plain" [matMenuTriggerFor]="remove" icon="ellipsis-h"></lib-button>
+            <mat-menu #remove="matMenu" class="navigation-menu">
+              <button [disabled]="tabsList?.length < 2" mat-menu-item [matMenuTriggerFor]="sectionsListMenu">Move to section</button>
+              <button (click)="delete(tabFields?.tabFieldUuid)" mat-menu-item>Remove</button>
+            </mat-menu>
+            <mat-menu #sectionsListMenu="matMenu" class="navigation-menu">
+              <ng-container *ngFor="let tab of tabsList; let tabIndex = index">
+                <button mat-menu-item *ngIf="tabIndex !== parentTabIndex" (click)="moveToSection(tabIndex)">{{ tab.tabText }}</button>
+              </ng-container>
+            </mat-menu>
+          </div>
+        </mat-card>
+      </div>
+      <ng-template [ngIf]="accordionItem.expanded">
+        <div class="child-field">
+          <div cdkDropList [cdkDropListData]="tabFields?.childs" (cdkDropListDropped)="dropChildField($event)">
+            <div *ngFor="let item of tabFields?.childs;" cdkDragBoundary=".child-field" cdkDrag [cdkDragData]="item">
+              <pros-form-tab-widget [parentTabIndex]="parentTabIndex" [parentFieldId]="tabFields?.fieldId" [tabFields]="item" [isChildField]="true"></pros-form-tab-widget>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </ng-container>
+  </ng-container>
+</div>

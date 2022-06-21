@@ -1,0 +1,23 @@
+<div class="root modal-wrapper">
+  <div class="f-row modal-header">
+    <lib-text-line type="leading" [enableWrap]="true">Alert</lib-text-line>
+  </div>
+
+  <div class="row-spacer"></div>
+
+  <div class="f-row modal-body">
+    <lib-button [sizeLarge]="true" [rounded]="true" icon="exclamation" iconFontType="solid" type="major">
+    </lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col">
+        <lib-text-line [enableWrap]="true" type="base">
+            Your subscription has expired. Please connect with our customer success team 
+            "csteam@prospecta.com" for renewing the subscription.
+        </lib-text-line>
+    </div>
+  </div>
+  <div class="f-row modal-footer">
+    <div class="f-spacer"></div>
+    <!-- <lib-button (click)="close()">Cancel</lib-button> -->
+  </div>
+</div>

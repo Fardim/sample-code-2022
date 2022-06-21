@@ -1,0 +1,28 @@
+div.root {
+  .modal-body {
+    min-height: 174px;
+    padding-bottom: 16px;
+
+    &.modal-w-d-body {
+      height: calc(600px - 60px * 2);
+      overflow: auto;
+    }
+
+    .field-label {
+      margin-bottom: 6px;
+    }
+
+    .input-row {
+      flex: 1;
+      margin-right: 6px;
+    }
+
+    .action-row {
+      margin-bottom: 12px;
+    }
+
+    .package-button {
+      margin-bottom: 12px;
+    }
+  }
+}

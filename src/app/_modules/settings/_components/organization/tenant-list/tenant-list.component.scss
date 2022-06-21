@@ -1,0 +1,23 @@
+div.root {
+  .tenant-list {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+
+    table.mat-table {
+      width: 100%;
+
+      td.mat-cell {
+        border-right: none;
+      }
+
+      .mat-column-action {
+        width: 48px;
+      }
+
+      .status-col {
+        width: 100%;
+      }
+    }
+  }
+}

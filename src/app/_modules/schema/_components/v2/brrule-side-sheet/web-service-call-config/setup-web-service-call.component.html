@@ -1,0 +1,25 @@
+<form *ngIf="form" [formGroup]="form">
+    <div *ngIf="targetSystemList.length" class="f-col mdo-field"
+        [class.has-error]="submitted && form.controls.target_system.errors?.required">
+        <lib-text-line [textColor]="submitted && form.controls.target_system.errors?.required ? 'error' : 'default'"
+            type="xsmall" class="field-label" weight="strong" i18n="@@target_system">Target system&nbsp;<span
+                class="mandatory">*</span></lib-text-line>
+        <!-- input container -->
+        <div class="mdo-field-input">
+            <input matInput (input)="searchTargetSystem($event.target.value)" (focus)="searchTargetSystem('')"
+                formControlName="target_system" i18n-placeholder="@@target_system" placeholder="Target system"
+                [matAutocomplete]="targetSystemAuto" />
+            <mat-autocomplete class="mdo-autocomplete" [displayWith]="displayTargetSystemFn.bind(this)"
+                #targetSystemAuto="matAutocomplete">
+                <ng-container *ngFor="let targetSystem of targetSystemFiltered">
+                    <mat-option class="mdo-option" [value]="targetSystem.connid">
+                        {{targetSystem.name}}
+                    </mat-option>
+                </ng-container>
+            </mat-autocomplete>
+        </div>
+        <lib-text-line type="small" textColor="error" *ngIf="submitted && (submitted && form.controls.target_system.errors?.required)">Please select a
+            target system</lib-text-line>
+    </div>
+    <pros-check-code-control [submitted]="submitted" [formGroup]="form.get('check_code')"></pros-check-code-control>
+</form>

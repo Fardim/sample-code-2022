@@ -1,0 +1,51 @@
+<form [formGroup]="backgroundForm">
+    <!-- BASIC DETAILS-->
+    <mat-accordion>
+        <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" [expanded]="true">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    Basic Details
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="f-col fields-col">
+                <div class="f-col">
+                    <mat-label>Description</mat-label>
+                    <mat-form-field appearance="outline">
+                        <textarea matInput formControlName="name"></textarea>
+                    </mat-form-field>
+                </div>
+
+                <div class="f-col">
+                    <mat-label> Enhancement Point </mat-label>
+                    <mat-form-field appearance="outline">
+                        <mat-select formControlName="enhancementPoint">
+                            <mat-option value="Select"> Select </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <div class="f-col">
+                    <mat-label> Cross Module </mat-label>
+                    <mat-form-field appearance="outline">
+                        <mat-select formControlName="crossModule">
+                            <mat-option *ngFor="let crossModule of crossModules" [value]="crossModule.id"> 
+                                {{ crossModule.value }} 
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <div class="f-col">
+                    <mat-label> Custom Event </mat-label>
+                    <mat-form-field appearance="outline">
+                        <mat-select formControlName="customEvent">
+                            <mat-option *ngFor="let event of customEvents" [value]="event.id">
+                                {{ event.value }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+</form>

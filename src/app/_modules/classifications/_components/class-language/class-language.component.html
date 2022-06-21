@@ -1,0 +1,134 @@
+<div class="f-row breadcrum-toolbar">
+  <lib-button *ngIf="closable" type="plain" icon="times" i18n="@@close" iconFontType="light" (click)="closeDialog()">
+  </lib-button>
+  <div class="col-spacer"></div>
+  <div class="f-col mdo-constrained-right">
+    <div class="f-row breadcrum-head">
+      <lib-text-line type="leading" i18n="@@language_and_colloquials">Language and colloquials </lib-text-line>
+      <div class="f-spacer"></div>
+      <lib-button *ngIf="!classInfo?.classType?.enableSync" type="major" width="80px" i18n="@@save" (click)="save()">Save</lib-button>
+    </div>
+  </div>
+</div>
+
+<div class="f-col sidesheetcontent-listing">
+  <span class="f-row-spacer-half"></span>
+  <div class="f-row mdo-justify">
+    <div class="nav-container">
+      <div class="f-row">
+        <lib-text-line type="leading" i18n="@@language">Language</lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="plain" [matMenuTriggerFor]="menu" iconFontType="solid" icon="caret-down">
+          <mat-icon fontSet="mdo-icons-light">plus</mat-icon>
+        </lib-button>
+
+        <mat-menu #menu="matMenu" xPosition="after" class="filter-menudropdown">
+          <pros-class-language-list (selectedLanguage)="addLanguage($event)"></pros-class-language-list>
+        </mat-menu>
+      </div>
+      <div class="f-row-spacer-half"></div>
+      <mat-list role="list" class="mdo-list">
+        <mat-list-item role="listitem" id="languageList" class="list-item" *ngFor="let label of classLabels"
+          [class.selected]="label.language?.toLowerCase() === selectedLanguage?.id"
+          (click)="setSelectedLanguage(label.language?.toLowerCase())">
+          <div class="f-row list-items">
+            <lib-text-line type="base" enableWrap="true">{{ getLanguage(label.language) }} </lib-text-line>
+            <span class="f-spacer"></span>
+            <lib-button *ngIf="label.language?.toLowerCase() !== _locale" type="plain" icon="times" iconFontType="light"
+              (click)="deleteLanguage(label.language)"></lib-button>
+          </div>
+        </mat-list-item>
+      </mat-list>
+    </div>
+    <div class="f-col language-container">
+      <form [formGroup]="languageForm" id="languageForm">
+        <mat-accordion>
+          <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+              <mat-panel-title>
+                <lib-text-line type="base" weight="strong">{{ isNoun ? 'Noun details' : 'Class details' }}
+                </lib-text-line>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="f-col">
+              <lib-input [label]="isNoun ? 'Noun short' : 'Class name'" type="text" [isRequired]="true"
+                [hint]="(languageForm.controls.code.touched && languageForm.controls.code.errors && languageForm.controls.code.errors.required) ? 'This is a required field' : ''"
+                [hasError]="languageForm.controls.code.touched &&languageForm.controls.code.errors && languageForm.controls.code.errors.required"
+                i18n="@@code" [formControl]="languageForm.controls['code']"> </lib-input>
+            </div>
+            <ng-container *ngIf="isNoun">
+              <div class="f-col">
+                <lib-input label="Noun long" type="text" [isRequired]="true" [hint]="
+                    languageForm.controls.codeLong.touched &&
+                    languageForm.controls.codeLong.errors &&
+                    languageForm.controls.codeLong.errors.required
+                      ? 'This is a required field'
+                      : ''
+                  " [hasError]="
+                    languageForm.controls.codeLong.touched &&
+                    languageForm.controls.codeLong.errors &&
+                    languageForm.controls.codeLong.errors.required
+                  " i18n="@@code_long" [formControl]="languageForm.controls['codeLong']">
+                </lib-input>
+              </div>
+
+              <div class="f-col">
+                <lib-input label="Modifier short" type="text" i18n="@@modifier_short" [isRequired]="isRequiredField('mod')" [hint]="
+                  languageForm.controls.mod.touched &&
+                  languageForm.controls.mod.errors &&
+                  languageForm.controls.mod.errors.required
+                    ? 'This is a required field'
+                    : ''"
+                  [hasError]="
+                  languageForm.controls.mod.touched &&
+                  languageForm.controls.mod.errors &&
+                  languageForm.controls.mod.errors.required"
+                  [formControl]="languageForm.controls['mod']"> </lib-input>
+              </div>
+
+              <div class="f-col">
+                <lib-input label="Modifier long" type="text" [isRequired]="isRequiredField('modLong')" [hint]="
+                    languageForm.controls.modLong.touched &&
+                    languageForm.controls.modLong.errors &&
+                    languageForm.controls.modLong.errors.required
+                      ? 'This is a required field'
+                      : ''"
+                    [hasError]="
+                    languageForm.controls.modLong.touched &&
+                    languageForm.controls.modLong.errors &&
+                    languageForm.controls.modLong.errors.required"
+                    i18n="@@modifier_long" [formControl]="languageForm.controls['modLong']">
+                </lib-input>
+              </div>
+            </ng-container>
+          </mat-expansion-panel>
+        </mat-accordion>
+        <mat-accordion>
+          <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+              <mat-panel-title>
+                <lib-text-line type="base" weight="strong" i18n="@@colloquials">Colloquials</lib-text-line>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+            <div class="f-col mdo-field">
+              <div class="mdo-field-input">
+                <mat-chip-list #chipList></mat-chip-list>
+                <lib-chip-list>
+                  <lib-chip *ngFor="let val of colloquialsList;" [removable]="true" (removed)="remove(val)">
+                    {{val.calloquialName}}
+                  </lib-chip>
+                  <input matInput label="Colloquial name" type="text" i18n="@@colloquial_name"
+                    [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                    [matChipInputAddOnBlur]="true" (matChipInputTokenEnd)="addColloquial($event)" />
+                </lib-chip-list>
+              </div>
+              <mat-label>
+                <lib-text-line type="small" textColor="secondary">Type and hit enter to add multiple values</lib-text-line>
+              </mat-label>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </form>
+    </div>
+  </div>
+</div>

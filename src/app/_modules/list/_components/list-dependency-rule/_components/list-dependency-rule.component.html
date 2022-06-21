@@ -1,0 +1,90 @@
+<div class="f-col root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    <div class="f-col-spacer-half"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@settings">Dependency rules</lib-text-line>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-row mdo-justify">
+      <div class="f-col listset-navigation">
+        <div class="f-row">
+          <lib-text-line type="leading">Rules</lib-text-line>
+          <div class="f-spacer"></div>
+          <lib-button-group>
+            <lib-button iconFontType="solid" [matMenuTriggerFor]="newFormtypeMenu">
+              <mat-icon>add</mat-icon>
+              <mat-icon>arrow_drop_down</mat-icon>
+            </lib-button>
+          </lib-button-group>
+          <mat-menu #newFormtypeMenu="matMenu" class="navigation-menu">
+            <button mat-menu-item formTypes (click)="addNewRule()">
+              New rule
+            </button>
+            <button _ngcontent-rax-c369="" aria-haspopup="true" mat-menu-item="" [matMenuTriggerFor]="rulesListtypeMenu"
+              prosclickstoppropagation=""
+              class="mat-focus-indicator mat-menu-trigger mat-menu-item mat-menu-item-submenu-trigger mat-menu-item-highlighted"
+              ng-reflect-menu="[object Object]" ng-reflect-disable-ripple="true" role="menuitem" tabindex="0"
+              aria-disabled="false" aria-expanded="true" aria-controls="mat-menu-panel-2"> Use existing
+              <div matripple="" class="mat-ripple mat-menu-ripple" ng-reflect-disabled="true"
+                ng-reflect-trigger="[object HTMLButtonElement]"></div>
+            </button>
+          </mat-menu>
+          <mat-menu #rulesListtypeMenu="matMenu" class="navigation-menu">
+            <lib-filter-dropdown class="chip-filters">
+              <div class="dropdown-search-wrapper">
+                <lib-search #searchLabelInput prosClickStopPropagation placeholder="Search rules">
+                </lib-search>
+              </div>
+              <div class="dropdown-options-wrapper f-col">
+                <div class="dropdown-options-inner-container" prosInfiniteScroll bufferPercentage="20">
+                  <div class="options">
+                    <lib-filter-option prosClickStopPropagation *ngFor="let rl of RulesList">
+                      <lib-checkbox [label]="rl.description" prosClickStopPropagation>
+                      </lib-checkbox>
+                    </lib-filter-option>
+                  </div>
+                </div>
+                <div class="filter-button-wrapper">
+                  <lib-button type="minor">Apply</lib-button>
+                </div>
+              </div>
+            </lib-filter-dropdown>
+          </mat-menu>
+        </div>
+        <div class="f-row-spacer-half"></div>
+        <lib-search [formControl]="globalSearchControl" i18n-placeholder="@@search" placeholder="Search rules">
+        </lib-search>
+        <div class="f-row-spacer-half"></div>
+        <mat-list role="list" class="mdo-list rules-list">
+          <mat-list-item [ngClass]="{'selected': rule.groupId=== this.groupId}" role="listitem" *ngFor="let rule of RulesList">
+            <div (click)="setGroupId(rule.groupId,rule.description)" class="w-100">
+              <lib-text-line type="base" enableWrap="true" matTooltip="{{rule.description}}"
+              *ngIf="InputModeId != rule.groupId"
+              [routerLink]="['../'+moduleId+'/rule/'+moduleId+'/'+rule.groupId+'/'+rule.description]">
+              {{rule.description}}</lib-text-line>
+            <lib-input (afterBlur)="NameChanged(rule.groupId)" class="lib-input-rename" id="{{rule.groupId + '_input'}}"
+              *ngIf="InputModeId==rule.groupId" value="{{rule.description}}" i18n-label="@@form_name">
+            </lib-input>
+            <div class="f-spacer"></div>
+            </div>
+            <lib-button [matMenuTriggerFor]="newFormtypeMenu1" icon="ellipsis-h" [disabled]="false" [hasDropdown]="false"
+              (afterClick)="afterClick($event)">
+            </lib-button>
+            <mat-menu #newFormtypeMenu1="matMenu" class="navigation-menu">
+              <button mat-menu-item (click)="setRenameModeOn(rule.groupId)">Rename</button>
+              <button mat-menu-item (click)="removeRules(rule.groupId)">Remove</button>
+            </mat-menu>
+          </mat-list-item>
+        </mat-list>
+      </div>
+      <div class="f-col tabs-result">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+</div>

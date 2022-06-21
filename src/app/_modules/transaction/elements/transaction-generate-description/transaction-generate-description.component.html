@@ -1,0 +1,77 @@
+<div class="mdo-field" *ngIf="!expansionview">
+    <lib-button type="minor" (afterClick)="afterClick()">{{ isProcessView ? 'Show' : 'Generate'}} description</lib-button>
+</div>
+
+<ng-template [ngIf]="isShowFieldSection">
+    <div class="root">
+        <div class="f-col extension-blocks">
+            <form [formGroup]="frmGroup" class="f-col">
+                <div class="f-row">
+                    <lib-text-line type="leading">Generate description</lib-text-line>
+                    <span class="f-spacer"></span>
+                    <lib-button-group *ngIf="!expansionview">
+                        <lib-button type="plain" icon="expand-alt" iconFontType="light" [disabled]="isFieldReadOnly" (afterClick)="openExpansionView()"></lib-button>
+                    </lib-button-group>
+                </div>
+                <span class="f-row-spacer-half"></span>
+
+                <div class="f-col mdo-field">
+                    <lib-text-line type="xsmall" weight="strong" class="field-label">Class</lib-text-line>
+                    <div class="mdo-field-input">
+                        <input formControlName="classField" matInput placeholder="Select class"
+                            [matAutocomplete]="fieldsAutoComp" #autocompleteTrigger="matAutocompleteTrigger"
+                            (keyup)="searchOption($event.target.value)" />
+                        <mat-autocomplete class="mdo-autocomplete" #fieldsAutoComp="matAutocomplete"
+                            (optionSelected)="classSelected(true, $event)">
+                            <mat-option class="mdo-option" *ngFor="let data of classList$ | async" [value]="data">
+                                {{ data.modLong ? data.codeLong + ' - ' +  data.modLong : data.codeLong}}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </div>
+                </div>
+
+                <lib-input label="Short description" autocomplete="off" formControlName="shortDesc"></lib-input>
+                <lib-textarea label="Long description" formControlName="longDesc" placeholder=""></lib-textarea>
+                
+                <div formArrayName="frmArray" *ngFor="let item of frmGroup.get('frmArray').controls; let i = index"
+                    class="dropdown-section">
+                    <ng-container [formGroupName]="i">
+                        <div class="attr-select" [ngStyle]="{'width' : isUoMExists(item) ? '60%' : '100%'}">
+                            <ng-template [ngIf]="item.value && item.value.fieldType === 'PICKLIST' || item.value.fieldType === 'DROPDOWN'"
+                                [ngIfElse]="elseBlock">
+                                <pros-transaction-dropdown [control]="getDetails('control', item)"
+                                    [controlName]="attrFieldValue" [moduleId]="moduleId" [rules]="getDetails('rules')"
+                                    [tabDetails]="getDetails('tabDetails')" [fieldObj]="getDetails('field', item)"
+                                    [layoutId]="layoutId" [recordId]="recordId" [process]="process"
+                                    useFrom="materialDescription" (openSideSheet)="addNewDescription($event)"
+                                    [reloadOptionSub]="reloadOptionSub">
+                                </pros-transaction-dropdown>
+                            </ng-template>
+                            <ng-template #elseBlock>
+                                <div class="f-col mdo-field">
+                                    <pros-transaction-input [control]="getDetails('control', item)"
+                                        [controlName]="attrFieldValue" [moduleId]="moduleId" [tabDetails]="getDetails('tabDetails')"
+                                        [fieldObj]="getDetails('field', item)" [layoutId]="layoutId"
+                                        [recordId]="recordId" useFrom="materialDescription" [process]="process" [rules]="getDetails('rules')">
+                                    </pros-transaction-input>
+                                </div>
+                            </ng-template>
+                        </div>
+                        <ng-template
+                            [ngIf]="getDetails('uomOptions', item) && getDetails('uomOptions', item).length > 0">
+                            <div class="uom-select">
+                                <pros-transaction-dropdown [control]="getDetails('uomControl', item)"
+                                    [controlName]="attrUomFieldValue" [moduleId]="moduleId"
+                                    [rules]="getDetails('rules')" [tabDetails]="getDetails('tabDetails')"
+                                    [fieldObj]="getDetails('uomField', item)" [layoutId]="layoutId"
+                                    [recordId]="recordId" useFrom="materialDescription" [isUoM]="true" [process]="process"
+                                    [availableOptions]="getDetails('uomOptions', item)">
+                                </pros-transaction-dropdown>
+                            </div>
+                        </ng-template>
+                    </ng-container>
+                </div>
+            </form>
+        </div>
+    </div>
+</ng-template>

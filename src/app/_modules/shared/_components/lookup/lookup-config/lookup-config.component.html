@@ -1,0 +1,45 @@
+<div class="f-col">
+    <form [formGroup]="lookupForm">
+        <div class="f-col mdo-field" (click)="$event.stopPropagation()">
+            <lib-text-line class="field-label" type="xsmall" weight="strong">Lookup table</lib-text-line>
+            <mat-form-field appearance="outline">
+                <input matInput [value]="displayAvailableModuleFn(lookupForm.controls.moduleId.value)" (focus)="filterAvailableModules('')" (input)="filterAvailableModules($event.target.value);lookupForm.controls.moduleId.setValue('')"
+                    [matAutocomplete]="fieldsCtrl">
+                <mat-autocomplete [displayWith]="displayAvailableModuleFn.bind(this)" class="mdo-autocomplete"
+                    #fieldsCtrl="matAutocomplete" (optionSelected)="setFormFieldValue(lookupForm.controls.moduleId, $event)">
+                    <mat-option *ngFor="let module of availableModulesFiltered" [matTooltip]="module.objectdesc" matTooltipPosition="right" [value]="module.objectid">
+                        {{module.objectdesc}}
+                    </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+        </div>
+        <div class="f-col mdo-field" (click)="$event.stopPropagation()">
+            <lib-text-line class="field-label" type="xsmall" weight="strong">Lookup column</lib-text-line>
+            <mat-form-field appearance="outline">
+                <input matInput [value]="displayModuleHeaderFn(lookupForm.controls.lookupColumn.value)" (focus)="filterModuleHeaderFields('')" (input)="filterModuleHeaderFields($event.target.value);lookupForm.controls.lookupColumn.setValue('')"
+                    [matAutocomplete]="lookupColumnCtrl">
+                <mat-autocomplete [displayWith]="displayModuleHeaderFn.bind(this)" class="mdo-autocomplete"
+                    #lookupColumnCtrl="matAutocomplete" (optionSelected)="setFormFieldValue(lookupForm.controls.lookupColumn, $event)">
+                    <mat-option *ngFor="let module of moduleHeaderFieldsFiltered" [matTooltip]="module.objectdesc" matTooltipPosition="right" [value]="module.fieldId">
+                        {{module.fieldDescri}}
+                    </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+        </div>
+        <div class="f-col mdo-field" (click)="$event.stopPropagation()">
+            <lib-text-line class="field-label" type="xsmall" weight="strong">Result lookup column</lib-text-line>
+            <mat-form-field appearance="outline">
+                <input matInput [value]="displayModuleHeaderFn(lookupForm.controls.lookupColumnResult.value)" (focus)="filterModuleHeaderFields('')" (input)="filterModuleHeaderFields($event.target.value);lookupForm.controls.lookupColumnResult.setValue('')"
+                    [matAutocomplete]="lookupColumnResultCtrl">
+                <mat-autocomplete [displayWith]="displayModuleHeaderFn.bind(this)" class="mdo-autocomplete"
+                    #lookupColumnResultCtrl="matAutocomplete" (optionSelected)="setFormFieldValue(lookupForm.controls.lookupColumnResult, $event)">
+                    <mat-option [value]="'id'">Module object number</mat-option>
+                    <mat-option *ngFor="let module of moduleHeaderFieldsFiltered" [matTooltip]="module.objectdesc" matTooltipPosition="right" [value]="module.fieldId">
+                        {{module.fieldDescri}}
+                    </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+        </div>
+    </form>
+    <lib-button type="major" [disabled]="!lookupForm.valid" (click)="saveConfig()" class="field-button">Save</lib-button>
+</div>

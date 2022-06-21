@@ -1,0 +1,45 @@
+<form *ngIf="formGroup" [formGroup]="formGroup">
+    <div *ngIf="!disabled" class="f-col mdo-field"
+        [class.has-error]="submitted && formGroup.controls.code.errors?.required">
+        <lib-text-line type="xsmall"
+            [textColor]="submitted && formGroup.controls.code.errors?.required ? 'error' : 'default'"
+            class="field-label" weight="strong" i18n="@@check_code">Check code <span class="mandatory">*</span>
+        </lib-text-line>
+        <!-- input container -->
+        <div class="mdo-field-input">
+            <input #codeInput matInput (input)="searchCode($event.target)" (focus)="searchCode({value:''})"
+                formControlName="code" i18n-placeholder="@@check_code" placeholder="Check code"
+                [matAutocomplete]="checkCodeAuto" />
+            <mat-autocomplete class="mdo-autocomplete" #checkCodeAuto="matAutocomplete">
+                <ng-container *ngFor="let cCode of checkCodeList">
+                    <mat-option [libTooltip]="cCode.shortDesc" class="mdo-option" (click)="selectCheckCode(cCode)"
+                        [value]="cCode.code">
+                        {{cCode.code}}
+                    </mat-option>
+                </ng-container>
+                <ng-container *ngIf="!checkCodeList.length && checkCodeSearchStr">
+                    <mat-option class="mdo-option" (click)="createNewCheckCode()">
+                        {{checkCodeSearchStr}} (new)
+                    </mat-option>
+                </ng-container>
+            </mat-autocomplete>
+        </div>
+        <lib-text-line type="xsmall" textColor="error" *ngIf="submitted && (submitted && formGroup.controls.code.errors?.required)">Please select a check
+            code</lib-text-line>
+
+    </div>
+    <div *ngIf="disabled" class="f-col">
+        <lib-input [disabled]="true" [isRequired]="true" label="Check code" formControlName="code">
+        </lib-input>
+    </div>
+    <div class="f-col">
+        <lib-textarea [disabled]="disabled" [isRequired]="true" label="Rule description" formControlName="description"
+            [hint]="submitted && formGroup.controls.description.errors?.required ? 'Please enter rule description' : ''"
+            [hasError]="submitted && formGroup.controls.description.errors?.required">
+        </lib-textarea>
+    </div>
+</form>
+<ng-container *ngIf="displaySidesheet">
+    <pros-check-code-sidesheet (closeDialog)="updateCheckcodeSelected($event)" [newCheckCode]="newCheckCode">
+    </pros-check-code-sidesheet>
+</ng-container>

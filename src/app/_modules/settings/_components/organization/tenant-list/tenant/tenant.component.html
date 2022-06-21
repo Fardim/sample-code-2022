@@ -1,0 +1,66 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@new_tenant">New tenant</lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-button type="major" i18n="@@create" width="80px" [disabled]="submitted" (afterClick)="saveNewTenant()">Create</lib-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <div class="f-col mdo-field">
+        <lib-banner *ngIf="bannerErrorMsg" status="error" [text]="bannerErrorMsg"></lib-banner>
+      </div>
+
+      <div class="f-col">
+        <lib-input [isRequired]="true" i18n="@@tenant_name"  label="Tenant name"
+        [hint]="submitted && !tenantInfo?.tenantName ? 'This is a required field' : ''" [hasError]="submitted && !tenantInfo?.tenantName"
+        labelIcon="question-circle" [(ngModel)]="tenantInfo.tenantName"></lib-input>
+      </div>
+
+      <div class="f-col mdo-field" [class.mdo-form-error]="submitted && !tenantInfo?.location?.regionId">
+        <lib-text-line class="field-label" weight="strong" type="xsmall" i18n="@@location">Location<span class="mandatory">*</span></lib-text-line>
+        <div class="mdo-field-input">
+          <input matInput placeholder="Search" i18n-placeholder="@@type_to_search" [matAutocomplete]="loc" />
+          <lib-button icon="{{getDropdownPos(loc)}}" matSuffix></lib-button>
+          <mat-autocomplete class="mdo-autocomplete" #loc [displayWith] = "displayWith" (optionSelected)="locationValueSelected($event)">
+            <mat-option class="mdo-option" *ngFor="let opt of filteredLocationList" [value]="opt">
+              {{opt?.regionDesc}}
+            </mat-option>
+          </mat-autocomplete>
+        </div>
+        <mat-error class="mdo-field-hint"
+          *ngIf="submitted && !tenantInfo?.location?.regionId">
+          <lib-text-line type="small">Please select location from location list</lib-text-line>
+        </mat-error>
+      </div>
+
+      <!-- <div class="f-col mdo-field" [class.mdo-form-error]="submitted && !tenantInfo?.type?.value">
+        <lib-text-line class="field-label" weight="strong" type="xsmall" i18n="@@type">Type<span class="mandatory">*</span></lib-text-line>
+        <div class="mdo-field-input">
+          <input matInput placeholder="Search" i18n-placeholder="@@type_to_search" [matAutocomplete]="type" />
+          <lib-button icon="{{getDropdownPos(type)}}" matSuffix></lib-button>
+          <mat-autocomplete class="mdo-autocomplete" #type [displayWith] = "displayWithLocation" (optionSelected)="TypeValueSelected($event)">
+            <mat-option class="mdo-option" *ngFor="let opt of filteredTypeList" [value]="opt">
+              {{opt?.label}}
+            </mat-option>
+          </mat-autocomplete>
+        </div>
+        <mat-error class="mdo-field-hint"
+          *ngIf="submitted && !tenantInfo?.type?.value">
+          <lib-text-line type="small">Please select Role from Role List</lib-text-line>
+        </mat-error>
+      </div> -->
+
+      <div class="f-col">
+        <lib-textarea i18n="@@description" label="Description" [rows]="5" [cols]="10">
+        </lib-textarea>
+      </div>
+    </div>
+  </div>
+</div>

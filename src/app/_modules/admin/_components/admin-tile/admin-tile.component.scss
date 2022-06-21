@@ -1,0 +1,61 @@
+mat-card.root {
+  min-width: 250px;
+  max-height: 220px;
+  height: 210px;
+
+  mat-card-header {
+    height: 30px;
+    max-height: 30px;
+
+    mat-card-actions {
+      margin-top: -10px;
+      padding-top: 0;
+      padding-bottom: 0;
+
+      button,
+      a {
+        color: #9fa9af;
+      }
+    }
+
+    button.TileAvtar__Admin {
+      z-index: 1;
+
+      mat-icon.avtar_iconsrule {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+        line-height: 24px;
+      }
+    }
+  }
+
+  mat-divider {
+    right: 0;
+    width: calc(100% - 130px);
+    left: auto;
+  }
+
+  mat-card-content {
+    margin-top: 40px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+
+  mat-chip-list {
+    .mat-standard-chip {
+      position: absolute;
+      bottom: 5px;
+    }
+
+    mat-chip {
+      color: #0076be;
+    }
+  }
+
+  img {
+    height: 60px;
+  }
+}

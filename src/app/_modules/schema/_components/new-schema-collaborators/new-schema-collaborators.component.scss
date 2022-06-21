@@ -1,0 +1,56 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  margin: 0;
+
+  .breadcrum-toolbar {
+    padding: 8px 12px;
+    align-items: baseline;
+
+    .mdo-constrained-right {
+      width: 100%;
+      margin-right: 0;
+
+      .breadcrum-head {
+        width: 100%;
+      }
+
+      .lib-search {
+        width: 213px;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 103px);
+    overflow: auto;
+
+    .mdo-justify {
+      margin: 0 16px;
+
+      mat-list.rule-list {
+        mat-list-item {
+          border-bottom-width: 1px;
+          border-bottom-style: solid;
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 66px;
+      }
+    }
+  }
+}

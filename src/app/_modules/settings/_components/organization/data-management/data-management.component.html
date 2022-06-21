@@ -1,0 +1,20 @@
+<div class="f-col root">
+  <div class="f-col">
+    <lib-banner [status]="successMessage?'success':'error'"
+    [text]="successMessage||'Making changes to the dataset will permenently modify your dataset. You will not be able to recover it!'"></lib-banner>
+  </div>
+  <div class="f-col mdo-field">
+    <lib-segment [formControl]="managementOption" [optionsList]="dataManagementOptions" labelKey="label" valueKey="value">
+    </lib-segment>
+  </div>
+
+  <div class="f-col mdo-field">
+    <pros-dataset-search label="Dataset" labelKey="moduleName" valueKey="moduleId" [availableOptions]="datasetList$|async"
+    (selectionChange)="selectDataset($event)"></pros-dataset-search>
+  </div>
+
+  <!-- <lib-button-group>
+    <lib-button [disabled]="!selectedModuleId" type="major" (click)="handleDelete()" width="80px">Delete
+    </lib-button>
+  </lib-button-group> -->
+</div>

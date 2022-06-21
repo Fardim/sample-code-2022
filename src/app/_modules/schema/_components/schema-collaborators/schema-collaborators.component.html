@@ -1,0 +1,84 @@
+<div class="root f-col">
+    <mat-toolbar>
+        <mat-toolbar-row>
+          <span>Collaborators</span>
+          <span class="f-spacer"></span>
+          <button mat-icon-button (click)="close()"><mat-icon>close</mat-icon></button>
+        </mat-toolbar-row> 
+    </mat-toolbar>
+    <mat-divider></mat-divider>
+    <mat-form-field>
+        <mat-label>Search Collaborators</mat-label>
+        <input matInput [formControl]="searchCollCtrl">
+    </mat-form-field>
+    <div class="f-col collaborators-list" [class.chip-enable-coll-list]="selectedCollaborators.length">
+        <ng-template ngFor let-collaborator [ngForOf]="collaboratorListOb | async">{{collaborator.fullName}}
+            <pros-collaborator
+                [schmeaId] = "schmeaId"
+                [collaborator] = "collaborator"
+                (saveClicked) = "updatePermission($event)"
+                (deleteClicked) = "deleteCollaborator($event)"
+            ></pros-collaborator>
+        </ng-template>        
+    </div>
+
+    <div class="f-col collaborators-add" [formGroup]="addCollaboratorFrmGrp" [class.chip-enable-coll-add]="selectedCollaborators.length">
+        <mat-divider></mat-divider>
+        <div class="f-row-spacer-half"></div>
+        <h3 class="mat-h3">Add Collaborators</h3>
+
+        <mat-form-field appearance="outline">
+            <input type="text"
+                   placeholder="Search users , roles and groups"
+                   aria-label="Number"
+                   matInput
+                   formControlName="addCollaboratorCtrl"
+                   [matAutocomplete]="addCollaboratorCtrlAuto">
+            <mat-autocomplete #addCollaboratorCtrlAuto="matAutocomplete" [displayWith]="displaywith" (optionSelected)="onSelectCollaborator($event)">
+                <mat-optgroup *ngFor="let group of collaborators" [label]="group.groupDesc">
+                    <mat-option *ngFor="let data of group.childs" [value]="data">
+                         {{data.description}}
+                    </mat-option>
+                </mat-optgroup>
+            </mat-autocomplete>
+        </mat-form-field>
+
+        <!-- FOR CHIPS -->
+        <div class="f-row selected-coll-groups" *ngIf="selectedCollaborators.length">
+            <button mat-icon-button (click)="paginateChip('prev')" [disabled]="enablePreBtn"><mat-icon>navigate_before</mat-icon></button> 
+            <mat-chip-list aria-label="Fish selection">
+                <ng-template ngFor let-selcoll [ngForOf]="possibleChips">
+                    <mat-chip *ngIf="selcoll.permissionType === 'USER'"   matTooltip="{{ selcoll.userMdoModel ? selcoll.userMdoModel.fullName : 'Unknown'}}">
+                        <mat-icon mat-list-icon class="chip-icon icon-user">person</mat-icon>
+                        <span class="chip-content">{{ selcoll.userMdoModel ? selcoll.userMdoModel.fullName : 'Unknown'}}</span>
+                        <mat-icon mat-list-icon class="chip-icon" (click)="remove(selcoll)">cancel</mat-icon>
+                    </mat-chip>
+    
+                    <mat-chip *ngIf="selcoll.permissionType === 'ROLE'"   matTooltip="{{ selcoll.rolesModel ? selcoll.rolesModel.roleDesc : 'Unknown'}}">
+                        <mat-icon mat-list-icon class="chip-icon icon-role">how_to_reg</mat-icon>
+                        <span class="chip-content">{{ selcoll.rolesModel ? selcoll.rolesModel.roleDesc : 'Unknown'}}</span>
+                        <mat-icon mat-list-icon class="chip-icon" (click)="remove(selcoll)">cancel</mat-icon>
+                    </mat-chip>
+
+                    <mat-chip *ngIf="selcoll.permissionType === 'GROUP'"   matTooltip="{{ selcoll.groupHeaderModel ? selcoll.groupHeaderModel.description : 'Unknown'}}">
+                        <mat-icon mat-list-icon class="chip-icon icon-group">group</mat-icon>
+                        <span class="chip-content">{{ selcoll.groupHeaderModel ? selcoll.groupHeaderModel.description : 'Unknown'}}</span>
+                        <mat-icon mat-list-icon class="chip-icon" (click)="remove(selcoll)">cancel</mat-icon>
+                    </mat-chip>
+
+                </ng-template>
+            </mat-chip-list>
+            <button mat-icon-button (click)="paginateChip('next')" [disabled]="!enableNextBtn"><mat-icon>navigate_next</mat-icon></button>
+        </div>
+        
+        <h4 mat-line>Permissions</h4>
+        <div class="f-row permissions">
+            <mat-slide-toggle color="primary" formControlName="isAdmin">Admin</mat-slide-toggle>
+            <mat-slide-toggle color="primary" formControlName="isViewer">Viewer</mat-slide-toggle>
+            <mat-slide-toggle color="primary" formControlName="isEditer">Editor</mat-slide-toggle>
+            <mat-slide-toggle color="primary" formControlName="isReviewer">Reviewer</mat-slide-toggle>
+        </div>
+        <div class="f-row-spacer-half"></div>
+        <div class="f-row action"><button mat-flat-button color="primary" (click)="saveCollaborators()">Add</button></div>
+    </div>
+</div>

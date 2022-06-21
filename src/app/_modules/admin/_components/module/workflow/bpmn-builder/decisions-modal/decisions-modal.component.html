@@ -1,0 +1,44 @@
+<mat-card class="root mat-elevation-z0">
+    <div class="f-row breadcrum-toolbar">
+        <div class="display-heading-large">
+                Recipient {{data.recipient.value}} decisions configuration
+        </div>
+        <span class="f-spacer"></span>
+        <button mat-button (click)="onCancelClick()">
+            <mat-icon>clear</mat-icon>
+        </button>
+    </div>
+    <mat-progress-bar value="30"></mat-progress-bar>
+    <div class="row-spacer"></div>
+    <div class="row-spacer"></div>
+        <form [formGroup]="decisionForm">
+            <ng-container *ngFor="let field of data.fields" [ngSwitch]="field.picklist">
+
+                <div class="f-col" *ngSwitchCase="FIELD_TYPE.Select" >
+                    <mat-label> {{ field.label }}</mat-label>
+                    <mat-form-field appearance="outline">
+                        <input type="text" placeholder="Select value" aria-label="Number" matInput
+                            [matAutocomplete]="selectValue" [formControlName]="field.id">
+                        <mat-icon matSuffix>search</mat-icon>
+                        <mat-autocomplete #selectValue="matAutocomplete" [displayWith]="getOptionText">
+                            <mat-option *ngFor="let option of field.filteredOptions | async" [value]="option">
+                                {{option.TEXT}}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                </div>
+
+                <div class="f-col" *ngSwitchDefault>
+                    <mat-label> {{ field.label }}</mat-label>
+                    <mat-form-field  appearance="outline">
+                        <input matInput [formControlName]="field.id">
+                    </mat-form-field>
+                </div>
+                
+            </ng-container>
+        </form>
+
+<div mat-dialog-actions align="end">
+    <button mat-button (click)="onCancelClick()">Cancel</button>
+    <button mat-button [mat-dialog-close]="decisionForm.value" cdkFocusInitial>Ok</button>
+</div>

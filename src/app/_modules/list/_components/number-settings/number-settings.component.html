@@ -1,0 +1,222 @@
+<div class="root">
+  <div class="f-row-spacer-half"></div>
+  <div class="f-row">
+    <lib-text-line type="leading"> Number setting </lib-text-line>
+    <div class="f-spacer"></div>
+    <lib-button-group>
+      <lib-button type="minor" (click)="createNewNumberSetting()">New number setting</lib-button>
+      <!-- <lib-button type="minor" [matMenuTriggerFor]="moreactionfile" icon="ellipsis-h"></lib-button> -->
+    </lib-button-group>
+    <!-- <mat-menu #moreactionfile="matMenu" class="navigation-menu">
+      <button mat-menu-item i18n="@@export_to_csv">Export to CSV</button>
+      <button mat-menu-item i18n="@@import_from_csv">Import from CSV</button>
+    </mat-menu> -->
+  </div>
+
+  <div class="f-row-spacer-half"></div>
+
+  <!-- Empty State  -->
+  <lib-empty-state
+    class="f-col load-empty"
+    primaryText="Nothing to see here"
+    icon="table"
+    iconSize="200"
+    secondaryText="You don't have any number settings created yet. Would you like to create one?"
+    *ngIf="!formListHasData"
+  >
+    <lib-button type="minor" (click)="createNewNumberSetting()">New number setting</lib-button>
+  </lib-empty-state>
+
+  <ng-container *ngIf="formListHasData">
+    <!-- Search and Filters Section -->
+    <div class="f-row filters-list">
+      <lib-chip-list>
+        <lib-search class="lib-search" i18n-placeholder="@@search" placeholder="Search" (valueChange)="searchFieldSub.next($event)">
+        </lib-search>
+        <!-- MODIFIED BY -->
+        <lib-chip
+          label="Modified by:"
+          i18n-label="@@role"
+          [matMenuTriggerFor]="modifiedbyMenu"
+          type="info"
+          [removable]="filterData?.userModified?.length ? true : false"
+          (removed)="setSelectedModifyby(null); afterFilterMenuClosed('modifiedBy')"
+        >
+          {{ filterData?.userModified?.length > 0 ? filterData?.userModified?.slice(0, 2)?.join(', ') : 'All' }}
+        </lib-chip>
+
+        <ng-container *ngIf="filterData?.userModified?.length > 2">
+          <lib-chip class="lib-chip" type="info" [matMenuTriggerFor]="selectedUserMenu">
+            +{{ filterData?.userModified?.length - 2 }}
+          </lib-chip>
+
+          <mat-menu #selectedUserMenu="matMenu" class="navigation-menu">
+            <ng-container *ngFor="let label of filterData?.userModified | slice: 2">
+              <button mat-menu-item>{{ label }}</button>
+            </ng-container>
+          </mat-menu>
+        </ng-container>
+
+        <mat-menu #modifiedbyMenu="matMenu" xPosition="after" class="filter-menudropdown">
+          <lib-filter-dropdown class="chip-filters">
+            <div class="dropdown-search-wrapper">
+              <lib-search #searchInput prosClickStopPropagation (valueChange)="searchModifyBySub.next($event)"></lib-search>
+            </div>
+            <div class="dropdown-options-wrapper f-col">
+              <div class="dropdown-options-inner-container" prosInfiniteScroll bufferPercentage="20" (scrollEnd)="modifybyScrollEnd()">
+                <div class="default-options">
+                  <lib-filter-option>
+                    <lib-checkbox label="All" (valueChange)="setSelectedModifyby(null)"></lib-checkbox>
+                  </lib-filter-option>
+                  <lib-section></lib-section>
+                </div>
+                <div class="options">
+                  <lib-filter-option prosClickStopPropagation *ngFor="let item of filteredmodifybyUsers">
+                    <lib-checkbox
+                      [label]="item.fname"
+                      prosClickStopPropagation
+                      [checked]="filterData?.userModified?.length && filterData?.userModified?.indexOf(item.userName) >= 0"
+                      (valueChange)="setSelectedModifyby(item, $event)"
+                    >
+                    </lib-checkbox>
+                  </lib-filter-option>
+                </div>
+              </div>
+              <div class="filter-button-wrapper">
+                <lib-button type="minor" (click)="afterFilterMenuClosed('modifiedBy')">Apply</lib-button>
+              </div>
+            </div>
+          </lib-filter-dropdown>
+        </mat-menu>
+
+        <!-- CREATED BY -->
+        <lib-chip
+          label="Created by:"
+          i18n-label="@@role"
+          [matMenuTriggerFor]="createdbyMenu"
+          type="info"
+          [removable]="filterData?.userCreated?.length ? true : false"
+          (removed)="setSelectedCreatedby(null); afterFilterMenuClosed('createdBy')"
+        >
+          {{ filterData?.userCreated?.length > 0 ? filterData?.userCreated?.slice(0, 2)?.join(', ') : 'All' }}
+        </lib-chip>
+
+        <ng-container *ngIf="filterData?.userCreated?.length > 2">
+          <lib-chip class="lib-chip" type="info" [matMenuTriggerFor]="selectedCreatedUserMenu">
+            +{{ filterData?.userCreated?.length - 2 }}
+          </lib-chip>
+
+          <mat-menu #selectedCreatedUserMenu="matMenu" class="navigation-menu">
+            <ng-container *ngFor="let label of filterData?.userCreated | slice: 2">
+              <button mat-menu-item>{{ label }}</button>
+            </ng-container>
+          </mat-menu>
+        </ng-container>
+
+        <mat-menu #createdbyMenu="matMenu" xPosition="after" class="filter-menudropdown">
+          <lib-filter-dropdown class="chip-filters">
+            <div class="dropdown-search-wrapper">
+              <lib-search #searchInput prosClickStopPropagation (valueChange)="searchCreatedBySub.next($event)"></lib-search>
+            </div>
+            <div class="dropdown-options-wrapper f-col">
+              <div class="dropdown-options-inner-container" prosInfiniteScroll bufferPercentage="20" (scrollEnd)="createdbyScrollEnd()">
+                <div class="default-options">
+                  <lib-filter-option>
+                    <lib-checkbox label="All" (valueChange)="setSelectedCreatedby(null)"></lib-checkbox>
+                  </lib-filter-option>
+                  <lib-section></lib-section>
+                </div>
+                <div class="options">
+                  <lib-filter-option prosClickStopPropagation *ngFor="let item of filteredcreatedbyUsers">
+                    <lib-checkbox
+                      [label]="item.fname"
+                      prosClickStopPropagation
+                      [checked]="filterData?.userCreated?.length && filterData?.userCreated?.indexOf(item.userName) >= 0"
+                      (valueChange)="setSelectedCreatedby(item, $event)"
+                    >
+                    </lib-checkbox>
+                  </lib-filter-option>
+                </div>
+              </div>
+              <div class="filter-button-wrapper">
+                <lib-button type="minor" (click)="afterFilterMenuClosed('createdBy')">Apply</lib-button>
+              </div>
+            </div>
+          </lib-filter-dropdown>
+        </mat-menu>
+      </lib-chip-list>
+    </div>
+
+    <!-- Number Settings Table -->
+    <div class="f-row-spacer-half"></div>
+
+    <lib-skeleton-overview *ngIf="showSkeleton"></lib-skeleton-overview>
+
+    <div class="teams">
+      <table #table [ngStyle]="{ display: showSkeleton ? 'none' : '' }" mat-table [dataSource]="dataSource" class="mat-elevation-z0">
+        <!-- dynamic columns -->
+        <ng-template ngFor let-dynCol [ngForOf]="displayedColumns">
+          <ng-container [matColumnDef]="dynCol">
+            <th class="action-column" mat-header-cell *matHeaderCellDef>
+              <ng-container *ngIf="dynCol !== 'action'">
+              {{ getLabel(dynCol) }}
+            </ng-container>
+            </th>
+
+            <td mat-cell *matCellDef="let element" [ngClass]="{ 'action-cell': dynCol == 'action'}">
+              <div class="f-row" *ngIf="dynCol == 'description'; else dateTemplate">
+                <lib-text-line textColor="link" class="cursor" type="base" enableWrap="true" *ngIf="dynCol == 'description'; else dateTemplate" (click)="gotoEditPage(element)">
+                 {{ element[dynCol] }}
+                </lib-text-line>
+              </div>
+
+              <ng-template #dateTemplate>
+                <lib-text-line type="base" enableWrap="true" *ngIf="dynCol == 'dateModified'; else userAvatarTemplate">
+                  {{ element[dynCol] | prosDatePipe }}
+                </lib-text-line>
+              </ng-template>
+
+              <ng-template #userAvatarTemplate>
+                <lib-avatar *ngIf="dynCol == 'userModified'; else actionCellTemplate" [initials]="shortName(element[dynCol])" [libTooltip]="element[dynCol]"></lib-avatar>
+              </ng-template>
+
+              <ng-template #actionCellTemplate>
+                <div *ngIf="dynCol == 'action'; else defaultCellTemplate" class="f-row">
+                  <lib-button type="plain" icon="ellipsis-h" (click)="$event.stopPropagation()" [matMenuTriggerFor]="actionMenu">
+                  </lib-button>
+                  <mat-menu #actionMenu="matMenu" class="navigation-menu">
+                    <button mat-menu-item i18n="@@edit" (click)="gotoEditPage(element)">Edit</button>
+                    <lib-section></lib-section>
+                    <button mat-menu-item i18n="@@delete" (click)="delete(element)">Delete</button>
+                  </mat-menu>
+                </div>
+              </ng-template>
+
+              <ng-template #defaultCellTemplate>
+                <lib-text-line type="base" enableWrap="true">
+                  {{ element[dynCol] ? element[dynCol] : '' }}
+                </lib-text-line>
+              </ng-template>
+            </td>
+          </ng-container>
+        </ng-template>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </div>
+    <div class="f-row-spacer-half"></div>
+
+    <div class="f-row">
+      <lib-pagination
+        [currentPageIndex]="recordsPageIndex"
+        [totalCount]="totalCount"
+        [pageSize]="recordsPageSize"
+        (pageChangeEvent)="onPageChange($event)">
+      </lib-pagination>
+      <lib-text-line type="base" enableWrap="true">
+        {{ displayedRecordsRange }}
+      </lib-text-line>
+    </div>
+  </ng-container>
+</div>

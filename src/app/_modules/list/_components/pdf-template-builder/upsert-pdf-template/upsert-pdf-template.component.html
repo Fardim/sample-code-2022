@@ -1,0 +1,42 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+      <lib-button (click)="close()" icon="times" iconFontType="light"></lib-button>
+      <div class="col-spacer"></div>
+      <div class="mdo-constrained-right">
+        <div class="f-row breadcrum-head">
+          <lib-text-line type="leading">{{ currentTemplateId ? 'Edit template' : 'New template' }}</lib-text-line>
+          <span class="f-spacer"></span>
+          <lib-button width="80px" type="plain" (afterClick)="clearRichTextData()">Reset</lib-button>&nbsp;
+          <lib-button width="80px" (click)="onSaveTemplate()" type="major">{{ currentTemplateId ? 'Update' : 'Save' }}
+          </lib-button>
+        </div>
+      </div>
+    </div>
+    <div class="f-row-spacer-half"></div>
+    <div class="f-col sidesheetcontent-listing">
+      <div class="f-col mdo-justify">
+        <div class="template-container">
+          <form [formGroup]="emailTemplateForm">
+            <div class="f-col">
+              <lib-input inputState="undefined" [hasError]="false" [isRequired]="true" autocomplete="off" label="Name"
+                labelIcon="question-circle" labelIconFont="mdo-icons" formControlName="templateName"></lib-input>
+            </div>
+  
+            <button (menuOpened)="getMenuCoordinates()" [style.position]="'absolute'" [style.left.px]="menuX"
+              [style.top.px]="menuY" mat-button [matMenuTriggerFor]="headerData"></button>
+  
+            <div #editor class="f-col mdo-field">
+              <lib-text-line type="xsmall" weight="strong" class="field-label">Editor</lib-text-line>
+              <pros-quill-editor [fieldid]="'email-body'" #quillEditorRef [denotationChar]="denotationChar" [selectedMenuItem]="selectedMenuItem"
+                formControlName="data" [editorConfig]="editorConfig" [returnDelta]="true"
+                (valueChange)="templateBodyUpdated($event)"></pros-quill-editor>
+            </div>
+  
+          </form>
+        </div>
+        <mat-menu panelClass="header-menu" #headerData="matMenu">
+          <pros-dash-menu [searchedTermForHeaderData]="searchedTermForHeaderData" [menuDataType]="menuDataType" (selectedFlow)="selectedFlow($event)" (closeMenu)="closeMenu($event)"></pros-dash-menu>
+        </mat-menu>
+      </div>
+    </div>
+  </div>

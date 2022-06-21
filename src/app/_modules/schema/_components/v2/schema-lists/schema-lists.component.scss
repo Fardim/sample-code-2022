@@ -1,0 +1,42 @@
+div.root {
+  padding: 0 16px;
+  user-select: text;
+
+  .breadcrum-toolbar {
+    padding-top: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  table.table-vertical {
+    .mat-row {
+      &.mat-row:nth-child(odd) {
+        background: transparent;
+      }
+    }
+
+    .mat-header-cell,
+    .mat-cell {
+      border-bottom-style: solid;
+      border-bottom-width: 1px;
+      border-right: none;
+
+      &.align-end {
+        text-align: right;
+        width: 300px;
+      }
+
+      .cursor {
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.new-module-creation.root {
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  box-sizing: border-box;
+}

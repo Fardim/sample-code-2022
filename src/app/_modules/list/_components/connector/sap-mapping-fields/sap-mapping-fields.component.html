@@ -1,0 +1,177 @@
+<div class="root">
+  <div class="f-col manually-dataset">
+
+    <div class="f-col mdo-field">
+      <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@system_type">System type
+      </lib-text-line>
+      <lib-segment [formControl]="datasetSourceOptionControl" [optionsList]="datasetSourceOptions" labelKey="label" valueKey="value">
+      </lib-segment>
+    </div>
+
+    <div class="f-col mdo-field">
+      <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@dataset_name">Dataset name </lib-text-line>
+      <div class="mdo-field-input">
+        <input matInput placeholder="Select data type" #optionsInput [matAutocomplete]="datasetAuto" />
+        <mat-autocomplete class="mdo-autocomplete" #datasetAuto="matAutocomplete">
+          <mat-option class="mdo-option" *ngFor="let data of datasetOptions" [value]="data">
+            {{ data }}
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+    </div>
+
+    <div class="row-spacer"></div>
+
+    <mat-drawer-container class="example-container" autosize hasBackdrop="false">
+      <mat-drawer #drawer mode="side" position="end" id="property-panel">
+        <pros-structure-level-config></pros-structure-level-config>
+      </mat-drawer>
+      <mat-drawer-content>
+        <div class="root">
+          <div class="grid-list">
+              <div class="mapping-wrapper-outer">
+                  <!-- sidenav main content goes here -->
+                  <div class="sidenav-body mapping-area" id="mapping-area">
+                      <lib-banner *ngIf="bannerText" [text]="bannerText" status="error"></lib-banner>
+                      <div class="f-row-spacer-half"></div>
+                      <div class="mapping-container-wrapper"
+                          [style.height]="!!bannerText? 'calc(100% - 112px)': 'calc(100% - 50px)'">
+                          <!-- source container -->
+                          <!-- <div class="source-container">
+                              <div class="f-row header-wrapper">
+                                  <lib-text-line textColor="primary" type="base" weight="strong">MDO Structure</lib-text-line>
+                                  <div class="f-spacer"></div>
+                                  <lib-button [icon]="sourceMenuToggle? 'angle-down': 'angle-up'" (click)="sourceMenuToggle = !sourceMenuToggle"></lib-button>
+                              </div>
+                              <div class="f-row-spacer-half"></div>
+                              <div class="f-row search-wrapper">
+                                  <lib-search class="lib-search" [formControl]="sourceControl" placeholder="search source fields"></lib-search>
+                              </div>
+                              <div class="f-row-spacer-half"></div>
+                              <div class="collapsible" #sourceContainer (scroll)="onScroll($event)">
+                                  <mat-accordion togglePosition="before" [multi]="true">
+                                      <mat-expansion-panel *ngFor="let item of filteredSourceFields | async" class="mat-elevation-z0" [expanded]="sourceMenuToggle">
+                                          <mat-expansion-panel-header>
+                                              <mat-panel-title>
+                                                  <div class="f-row">
+                                                      <lib-text-line textColor="primary" [enableWrap]="false">
+                                                          <div [innerHTML]="item.category | highlight: sourceControl.value">
+                                                              {{item.category}}
+                                                          </div>
+                                                      </lib-text-line>
+                                                      <div class="f-spacer"></div>
+                                                      <lib-text-line textColor="secondary">1:1</lib-text-line>
+                                                  </div>
+                                              </mat-panel-title>
+                                          </mat-expansion-panel-header>
+
+                                          <ng-container *ngFor="let field of item.childrens">
+                                            <div
+                                              *ngIf="!sourceControl.value || field.name.includes(sourceControl.value)"
+                                              [id]="field.id"
+                                              matBadge
+                                              libStatusBadge
+                                              [badgeIcon]="fieldHasMapping(field.id)? '': 'plus'"
+                                              [statusBadgePosition]="{ top: 13, right: 0 }"
+                                              (click)="selectSourceField(field)">
+                                              <lib-filter-option class="lib-filter-option" [ngClass]="{'selected': isSourceSelected(field.id)}">
+                                                  <lib-button [disabled]="true"></lib-button>
+                                                  <mat-icon fontSet="mdo-icons">eye</mat-icon>
+                                                  <div class="f-col-spacer-half"></div>
+                                                  <lib-text-line type="base" textColor="primary" [enableWrap]="false">
+                                                      <div [innerHTML]="field.name | highlight: sourceControl.value">
+                                                          {{field.name}}
+                                                      </div>
+                                                  </lib-text-line>
+                                              </lib-filter-option>
+                                          </div>
+                                          </ng-container>
+                                      </mat-expansion-panel>
+                                  </mat-accordion>
+
+                              </div>
+                          </div> -->
+
+                          <!-- Spacer between grids, do not remove -->
+                          <div></div>
+
+                          <!-- target container -->
+                          <div class="target-container">
+                              <!-- To be used when the target div is out of view -->
+                              <div class="hidden-top-reference" id="top-reference"></div>
+                              <div class="hidden-bottom-reference" id="bottom-reference"></div>
+
+                              <div class="f-row header-wrapper">
+                                  <lib-text-line textColor="primary" type="base" weight="strong">HCI Connection Structure</lib-text-line>
+                                  <div class="f-spacer"></div>
+                                  <lib-button [icon]="targetMenuToggle? 'angle-down': 'angle-up'" (click)="targetMenuToggle = !targetMenuToggle"></lib-button>
+                              </div>
+                              <div class="f-row-spacer-half"></div>
+                              <div class="f-row search-wrapper">
+                                  <lib-search class="lib-search" [formControl]="targetControl" placeholder="search target fields"></lib-search>
+                              </div>
+                              <div class="f-row-spacer-half"></div>
+                              <!-- <div class="collapsible" (scroll)="onScroll($event)">
+                                  <mat-accordion togglePosition="before" [multi]="true">
+                                      <mat-expansion-panel class="mat-elevation-z0" *ngFor="let item of filteredTargetFields | async" [expanded]="targetMenuToggle">
+                                          <mat-expansion-panel-header>
+                                              <mat-panel-title>
+                                                  <div class="f-row">
+                                                      <lib-text-line textColor="primary" [enableWrap]="false">
+                                                          <div [innerHTML]="item.category | highlight: targetControl.value">
+                                                              {{item.category}}
+                                                          </div>
+                                                      </lib-text-line>
+                                                      <div class="f-spacer"></div>
+                                                      <lib-button>
+                                                          1:1
+                                                      </lib-button>
+                                                  </div>
+                                              </mat-panel-title>
+                                          </mat-expansion-panel-header>
+                                          <ng-container *ngFor="let field of item.childrens">
+                                            <div [id]="field.id" (click)="selectTargetField(field)">
+                                              <lib-filter-option class="lib-filter-option" [ngClass]="{'selected': isSourceSelected(field.id)}">
+                                                <div class="f-row">
+                                                  <lib-button [disabled]="true"></lib-button>
+                                                  <mat-icon fontSet="mdo-icons">eye</mat-icon>
+                                                  <div class="f-col-spacer-half"></div>
+                                                  <lib-text-line type="base" textColor="primary" [enableWrap]="false">
+                                                      <div [innerHTML]="field.name | highlight: targetControl.value">
+                                                          {{field.name}}
+                                                      </div>
+                                                  </lib-text-line>
+                                                  <ng-container *ngIf="!!getMappedField(field.id)">
+                                                      <div class="f-col-spacer-half"></div>
+                                                      <lib-label>{{getMappedField(field.id)?.name}}</lib-label>
+                                                  </ng-container>
+                                                </div>
+                                                <div class="f-spacer"></div>
+                                                <span class="indicator" *ngIf="field?.hasTransformation"></span>
+                                                <div class="col-spacer"></div>
+                                              </lib-filter-option>
+                                            </div>
+                                          </ng-container>
+                                      </mat-expansion-panel>
+                                  </mat-accordion>
+                              </div> -->
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        </div>
+
+      </mat-drawer-content>
+    </mat-drawer-container>
+  </div>
+
+  <div class="f-row dataset-button">
+    <lib-button type="plain" width="80px" i18n="@@cancel">Cancel</lib-button>
+    <span class="f-spacer"></span>
+    <lib-button type="plain" width="80px" i18n="@@back" (click)="connectorService.updateNextStep(-1)">Back</lib-button>
+    &nbsp;
+      <lib-button type="major" width="80px" i18n="@@next" (click)="connectorService.updateNextStep(1)">Next </lib-button>
+  </div>
+</div>
+

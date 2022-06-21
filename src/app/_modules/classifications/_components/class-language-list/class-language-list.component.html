@@ -1,0 +1,14 @@
+<lib-filter-dropdown class="chip-filters">
+  <div class="dropdown-search-wrapper">
+    <lib-search prosClickStopPropagation placeholder="Search..." (valueChange)="searchLanguageSub.next($event)"></lib-search>
+  </div>
+  <div class="dropdown-options-wrapper f-col">
+    <div class="dropdown-options-inner-container">
+      <div class="options">
+        <lib-filter-option prosClickStopPropagation *ngFor="let lang of searchLanguageList" [value]="lang.id" (click)="addLanguage(lang)">
+          <lib-text-line>{{ lang.name }} </lib-text-line>
+        </lib-filter-option>
+      </div>
+    </div>
+  </div>
+</lib-filter-dropdown>

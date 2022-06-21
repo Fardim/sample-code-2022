@@ -1,0 +1,26 @@
+//coming soon
+.hide {
+  display: none;
+}
+
+.root {
+  display: flex;
+}
+
+.lib-tab-with-actions {
+  width: calc(100% - 30px);
+}
+
+.more-actions {
+  margin-top: 0.5rem;
+}
+
+.tab-loader {
+  width: 100%;
+  justify-content: space-between;
+  height: 48px;
+
+  .lib-skeleton {
+    width: 15%;
+  }
+}

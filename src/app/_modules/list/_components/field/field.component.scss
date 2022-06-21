@@ -1,0 +1,83 @@
+.flex-row {
+  justify-content: flex-start;
+  align-items: stretch;
+  height: 100%;
+}
+
+div.root {
+  user-select: text;
+  height: 100%;
+  padding: 0 12px;
+  overflow: hidden;
+  margin: 0 auto;
+  width: 100%;
+
+  .breadcrum-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 8px 0;
+    min-height: 36px;
+  }
+
+  .lib-search {
+    width: 213px;
+    margin-right: 24px;
+  }
+
+  .listing-container {
+    height: calc(100% - 52px);
+    overflow: hidden;
+    align-items: flex-start;
+
+    .listset-navigation {
+      height: 100%;
+      width: 220px;
+      overflow-y: auto;
+      border-right-width: 1px;
+      border-right-style: solid;
+      margin-right: 12px;
+      padding-top: 14px;
+
+      mat-accordion.mat-accordion {
+        padding-right: 12px;
+      }
+    }
+
+    .listset-grid {
+      width: calc(100% - 220px - 24px);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .field-list-container {
+      overflow: hidden;
+      height: 100%;
+      width: 100%;
+      padding-top: 12px;
+
+      .field-header {
+        min-height: 36px;
+
+        .titleLoader {
+          width: 160px;
+        }
+      }
+
+      .centered {
+        position: relative;
+        display: flex;
+        justify-content: center;
+      }
+    }
+  }
+}
+
+.define-fieldsdata {
+  align-items: flex-start;
+  justify-content: space-around;
+
+  .define-fieldlist {
+    flex: 1;
+  }
+}

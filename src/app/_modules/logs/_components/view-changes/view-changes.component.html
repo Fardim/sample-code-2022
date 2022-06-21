@@ -1,0 +1,109 @@
+<mat-drawer-container class="example-container" autosize hasBackdrop="false">
+  <mat-drawer #drawer mode="side" position="end" id="property-panel"> </mat-drawer>
+  <mat-drawer-content>
+    <div class="root">
+      <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+        <div class="f-col-spacer-half"></div>
+        <div class="f-col mdo-constrained-right">
+          <div class="f-row breadcrum-head">
+            <lib-text-line type="leading" enableWrap="true"> View changes </lib-text-line>
+          </div>
+        </div>
+      </div>
+      <div class="f-col sidesheetcontent-listing">
+        <div class="f-row mdo-justify">
+          <div class="f-col hierarchy-listing" [style.width.px]="widthOfHierarchies">
+            <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="hierarchy-tree">
+              <mat-tree-node
+                *matTreeNodeDef="let node"
+                matTreeNodePadding
+                [ngClass]="{ selected: isActive(node) }"
+                class="f-row"
+              >
+                <lib-text-line class="hierarchy-name" type="base" (click)="handleClickHierercyLabel(node)">
+                  {{ node.label }}
+                </lib-text-line>
+                <span class="f-spacer"></span>
+              </mat-tree-node>
+              <mat-tree-node
+                *matTreeNodeDef="let node; when: hasChild"
+                matTreeNodePadding
+                [ngClass]="{ selected: isActive(node) }"
+                class="f-row"
+              >
+                <button mat-icon-button matTreeNodeToggle prosClickStopPropagation>
+                  <mat-icon class="mat-icon-rtl-mirror">
+                    {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                  </mat-icon>
+                </button>
+                <lib-text-line class="hierarchy-name" type="base" (click)="handleClickHierercyLabel(node)">
+                  {{ node.label }}
+                </lib-text-line>
+              </mat-tree-node>
+            </mat-tree>
+          </div>
+          <div class="split-col" (click)="toggleSideBar()">
+            <div class="split-arrow">
+              <mat-icon fontSet="mdo-icons">{{ arrowIcon }}</mat-icon>
+            </div>
+          </div>
+          <div
+            class="f-col form-area-container"
+            [ngStyle]="{ width: 'calc(100% - ' + widthOfHierarchies + 'px - 24px)' }"
+          >
+            <ng-template [ngIf]="tableDataSource.length > 0" [ngIfElse]="emptyStateTemplate">
+              <table mat-table [dataSource]="tableDataSource" matSort class="mat-elevation-z0">
+                <ng-template ngFor let-dynCol let-index="index" [ngForOf]="displayedObjColumns | async">
+                  <ng-container [matColumnDef]="dynCol.key">
+                    <th mat-header-cell *matHeaderCellDef class="fixed-width-c2">
+                      {{ dynCol.label }}
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="fixed-width-c2">
+                      <ng-template
+                        [ngIf]="dynCol.key === 'action' && getActionStatus(element[dynCol.key])"
+                        [ngIfElse]="detailsCellTemplate"
+                      >
+                        <lib-label [text]="element[dynCol.key]" [status]="getActionStatus(element[dynCol.key])">
+                        </lib-label>
+                      </ng-template>
+                      <ng-template #detailsCellTemplate>
+                        <ng-container *ngIf="dynCol.key === 'details'; else defaultCol">
+                          <lib-text-line
+                            type="base"
+                            textColor="link"
+                            (click)="handleClickView(element)"
+                            class="info-link"
+                            enableWrap="true"
+                            >View</lib-text-line
+                          >
+                        </ng-container>
+                      </ng-template>
+                      <ng-template #defaultCol>
+                        {{ element[dynCol.key] }}
+                      </ng-template>
+                    </td>
+                  </ng-container>
+                </ng-template>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns | async; sticky: true"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns | async"></tr>
+              </table>
+            </ng-template>
+            <ng-template #emptyStateTemplate>
+              <div class="f-row empty-block">
+                <lib-empty-state
+                  primaryText="Nothing to see here"
+                  secondaryText="No data found"
+                  icon="table"
+                  iconSize="200"
+                >
+                </lib-empty-state>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>

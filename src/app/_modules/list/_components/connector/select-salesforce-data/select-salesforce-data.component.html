@@ -1,0 +1,53 @@
+<div class="root" *ngIf="!showSFStoreData">
+  <lib-banner class="lib-banner" status="warning">
+    <lib-text-line [innerHtml]="errorText"></lib-text-line>
+    <span class="f-spacer"></span>
+    <lib-button class="lib-button" type="plain" iconFontType="light" (click)="reAuthorise()">Re-authorise</lib-button>
+  </lib-banner>
+
+  <div class="f-col">
+    <lib-search i18n-placeholder="@@search_services" placeholder="Search objects" class="lib-search"
+      matAutocompleteOrigin #origin="matAutocompleteOrigin" (afterFocus)="onServiceSearchFocus()" (keyup)="onServiceSearchFocus()"
+      (focus)="onServiceSearchFocus()" [formControl]="sfObjectCtrl">
+    </lib-search>
+
+    <input matInput [matAutocomplete]="auto" [matAutocompleteConnectedTo]="origin" #searchServiceTrigger="matAutocompleteTrigger" hidden />
+    <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete">
+      <div class="service-entries" *ngFor="let entry of sfOptions | async">
+        <mat-option (click)="selectSFObject(entry)">
+          {{ entry.name }}
+        </mat-option>
+        <lib-section></lib-section>
+      </div>
+    </mat-autocomplete>
+  </div>
+
+  <div class="row-spacer"></div>
+
+  <div class="f-col">
+    <lib-slide-toggle [formControl]="updateDataCtrl" labelposition="before" label="Update data in this system"
+      (toggleChange)="onToggle($event,'update')" i18n-label="@@update_data" theme="primary">
+    </lib-slide-toggle>
+  </div>
+
+  <div class="row-spacer"></div>
+
+  <div class="f-col">
+    <lib-slide-toggle [formControl]="syncDataCtrl" labelposition="before" label="Sync data now" (toggleChange)="onToggle($event,'syncData')"
+      i18n-label="@@update_data" theme="primary">
+    </lib-slide-toggle>
+  </div>
+
+  <div class="f-row dataset-button">
+    <lib-button type="plain" (click)="onCancelClick(false)" i18n="@@cancel">Cancel</lib-button>
+    <span class="f-spacer"></span>
+    <div class="f-row">
+      <lib-button type="plain" (click)="back()" i18n="@@back">Back</lib-button>
+    </div>
+  </div>
+</div>
+
+
+<div class="root" *ngIf="showSFStoreData">
+  <pros-store-salesforce-dataset></pros-store-salesforce-dataset>
+</div>

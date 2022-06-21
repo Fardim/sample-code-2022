@@ -1,0 +1,76 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading">
+                    Business rule library
+                </lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button-group>
+                    <lib-button type="major" width="80px" (click)="saveRuleData()">Save</lib-button>
+                </lib-button-group>
+            </div>
+        </div>
+    </div>
+    <div class="f-col sidesheetcontent-listing">
+        <div class="mdo-justify">
+            <div class="f-row" #filterContainer>
+                <lib-chip-list class="filters-list">
+                    <lib-search class="lib-search" [formControl]="search" placeholder="Search">
+                    </lib-search>
+                    <lib-chip class="mdo-filter-matchip" (click)="getAssignedRules()"> Assigned
+                    </lib-chip>
+                    <lib-chip class="mdo-filter-matchip" (click)="getUnAssignedRules()"> Unassigned
+                    </lib-chip>
+                    <lib-chip class="mdo-filter-matchip" label="Rule type:" type="info" [matMenuTriggerFor]="ruleType">
+                        All
+                    </lib-chip>
+                    <mat-menu #ruleType="matMenu" xPosition="after" class="navigation-menu">
+                        <button mat-menu-item (click)="getRuleByRuleType('All')">All</button>
+                        <ng-container *ngFor="let type of businessRuleTypes">
+                            <button mat-menu-item *ngIf="type.isImplemented" (click)="getRuleByRuleType(type)"
+                                [libTooltip]="type.ruleDesc">
+                                {{ type.ruleDesc }}
+                            </button>
+                        </ng-container>
+                    </mat-menu>
+                </lib-chip-list>
+            </div>
+            <div class="f-row-spacer-half"></div>
+            <lib-skeleton type="line" *ngIf="loading"></lib-skeleton>
+            <div class="f-col list-scroll" prosInfiniteScroll bufferPercentage="20" (scrollEnd)="loadMore()">
+                <table mat-table [dataSource]="brData" class="mat-elevation-z0 table-vertical"> 
+                    <ng-container matColumnDef="brInfo" sticky>
+                        <td mat-cell *matCellDef="let element">
+                            {{element.brInfo}}
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="dataset">
+                        <td mat-cell *matCellDef="let element">
+                            {{element.moduleDesc || element.moduleId || 'Untitled'}}
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="brType">
+                        <td mat-cell *matCellDef="let element">
+                            {{getRuleDesc(element.brType) }}
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="brStatus">
+                        <td mat-cell *matCellDef="let element" class="right-align">
+                            <lib-button width="80px" *ngIf="!element.isAssigned" libTooltip="Click to assign"
+                                type="minor" (click)="assignRule(element)">Assign</lib-button>
+                            <lib-button width="80px" *ngIf="element.isAssigned" libTooltip="Click to un-assign"
+                                (click)="assignRule(element)" icon="check" type="minor">
+                            </lib-button>
+                        </td>
+                    </ng-container>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

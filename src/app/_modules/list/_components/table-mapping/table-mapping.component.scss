@@ -1,0 +1,64 @@
+mat-card.root {
+  height: 100%;
+  user-select: text;
+  padding: 0;
+  border: none;
+
+  .modal-wrapper {
+    .modal-body {
+      height: calc(100% - 120px);
+      overflow: auto;
+
+      .manually-dataset {
+        height: 100%;
+
+        .scrollable-form-area {
+          width: 62%;
+          margin: 0 auto;
+
+          .field-label {
+            margin-bottom: 6px;
+          }
+
+          .dataset-form {
+            justify-content: space-between;
+
+            .dataset-search {
+              flex: 1;
+            }
+          }
+
+          .flex-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0;
+            height: 435px;
+
+            .existing-mapping-wrapper {
+              width: 100%;
+
+              .mapping-inner-container {
+                height: 100%;
+              }
+            }
+
+            .new-mapping-wrapper {
+              width: 100%;
+            }
+          }
+
+          .multipickcheck {
+            .menu-spacing {
+              padding: 12px;
+            }
+
+            .multiselect-checkbox {
+              max-height: 280px;
+              overflow-y: auto;
+            }
+          }
+        }
+      }
+    }
+  }
+}

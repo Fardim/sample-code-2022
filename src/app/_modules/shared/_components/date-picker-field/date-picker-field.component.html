@@ -1,0 +1,25 @@
+<ng-template [ngIf]="showRangeFld">
+    <mat-form-field appearance="outline">
+        <mat-label>Choose a Strat Date</mat-label>
+        <input matInput [matDatepicker]="picker" [formControl]="conditionFieldStartValue" [max]="today" (dateInput)="changeStartDate($event)">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker disabled="false"></mat-datepicker>
+    </mat-form-field>
+    <span class="col-spacer"></span>
+
+    <mat-form-field appearance="outline">
+        <mat-label>Choose a End Date</mat-label>
+        <input matInput [matDatepicker]="picker1" [formControl]="conditionFieldEndValue" [max]="today" (dateInput)="changeEndtDate($event)">
+        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+        <mat-datepicker #picker1 disabled="false"></mat-datepicker>
+    </mat-form-field>
+</ng-template>
+
+<ng-template [ngIf]="!showRangeFld">
+    <mat-form-field appearance="outline">
+        <!-- <mat-label>Choose a Date</mat-label> -->
+        <input matInput [max]="showFutureDates?null:today" [min]="minimumValidDate?minimumValidDate:null" [matDatepicker]="picker" [formControl]="conditionFieldValue" (dateInput)="changeStartDate($event)">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker disabled="false"></mat-datepicker>
+    </mat-form-field>
+</ng-template>

@@ -1,0 +1,30 @@
+<div class="root">
+  <div class="f-col virtual-dataset">
+    <form [formGroup]="virtualDatasetForm">
+      <div class="f-col mdo-field">
+        <lib-banner *ngIf="showErrorBanner" status="error" [text]="formErrMsg"></lib-banner>
+      </div>
+
+      <div class="f-col">
+        <lib-input label="Dataset name" i18n-label="@@dataset_name" formControlName="vdName" type="text" [isRequired]="true"
+          [hint]="(virtualDatasetForm.controls.vdName.touched && virtualDatasetForm.controls.vdName.errors && virtualDatasetForm.controls.vdName.errors.required) ? 'This is a required field' : ''"
+          [hasError]="virtualDatasetForm.controls.vdName.touched && virtualDatasetForm.controls.vdName.errors && virtualDatasetForm.controls.vdName.errors.required">
+        </lib-input>
+      </div>
+
+      <div class="f-col">
+        <lib-textarea label="Dataset description" i18n-label="@@dataset_description" formControlName="vdDescription" type="textarea" placeholder="Enter the value">
+        </lib-textarea>
+      </div>
+    </form>
+  </div>
+  <div class="f-row dataset-button">
+    <lib-button type="plain" (click)="onCancelClick()" i18n="@@cancel">Cancel</lib-button>
+    <span class="f-spacer"></span>
+    <div class="f-row">
+      <lib-button type="plain" (click)="back()" i18n="@@back">Back</lib-button>
+      <lib-button type="major" i18n="@@create" (click)="onSubmitClick()">Create
+      </lib-button>
+    </div>
+  </div>
+</div>

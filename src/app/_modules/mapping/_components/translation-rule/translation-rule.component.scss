@@ -1,0 +1,41 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  width: 800px;
+
+  .breadcrum-toolbar {
+    padding: 8px 64px 16px 8px;
+
+    .mdo-constrained-right {
+      width: 100%;
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px);
+    overflow: auto;
+
+    .mdo-justify {
+      margin: 0 64px;
+
+      .field-label {
+        margin-bottom: 6px;
+      }
+
+      .lib-input {
+        height: 36px;
+      }
+
+      .rule-condition {
+        border: 1px solid #e4ebf3;
+        border-radius: 4px;
+        padding-top: 8px;
+      }
+
+      .add-more {
+        margin-top: 16px;
+      }
+    }
+  }
+}

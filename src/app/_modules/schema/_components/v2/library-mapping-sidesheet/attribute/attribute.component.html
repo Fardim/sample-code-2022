@@ -1,0 +1,66 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" (click)="close()" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading">Create new attribute</lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button type="major" (click)="save()">Save</lib-button>
+            </div>
+        </div>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <form [formGroup]="attributeForm">
+                <div class="mdo-field">
+                    <pros-form-input [type]="'text'" [control]="formField('attrCode')"
+                    [placeholder]="'Name'" [label]="'Name'">
+                    </pros-form-input>
+                    <mat-error
+                        *ngIf="submitted && attributeForm.controls.attrCode.errors && attributeForm.controls.attrCode.errors.required">
+                        Please enter name
+                    </mat-error>
+                </div>
+                <div class="mdo-field">
+                    <pros-form-input [type]="'text'" [control]="formField('attrDesc')" 
+                    [placeholder]="'Description'" [label]="'Description'"></pros-form-input>
+                    <mat-error
+                        *ngIf="submitted && attributeForm.controls.attrDesc.errors && attributeForm.controls.attrDesc.errors.required">
+                        Please enter description
+                    </mat-error>
+                </div>
+                <div class="f-col mdo-field">
+                    <div class="f-row-spacer-half"></div>
+                    <div class="f-row">
+                        <mat-button-toggle-group formControlName="type" appearance="legacy">
+                            <mat-button-toggle [value]="ATTRIBUTE_DATA_TYPE.TEXT">Text</mat-button-toggle>
+                            <mat-button-toggle [value]="ATTRIBUTE_DATA_TYPE.NUMBER">Number</mat-button-toggle>
+                            <mat-button-toggle [value]="ATTRIBUTE_DATA_TYPE.LIST">List</mat-button-toggle>
+                        </mat-button-toggle-group>
+                        <div class="f-col-spacer-half"></div>
+                        <lib-text-line *ngIf="formField('type').value===ATTRIBUTE_DATA_TYPE.LIST" type="base" textColor="link" class="cursor" (click)="openDefaultValueSideSheet()"><span i18n="@@default_value">Default value</span> ({{defaultValueCount}})</lib-text-line>
+                    </div>
+                    <div class="f-row-spacer-half"></div>
+                </div>
+                <div class="mdo-field">
+                    <pros-form-input type="number" [control]="formField('attFieldLen')"
+                     [placeholder]="'Field length'" [label]="'Field length'"></pros-form-input>
+                    <mat-error
+                        *ngIf="submitted && attributeForm.controls.attFieldLen.errors && attributeForm.controls.attFieldLen.errors.required">
+                        Please enter field length
+                    </mat-error>
+                </div>
+                <div class="mdo-field">
+                    <pros-form-input [type]="'text'" [control]="formField('prefix')"
+                     [placeholder]="'Prefix'" [label]="'Prefix'"></pros-form-input>
+                    <mat-error
+                        *ngIf="submitted && attributeForm.controls.prefix.errors && attributeForm.controls.prefix.errors.required">
+                        Please enter prefix
+                    </mat-error>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

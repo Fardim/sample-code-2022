@@ -1,0 +1,18 @@
+<mat-card class="root mat-elevation-z0">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-row mdo-constrained-right">
+      <!-- <div class="display-heading-large">Summary</div> -->
+      <lib-text-line type="leading">Summary</lib-text-line>
+    </div>
+  </div>
+
+  <div class="row-spacer"></div>
+
+  <div class="f-col mdo-justify">
+    <ng-template *ngIf="layoutData" ngFor let-metadata [ngForOf]="layoutMetadata.getValue()">
+      <pros-summary-tabs [metadata]="metadata" [data]="layoutData"></pros-summary-tabs>
+    </ng-template>
+  </div>
+</mat-card>

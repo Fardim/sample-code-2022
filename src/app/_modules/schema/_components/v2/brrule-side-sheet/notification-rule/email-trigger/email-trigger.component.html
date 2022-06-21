@@ -1,0 +1,33 @@
+<div class="f-col">
+    <lib-text-line type="xsmall" class="field-label" weight="strong" i18n="@@rule_type">Email<span class="mandatory">*</span></lib-text-line>
+    <div class="user-defined-set">
+        <ng-container *ngFor="let rule of selectedEmailFields;let i = index">
+            <div class="f-row defined-row">
+                <div class="col select-col udr-select-col"></div>
+                <!-- Field Name -->
+                <div class="col">
+                    <pros-option-filter [availableOptions]="emailFieldList"
+                        (selectionChange)="setEmailField($event, i)"
+                        (inputBlur)="updateEmailField($event, i)" [value]="rule.fieldId" class="w-100"
+                        placeholder="Email field">
+                    </pros-option-filter>
+                </div>
+                <!-- Remove -->
+                <div class="col">
+                    <lib-button type="plain" icon="trash-alt" iconFontType="light" libTooltip="Delete"
+                        (click)="removeEmailField(i)">
+                    </lib-button>
+                </div>
+            </div>
+            <div class="mdo-field" *ngIf="submitted && !rule.fieldId" [class.mdo-form-error]="submitted && !rule.fieldId">
+                <mat-error class="mdo-field-hint">
+                    <lib-text-line type="small">Please Select Field Value</lib-text-line>
+                </mat-error>
+            </div>
+        </ng-container>
+    </div>
+    <div class="col-spacer"></div>
+    <div class="f-row button-add-block">
+        <lib-text-line textColor='link' (click)="addEmailField()">+ Add another</lib-text-line>
+    </div>
+</div>

@@ -1,0 +1,69 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <ng-container *ngIf="showFullScreenEditor; else mainView">
+            <lib-button class="times" (click)="toggleFullScreenEditor()" type="plain" iconFontType="light" icon="times"></lib-button>
+            <div class="col-spacer"></div>
+            <div class="f-col mdo-constrained-right">
+                <div class="f-row breadcrum-head">
+                    <lib-text-line type="leading">DAXE Editor</lib-text-line>
+                    <div class="f-spacer"></div>
+                    <lib-button type="major" (click)="toggleFullScreenEditor()" width="80px">OK</lib-button>
+                </div>
+            </div>
+        </ng-container>
+        <ng-template #mainView>
+            <lib-button class="times" (click)="close()" type="plain" iconFontType="light" icon="times"></lib-button>
+            <div class="col-spacer"></div>
+            <div class="f-col mdo-constrained-right">
+                <div class="f-row breadcrum-head">
+                    <lib-text-line *ngIf="mode === 'new'" type="leading">New DAXE</lib-text-line>
+                    <lib-text-line *ngIf="mode === 'edit'" type="leading">{{ daxeRule?.name }}</lib-text-line>
+                    <div class="f-spacer"></div>
+                    <lib-button-group>
+                        <lib-button type="major" (click)="save(false)" width="80px">Save</lib-button>
+                        <lib-button type="major" (click)="save(true)" *ngIf="mode === 'new'">Save as draft</lib-button>
+                    </lib-button-group>
+
+                </div>
+            </div>
+        </ng-template>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify flex-1" [formGroup]="form">
+            <div class="f-col" *ngIf="!showFullScreenEditor">
+                <lib-input formControlName="name" [isRequired]="true" label="DAXE program name"></lib-input>
+            </div>
+            <div class="f-col" *ngIf="!showFullScreenEditor">
+                <lib-textarea formControlName="brief" label="Program details" [isRequired]="true"></lib-textarea>
+            </div>
+            <div class="f-col" *ngIf="!showFullScreenEditor">
+                <lib-textarea formControlName="whatsNew" *ngIf="mode === 'edit'" label="Whats new?"></lib-textarea>
+            </div>
+            <div class="f-col mdo-field" *ngIf="!showFullScreenEditor">
+                <!-- label -->
+                <mat-label class="mdo-field-label">Usage</mat-label>
+                <!-- input container -->
+                <div class="mdo-field-input">
+                    <input formControlName="usage" matInput placeholder="Type to search" [matAutocomplete]="auto" />
+                    <mat-icon fontSet="mdo-icons-light" class="autocomplete-icon" matSuffix>{{menuOpen? 'chevron-up': 'chevron-down'}}</mat-icon>
+                    <!-- autocomplete -->
+                    <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" (opened)="menuOpen = true" (closed)="menuOpen = false">
+                        <mat-option class="mdo-option" [value]="DaxeUsage.VALIDATING">Validating data</mat-option>
+                        <mat-option class="mdo-option" [value]="DaxeUsage.TRANSFORMING">Transforming data</mat-option>
+                    </mat-autocomplete>
+                </div>
+            </div>
+
+            <div class="f-col flex-1">
+                <div class="f-row"  *ngIf="!showFullScreenEditor">
+                    <lib-text-line type="leading">DAXE Editor</lib-text-line>
+                    <lib-button (click)="toggleFullScreenEditor()" type="plain" icon="external-link-alt"></lib-button>
+                </div>
+                <div class="f-row editor-container flex-1">
+                  <ngx-monaco-editor [options]="editorOptions" formControlName="daxeCode"></ngx-monaco-editor>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

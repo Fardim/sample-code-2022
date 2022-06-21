@@ -1,0 +1,233 @@
+<div class="root">
+  <div class="f-row">
+    <lib-text-line type="leading" i18n="@@rules">{{ruleTitle}}</lib-text-line>
+    <div class="f-spacer"></div>
+    <lib-button-group>
+      <lib-button [disabled]="fieldDisabled" i18n="@@save" type="minor" (afterClick)="SaveUpdateGroup()" width="80px">Save</lib-button>
+      <lib-button type="minor" matTooltip="Add new condtion" icon="plus" iconFontType="light"
+        *ngIf="Conditions.length!=0 || resultsFromSearch" [hasDropdown]="false" (afterClick)="close()"></lib-button>
+      <lib-button type="minor" [matMenuTriggerFor]="newFormtypeMenu" icon="ellipsis-h"></lib-button>
+      <mat-menu #newFormtypeMenu="matMenu" class="navigation-menu">
+        <button mat-menu-item (click)="downloadTemplate()" formTypes>
+          Download template
+        </button>
+        <button mat-menu-item (click)="saveRuleToFile()" formTypes>
+          Save rules to file
+        </button>
+        <input type="file" #rules_file style="display: none;"/>
+        <button mat-menu-item (click)="loadRulesFromFile()" formTypes>
+          Load rules from file
+        </button>
+      </mat-menu>
+    </lib-button-group>
+  </div>
+  <div class="f-row-spacer-half"></div>
+  <div class="f-col depends-data-container">
+    <mat-accordion>
+      <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+          <mat-panel-title class="f-row">
+            <lib-text-line type="base" weight="strong" i18n="@@rules">Fields</lib-text-line>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="f-col">
+          <div class="f-col" *ngIf="sourceTargetshowSkeleton">
+            <lib-skeleton type="line"></lib-skeleton>
+            <div class="f-row-spacer-half"></div>
+            <lib-skeleton type="line"></lib-skeleton>
+          </div>
+
+          <lib-banner *ngIf="fieldDisabled"
+            text="Editing any source or target field deletes the conditions created permanently." status="info">
+            <a (click)="enableFields()" class="info-link">&nbsp; {{''}} Edit fields</a>
+          </lib-banner>
+
+          <ng-container *ngIf="!sourceTargetshowSkeleton">
+            <div class="f-col mdo-field">
+              <lib-text-line type="xsmall" weight="strong" class="field-label">Source</lib-text-line>
+              <div class="mdo-field-input">
+                <!-- chip list -->
+                <lib-chip-list>
+                  <ng-container *ngFor="let opt of SelectedOptions; let i=index">
+                    <ng-container *ngIf="i<=limit-1">
+                      <lib-chip [removable]="true" (removed)="remove(opt.structureId,opt.FieldId)">
+                        {{opt.strucDesc}}/{{fieldNames[opt.FieldId]}}
+                      </lib-chip>
+                    </ng-container>
+                  </ng-container>
+                  <lib-chip *ngIf="hasLimit(SelectedOptions)">+{{SelectedOptions.length - limit}}</lib-chip>
+                  <input matInput placeholder="Type field name to add..." #optionInput [formControl]="sourceCtrl"
+                    [matAutocomplete]="auto" (focus)="updateOptions($event)"/>
+                </lib-chip-list>
+                <!-- autocomplete -->
+                <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" (optionSelected)="selected($event)">
+                  <mat-optgroup class="mat-optgroup" *ngFor="let struct of filteredStructures">
+                    <label class="mat-optgroup-label" id="mat-optgroup-label-0">{{struct.strucDesc }}
+                      {{struct.pickList}}
+                    </label>
+                    <mat-option class="mdo-option option-hierarchy" *ngFor="let field of struct.Fields"
+                      [value]="struct.strucDesc+','+field.fieldId+','+struct.structureId+','+field.pickList+','+struct.parentStrucId">
+                      {{fieldNames[field.fieldId]}}
+                    </mat-option>
+                    <mat-option class="option-empty" *ngIf="struct.Fields.length==0">
+                      {{''}}
+                    </mat-option>
+                  </mat-optgroup>
+                </mat-autocomplete>
+              </div>
+            </div>
+            <div class="f-col mdo-field">
+              <lib-text-line type="xsmall" weight="strong" class="field-label">Target</lib-text-line>
+              <div class="mdo-field-input">
+                <!-- chip list -->
+                <lib-chip-list>
+                  <ng-container *ngFor="let opt of TargetSelectedOptions; let i=index">
+                    <ng-container *ngIf="i<=limit-1">
+                      <lib-chip [removable]="true" (removed)="targetRemove(opt.structureId,opt.FieldId)">
+                        {{opt.strucDesc}}/{{fieldNames[opt.FieldId]}}</lib-chip>
+                    </ng-container>
+                  </ng-container>
+                  <lib-chip [matMenuTriggerFor]="selectOptions" *ngIf="hasLimit(TargetSelectedOptions)">+{{TargetSelectedOptions.length - limit}}</lib-chip>
+                  <input matInput placeholder="Type field name to add..." #optionInput [formControl]="targetCtrl"
+                    [matAutocomplete]="auto1" disabled (focus)="updateOptions($event)"/>
+                </lib-chip-list>
+                <!-- autocomplete -->
+                <mat-autocomplete class="mdo-autocomplete" #auto1="matAutocomplete"
+                (optionSelected)="targetSelected($event)">
+                <mat-optgroup class="mat-optgroup" *ngFor="let struct of filteredStructuresTarget">
+                  <label class="mat-optgroup-label" id="mat-optgroup-label-0">{{struct.strucDesc}} </label>
+                  <mat-option class="mdo-option option-hierarchy"
+                    *ngFor="let field of struct.Fields"
+                    [value]="struct.strucDesc+','+field.fieldId+','+struct.structureId+','+field.pickList+','+struct.parentStrucId">
+                    {{fieldNames[field.fieldId]}}
+                  </mat-option>
+                  <mat-option class="option-empty" *ngIf="struct.Fields.length==0">
+                    {{''}}
+                  </mat-option>
+                </mat-optgroup>
+              </mat-autocomplete>
+              <mat-menu #selectOptions="matMenu">
+                <mat-list>
+                  <mat-list-item class="f-row" *ngFor="let opt of TargetSelectedOptions.slice(limit)">
+                    <lib-text-line type="base">{{opt.strucDesc}}/{{fieldNames[opt.FieldId]}}</lib-text-line>
+                    <span class="f-spacer"></span>
+                    <span class="f-col-spacer-half"></span>
+                    <lib-button type="plain" iconFontType="light" icon="times" (click)="targetRemove(opt.structureId,opt.FieldId)"></lib-button>
+                  </mat-list-item>
+                </mat-list>
+              </mat-menu>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+    <mat-accordion>
+      <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" [expanded]="true">
+        <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+          <mat-panel-title class="f-row">
+            <lib-text-line type="base" weight="strong">Conditions</lib-text-line>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="f-col">
+          <div class="f-col" *ngIf="conditionshowSkeleton">
+            <lib-skeleton type="line"></lib-skeleton>
+            <div class="f-row-spacer-half"></div>
+            <lib-skeleton type="line"></lib-skeleton>
+          </div>
+
+          <ng-container *ngIf="Conditions.length!=0 || resultsFromSearch">
+            <div class="f-row">
+              <lib-search class="lib-search" [formControl]="searchValuesControl" i18n-placeholder="@@search"
+                placeholder="Search values">
+              </lib-search>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="!conditionshowSkeleton">
+            <lib-empty-state *ngIf="Conditions.length==0" class="f-col load-empty" primaryText="Nothing to see here"
+              icon="table" iconSize="200" secondaryText="You don't have any conditions. Would you like to create one?">
+              <lib-button type="minor" [disabled]="!isSourceTargetSaved" [hasDropdown]="false" (afterClick)="close()">New condition
+              </lib-button>
+            </lib-empty-state>
+            <div class="teams" *ngIf="Conditions.length!=0">
+              <div class="example-container ">
+                <table mat-table [dataSource]="dataSource">
+                  <!--- Note that these columns can be defined in any order.
+                  The actual rendered columns are set as a property on the row definition" -->
+                  <ng-container matColumnDef="select" sticky>
+                    <mat-header-cell *matHeaderCellDef>
+                      <lib-checkbox></lib-checkbox>
+                    </mat-header-cell>
+                    <mat-cell *matCellDef="let element">
+                      <ng-container *ngIf="element.isFirstRow">
+                        <lib-checkbox></lib-checkbox>
+                        <div class="col-spacer"></div>
+                        <div class="f-col-spacer-half"></div>
+                        <lib-button _ngcontent-oim-c242="" icon="ellipsis-h" [matMenuTriggerFor]="newFormtypeMenu1"></lib-button>
+                        <mat-menu #newFormtypeMenu1="matMenu" class="navigation-menu">
+                          <button mat-menu-item (click)="Edit(element.mappingId)">
+                            Edit
+                          </button>
+                          <button mat-menu-item (click)="DeleteCondition(element.mappingId)">
+                            Remove
+                          </button>
+                        </mat-menu>
+                      </ng-container>
+                    </mat-cell>
+                  </ng-container>
+                  <!-- Position Column -->
+                  <ng-container matColumnDef="Source Field">
+                    <mat-header-cell *matHeaderCellDef> Source field </mat-header-cell>
+                    <mat-cell *matCellDef="let element">
+                      {{fieldNames[element.sourceField]}}
+                    </mat-cell>
+                  </ng-container>
+                  <!-- Name Column -->
+                  <ng-container matColumnDef="Field value">
+                    <mat-header-cell *matHeaderCellDef> Field value </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.sourceFieldValue}} </mat-cell>
+                  </ng-container>
+                  <!-- Weight Column -->
+                  <ng-container matColumnDef="Target Field">
+                    <mat-header-cell *matHeaderCellDef> Target field </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{fieldNames[element.targetField]}} </mat-cell>
+                  </ng-container>
+                  <!-- Symbol Column -->
+                  <ng-container matColumnDef="Field Value">
+                    <mat-header-cell *matHeaderCellDef> Field value </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.targetFieldValue}} </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="Default">
+                    <mat-header-cell *matHeaderCellDef> Default</mat-header-cell>
+                    <mat-cell *matCellDef="let element">
+                      <lib-checkbox disabled="true" [checked]="element.isDefault"></lib-checkbox>
+                    </mat-cell>
+                  </ng-container>
+                  <ng-container matColumnDef="Status">
+                    <mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+                    <mat-cell *matCellDef="let element">
+                      <ng-container *ngFor="let map of appliedMapping">
+                        <mat-icon *ngIf="map.key==element.status">{{map.Icon}}</mat-icon>
+                      </ng-container>
+                    </mat-cell>
+                  </ng-container>
+                  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+                  <mat-row [class.border-row]="row.isFirstRow" *matRowDef="let row; columns: displayedColumns;">
+                  </mat-row>
+                </table>
+              </div>
+              <div class="f-row pagination">
+                <lib-pagination [currentPageIndex]="conditionsPageIndex" [totalCount]="totalCount"
+                  [pageSize]="conditionsPageSize" (pageChangeEvent)="onPageChange($event)">
+                </lib-pagination>
+                <lib-text-line type="base">{{ displayedRecordsRange }}</lib-text-line>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</div>

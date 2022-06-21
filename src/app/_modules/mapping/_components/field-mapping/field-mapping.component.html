@@ -1,0 +1,66 @@
+<div class="f-row root" [class.translation-rule-visible]="showTranslationRuleSection">
+    <div class="f-col mapping-grid">
+        <div class="f-row breadcrum-toolbar">
+            <lib-button icon="times" iconFontType="light" (afterClick)="close()"></lib-button>
+            <div class="col-spacer"></div>
+            <div class="f-col mdo-constrained-right">
+                <div class="f-row breadcrum-head">
+                    <lib-text-line type="leading">Field mapping</lib-text-line>
+                    <div class="f-spacer"></div>
+                    <lib-button type="major" (afterClick)="saveMapping()"
+                    [disabled]="(!saveTargetMappings?.segmentMappings?.length || mappingTargetLoader || saveMappingLoader) && !translationRuleAdded">
+                        Save mapping</lib-button>
+                </div>
+            </div>
+        </div>
+    
+        <div class="f-col sidesheetcontent-listing">
+            <div class="f-col mdo-justify">
+                <lib-banner *ngIf="bannerText" [text]="bannerText" status="error"></lib-banner>
+    
+                <lib-tab-group [disableRipple]="true" (selectedIndexChange)="tabChange($event)" class="lib-tabs">
+                    <lib-tab label="Request">
+                        <pros-mapping-filters (filterChange)="setFilters($event)"></pros-mapping-filters>
+                        <div class="f-row-spacer-half"></div>
+                        <pros-mapping-wrapper class="mapping-container-wrapper"
+                            [mappingSourceLoader]="mappingSourceLoader" [mappingTargetLoader]="mappingTargetLoader"
+                            [sourceFields]="sourceFields" [targetFields]="targetFields"
+                            [existingMapping]="existingMapping" [isResponseType]="isResponseType"
+                            [messageTypes]="messageTypes" (infoMessage)="setBannerText($event)"
+                            (updateTargetMapping)="updateMappedTarget($event)" [reloadMappingData]="mappingTargetLoader"
+                            [mappingFilter]="mappingFilter"></pros-mapping-wrapper>
+                    </lib-tab>
+                    <lib-tab label="Response">
+                        <pros-mapping-filters (filterChange)="setFilters($event)"></pros-mapping-filters>
+                        <div class="f-row-spacer-half"></div>
+                        <pros-mapping-wrapper class="mapping-container-wrapper"
+                            [mappingSourceLoader]="mappingSourceLoader" [mappingTargetLoader]="mappingTargetLoader"
+                            [sourceFields]="sourceFields" [targetFields]="targetFields"
+                            [isResponseType]="isResponseType" [messageTypes]="messageTypes"
+                            [existingMapping]="existingMapping" (infoMessage)="setBannerText($event)"
+                            (updateTargetMapping)="updateMappedTarget($event)" [reloadMappingData]="mappingTargetLoader"
+                            [mappingFilter]="mappingFilter"></pros-mapping-wrapper>
+                    </lib-tab>
+                </lib-tab-group>
+    
+            </div>
+        </div> 
+    </div>
+
+    <div class="f-col value-transformation-section" *ngIf="showTranslationRuleSection">
+       <div class="f-row property-breadcrum">
+            <lib-text-line type="leading">Translation rule</lib-text-line>
+       </div>
+
+       <div class="f-col property-transformation">
+        <form [formGroup]="translationRuleFormGroup" class="f-col property-transformation">
+            <pros-target-field-transformation-rule
+                     [targetFields]="targetFields"
+                     formControlName = "translationRule"
+                     [brType]="'BR_TRANSFORMATION'"
+             ></pros-target-field-transformation-rule>
+        </form>
+       </div>
+    </div>
+</div>
+

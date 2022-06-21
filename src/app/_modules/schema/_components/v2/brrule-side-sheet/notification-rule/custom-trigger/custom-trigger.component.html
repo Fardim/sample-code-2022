@@ -1,0 +1,46 @@
+<div class="f-col mdo-field">
+  <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@event">UDR Rule<span class="mandatory">*</span></lib-text-line>
+  <div class="mdo-field-input">
+    <input
+      matInput
+      placeholder="Select UDR rule"
+      #optionsInput
+      [formControl]="bussinessRuleSearchControl"
+      [matAutocomplete]="translationRuleAuto"
+    />
+    <lib-button type="plain" iconFontType="light" icon="chevron-down" matSuffix></lib-button>
+
+    <mat-autocomplete
+      class="mdo-autocomplete transformation-autocomplete"
+      #translationRuleAuto="matAutocomplete"
+      (optionSelected)="updateBusinessRule($event)"
+      [displayWith]="displayWith"
+    >
+      <div class="options">
+        <mat-option *ngFor="let rule of businessRulesObs | async" [value]="rule">
+          {{ rule.brInfo }}
+        </mat-option>
+      </div>
+    </mat-autocomplete>
+  </div>
+</div>
+<lib-section [text]="'OR'" class="section-divider"></lib-section>
+<pros-blocks-hierarchy
+  [blocksGrp]="udrNodeForm"
+  [operatorsList]="operators"
+  [submitted]="submitted"
+  [sourceList]="fieldListFiltered"
+  [blocksList]="udrBlockList"
+  [showRegex]="true"
+  [isNewModule]="!moduleId"
+  (updateFldList)="updateUDRFldList($event)"
+  [initialSrcList]="initialFieldList"
+  [targetListMetaData]="parentMetadata"
+  [moduleId]="moduleId"
+></pros-blocks-hierarchy>
+
+<div class="f-col mdo-field">
+  <mat-error class="mdo-field-hint" *ngIf="submitted && !isUDRBlockValid()">
+    <lib-text-line type="small">Please Select the Business rule from list or enter field Value</lib-text-line>
+  </mat-error>
+</div>

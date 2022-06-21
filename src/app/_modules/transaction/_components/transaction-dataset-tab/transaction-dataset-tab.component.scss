@@ -1,0 +1,49 @@
+div.root {
+  height: 100%;
+  width: 100%;
+
+  .hierarchy-listing {
+    width: 220px;
+    height: 100%;
+    border-right-width: 1px;
+    border-right-style: solid;
+    padding-right: 12px;
+    margin-right: 12px;
+    overflow-x: auto;
+  }
+
+  .split-col {
+    height: 100%;
+    width: 1px;
+    position: relative;
+
+    .split-arrow {
+      border-radius: 50%;
+      position: absolute;
+      left: -22px;
+      top: 16px;
+      cursor: pointer;
+      z-index: 2;
+      width: 20px;
+      height: 20px;
+      text-align: center;
+      line-height: 16px;
+
+      mat-icon.mat-icon {
+        width: 9px;
+        font-size: 8px;
+      }
+    }
+  }
+
+  .form-area-container {
+    height: 100%;
+    // width: calc(100% - 276px - 24px);
+    // overflow: auto;
+
+    .empty-state {
+      justify-content: center;
+      height: 100%;
+    }
+  }
+}

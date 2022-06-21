@@ -1,0 +1,76 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading" i18n="@@Update_dataset_&_records"> Update dataset & records
+                </lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-button width="80px" type="major" i18n="@@apply" [disabled]="mappingForm?.invalid"
+                    (afterClick)="save()"> Apply </lib-button>
+            </div>
+        </div>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <form [formGroup]="mappingForm">
+                <!-- Dataset -->
+                <div class="f-col">
+                    <lib-text-line type="xsmall" weight="strong" class="field-label required">
+                        Dataset
+                    </lib-text-line>
+                    <div class="mdo-field" [class.has-error]="submitted && mappingForm.controls?.dataset.invalid">
+                        <div class="mdo-field-input">
+                            <input matInput #datasetInputEl #srcDatasetAutoTrigger="matAutocompleteTrigger"
+                                [matAutocomplete]="srcDatasetAuto" formControlName="dataset"
+                                (keyup)="datasetSearchSub.next(datasetInputEl.value)" />
+                            <mat-icon matSuffix fontSet="mdo-icons-light" class="autocomplete-icon">chevron-down</mat-icon>
+                            <mat-autocomplete class="mdo-autocomplete" #srcDatasetAuto="matAutocomplete"
+                                [displayWith]="displayDatasetFn" (optionSelected)="getData('')">
+                                <mat-option *ngFor="let dataset of datasetListObs | async"
+                                    [value]="{datasetId: dataset.moduleId, datasetDesc: dataset.moduleDesc}">
+                                    {{ dataset.moduleDesc }}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </div>
+                        <mat-error>
+                            <mat-error *ngIf="submitted && mappingForm.controls?.dataset?.errors?.required">
+                                <lib-text-line type="small"> This is required</lib-text-line>
+                            </mat-error>
+                            <mat-error *ngIf="submitted && mappingForm.controls?.dataset?.errors?.datasetError">
+                                <lib-text-line type="small">Select a valid option</lib-text-line>
+                            </mat-error>
+                        </mat-error>
+                    </div>
+                </div>
+
+                <!-- Record -->
+                <div class="f-col">
+                    <lib-text-line type="xsmall" weight="strong" class="field-label required">
+                        Assign record
+                    </lib-text-line>
+                    <div class="mdo-field" [class.has-error]="submitted && mappingForm.controls?.recordId.invalid">
+                        <div class="mdo-field-input">
+                            <input matInput #recordInputEl [matAutocomplete]="recordIdAuto" 
+                                formControlName="recordId"
+                                (keyup)="recordSearchSub.next(recordInputEl.value)"/>
+                            <mat-icon matSuffix fontSet="mdo-icons-light" class="autocomplete-icon">chevron-down</mat-icon>
+                            <mat-autocomplete class="mdo-autocomplete" #recordIdAuto="matAutocomplete">
+                                    <mat-option *ngFor="let record of recordsList" [value]="record">
+                                        {{ record }}
+                                    </mat-option>
+                            </mat-autocomplete>
+                        </div>
+                        <mat-error>
+                            <mat-error *ngIf="submitted && mappingForm.controls?.recordId.errors?.required">
+                                <lib-text-line type="small"> This is required</lib-text-line>
+                            </mat-error>
+                        </mat-error>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

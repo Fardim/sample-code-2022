@@ -1,0 +1,14 @@
+<div class="f-row">
+  <lib-checkbox
+  [formControl]="copyField"
+  *ngIf="process === 'copy'"
+  class="copy-box"
+  ></lib-checkbox>
+
+  <div class="f-col mdo-field">
+    <lib-text-line type="xsmall" weight="strong" class="field-label">{{ fieldObj?.fieldCtrl?.description }}<span class="mandatory">{{isRequired ? '*' : ''}}</span> {{isRequired ? '*' : ''}}
+    </lib-text-line>
+    <lib-radio-group name="group_{{fieldObj.fieldId}}" labelPosition="after" layout="horizontal" theme="primary" [options]="options$ | async"
+      [formControl]="control" [disabled]="isFieldReadOnly || control.disabled" labelKey="text" valueKey="code" (valueChange)="valueChange($event)"></lib-radio-group>
+  </div>
+</div>

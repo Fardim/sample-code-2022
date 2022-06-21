@@ -1,0 +1,35 @@
+div.root {
+  mat-expansion-panel {
+    border-radius: 0;
+
+    .mat-expansion-panel-header {
+      padding: 0 12px;
+
+      &.expansion-header {
+        .add-hierarchy {
+          display: none;
+        }
+
+        .hierarchy-name {
+          width: 138px;
+        }
+
+        &:hover {
+          .add-hierarchy {
+            display: block;
+          }
+        }
+      }
+    }
+
+    &.selected {
+      .mat-expansion-panel-header {
+        &.expansion-header {
+          .add-hierarchy {
+            display: block;
+          }
+        }
+      }
+    }
+  }
+}

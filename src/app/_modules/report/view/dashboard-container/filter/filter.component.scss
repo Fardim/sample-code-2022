@@ -1,0 +1,48 @@
+mat-card.widget {
+  box-sizing: border-box;
+  padding: 8px;
+  height: 100%;
+
+  .filter-row {
+    padding: 8px;
+  }
+
+  mat-card-content {
+    height: calc(100% - 52px - 16px);
+    overflow: auto;
+    padding: 0 8px;
+
+    .vertical-row {
+      .button {
+        margin: 4px;
+        flex-shrink: 0;
+      }
+    }
+
+    .input-actions {
+      mat-divider.mat-divider {
+        height: 40px;
+      }
+    }
+
+    .horizontal-row {
+      overflow-x: auto;
+      padding-bottom: 16px;
+
+      button {
+        margin: 4px;
+        flex-shrink: 0;
+        padding: 0 16px;
+
+        &:first-of-type {
+          margin-left: 0;
+        }
+      }
+    }
+
+    mat-slider {
+      width: 100%;
+      margin-top: 16px;
+    }
+  }
+}

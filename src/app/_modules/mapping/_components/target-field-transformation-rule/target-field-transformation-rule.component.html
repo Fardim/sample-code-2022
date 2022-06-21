@@ -1,0 +1,67 @@
+<div class="root">
+  <div class="f-col empty-state-wrapper" *ngIf="!targetFieldMappingValue?.targetFieldDesc || showNullState">
+    <lib-empty-state
+      primaryText="Nothing to see here"
+      secondaryText="Select a target field to manage translation rule"
+      icon="search"
+      iconSize="100"
+    >
+    </lib-empty-state>
+  </div>
+
+  <div class="f-col" *ngIf="targetFieldMappingValue?.targetFieldDesc && !showNullState">
+    <div class="mdo-justify">
+      <div class="f-col mdo-field">
+        <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@translation_rule">
+          Translation rule
+        </lib-text-line>
+        <div class="mdo-field-input">
+          <input matInput placeholder="Select data type" #optionsInput [formControl]="bussinessRuleSearchControl" [matAutocomplete]="translationRuleAuto" />
+          <mat-icon fontSet="mdo-icons-light" class="autocomplete-icon" matSuffix>chevron-down</mat-icon>
+
+          <mat-autocomplete class="mdo-autocomplete transformation-autocomplete" #translationRuleAuto="matAutocomplete">
+            <div class="options">
+              <mat-option *ngFor="let rule of businessRulesObs | async">
+                <lib-filter-option prosClickStopPropagation>
+                  <lib-checkbox
+                    [label]="rule.brInfo || 'Untitled'"
+                    prosClickStopPropagation
+                    [checked]="isRuleSelected(rule)"
+                    (valueChange)="selection.toggle(rule);ruleSelectionChanges(rule)"
+                  >
+                  </lib-checkbox>
+                </lib-filter-option>
+              </mat-option>
+            </div>
+            <div class="separator">
+              <mat-divider></mat-divider>
+            </div>
+            <mat-option (click)="openBusinessRuleSideSheet('new')">
+              <lib-text-line type="base" textColor="link" i18n="@@new_rule">
+                New rule
+              </lib-text-line>
+            </mat-option>
+          </mat-autocomplete>
+        </div>
+      </div>
+      <div class="f-col mdo-field">
+        <div class="f-row" *ngFor="let businessRule of selection.selected">
+          <lib-text-line
+            [ngClass]="{'business-rule-title': !businessRule?.isRuleDeleted}"
+            [textColor]="businessRule?.isRuleDeleted ? 'error' : 'link'"
+            (click)="businessRule?.isRuleDeleted ? '' : openBusinessRuleSideSheet('edit', businessRule);autocomplete?.closePanel()"
+          >
+            {{ businessRule?.brInfo ? businessRule?.brInfo : 'Untitled' }}
+          </lib-text-line>
+          <div class="f-spacer"></div>
+          <lib-button
+            (click)="businessRule?.isRuleDeleted ? '' : deleteBusinessRule(businessRule)"
+            type="plain"
+            iconFontType="light"
+            icon="trash-alt"
+          ></lib-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

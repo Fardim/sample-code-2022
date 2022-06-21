@@ -1,0 +1,35 @@
+.colunm-box {
+  box-sizing: border-box;
+  min-height: 48px;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+
+  .col {
+    display: flex;
+    flex: 1 0 auto;
+    width: 1px;
+    align-items: center;
+    margin-left: 8px;
+    overflow-x: auto;
+
+    &.col-x8 {
+      flex: 8;
+
+      .cursor {
+        cursor: pointer;
+      }
+    }
+
+    &.col-x16 {
+      pros-payload-test-table {
+        width: 100%;
+      }
+    }
+
+    .lib-input {
+      display: block;
+      height: 36px;
+      width: 100%;
+    }
+  }
+}

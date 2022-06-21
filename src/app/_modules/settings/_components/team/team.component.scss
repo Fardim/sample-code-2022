@@ -1,0 +1,79 @@
+div.root {
+  height: 100%;
+  overflow: hidden;
+  padding: 0 12px;
+
+  .breadcrum-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding-top: 8px;
+    min-height: 36px;
+  }
+
+  .lib-search {
+    width: 213px;
+    margin-right: 6px;
+  }
+
+  .load-empty {
+    align-items: center;
+    height: calc(100% - 52px);
+    justify-content: center;
+  }
+
+  .teams {
+    overflow: auto;
+
+    &.has-selection {
+      height: calc(100% - 190px - 60px);
+    }
+
+    &.has-no-selection {
+      height: calc(100% - 154px - 60px);
+    }
+
+    &.hasErrorBanner {
+      height: calc(100% - 230px);
+    }
+
+    table.mat-table {
+      width: 100%;
+      overflow: auto;
+
+      td.mat-cell {
+        border-right: none;
+        min-width: 160px;
+
+        &.action-cell {
+          min-width: 40px;
+          width: 40px;
+        }
+
+        .end-cell {
+          justify-content: flex-end;
+        }
+
+        &.mat-column-select {
+          min-width: 36px;
+        }
+
+        &.mat-column-userName {
+          min-width: 200px;
+        }
+
+        .filter-pill {
+          font-size: 14px;
+        }
+
+        .label-pill {
+          margin-right: 6px;
+        }
+      }
+    }
+  }
+}
+
+.hide-table {
+  display: none;
+}

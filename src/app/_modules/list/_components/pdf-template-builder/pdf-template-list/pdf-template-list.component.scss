@@ -1,0 +1,43 @@
+.root {
+  height: 100%;
+  padding: 0 12px;
+  user-select: text;
+
+  .load-empty {
+    align-items: center;
+    height: calc(100% - 52px);
+    justify-content: center;
+  }
+
+  .filters-list {
+    .lib-search {
+      width: 213px;
+      margin-right: 6px;
+    }
+  }
+
+  .teams {
+    height: calc(100% - 36px * 2 - 48px - 8px * 4);
+    overflow: auto;
+
+    table.mat-table {
+      width: 100%;
+      overflow: auto;
+      border-collapse: separate;
+
+      td.mat-cell {
+        border-right: none;
+        min-width: 160px;
+
+        &.action-cell {
+          min-width: 40px;
+          width: 40px;
+        }
+
+        .lib-chip {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}

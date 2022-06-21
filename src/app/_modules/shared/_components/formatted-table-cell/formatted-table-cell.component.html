@@ -1,0 +1,66 @@
+<ng-template [ngIf]="value?.length">
+    <ng-container [ngSwitch]="fieldType">
+    
+        <!-- Text area cell -->
+        <div *ngSwitchCase="'TEXTAREA'" class="formatted-textarea-cell" #textareaContainer
+            [libTooltip]="value[0].t || value[0].c" [matTooltipDisabled]="!hasOverflow">
+            {{ value[0].t || value[0].c }}
+        </div>
+    
+        <!-- Date cell -->
+        <div *ngSwitchCase="'DATEPICKER'">
+            {{ getDateValue() }}
+        </div>
+    
+        <!-- URL cell -->
+        <a *ngSwitchCase="'URL'" [href]="value[0].c" target="_blank" class="info-link">
+            {{ value[0].t ||  value[0].c }}
+        </a>    
+    
+        <!-- DROPDOWN cell -->
+        <ng-container *ngSwitchCase="'DROPDOWN'">
+            <lib-chip-list>
+                <ng-container *ngFor="let option of value; let i=index">
+                  <ng-container *ngIf="i<maxAllowedChips">
+                    <lib-chip>
+                       {{ option.t || option.c }}
+                    </lib-chip>
+                  </ng-container>
+                </ng-container>
+                <lib-chip *ngIf="value.length > maxAllowedChips" [libTooltip]="getHiddenOptions(maxAllowedChips)">
+                  +{{ value.length - maxAllowedChips }}
+                </lib-chip>
+            </lib-chip-list>
+        </ng-container>
+
+        <!-- ATTACHMENT cell -->
+        <ng-container *ngSwitchCase="'ATTACHMENT'">
+            <div class="f-row">
+                <div class="f-col attachment-section">
+                    <div class="f-row">
+                      <img [src]="getAttachmentIcon(value[0].t)" class="attachment-icon" />
+                      <lib-text-line type="base" [libTooltip]="value[0].t" matTooltipPosition="below" [matTooltipDisabled]="value[0].t?.length < 15">
+                        {{ (value[0].t || value[0].c)  | slice:0:15 }} <span *ngIf="value[0].t?.length > 15">...</span>
+                      </lib-text-line>
+                    </div>
+                </div>
+                <ng-template [ngIf]="value.length > 1" >
+                    <div class="f-col-spacer-half"></div>
+                    <lib-chip [libTooltip]="getHiddenOptions(1)">
+                        +{{ value.length - 1 }}
+                    </lib-chip>
+                </ng-template>
+            </div>
+        </ng-container>
+
+        <!-- HTML-EDITOR cell -->
+        <div *ngSwitchCase="'HTML-EDITOR'" [innerHTML]="value[0].c">
+            {{ value[0].t || value[0].c }}
+        </div>
+    
+        <!-- Default cell -->
+        <div *ngSwitchDefault>
+            {{ value[0].t || value[0].c }}
+        </div>
+    </ng-container>
+</ng-template>

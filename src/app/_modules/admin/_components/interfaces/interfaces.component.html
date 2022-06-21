@@ -1,0 +1,84 @@
+<mat-card class="bxshadow-variant-0">
+    <mat-form-field class="filtersearch">
+        <mat-chip-list #chipList aria-label="Fruit selection">
+            <mat-chip
+                *ngFor="let fruit of fruits"
+                [selectable]="selectable"
+                [removable]="removable"
+                (removed)="remove(fruit)">
+                {{fruit}}
+                <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+            </mat-chip>
+            <input
+            placeholder="New fruit..."
+            #fruitInput
+            [formControl]="fruitCtrl"
+            [matAutocomplete]="auto"
+            [matChipInputFor]="chipList"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            [matChipInputAddOnBlur]="addOnBlur"
+            (matChipInputTokenEnd)="add($event)">
+        </mat-chip-list>
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+            <mat-option *ngFor="let fruit of filteredFruits | async" [value]="fruit">
+                <div (click)="selected($event)">
+                    <mat-checkbox>{{fruit}}</mat-checkbox>
+                </div>
+            </mat-option>
+        </mat-autocomplete>
+    </mat-form-field> 
+    
+    
+    <div class="mat-elevation-z8 root-AdminTable">
+        <table mat-table [dataSource]="dataSource" matSort>
+            <ng-container matColumnDef="star" stickyEnd>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header></th>
+                <td mat-cell *matCellDef="let element" [matMenuTriggerFor]="actiontable">
+                    <mat-icon mat-icon-button>more_vert</mat-icon>
+                    <mat-menu #actiontable="matMenu">
+                        <button mat-menu-item>Details</button>
+                        <button mat-menu-item>Copy</button>
+                        <button mat-menu-item>Edit</button>
+                        <button mat-menu-item>Delete</button> 
+                        <button mat-menu-item [matMenuTriggerFor]="Download">Download</button>
+                    </mat-menu>
+                    <mat-menu #Download="matMenu">
+                        <button mat-menu-item>WSDL</button>
+                        <button mat-menu-item>XSD</button>
+                    </mat-menu>
+                </td>
+            </ng-container>
+    
+            <!-- Module Column -->
+            <ng-container matColumnDef="position">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Module Name</th>
+                <td mat-cell *matCellDef="let element"> {{element.ModuleName}} </td>
+            </ng-container>
+            
+            <!-- Description Column -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Description </th>
+                <td mat-cell *matCellDef="let element"> {{element.Description}} </td>
+            </ng-container>
+            
+            <!-- Direction Column -->
+            <ng-container matColumnDef="weight">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Direction </th>
+                <td mat-cell *matCellDef="let element"> {{element.Direction}} 
+                    <button *ngIf="element.Direction === 'Outbound'" mat-mini-fab class="direction-fab"><mat-icon color="primary">arrow_upward</mat-icon></button>
+                    <button *ngIf= "element.Direction === 'Inbound'" mat-mini-fab class="direction-fab"><mat-icon color="primary">arrow_downward</mat-icon></button>
+                </td>
+            </ng-container>
+            
+            <!-- Target Column -->
+            <ng-container matColumnDef="symbol">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Target System </th>
+                <td mat-cell *matCellDef="let element"> {{element.System}} </td>
+            </ng-container>
+            
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        <mat-paginator [length]="resultsLength" [pageSizeOptions]="[5, 10, 25, 100]"></mat-paginator>
+    </div>
+    </mat-card>

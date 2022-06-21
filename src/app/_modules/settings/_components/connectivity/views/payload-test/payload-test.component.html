@@ -1,0 +1,36 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading">Payload testing</lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-button type="major" width="80px" (click)="testPayload()" [disabled]="showEmptyState || showLoader">Test</lib-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <form [formGroup]="formGroup" class="form-listing">
+        <lib-banner *ngIf="showBanner.error" status="error">
+          <div class="f-row">
+            <lib-text-line type="base">Payload test is unsuccessful. <a *ngIf="showBanner?.errorList?.length" class="info-link" (click)="showErrorModal(showBanner.errorList)">Click here</a> <lib-text-line *ngIf="showBanner?.errorList?.length">to view the errors.</lib-text-line></lib-text-line> 
+          </div>
+        </lib-banner>
+
+        <lib-banner *ngIf="showBanner.success" text="Banner" status="success"></lib-banner>
+        <lib-skeleton-vertical-table class="details-accordion" *ngIf="showLoader"></lib-skeleton-vertical-table>
+
+        <div class="f-row empty-block">
+          <lib-empty-state *ngIf="!showLoader && showEmptyState" primaryText="Nothing to see here"
+          secondaryText="No mapping found for current dataset" icon="table">
+          </lib-empty-state>
+        </div>
+        
+        <pros-payload-test-form *ngIf="!showLoader && !showEmptyState" formControlName="payloadTestData">
+        </pros-payload-test-form>
+      </form>
+    </div>
+  </div>

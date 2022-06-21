@@ -1,0 +1,31 @@
+div.root {
+  user-select: text;
+  padding: 0 16px;
+  height: 100%;
+  overflow: hidden;
+
+  .dashboard-row {
+    padding-top: 8px;
+  }
+
+  .empty-state {
+    justify-content: center;
+    height: 100%;
+
+    .messages {
+      display: flex;
+      margin-top: -36px;
+
+      .cursor {
+        cursor: pointer;
+      }
+    }
+  }
+
+  pros-null-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(100% - 48px - 16px * 2);
+  }
+}

@@ -1,0 +1,134 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-row mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading">Collaborators</lib-text-line>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <lib-banner status="error" *ngIf="showErrorBanner" text="Multiple entries for the same collaborator can not be added"> </lib-banner>
+
+      <div class="row-spacer"></div>
+      <div class="f-col">
+        <lib-search (valueChange)="searchFld($event)"></lib-search>
+      </div>
+
+      <div class="row-spacer"></div>
+
+      <div class="f-col collaborators-list" [class.chip-enable-coll-list]="selectedCollaborators.length">
+        <ng-template ngFor let-collaborator [ngForOf]="collaboratorListOb | async">
+          <pros-collaborator
+            [reportId]="reportId"
+            [collaborator]="collaborator"
+            (saveClicked)="updatePermission($event)"
+            (editPermissionEmit)="editPermission($event)"
+            (deleteClicked)="deleteCollaborator($event)"
+          >
+          </pros-collaborator>
+        </ng-template>
+      </div>
+      <div class="row-spacer"></div>
+      <div class="f-col collaborators-add" [formGroup]="addCollaboratorFrmGrp" [class.chip-enable-coll-add]="selectedCollaborators.length">
+        <lib-section></lib-section>
+        <div class="f-row-spacer-half"></div>
+        <lib-text-line type="small" weight="strong">Add collaborators</lib-text-line>
+        <div class="f-row-spacer-half"></div>
+        <div class="f-col mdo-field">
+          <!-- input container -->
+          <div class="mdo-field-input">
+            <input
+              matInput
+              #loosefoucs
+              aria-label="Number"
+              placeholder="Search users , roles"
+              #optionsInput
+              type="text"
+              formControlName="addCollaboratorCtrl"
+              [matAutocomplete]="addCollaboratorCtrlAuto"
+            />
+            <!-- autocomplete -->
+            <mat-autocomplete
+              class="mdo-autocomplete"
+              #addCollaboratorCtrlAuto="matAutocomplete"
+              [displayWith]="displayWith"
+              (optionSelected)="onSelectCollaborator($event)"
+            >
+              <mat-optgroup *ngFor="let group of collaborators" [label]="group.groupDesc">
+                <mat-option class="mdo-option" *ngFor="let data of group.childs" [value]="data">
+                  {{ data.description }}
+                </mat-option>
+              </mat-optgroup>
+            </mat-autocomplete>
+          </div>
+        </div>
+
+        <!-- FOR CHIPS -->
+        <div class="f-row selected-coll-groups" *ngIf="selectedCollaborators.length">
+          <lib-button (click)="paginateChip('prev')" [disabled]="enablePreBtn" type="plain" icon="chevron-left"></lib-button>
+          <lib-chip-list class="mdo-chip-list" aria-label="Collaborators selection">
+            <ng-template ngFor let-selcoll [ngForOf]="possibleChips">
+              <lib-chip
+                icon="user"
+                removable="true"
+                (removed)="remove(selcoll)"
+                *ngIf="selcoll.permissionType === 'USER'"
+                matTooltipPosition="right"
+                matTooltip="{{ selcoll.userMdoModel ? selcoll.userMdoModel.fullName : 'Unknown' }}"
+              >
+                &nbsp;
+                <span class="chip-content">{{ selcoll.userMdoModel ? selcoll.userMdoModel.fullName : 'Unknown' }}</span
+                >&nbsp;
+              </lib-chip>
+              <lib-chip
+                icon="user-check"
+                (removed)="remove(selcoll)"
+                removable="true"
+                *ngIf="selcoll.permissionType === 'ROLE'"
+                matTooltipPosition="right"
+                matTooltip="{{ selcoll.rolesModel ? selcoll.rolesModel.description : 'Unknown' }}"
+              >
+                &nbsp;
+                <span class="chip-content">{{ selcoll.rolesModel ? selcoll.rolesModel.description : 'Unknown' }}</span
+                >&nbsp;
+              </lib-chip>
+              <!-- <lib-chip
+                (removed)="remove(selcoll)"
+                icon="user-friends"
+                removable="true"
+                *ngIf="selcoll.permissionType === 'GROUP'"
+                matTooltipPosition="right"
+                matTooltip="{{ selcoll.groupHeaderModel ? selcoll.groupHeaderModel.description : 'Unknown' }}"
+              >
+                &nbsp;
+                <span class="chip-content">{{ selcoll.groupHeaderModel ? selcoll.groupHeaderModel.description : 'Unknown' }}</span>
+              </lib-chip> -->
+            </ng-template>
+          </lib-chip-list>
+          <lib-button (click)="paginateChip('next')" [disabled]="!enableNextBtn" icon="chevron-right" type="plain"></lib-button>
+        </div>
+
+        <div class="f-row-spacer-half"></div>
+
+        <div class="f-col">
+          <lib-text-line type="small" weight="strong">Permissions</lib-text-line>
+          <div class="f-row-spacer-half"></div>
+          <div class="f-row permissions">
+            <lib-slide-toggle formControlName="isViewable" labelposition="before" label="Can view" theme="primary"></lib-slide-toggle>
+            <lib-slide-toggle formControlName="isEditable" labelposition="before" label="Can edit" theme="primary"></lib-slide-toggle>
+            <lib-slide-toggle formControlName="isDeleteable" labelposition="before" label="Can delete" theme="primary"></lib-slide-toggle>
+          </div>
+        </div>
+        <div class="f-row-spacer-half"></div>
+        <div class="f-row">
+          <div class="f-spacer"></div>
+          <lib-button type="major" (click)="saveCollaborators()">Add</lib-button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

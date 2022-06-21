@@ -1,0 +1,13 @@
+mat-card.root {
+  height: 100%;
+  user-select: text;
+  padding: 0;
+  border: none;
+
+  .modal-wrapper {
+    .modal-body {
+      height: calc(100% - 120px);
+      overflow: auto;
+    }
+  }
+}

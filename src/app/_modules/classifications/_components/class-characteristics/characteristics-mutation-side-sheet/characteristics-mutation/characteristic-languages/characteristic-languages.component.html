@@ -1,0 +1,55 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button iconFontType="light" i18n="@@close" icon="times" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@new_language_characteristics">Add language-characteristics</lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-button type="major" width="80px" i18n="@@save" (click)="save()">Save</lib-button>
+      </div>
+    </div>
+  </div>
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <div class="f-col" *ngIf="validationErrors">
+        <lib-banner status="error">There are&nbsp;<b>{{ validationErrors }}</b>&nbsp;field errors.
+        </lib-banner>
+      </div>
+      <form [formGroup]="labelForm">
+        <div formArrayName="labels" *ngFor="let child of labelsFormArray.controls; let i = index">
+          <div class="f-row colunm-box">
+            <div class="col col-x6">
+              <mat-form-field appearance="outline" class="mdo-field-input">
+                <mat-select required="true" [formControl]="labelsFormArray.controls[i]?.controls?.language">
+                  <mat-option *ngFor="let obj of languages" [value]="obj.id" (click)="checkOptionSelected(obj, i)">
+                    {{ obj.name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-error *ngIf="labelsFormArray.controls[i]?.controls.language.errors?.selectedLanguage"
+                i18n="@@duplicate_language">
+                Language already selected! please select another language</mat-error>
+            </div>
+            <div class="col col-x6">
+              <mat-form-field appearance="outline" class="mdo-field-input">
+                <input matInput placeholder="Type description"
+                  [formControl]="labelsFormArray.controls[i]?.controls?.label" class="lib-input"
+                  i18n-placeholder="@@label" required="true" />
+              </mat-form-field>
+            </div>
+            <div class="col">
+              <lib-button *ngIf="i > 0" type="plain" icon="trash-alt" iconFontType="light" i18n="@@remove" (click)="removeItem(i)">
+              </lib-button>
+            </div>
+          </div>
+          <lib-section></lib-section>
+        </div>
+      </form>
+      <div class="f-row-spacer-half"></div>
+      <div class="f-row">
+        <lib-button type="minor" width="80px" i18n="@@add" (click)="addLabel()">Add</lib-button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,116 @@
+/* 
+ * Replicated from 
+ * <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+ * <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+ */
+
+/* material-icons */
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    font-display: fallback;
+    /* src: url(MaterialIcons-Regular.eot);  For IE6-8 We will not support IE6-8 */
+    src: local('Material Icons'),
+         local('MaterialIcons-Regular'),
+         /* url(./materialicons/v41/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2) format('woff2') */
+         url(./materialicons/v41/flUhRq6tzZclQEJ-Vdg-IuiaDsNa.woff) format('woff'); 
+         /* We have to support woff for old mobile browsers from Android 5+
+         /* url(MaterialIcons-Regular.ttf) format('truetype'); // We will not support TTF */
+}
+
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;  /* Preferred icon size */
+    display: inline-block;
+    line-height: 1;
+    text-transform: none;
+    letter-spacing: normal;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;  
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
+    /* Support for IE. */
+    font-feature-settings: 'liga';
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+@font-face {      
+    font-family: 'lato';
+    font-style: normal;
+    font-weight: 400;
+    src: 
+        local('Lato Regular'), 
+        local('Lato-Regular'), 
+        url(./lato/v1/Lato-Regular.woff) format('woff');
+}
+
+@font-face {      
+    font-family: 'lato';
+    font-style: normal;
+    font-weight: 500;
+    src: 
+        local('Lato Semibold'), 
+        local('Lato-Semibold'), 
+        url(./lato/v1/Lato-Semibold.woff) format('woff');
+}
+
+@font-face {      
+    font-family: 'lato';
+    font-style: normal;
+    font-weight: 600;
+    src: 
+        local('Lato Bold'), 
+        local('Lato-Bold'), 
+        url(./lato/v1/Lato-Bold.woff) format('woff');
+}
+
+/** 
+* MDO fonts
+* For custom icons 
+*
+**/
+@font-face {
+    font-family: 'Mdo Icons';
+    font-weight: 400;
+    src: url(./mdoicons/v1/mdo.woff) format('woff');
+    font-style: normal;
+    font-display: fallback;
+    font-weight: normal;
+}
+
+.mdo-icons {
+    font-family: 'Mdo Icons';
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    font-size: 14px;  /* Preferred icon size */
+    line-height: 1;
+    text-transform: none;
+    word-wrap: normal;
+    white-space: nowrap;
+    direction: ltr;
+    display: inline-block;
+    /* letter-spacing: 10px; */
+    /* Support for all WebKit browsers. */
+    -webkit-font-smoothing: antialiased;
+    /* Support for Safari and Chrome. */
+    text-rendering: optimizeLegibility;  
+    /* Support for Firefox. */
+    -moz-osx-font-smoothing: grayscale;
+    /* Support for IE. */
+    font-feature-settings: 'liga';
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}

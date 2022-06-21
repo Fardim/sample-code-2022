@@ -1,0 +1,32 @@
+<div class="f-col root">
+	<lib-button class="close-button" icon="times" iconFontType="light" *ngIf="showCloseButton" (afterClick)="close()"></lib-button>
+	<div class="login-logo">
+		<img src="./assets/images/CH_Logo_name.svg" alt="connekthub" height="36px">
+	</div>
+	<div class="row-spacer"></div>
+	<mat-card class="f-col mat-elevation-z0">
+		<form [formGroup]="form" (ngSubmit)="signIn()">
+			<lib-text-line type="leading">Sign in to your ConnektHub account</lib-text-line>
+			<div class="row-spacer"></div>
+			<div class="f-col">
+				<pros-form-input [type]="'text'" [control]="form.get('userName')" [label]="'Username'">
+				</pros-form-input>
+				<div class="row-spacer"></div>
+				<pros-form-input [type]="'password'" [control]="form.get('password')" [label]="'Password'">
+				</pros-form-input>
+			</div>
+			<ng-template [ngIf]="errorMsg">
+				<div class="row-spacer"></div>
+				<div class="f-col">
+					<mat-error class="err-msg"> {{ errorMsg }}</mat-error>
+				</div>
+			</ng-template>
+			<div class="row-spacer"></div>
+			<div class="row-spacer"></div>
+			<div class="f-col">
+				<lib-button type="major" class="action-login">Login</lib-button>
+				<!-- <button mat-flat-button color="primary"></button> -->
+			</div>
+		</form>
+	</mat-card>
+</div>

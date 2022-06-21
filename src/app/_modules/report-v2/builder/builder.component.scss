@@ -1,0 +1,36 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+
+  .dashboard-row {
+    padding: 0 12px;
+  }
+
+  .builder-col {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+  }
+
+  .property-col {
+    width: 350px;
+    height: 100%;
+    overflow: auto;
+    // background-color: #FAFBFC;
+  }
+}
+
+.empty-block {
+  height: 100%;
+  justify-content: center;
+}
+
+.messages {
+  display: flex;
+  margin-top: -36px;
+
+  .cursor {
+    cursor: pointer;
+  }
+}

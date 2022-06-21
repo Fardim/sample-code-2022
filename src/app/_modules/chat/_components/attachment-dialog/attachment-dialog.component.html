@@ -1,0 +1,47 @@
+<div class="modal-wrapper">
+  <div class="f-row modal-header">
+    <lib-text-line type="leading">Add files</lib-text-line>
+    <lib-button icon="times" (afterClick)="close()"></lib-button>
+  </div>
+  <div class="editor-container">
+    <pros-chat-editor
+        editorId="attachmentEditor"
+        innerToolbarId="attachmentToolbar"
+        editorMode="attachment"
+        [currentUser]="currentUser"
+        [currentChannelId]="currentChannelId"
+        (emitPayload)="attchmentMessageEmitter($event)"
+        class="chat-editor-outer">
+    </pros-chat-editor>
+    <div class="f-row-spacer-half"></div>
+    <div class="dashed-border"></div>
+  </div>
+  <div class="f-row-spacer-half"></div>
+  <div class="modal-body">
+    <input class="drag-input" type="file" id="uploader" #uploadInput (change)="uploadAttachements($event.target.files)"
+                    prosClickStopPropagation />
+    <pros-attachment-section
+        (valueChange)="updateAttachments($event)"
+        [attachments]="attachments"
+        [removable]="true">
+    </pros-attachment-section>
+  </div>
+  <lib-section></lib-section>
+  <div class="f-row modal-footer">
+    <lib-button (afterClick)="fileInput.click()">
+      <lib-text-line type="base" textColor="info">Add more files</lib-text-line>
+    </lib-button>
+    <div class="f-spacer"></div>
+    <lib-button type="major" [disabled]="attachmentsHasError || attachmentIsUploading || !attachments?.length" (afterClick)="add()">Add</lib-button>
+  </div>
+</div>
+
+<input
+  type="file"
+  style="display: none"
+  #fileInput
+  id="ql-file-input"
+  multiple
+  (change)="uploadAttachements($event.target.files)"
+  (click)="$event.target.value = ''"
+/>

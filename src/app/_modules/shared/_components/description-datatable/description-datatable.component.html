@@ -1,0 +1,318 @@
+<div class="root">
+    <div class="f-row-spacer-half"></div>
+    <div class="f-row">
+        <lib-button *ngIf="isExpansionViewActive" type="plain" icon="compress-alt" iconFontType="light" (afterClick)="closeExpansionView()">
+        </lib-button>
+
+        <lib-text-line class="lib-text-line" type="leading" enableWrap="true" *ngIf="dataFrom !== 'DIW'">
+            Generate description
+        </lib-text-line>
+        
+        <span class="f-spacer"></span>
+       
+        <lib-button-group *ngIf="dataFrom==='EC'">
+            <lib-button type="major" [disabled]="!updatedAttributes?.length" (afterClick)="generateDescription()">
+                Generate description
+            </lib-button>
+            <lib-button type="major" (click)="submit()">
+                Submit
+            </lib-button>
+        </lib-button-group>
+    </div>
+    <div class="f-row-spacer-half"></div>
+    <div class="f-col mat-tab-container">
+        <div class="f-row">
+            <lib-text-line type="leading" enableWrap="true">
+                {{ moduleInfo?.moduleDesc || 'Unknown' }} ({{ statics?.totalCnt || 0}})
+            </lib-text-line>
+            <span class="f-spacer"></span>
+            <lib-button *ngIf="!isExpansionViewActive && (dataFrom !== 'DIW')" type="plain" icon="expand-alt" iconFontType="light" (afterClick)="openExpansionView()">
+            </lib-button>
+        </div>
+        <div class="f-row filter-container">
+            <lib-search class="lib-search" [formControl]="searchNounNavCtrl"
+                placeholder="Search noun and modifiers" [disabled]="disableSearch"></lib-search>
+
+            <ng-template [ngIf]="dataFrom === 'DIW'">
+                <lib-chip label="All" class="mdo-filter-matchip" disableRipple="true" [selectable]="true"
+                [selected]="!activeTab  || activeTab !== '_correction' && activeTab !== '_outdated'" (click)="viewOf.next('_all')">
+                <lib-text-line [textColor]="(!activeTab  || activeTab !== 'correction' && activeTab !== 'outdated') ? 'plain' : 'secondary'">{{ currentDataScopeCount }}</lib-text-line>
+                </lib-chip>
+
+                <lib-chip label="Corrections" class="mdo-filter-matchip" disableRipple="true" [selectable]="true"
+                    [selected]="activeTab && activeTab === '_correction'" (click)="viewOf.next('_correction')">
+                    <lib-text-line [textColor]="(activeTab && activeTab === '_correction') ? 'plain' : 'info'">
+                        {{statics?.correctedCnt || 0 }}
+                    </lib-text-line>
+                </lib-chip>
+            </ng-template>
+            
+        </div>
+
+        <div class="f-row-spacer-half"></div>
+
+        <div class="f-row listing-container" #listingContainer>
+            <div class="f-col listset-navigation" [style.width.px]="widthOfSchemaNav">
+                <div class="nav-tree">
+                    <mat-accordion>
+                        <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" expanded="expanded">
+                            <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px"
+                                prosExpansionPanelToggleHandler>
+                                <mat-panel-title>
+                                    <lib-text-line type="base" class="expand-title">Master</lib-text-line>
+                                    <span class="f-spacer"></span>
+                                    <!-- <lib-text-line type="base" textColor="success">
+                                        count
+                                    </lib-text-line> -->
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+
+                            <ng-template ngFor let-noun [ngForOf]="nounModsList?.master">
+                                <mat-accordion>
+                                    <mat-expansion-panel togglePosition="before" class="mat-elevation-z0"
+                                        expanded="expanded">
+                                        <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px"
+                                            class="undertree-expansion-panel" prosExpansionPanelToggleHandler>
+                                            <mat-panel-title>
+                                                <lib-text-line type="base" class="expand-title">{{noun.nounDesc ?
+                                                    noun.nounDesc :
+                                                    'Unknown'}}</lib-text-line>
+                                                <span class="f-spacer"></span>
+                                                <lib-text-line type="base" textColor="success">{{ noun.doc_cnt
+                                                    ?
+                                                    noun.doc_cnt : 0 }}</lib-text-line>
+                                            </mat-panel-title>
+                                        </mat-expansion-panel-header>
+
+                                        <mat-nav-list role="navigation" class="tree-nav-list">
+                                            <mat-list-item class="f-row understep-two"
+                                                [class.selected]="noun.nounCode === activeNounCode && modifier.modCode === activeModeCode && modifier.uuid===activeClassUUID"
+                                                *ngFor="let modifier of noun.modifier"
+                                                (click)="applyFilter(noun.nounCode, modifier.modCode, modifier.uuid);
+                                                innerBreadcurmbtxt = 'Master' + ' / ' + noun?.nounDesc + ' / ' + (modifier?.modDesc ? modifier?.modDesc : 'Unknown' )">
+                                                <lib-text-line type="base" class="expand-title">{{ modifier.modDesc
+                                                    ? modifier.modDesc :
+                                                    'Unknown' }}</lib-text-line>
+                                                <span class="f-spacer"></span>
+                                                <lib-text-line type="base" textColor="success">{{ modifier.doc_cnt
+                                                    ? modifier.doc_cnt : 0 }}</lib-text-line>
+                                                <span class="col-spacer"></span>
+                                            </mat-list-item>
+                                        </mat-nav-list>
+                                    </mat-expansion-panel>
+                                </mat-accordion>
+                            </ng-template>
+                        </mat-expansion-panel>
+                    </mat-accordion>
+                    <ng-template [ngIf]="dataFrom==='DIW'">
+                        <mat-accordion>
+                            <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" expanded="expanded">
+                                <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px"
+                                    prosExpansionPanelToggleHandler>
+                                    <mat-panel-title>
+                                        <lib-text-line type="base" class="expand-title">connekthub</lib-text-line>    
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+    
+                                <ng-template ngFor let-noun [ngForOf]="nounModsList?.connecthubCounts">
+                                    <mat-accordion>
+                                        <mat-expansion-panel togglePosition="before" class="mat-elevation-z0"
+                                            expanded="expanded">
+                                            <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px"
+                                                class="undertree-expansion-panel" prosExpansionPanelToggleHandler>
+                                                <mat-panel-title>
+                                                    <lib-text-line type="base" class="expand-title">{{noun.nounDesc ?
+                                                        noun.nounDesc :
+                                                        'Unknown'}}</lib-text-line>
+                                                    <span class="f-spacer"></span>
+                                                    <lib-text-line type="base" textColor="success">{{ noun.doc_cnt
+                                                        ?
+                                                        noun.doc_cnt : 0 }}</lib-text-line>
+                                                </mat-panel-title>
+                                            </mat-expansion-panel-header>
+    
+                                            <mat-nav-list role="navigation" class="tree-nav-list">
+                                                <mat-list-item class="f-row understep-two"
+                                                    [class.selected]="noun.nounCode === activeNounCode && modifier.modCode === activeModeCode && modifier.uuid===activeClassUUID"
+                                                    *ngFor="let modifier of noun.modifier"
+                                                    (click)="applyFilter(noun.nounCode, modifier.modCode, modifier.uuid, false);
+                                                    innerBreadcurmbtxt = 'Master' + ' / ' + noun?.nounDesc + ' / ' + (modifier?.modDesc ? modifier?.modDesc : 'Unknown' )">
+                                                    <lib-text-line type="base" class="expand-title">{{ modifier.modDesc
+                                                        ? modifier.modDesc :
+                                                        'Unknown' }}</lib-text-line>
+                                                    <span class="f-spacer"></span>
+                                                    <lib-text-line type="base" textColor="success">{{ modifier.doc_cnt
+                                                        ? modifier.doc_cnt : 0 }}</lib-text-line>
+                                                    <span class="col-spacer"></span>
+                                                </mat-list-item>
+                                            </mat-nav-list>
+                                        </mat-expansion-panel>
+                                    </mat-accordion>
+                                </ng-template>
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                        <mat-accordion *ngIf="activeTab !== '_correction'">
+                            <mat-expansion-panel hideToggle class="mat-elevation-z0">
+                                <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px"
+                                    prosExpansionPanelToggleHandler>
+                                    <mat-panel-title
+                                        (click)="applyFilter('Unknown', '', ''); innerBreadcurmbtxt = 'Unknown'">
+                                        <lib-text-line type="base" class="expand-title">Unknown</lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <lib-text-line type="base" textColor="error">
+                                            {{ nounModsList?.unknowCount?.cnt || 0 }}
+                                        </lib-text-line>
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                    </ng-template>
+                </div>
+
+                <div class="split-panel-mark" (click)="toggleSideBar()">
+                    <mat-icon fontSet="mdo-icons">{{arrowIcon}}</mat-icon>
+                </div>
+            </div>
+
+            <div class="f-col listset-grid" [ngStyle]="{'width':'calc(100% - ' +widthOfSchemaNav + 'px - 24px)' }">
+                <lib-text-line type="leading">{{ innerBreadcurmbtxt }}</lib-text-line>
+                <lib-button-group *ngIf="activeTab === '_correction' && selection.selected.length !== 0">
+                    <lib-button type="minor" (afterClick)="approveRecords('global')"> Approve </lib-button>
+                    <lib-button type="minor" (afterClick)="rejectRecords('global')"> Reject </lib-button>
+                </lib-button-group>
+                <!-- Data Table -->
+                <div class="f-col datasource" (scroll)="onTableScroll($event)" #tableContainer>
+                    <table mat-table [dataSource]="dataSource" #table>
+                        <!-- Checkbox Column -->
+                        <ng-container matColumnDef="checkbox_select" sticky>
+                            <th mat-header-cell *matHeaderCellDef>
+                                <lib-checkbox (valueChange)="masterToggle()"
+                                    [checked]="selection.hasValue() && isAllSelected()"
+                                    [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                    [aria-label]="checkboxLabel()" color="primary">
+                                </lib-checkbox>
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                <lib-checkbox prosClickStopPropagation (valueChange)="selection.toggle(row)"
+                                    [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)"
+                                    color="primary">
+                                </lib-checkbox>
+                            </td>
+                        </ng-container>
+
+                        <!-- Actions Column -->
+                        <ng-container matColumnDef="_actions" sticky>
+                            <th mat-header-cell *matHeaderCellDef>
+                                <!-- <lib-button type="plain" icon="cog" iconFontType="light">
+                                </lib-button> -->
+                            </th>
+                            <td mat-cell *matCellDef="let row">
+                                <lib-button-group class="button-group">
+                                    <lib-button type="minor" (afterClick)="inlineGenerateDesc(row)" icon="poo-storm" iconFontType="light">
+                                    </lib-button>
+                                    <ng-template [ngIf]="activeTab==='_correction' && !row.OBJECTNUMBER?.isReviewed">
+                                        <lib-button (click)="approveRecords('inline', row)" type="minor" icon="check" iconFontType="light"></lib-button>
+                                        <lib-button (click)="rejectRecords('inline', row)" type="minor" icon="ban" iconFontType="light"></lib-button>
+                                    </ng-template>
+                                </lib-button-group>
+                            </td>
+                        </ng-container>
+
+                        <!-- Material number Column -->
+                        <ng-container matColumnDef="OBJECTNUMBER" sticky>
+                            <th mat-header-cell *matHeaderCellDef> {{moduleInfo?.moduleDesc || 'Object number'}}
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                {{ element['OBJECTNUMBER'] ? element['OBJECTNUMBER'].fieldValue : '' }}
+                            </td>
+                        </ng-container>
+
+                        <!-- Short description Column -->
+                        <ng-container matColumnDef="SHORT_DESC">
+                            <th mat-header-cell *matHeaderCellDef> Short description
+                            </th>
+                            <td mat-cell *matCellDef="let element" class="read-only-cell">
+                                {{ element['SHORT_DESC'] ? element['SHORT_DESC'].fieldValue : '' }}
+                            </td>
+                        </ng-container>
+
+                        <!-- Long description Column -->
+                        <ng-container matColumnDef="LONG_DESC">
+                            <th mat-header-cell *matHeaderCellDef> Long description
+                            </th>
+                            <td mat-cell *matCellDef="let element" class="read-only-cell">
+                                {{ element['LONG_DESC'] ? element['LONG_DESC'].fieldValue : '' }}
+                            </td>
+                        </ng-container>
+
+                        <!-- Class Column -->
+                        <ng-container matColumnDef="NOUN_CODE">
+                            <th mat-header-cell *matHeaderCellDef> Class
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                {{ element['NOUN_CODE'] ? element['NOUN_CODE'].fieldValue : '' }}
+                            </td>
+                        </ng-container>
+
+                        <!-- Modifier Column -->
+                        <ng-container matColumnDef="MODE_CODE">
+                            <th mat-header-cell *matHeaderCellDef> Modifier
+                            </th>
+                            <td mat-cell *matCellDef="let element">
+                                {{ element['MODE_CODE'] ? element['MODE_CODE'].fieldValue : '' }}
+                            </td>
+                        </ng-container>
+
+                        <!-- load dynamic columns-->
+                        <ng-template ngFor let-dynCols [ngForOf]="(displayedColumns | async)">
+                            <ng-template [ngIf]="isStaticColumn(dynCols)" [ngIfElse]="other">
+                                <!-- skip all static columns -->
+                            </ng-template>
+                            <ng-template #other>
+                                <ng-container [matColumnDef]="dynCols">
+                                    <th mat-header-cell *matHeaderCellDef>
+                                        {{ columnName(dynCols) }} <span class="mandatory"
+                                            *ngIf="isMandatory(dynCols)">*</span>
+                                    </th>
+                                    <td mat-cell *matCellDef="let element; let rIndex = index;"
+                                        [class.error-cell]="element[dynCols] && element[dynCols].err_msg ? true : false"
+                                        [class.edit-mode]="isEditEnabled(dynCols, element, rIndex)"
+                                        (click)="editCurrentCell(dynCols,element, rIndex, containerRef)"
+                                        
+                                        matBadge libStatusBadge
+                                        [badgeIconFont]="getBadgeState(dynCols, rIndex).font"
+                                        [statusBadgePosition]="{ top: 11, right: -11 }"
+                                        [badgeIcon]="getBadgeState(dynCols, rIndex).icon"
+                                        [badgeType]="getBadgeState(dynCols, rIndex).type"
+                                        [badgeZindex]="1">
+                                        <!-- Status Badge implementation based on request status -->
+                                        <div class="f-col grid-cell-editable">
+                                            <div class="mdo-form-input f-col" style="display: none;"
+                                                id="inpctrl_{{ dynCols + '_' + rIndex }}">
+                                                <!-- container to hold input field when cell gets edited  -->
+                                                <ng-template prosContainerRef #containerRef="prosContainerRef">
+                                                </ng-template>
+                                            </div>
+                                            <span id="viewctrl_{{ dynCols + '_' + rIndex }}">
+                                                {{ element[dynCols] ? element[dynCols].fieldText || element[dynCols].fieldValue : '' }}
+                                            </span>
+
+                                            <span class="error-message">
+                                                {{ element[dynCols] ? element[dynCols].err_msg : '' }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                </ng-container>
+                            </ng-template>
+                        </ng-template>
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns | async; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns | async;">
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <pros-skeleton-loader [tableView]="schemaInfo && statics" [loading]="loading"></pros-skeleton-loader> -->

@@ -1,0 +1,68 @@
+<ng-template [ngIf]="isTableFilter === 'true'" [ngIfElse]="configure">
+    <div class="f-col mdo-field multiselect-input" [id]="fieldId" [matMenuTriggerFor]="childMenu">
+        <div class="mdo-field-input" (click)="onFocus()">
+            <span [id]="'input-'+fieldId" *ngIf="selectedNode && selectedNode.length"></span>
+            <span [id]="'additional-'+fieldId" *ngIf="selectedNode && selectedNode.length > 1"></span>
+        </div>
+    </div>
+    <mat-menu #childMenu="matMenu" [overlapTrigger]="false">
+        <div class="f-col multicheck">
+            <div class="f-col menu-spacing" prosClickStopPropagation>
+                <lib-search [formControl]="control" [placeholder]="placeholder"></lib-search>
+            </div>
+            <div class="f-col multiselect-checkbox" prosClickStopPropagation>
+                <span *ngFor="let data of nestedData" class="nestedData">
+                    <span class="button-flex" *ngIf="data.child && data.child.length > 0">
+                        <lib-checkbox class="checkbox-flex" [checked]="data.checked" (valueChange)="clickedActive(data)"
+                            [matTooltip]="getLabel(data)" matTooltipPosition="right" [label]="getLabel(data)"
+                            [indeterminate]="getCheckedAmount(data)">
+                        </lib-checkbox>
+                        <button mat-menu-item color="primary" [matMenuTriggerFor]="menu.childMenu">
+                        </button>
+                        <pros-menu-item #menu (valueChange)="clickedActive($event)" [nestedData]="data.child"
+                            [selectedNode]="selectedNode" [displayCriteria]="displayCriteria">
+                        </pros-menu-item>
+                    </span>
+                    <span *ngIf="!data.child || data.child.length === 0">
+                        <lib-checkbox [checked]="data.checked" (valueChange)="clickedActive(data)"
+                            [matTooltip]="getLabel(data)" matTooltipPosition="right" [label]="getLabel(data)">
+                        </lib-checkbox>
+                    </span>
+                </span>
+            </div>
+        </div>
+        <div class="filter-button-wrapper">
+            <lib-button type="minor" (click)="applyFilter()" i18n="@@apply">Apply</lib-button>
+        </div>
+    </mat-menu>
+</ng-template>
+<ng-template #configure>
+    <div class="dropdown-search-wrapper">
+        <lib-search [formControl]="control" placeholder="search..." prosClickStopPropagation></lib-search>
+    </div>
+    <div class="f-col sideSheet-checkbox" prosClickStopPropagation>
+        <span *ngFor="let data of nestedData" [ngClass]="isFilterWidget === 'true' ? 'nestedDataWidth' : 'sideSheet-nested'">
+            <span class="sideSheet-button-flex" *ngIf="data.child && data.child.length > 0">
+                <lib-checkbox class="sideSheet-checkbox-flex" [checked]="data.checked" (valueChange)="clickedActive(data)"
+                    [matTooltip]="getLabel(data)" matTooltipPosition="right" [label]="getLabel(data)"
+                    [indeterminate]="getCheckedAmount(data)">
+                </lib-checkbox>
+                <button mat-button class="sideSheet-button-fl" [matMenuTriggerFor]="menu.childMenu">
+                    <mat-icon>chevron_right</mat-icon>
+                </button>
+                <pros-menu-item #menu (valueChange)="clickedActive($event)" [nestedData]="data.child"
+                    [selectedNode]="selectedNode" [displayCriteria]="displayCriteria" prosClickStopPropagation>
+                </pros-menu-item>
+            </span>
+            <span *ngIf="!data.child || data.child.length === 0">
+                <lib-checkbox [checked]="data.checked" (valueChange)="clickedActive(data)"
+                    [matTooltip]="getLabel(data)" matTooltipPosition="right" 
+                    [label]="getLabel(data)">
+                </lib-checkbox>
+            </span>
+        </span>
+    </div>
+    <div *ngIf="isFilterWidget === 'true'" class="filter-button-wrapper">
+        <lib-button type="minor" (click)="applyFilter()" i18n="@@apply">Apply</lib-button>
+    </div>
+</ng-template>

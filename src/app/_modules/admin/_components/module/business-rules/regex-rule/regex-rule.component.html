@@ -1,0 +1,31 @@
+<div class="rulesfields">
+    <div class="f-col" [formGroup]="regexFrmGrp">
+        <mat-form-field appearance="outline">
+            <mat-label>Description</mat-label>
+            <input matInput autocomplete="off" formControlName="ruleDesc">
+        </mat-form-field>
+
+        <!-- FIELD CONTROL -->
+        <pros-generic-field-control [moduleId]="moduleId" lebel="Select Fields" [isMultiSelection]="true"
+            [selectedFldId]="selectedFldId" (selectionChange)="selectedFields($event)">
+        </pros-generic-field-control>
+
+        <!-- PREDINED REGEX -->
+        <mat-form-field appearance="outline">
+            <mat-label> Standard Function </mat-label>
+            <input matInput [matAutocomplete]="preSelectedRegexAuto" formControlName="standardFun">
+            <mat-autocomplete #preSelectedRegexAuto="matAutocomplete" [displayWith]="displayWithPreRegex"
+                (optionSelected)="selectRegex($event)">
+                <mat-option *ngFor="let regex of preDefinedRegexObs | async" [value]="regex">
+                    {{regex.FUNC_NAME}}
+                </mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Textarea</mat-label>
+            <textarea matInput formControlName="queryScript"></textarea>
+        </mat-form-field>
+    </div>
+</div>
+<div class="row-spacer"></div>

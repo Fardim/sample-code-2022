@@ -1,0 +1,38 @@
+<div class="root">
+        <div *ngFor="let item of tabContainer;let first = first">
+                <div class="collapsible" >
+                  <mat-accordion  togglePosition="before">
+                    <mat-expansion-panel [expanded]="first" class="mat-elevation-z0" expended="true" class="mat-elevation-z0" (opened)="panelOpenState = true" (closed)="panelOpenState = false" hideToggle="true">
+                      <mat-expansion-panel-header>
+                        <mat-panel-title>
+                          <div class="icon">
+                            <div>
+                              <mat-icon *ngIf="!panelOpenState">keyboard_arrow_right</mat-icon>
+                              <mat-icon *ngIf="panelOpenState">expand_more</mat-icon>
+                            </div>
+                            <div class="header-text">{{item?.tabText}}</div>
+                          </div>
+                          <div class="header-action">
+                            <lib-button type="plain" icon="sliders-h" (click)="$event.stopPropagation()"></lib-button>
+                            <lib-button type="plain"[matMenuTriggerFor]="header" icon="ellipsis-h" (click)="$event.stopPropagation()" ></lib-button>
+                            <mat-menu #header="matMenu" class="navigation-menu">
+                              <button mat-menu-item i18n="@@duplicate">Duplicate</button>
+                              <button mat-menu-item i18n="@@remove">Remove</button>
+                              <button mat-menu-item [matMenuTriggerFor]="criteria">Copy criteria from section</button>
+                            </mat-menu>          
+                            <mat-menu #criteria="matMenu">
+                              <button mat-menu-item>List item</button>
+                              <button mat-menu-item>List item</button>
+                              <button mat-menu-item>List item</button>
+                              <button mat-menu-item>List item</button>
+                            </mat-menu>
+                          </div>
+                        </mat-panel-title>
+                      </mat-expansion-panel-header>
+                      <pros-form-tab-widget *ngFor="let tab of item?.fields;let last = last"  [isLast]="last" [tabFields]="tab" (deleteFormWidget)="deleteFormWidget($event)"></pros-form-tab-widget>
+                    </mat-expansion-panel>
+                    </mat-accordion>
+                    </div>
+              </div>
+              
+<!-- </div> -->

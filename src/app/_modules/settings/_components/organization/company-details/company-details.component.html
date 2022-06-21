@@ -1,0 +1,99 @@
+<div class="f-col tabs-content">
+  <!-- ! TODO: New to add validity feedback in styles to all form elements-->
+  <form [formGroup]="organizationDetailsFormGroup" class="f-row company-details">
+    <div class="avatar">
+      <lib-avatar [srcPicture]="logo" libTooltip="Organization logo" i18n-liblibTooltip="@@organization-logo"
+        [editable]="!showSkeleton" size="large" (avatarChange)="companyLogoChange($event)">
+        <mat-icon fontSet="mdo-icons-light" inline="true" *ngIf="!showSkeleton">landmark</mat-icon>
+      </lib-avatar>
+    </div>
+
+    <lib-skeleton-overview class="entry-fields" *ngIf="showSkeleton"></lib-skeleton-overview>
+
+    <div class="entry-fields" *ngIf="!showSkeleton">
+      <div class="f-col">
+        <lib-banner status="warning" *ngIf="organizationDetailsFormGroup.invalid">Details invalid! Please check the
+          details to proceed</lib-banner>
+      </div>
+      
+      <div class="f-col">
+        <lib-input formControlName="companyName" isRequired="true"
+          [hasError]="organizationDetailsFormGroup.controls.companyName.dirty && organizationDetailsFormGroup.controls.companyName.invalid"
+          label="Organization name" i18n-label="@@organization-name" type="text" (afterBlur)="attempOrgInfoUpdate()">
+        </lib-input>
+      </div>
+
+      <div class="f-col">
+        <lib-input formControlName="website" label="Website" i18n-label="@@organization-website" type="text"
+          (afterBlur)="attempOrgInfoUpdate()"></lib-input>
+      </div>
+
+      <div class="f-col">
+        <lib-input formControlName="billingEmail" label="Biling e-mail"
+          [hasError]="organizationDetailsFormGroup.controls.billingEmail.dirty && !organizationDetailsFormGroup.controls.billingEmail.valid"
+          isRequired="true" i18n-label="@@organization-billing-email" type="text" (afterBlur)="attempOrgInfoUpdate()">
+        </lib-input>
+      </div>
+
+      <div class="f-col">
+        <lib-input formControlName="contactNumber" label="Contact number" i18n-label="@@organization-contact-number"
+          type="text" (afterBlur)="attempOrgInfoUpdate()"></lib-input>
+      </div>
+
+      <div class="f-col">
+        <lib-input label="Number of users" i18n-label="@@organization-user-count" type="text"
+          [value]="totalUserCount$ | async" [disabled]="true" (afterBlur)="attempOrgInfoUpdate()"></lib-input>
+      </div>
+
+      <div class="f-col" formGroupName="address">
+
+        <span class="f-row-spacer-half"></span>
+        
+        <lib-section text="Address details" i18n-text="@@organization-address-details"></lib-section>
+        <span class="f-row-spacer-half"></span>
+        <!--Possible addtion of multiple adresses to handled here-->
+
+        <div class="f-col">
+          <pros-geo-location-map mode="AUTOCOMPLETE_SEARCHBAR" placeholder="Start typing here to search"
+            i18n-placeholder="@@organization-address-search-placeholder" (placeChanged)="addressAutocomplete($event)">
+          </pros-geo-location-map>
+        </div>
+
+        <div class="f-col">
+          <lib-input formControlName="streetNo" label="Street number" i18n-label="@@organization-street-number"
+          type="text" (afterBlur)="attempOrgInfoUpdate()"></lib-input>
+        </div>
+
+        <div class="f-col">
+          <lib-input formControlName="addressLine1" label="Address line 1" i18n-label="@@organization-address-line-1"
+          type="text" (afterBlur)="attempOrgInfoUpdate()"></lib-input>
+        </div>
+
+        <div class="f-col">
+          <lib-input formControlName="addressLine2" label="Address line 1" i18n-label="@@organization-address-line-2"
+          type="text" (afterBlur)="attempOrgInfoUpdate()"></lib-input>
+        </div>
+
+        <div class="f-col">
+          <lib-input formControlName="suburb" label="Suburb/Town/City" i18n-label="@@organization-suburb" type="text"
+          (afterBlur)="attempOrgInfoUpdate()"></lib-input>
+        </div>
+
+        <div class="f-col">
+          <lib-input formControlName="state" label="State" i18n-label="@@organization-state" type="text"
+          (afterBlur)="attempOrgInfoUpdate()"></lib-input>
+        </div>
+
+        <div class="f-col">
+          <lib-input formControlName="postalCode" label="Postcode" i18n-label="@@organization-postal-code" type="text"
+          (afterBlur)="attempOrgInfoUpdate()"></lib-input>
+        </div>
+
+        <div class="f-col">
+          <lib-input formControlName="country" label="Country" i18n-label="@@organization-country" type="text"
+          (afterBlur)="attempOrgInfoUpdate()"></lib-input>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

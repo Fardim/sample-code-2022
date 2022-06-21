@@ -1,0 +1,16 @@
+.sum-collection {
+  margin-left: 3px;
+}
+
+.sum-collection::after {
+  display: inline-block;
+  content: '';
+  border-radius: 50%;
+  height: 3px;
+  width: 3px;
+  margin: 0 2px 0 5px;
+}
+
+.sum-collection:last-child::after {
+  display: none;
+}

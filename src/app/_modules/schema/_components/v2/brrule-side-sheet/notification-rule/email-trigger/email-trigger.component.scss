@@ -1,0 +1,25 @@
+.user-defined-set {
+  .defined-row {
+    border-width: 1px;
+    border-style: solid;
+    align-items: center;
+    height: 54px;
+    margin: 0 0 16px 0;
+    border-radius: 3px;
+
+    div.col {
+      display: block;
+      flex: 1;
+      min-width: 0;
+      position: relative;
+      padding: 0 8px;
+
+      &:first-of-type,
+      &:last-of-type {
+        min-width: auto;
+        flex: 0 0 auto;
+        padding: 0;
+      }
+    }
+  }
+}

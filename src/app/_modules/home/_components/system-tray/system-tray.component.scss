@@ -1,0 +1,155 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  width: 900px;
+
+  .breadcrum-toolbar {
+    padding: 8px 12px;
+
+    .mdo-constrained-right {
+      align-items: center;
+      width: 100%;
+      margin-right: 0;
+
+      .breadcrum-head {
+        width: 100%;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px);
+    overflow: auto;
+
+    .mdo-justify {
+      margin: 0 16px;
+      height: 100%;
+
+      .filters-list {
+        .lib-search {
+          margin-right: 6px;
+          width: 213px;
+        }
+      }
+
+      .notification-container {
+        height: 100%;
+      }
+
+      .jobs-table {
+        table.mat-table {
+          width: 100%;
+
+          .mat-cell,
+          .mat-header-cell {
+            border-right: 0;
+
+            &.end-item {
+              text-align: right;
+            }
+
+            &.center-item {
+              text-align: center;
+
+              .cell-align {
+                display: flex;
+                justify-content: center;
+              }
+            }
+
+            .cancelled-job {
+              text-decoration: line-through;
+            }
+
+            &.jobs-name-container {
+              width: 350px;
+            }
+          }
+
+          .mat-column-jobName {
+            white-space: unset;
+            overflow-wrap: break-word;
+            word-break: break-word;
+            width: 100px;
+            -ms-hyphens: auto;
+            -moz-hyphens: auto;
+            -webkit-hyphens: auto;
+            hyphens: auto;
+
+            .jobs-name-container {
+              width: 350px;
+
+              .job-name-col {
+                .text-line {
+                  margin-right: 5px;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .lib-tab {
+        height: 100%;
+
+        .notification-list {
+          overflow: auto;
+          height: 100%;
+        }
+
+        mat-list-item.mat-list-item {
+          height: auto;
+
+          .notification-listing {
+            width: 100%;
+            padding: 8px 0;
+
+            .notify-row {
+              padding: 0 12px;
+              width: calc(100% - 104px);
+
+              .timetext {
+                margin-top: 4px;
+              }
+
+              .mat-expand-icon {
+                font-size: 8px;
+                height: 8px;
+                width: 8px;
+                cursor: pointer;
+              }
+            }
+
+            .job-row {
+              width: calc(100% - 320px);
+              padding: 0 12px;
+            }
+
+            .notify-content {
+              &.expand-content {
+                -webkit-line-clamp: inherit;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 62px;
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+<mat-toolbar class="root">
+    <mat-toolbar-row *ngIf="crumbs && crumbs.heading">
+        <h1>{{crumbs.heading}}</h1>
+    </mat-toolbar-row>
+    <mat-toolbar-row class="mat-caption">
+        <mat-icon color="primary" (click)="homeRoutingUrl()">home</mat-icon>
+        <ng-template [ngIf]="crumbs && crumbs.links">
+            <ng-template ngFor let-link [ngForOf]="crumbs.links">
+                <mat-icon>keyboard_arrow_right</mat-icon>
+                <a class="link" routerLink="{{link.link}}">{{ link.text }}</a>
+            </ng-template>
+        </ng-template>
+        <ng-template [ngIf]="crumbs && crumbs.links && crumbs.heading">
+            <mat-icon>keyboard_arrow_right</mat-icon>
+            <a>{{ crumbs.heading }}</a>
+        </ng-template>
+    </mat-toolbar-row>
+</mat-toolbar>

@@ -1,0 +1,540 @@
+<div class="root">
+
+   <div *ngIf="!showSkeleton" class="f-col">
+      <div class="f-row breadcrum-toolbar">
+         <lib-text-line type="leading" i18n="@@teams">Team</lib-text-line>
+         <div class="f-spacer"></div>
+         <lib-button type="minor" width="80px" (click)="OpenInviteSidesheet()" i18n="@@invite">Invite</lib-button>
+      </div>
+
+      <div class="f-row-spacer-half"></div>
+
+      <div class="f-col" *ngIf="showErrorBanner">
+         <lib-banner status="error" [text]="'Only admin users can view profile details'"></lib-banner>
+      </div>
+
+      <div class="f-row">
+         <lib-tab-group disableRipple="true" [selectedIndex]="selectedTabIndex"
+            (selectedIndexChange)="selectedTabChange($event)">
+            <lib-tab label="">
+               <div label>
+                  <lib-text-line [enableWrap]="false"> Team members </lib-text-line>
+               </div>
+            </lib-tab>
+            <lib-tab label="">
+               <div label>
+                  <lib-text-line [enableWrap]="false"> Partner </lib-text-line>
+               </div>
+            </lib-tab>
+         </lib-tab-group>
+      </div>
+
+      <div class="f-row">
+         <lib-chip-list class="filters-list">
+            <lib-search class="lib-search" i18n-placeholder="@@search" placeholder="Search team"
+               (valueChange)="searchFieldSub.next($event)">
+            </lib-search>
+            <lib-chip label="Status:" i18n-label="@@status" [matMenuTriggerFor]="statusMenu" type="info">
+               {{ (selectedStatus.length > 0 ? selectedStatus.join(', ') : 'All') }}
+            </lib-chip>
+            <lib-chip label="Role:" i18n-label="@@role" [matMenuTriggerFor]="rolesMenu" type="info">
+               {{(selectedRoles.length > 0 ? selectedRolesDescription.join(', ') : 'All' ) }}
+            </lib-chip>
+            <mat-menu #statusMenu="matMenu" xPosition="after" class="filter-menudropdown">
+               <lib-filter-dropdown class="chip-filters">
+                  <div class="dropdown-search-wrapper">
+                     <lib-search #searchInput prosClickStopPropagation (valueChange)="searchStatusSub.next($event)"
+                        placeholder="Search"></lib-search>
+                  </div>
+                  <div class="dropdown-options-wrapper f-col">
+                     <div class="dropdown-options-inner-container">
+                        <div class="default-options">
+                           <lib-filter-option prosClickStopPropagation>
+                              <lib-checkbox label="All" prosClickStopPropagation [checked]="selectedStatus.length == 0"
+                                 (valueChange)="setSelectedStatus('')"></lib-checkbox>
+                           </lib-filter-option>
+                           <div class="separator">
+                              <mat-divider></mat-divider>
+                           </div>
+                        </div>
+                        <div class="options">
+                           <lib-filter-option prosClickStopPropagation *ngFor="let item of filteredStatus">
+                              <lib-checkbox [label]="item" prosClickStopPropagation
+                                 [checked]="selectedStatus.indexOf(item) >= 0" (valueChange)="setSelectedStatus(item)">
+                              </lib-checkbox>
+                           </lib-filter-option>
+                        </div>
+                     </div>
+                     <div class="filter-button-wrapper">
+                        <lib-button type="minor" (click)="afterStatusAndRoleMenuClosed()">Apply</lib-button>
+                     </div>
+                  </div>
+               </lib-filter-dropdown>
+            </mat-menu>
+            <mat-menu #rolesMenu="matMenu" xPosition="after" class="filter-menudropdown">
+               <lib-filter-dropdown class="chip-filters">
+                  <div class="dropdown-search-wrapper">
+                     <lib-search #searchInput prosClickStopPropagation (valueChange)="searchRoleSub.next($event)"
+                        placeholder="Search"></lib-search>
+                  </div>
+                  <div class="dropdown-options-wrapper f-col">
+                     <div class="dropdown-options-inner-container" prosInfiniteScroll bufferPercentage="20"
+                        (scrollEnd)="roleScrollEnd()">
+                        <div class="default-options">
+                           <lib-filter-option prosClickStopPropagation>
+                              <lib-checkbox prosClickStopPropagation label="All" i18n-label="@@all"
+                                 [checked]="selectedRoles.length == 0" (valueChange)="setSelectedRole(null)">
+                              </lib-checkbox>
+                           </lib-filter-option>
+                           <div class="separator">
+                              <mat-divider></mat-divider>
+                           </div>
+                        </div>
+                        <div class="options">
+                           <lib-filter-option prosClickStopPropagation *ngFor="let item of filteredRoles">
+                              <lib-checkbox [label]="item.description" prosClickStopPropagation
+                                 [checked]="selectedRoles.indexOf(item.roleId.toString()) >= 0"
+                                 (valueChange)="setSelectedRole(item)"></lib-checkbox>
+                           </lib-filter-option>
+                        </div>
+                     </div>
+                     <div class="filter-button-wrapper">
+                        <lib-button type="minor" (click)="afterStatusAndRoleMenuClosed()">Apply</lib-button>
+                     </div>
+                  </div>
+               </lib-filter-dropdown>
+            </mat-menu>
+         </lib-chip-list>
+      </div>
+   </div>
+
+
+
+   <div class="f-row-spacer-half"></div>
+
+   <div class="f-col root" *ngIf="showSkeleton">
+      <pros-toolbar-skeleton></pros-toolbar-skeleton>
+      <div class="f-col table-loader">
+         <lib-skeleton-table></lib-skeleton-table>
+      </div>
+   </div>
+
+   <div class="f-col" *ngIf="showTableSkeleton">
+      <lib-skeleton-table></lib-skeleton-table>
+   </div>
+
+   <div class="f-row" *ngIf="!showTableSkeleton">
+      <lib-button-group *ngIf="selection.hasValue()">
+         <lib-button type="minor" (click)="setStatus('ACTIVE')" i18n="@@activate">Activate</lib-button>
+         <lib-button type="minor" (click)="setStatus('INACTIVE')" i18n="@@inactivate">Inactivate</lib-button>
+         <!-- <lib-button type="minor" (click)="selection.clear()" i18n="@@clear_selection">Clear selection</lib-button> -->
+      </lib-button-group>
+      <span class="f-col-spacer-half"></span>
+      <lib-text-line type="base" textColor="secondary" *ngIf="selection.hasValue()">
+         {{ selectedPages.includes('all') ? totalCount : selection.selected?.length }} of
+         {{totalCount}} records selected.
+      </lib-text-line>
+   </div>
+   <div
+      [ngClass]="{'hasErrorBanner': showErrorBanner, 'teams': true, 'has-selection': selection.hasValue(), 'has-no-selection': !selection.hasValue()}">
+      <table #table [ngClass]="{
+         'hide-table': !showTableSkeleton && !dataSource?.docLength()  }"
+         [ngStyle]="{ 'display': showSkeleton || showTableSkeleton ? 'none' : '' }" mat-table [dataSource]="dataSource"
+         [columns]="columns" prosMultiSort (sortingFields)="sortingFields($event)" class="mat-elevation-z0">
+         <!-- Checkbox Column -->
+         <ng-container matColumnDef="select" sticky>
+            <th mat-header-cell *matHeaderCellDef>
+               <lib-checkbox-option [menuOptions]="CheckboxOptions" (valueChange)="masterToggle($event)"
+                  [checked]="selection.hasValue() && selectedPages.includes('all')"
+                  [indeterminate]="selection.hasValue()  && !selectedPages.includes('all')"></lib-checkbox-option>
+            </th>
+            <td mat-cell *matCellDef="let element">
+               <lib-checkbox (valueChange)="toggle(element)" [checked]="isChecked(element)"
+                  [aria-label]="checkboxLabel(element)"></lib-checkbox>
+            </td>
+         </ng-container>
+         <ng-container matColumnDef="userName" sticky>
+            <th mat-header-cell *matHeaderCellDef [pros-multi-sort-header]="'userName'">
+               Username
+            </th>
+            <td mat-cell *matCellDef="let element">
+               <div class="f-row">
+                  <lib-avatar (click)="openProfileSectionSidesheet(element)" size="small" [initials]="getInitials(element)"></lib-avatar>
+                  <div class="f-col-spacer-half"></div>
+                  <lib-text-line textColor="link" class="cursor" type="base" (click)="openProfileSectionSidesheet(element)">
+                     {{ element['userName'] ? element['userName'] : '' }}
+                  </lib-text-line>
+               </div>
+            </td>
+         </ng-container>
+         <ng-container matColumnDef="assign">
+            <th mat-header-cell *matHeaderCellDef>
+               Assign
+            </th>
+            <td mat-cell *matCellDef="let element">
+               <lib-chip-list class="teams-chips">
+                  <lib-chip class="mdo-filter-matchip filter-pill"
+                     [ngClass]="{'disabled-trigger': element.status === 'INVITED'}" [matMenuTriggerFor]="assignMenu">
+                     <mat-icon fontSet="mdo-icons-light">
+                        plus
+                     </mat-icon>
+                  </lib-chip>
+               </lib-chip-list>
+               <mat-menu #assignMenu="matMenu">
+                  <button mat-menu-item [matMenuTriggerFor]="partnerRolesMenu"
+                     (mouseover)="setRoleValues(element.roles)"> Role </button>
+                  <button mat-menu-item (click)="openDatasetRecordMapping(element)"> Assign dataset record </button>
+               </mat-menu>
+               <mat-menu #partnerRolesMenu="matMenu" direction="down" yPosition="below" [overlapTrigger]="false"
+                  class="filter-menudropdown">
+                  <div (mouseleave)="searchLabelInput.clearSearch()" prosClickStopPropagation class="chip-filters">
+                     <lib-filter-dropdown>
+                        <div class="dropdown-search-wrapper">
+                           <lib-search placeholder="Search" #searchLabelInput prosClickStopPropagation
+                              (valueChange)="searchRoleSub.next($event)">
+                           </lib-search>
+                        </div>
+                        <div class="dropdown-options-wrapper f-col">
+                           <div class="dropdown-options-inner-container">
+                              <div class="options">
+                                 <lib-filter-option prosClickStopPropagation *ngFor="let item of filteredRoles">
+                                    <lib-checkbox [label]="item.description" prosClickStopPropagation
+                                       [checked]="setUserRole(item)" (valueChange)="updateInvitedUserRole(item)">
+                                    </lib-checkbox>
+                                 </lib-filter-option>
+                              </div>
+                           </div>
+                           <div class="filter-button-wrapper">
+                              <lib-button type="minor" (click)="invitedUserRoleChanged(element)">Apply</lib-button>
+                           </div>
+                        </div>
+                     </lib-filter-dropdown>
+                  </div>
+               </mat-menu>
+            </td>
+         </ng-container>
+
+         <ng-container matColumnDef="datasetRecord">
+            <th mat-header-cell *matHeaderCellDef>
+               Dataset Record
+            </th>
+            <td mat-cell *matCellDef="let element">
+               {{ (element.datasetId || '') + ' - ' + (element.recordNumber || '') }}
+            </td>
+         </ng-container>
+         <!-- dynamic columns -->
+         <ng-template ngFor let-dynCol [ngForOf]="displayedColumns">
+            <ng-template [ngIf]="isStaticCol(dynCol)" [ngIfElse]="dynamic">
+            </ng-template>
+            <ng-template #dynamic>
+
+               <ng-container *ngIf="dynCol === 'action'|| dynCol === 'userName'; else nonSticky">
+                  <ng-container [matColumnDef]="dynCol" sticky>
+                     <th class="action-column" mat-header-cell *matHeaderCellDef [pros-multi-sort-header]="dynCol">
+                        <ng-container *ngIf="dynCol !== 'action'">
+                           {{ getLabel(dynCol) }}
+                        </ng-container>
+                     </th>
+                     <td mat-cell *matCellDef="let element" [ngClass]="{ 'action-cell': dynCol == 'action'}">
+                        <div class="f-row" *ngIf="dynCol == 'roles'; else dateTemplate">
+                           <ng-template *ngIf="element[dynCol]">
+                              <ng-container *ngFor="let label of element[dynCol].slice(0, 3)">
+                                 <lib-chip>{{ label?.roleDesc }}</lib-chip>
+                              </ng-container>
+                           </ng-template>
+                           <ng-container *ngIf="element[dynCol] && element[dynCol].length > 3">
+                              <lib-chip>{{ element[dynCol].slice(3, element[dynCol].length).length }}+</lib-chip>
+                           </ng-container>
+                           <lib-chip *ngIf="element.isImportant" icon="long-arrow-up"></lib-chip>
+                           <lib-chip #editButton [matMenuTriggerFor]="labelsMenu" #levelOneTrigger="matMenuTrigger"
+                              (mouseover)="levelOneTrigger.openMenu()" prosClickStopPropagation>
+                              <mat-icon fontSet="mdo-icons-light" class="chip-icon">pencil</mat-icon>
+                           </lib-chip>
+                           <mat-menu #labelsMenu="matMenu" direction="down" yPosition="below" [overlapTrigger]="false"
+                              class="filter-menudropdown">
+                              <div (mouseleave)="searchLabelInput.clearSearch(); levelOneTrigger?.closeMenu()"
+                                 prosClickStopPropagation class="chip-filters">
+                                 <lib-filter-dropdown>
+                                    <div class="dropdown-search-wrapper">
+                                       <lib-search #searchLabelInput prosClickStopPropagation
+                                          (valueChange)="labelSearchFieldSub.next($event)">
+                                       </lib-search>
+                                    </div>
+                                    <div class="dropdown-options-wrapper f-col">
+                                       <div class="dropdown-options-inner-container">
+                                          <div class="height-zero-mat-menu-item" mat-menu-item></div>
+                                          <mat-list class="default-options">
+                                             <mat-list-item class="f-row"
+                                                *ngFor="let label of element[dynCol]; let index = index">
+                                                <div class="f-col">
+                                                   <lib-text-line type="base" enableWrap="true"> {{ label?.roleDesc }}
+                                                   </lib-text-line>
+                                                </div>
+                                                <span class="f-spacer"></span>
+                                                <span class="f-col-spacer-half"></span>
+                                                <lib-button iconFontType="solid" icon="times"
+                                                   (click)="removeLabel(element, label)">
+                                                </lib-button>
+                                             </mat-list-item>
+                                          </mat-list>
+                                          <lib-section></lib-section>
+                                          <mat-list class="options">
+                                          </mat-list>
+                                       </div>
+                                    </div>
+                                 </lib-filter-dropdown>
+                              </div>
+                           </mat-menu>
+                        </div>
+                        <ng-template #dateTemplate>
+                           <div *ngIf="dynCol == 'joinedDate' || dynCol == 'lastActiveDate'; else statusTemplate">
+                              {{ element[dynCol] | date }}
+                           </div>
+                        </ng-template>
+                        <ng-template #statusTemplate>
+                           <div *ngIf="dynCol == 'status'; else usernameCellTemplate">
+                              <lib-label *ngIf="element[dynCol] == 'ACTIVE'" text="Active" status="success"
+                                 i18n="@@active">
+                              </lib-label>
+                              <lib-label *ngIf="element[dynCol] == 'INACTIVE'" text="Inactive" status="error"
+                                 i18n="@@deactivate">
+                              </lib-label>
+                              <lib-label *ngIf="element[dynCol] == 'INVITED'" text="Invited" status="warning"
+                                 i18n="@@invited">
+                              </lib-label>
+                              <lib-label *ngIf="element[dynCol] == 'INVITE_EXPIRED'" text="Invite Expired" status="info"
+                                 i18n="@@invite_expired">
+                              </lib-label>
+                              <lib-label *ngIf="element[dynCol] == 'REVOKED'" text="Revoked" status="warning"
+                                 i18n="@@revoked">
+                              </lib-label>
+                              <lib-label *ngIf="element[dynCol] == 'LOCKED'" text="Locked" status="error"
+                                 i18n="@@locked">
+                              </lib-label>
+                           </div>
+                        </ng-template>
+                        <ng-template #usernameCellTemplate>
+                           <div *ngIf="dynCol == 'userName'; else actionCellTemplate" class="f-row">
+                              <lib-avatar size="small" [initials]="getInitials(element)"></lib-avatar>
+                              <lib-text-line class="link-text" textColor="link" type="base"
+                                 (click)="openProfileSectionSidesheet(element)">
+                                 {{ element[dynCol] ? element[dynCol] : '' }}
+                              </lib-text-line>
+                           </div>
+                        </ng-template>
+                        <ng-template #actionCellTemplate>
+                           <div *ngIf="dynCol == 'action'; else defaultCellTemplate" class="f-row">
+                              <lib-button type="plain" icon="ellipsis-h" (click)="$event.stopPropagation()"
+                                 [matMenuTriggerFor]="actionMenu">
+                              </lib-button>
+                              <mat-menu #actionMenu="matMenu" class="navigation-menu">
+                                 <button mat-menu-item (click)="changeUserStatus(element,'ACTIVE')"
+                                    *ngIf="element.status === 'INACTIVE'" i18n="@@activate">
+                                    Activate
+                                 </button>
+                                 <button mat-menu-item (click)="changeUserStatus(element, 'INACTIVE')"
+                                    *ngIf="(element.status === 'ACTIVE' || element.status === 'LOCKED')"
+                                    i18n="@@deactivate">
+                                    Deactivate
+                                 </button>
+                                 <button mat-menu-item (click)="resendInvitation(element)"
+                                    *ngIf="(element.status === 'INVITED' || element.status === 'REVOKED')"
+                                    i18n="@@resend_invitation">
+                                    Re-send invitation
+                                 </button>
+                                 <button mat-menu-item (click)="revokeSelectedMembers(element)"
+                                    *ngIf="element.status === 'INVITED'" i18n="@@revoke_invitation">
+                                    Revoke invitation
+                                 </button>
+                                 <!-- <button mat-menu-item (click)="resetPassword(element)" *ngIf="(element.status === 'ACTIVE' || element.status === 'LOCKED')"
+                          i18n="@@reset_password">
+                          Reset Password
+                          </button> -->
+                              </mat-menu>
+                           </div>
+                        </ng-template>
+                        <ng-template #defaultCellTemplate>
+                           <div>
+                              {{ element[dynCol] ? element[dynCol] : '' }}
+                           </div>
+                        </ng-template>
+                     </td>
+                  </ng-container>
+               </ng-container>
+               <ng-template #nonSticky>
+                  <ng-container [matColumnDef]="dynCol">
+                     <th mat-header-cell *matHeaderCellDef [pros-multi-sort-header]="dynCol">
+                        {{ getLabel(dynCol) }}
+                     </th>
+                     <td mat-cell *matCellDef="let element">
+                        <div class="f-row" *ngIf="dynCol == 'roles'; else dateTemplate">
+                           <lib-chip-list class="teams-chips">
+                              <ng-template [ngIf]="element[dynCol]">
+                                 <ng-container *ngFor="let label of element[dynCol].slice(0, 3)">
+                                    <lib-chip>{{ label?.roleDesc || 'Unkown' }}</lib-chip>
+                                 </ng-container>
+                              </ng-template>
+
+                              <ng-container *ngIf="element[dynCol] && element[dynCol].length > 3">
+                                 <lib-chip class="mdo-filter-matchip filter-pill" [matMenuTriggerFor]="labelsNumberMenu"
+                                    #levelTwoTrigger="matMenuTrigger" (mouseover)="levelTwoTrigger.openMenu()"
+                                    prosClickStopPropagation>{{ element[dynCol].slice(3, element[dynCol].length).length
+                                    }}+
+                                 </lib-chip>
+                                 <mat-menu #labelsNumberMenu="matMenu" direction="down" yPosition="below"
+                                    [overlapTrigger]="false" class="filter-menudropdown">
+                                    <div (mouseleave)="levelTwoTrigger.closeMenu()" prosClickStopPropagation
+                                       class="chip-filters">
+                                       <mat-list class="default-options">
+                                          <mat-list-item class="f-row"
+                                             *ngFor="let label of element[dynCol]; let index = index">
+                                             <div class="f-col">
+                                                <lib-text-line type="base" enableWrap="true"> {{ label?.roleDesc }}
+                                                </lib-text-line>
+                                             </div>
+                                             <span class="f-spacer"></span>
+                                          </mat-list-item>
+                                       </mat-list>
+                                    </div>
+                                 </mat-menu>
+                              </ng-container>
+
+                              <lib-chip *ngIf="element.isImportant" icon="long-arrow-up"></lib-chip>
+                              <lib-chip *ngIf="selectedTabIndex===0" class="mdo-filter-matchip filter-pill" #editButton
+                                 [matMenuTriggerFor]="labelsMenu" #levelOneTrigger="matMenuTrigger"
+                                 (mouseover)="levelOneTrigger.openMenu();setRoleValues(element[dynCol])"
+                                 prosClickStopPropagation>
+                                 <mat-icon fontSet="mdo-icons-light">pencil</mat-icon>
+                              </lib-chip>
+                              <mat-menu #labelsMenu="matMenu" direction="down" yPosition="below"
+                                 [overlapTrigger]="false" class="filter-menudropdown">
+                                 <div (mouseleave)="searchLabelInput.clearSearch(); levelOneTrigger?.closeMenu()"
+                                    prosClickStopPropagation class="chip-filters">
+                                    <lib-filter-dropdown>
+                                       <div class="dropdown-search-wrapper">
+                                          <lib-search placeholder="Search" #searchLabelInput prosClickStopPropagation
+                                             (valueChange)="labelSearchFieldSub.next($event)">
+                                          </lib-search>
+                                       </div>
+                                       <div class="dropdown-options-wrapper f-col">
+                                          <mat-list class="default-options">
+                                             <mat-list-item class="f-row"
+                                                *ngFor="let label of inviteUserRoleChanges; let index = index">
+                                                <lib-text-line type="base" enableWrap="true"> {{ label?.roleDesc }}
+                                                </lib-text-line>
+                                                <span class="f-spacer"></span>
+                                                <span class="f-col-spacer-half"></span>
+                                                <lib-button iconFontType="light" icon="times"
+                                                   (click)="updateInvitedUserRole(label)">
+                                                </lib-button>
+                                             </mat-list-item>
+                                          </mat-list>
+                                          <div class="dropdown-options-inner-container">
+                                             <div class="options">
+                                                <lib-filter-option prosClickStopPropagation
+                                                   *ngFor="let item of filteredRoles">
+                                                   <lib-checkbox [label]="item.description" prosClickStopPropagation
+                                                      [checked]="setUserRole(item)"
+                                                      (valueChange)="updateInvitedUserRole(item)"></lib-checkbox>
+                                                </lib-filter-option>
+                                             </div>
+                                          </div>
+                                          <div class="filter-button-wrapper">
+                                             <lib-button type="minor" (click)="invitedUserRoleChanged(element)">Apply
+                                             </lib-button>
+                                          </div>
+                                       </div>
+                                    </lib-filter-dropdown>
+                                 </div>
+                              </mat-menu>
+                           </lib-chip-list>
+                        </div>
+                        <ng-template #dateTemplate>
+                           <div *ngIf="dynCol == 'joinedDate' || dynCol == 'lastActiveDate'; else statusTemplate">
+                              {{ element[dynCol] | date }}
+                           </div>
+                        </ng-template>
+                        <ng-template #statusTemplate>
+                           <div *ngIf="dynCol == 'status'; else actionCellTemplate">
+                              <lib-label *ngIf="element[dynCol] == 'ACTIVE'" text="Active" status="success"
+                                 i18n="@@active">
+                              </lib-label>
+                              <lib-label *ngIf="element[dynCol] == 'INACTIVE'" text="Inactive" status="error"
+                                 i18n="@@deactivate">
+                              </lib-label>
+                              <lib-label *ngIf="element[dynCol] == 'INVITED'" text="Invited" status="warning"
+                                 i18n="@@invited">
+                              </lib-label>
+                              <lib-label *ngIf="element[dynCol] == 'INVITE_EXPIRED'" text="Invite Expired" status="info"
+                                 i18n="@@invite_expired">
+                              </lib-label>
+                              <lib-label *ngIf="element[dynCol] == 'REVOKED'" text="Revoked" status="warning"
+                                 i18n="@@revoked">
+                              </lib-label>
+                              <lib-label *ngIf="element[dynCol] == 'LOCKED'" text="Locked" status="error"
+                                 i18n="@@locked">
+                              </lib-label>
+                           </div>
+                        </ng-template>
+                        <ng-template #actionCellTemplate>
+                           <div *ngIf="dynCol == 'action'; else defaultCellTemplate" class="f-row ellipse-row">
+                              <lib-button type="plain" icon="ellipsis-h" (click)="$event.stopPropagation()"
+                                 [matMenuTriggerFor]="actionMenu">
+                              </lib-button>
+                              <mat-menu #actionMenu="matMenu" class="navigation-menu">
+                                 <button mat-menu-item (click)="changeUserStatus(element,'ACTIVE')"
+                                    *ngIf="element.status === 'INACTIVE'" i18n="@@activate">
+                                    Activate
+                                 </button>
+                                 <button mat-menu-item (click)="changeUserStatus(element, 'INACTIVE')"
+                                    *ngIf="(element.status === 'ACTIVE' || element.status === 'LOCKED')"
+                                    i18n="@@deactivate">
+                                    Deactivate
+                                 </button>
+                                 <button mat-menu-item (click)="resendInvitation(element)"
+                                    *ngIf="(element.status === 'INVITED' || element.status === 'REVOKED')"
+                                    i18n="@@resend_invitation">
+                                    Re-send invitation
+                                 </button>
+                                 <button mat-menu-item (click)="revokeSelectedMembers(element)"
+                                    *ngIf="element.status === 'INVITED'" i18n="@@revoke_invitation">
+                                    Revoke invitation
+                                 </button>
+                                 <!-- <button mat-menu-item (click)="resetPassword(element)" *ngIf="(element.status === 'ACTIVE' || element.status === 'LOCKED')"
+                          i18n="@@reset_password">
+                          Reset Password
+                          </button> -->
+                              </mat-menu>
+                           </div>
+                        </ng-template>
+                        <ng-template #defaultCellTemplate>
+                           <div>
+                              {{ element[dynCol] ? element[dynCol] : '' }}
+                           </div>
+                        </ng-template>
+                     </td>
+                  </ng-container>
+               </ng-template>
+            </ng-template>
+         </ng-template>
+         <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+         <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+      <div style="margin-top: 12px;" *ngIf="(!showTableSkeleton && !dataSource?.docLength())">
+         <!-- <lib-empty-state primaryText="No users found" icon="search" iconSize="200"></lib-empty-state> -->
+         <lib-empty-state class="f-col load-empty" primaryText="Nothing to see here" icon="search" iconSize="200"
+            secondaryText="Your search did not return any results, try modifying your search">
+            <!-- <lib-button-group>
+            <lib-button (click)="newTemplates()" type="minor">New template</lib-button>
+          </lib-button-group> -->
+         </lib-empty-state>
+      </div>
+   </div>
+   <div class="f-row-spacer-half"></div>
+   <div class="f-row" [ngClass]="{'hide-table': !showTableSkeleton && !dataSource?.docLength()}">
+      <lib-pagination [currentPageIndex]="recordsPageIndex" [totalCount]="totalCount" [pageSize]="recordsPageSize"
+         (pageChangeEvent)="onPageChange($event)">
+      </lib-pagination>
+      <lib-text-line type="base">{{ displayedRecordsRange }}</lib-text-line>
+   </div>
+</div>

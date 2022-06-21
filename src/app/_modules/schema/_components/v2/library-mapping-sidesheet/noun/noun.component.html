@@ -1,0 +1,79 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" (click)="close()" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading">Create new noun</lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button type="major" (click)="save()">Save</lib-button>
+            </div>
+        </div>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+
+            <lib-banner *ngIf="validationError.status === 'error'" status="error" [text]="validationError.message"></lib-banner>
+
+            <form [formGroup]="nounForm">
+                <div class="mdo-field">
+                    <lib-input [type]="'text'" [formControl]="formField('nounCode')" [isRequired]="true" [placeholder]="'Noun code'"
+                         [label]="'Noun code'"                         
+                         [hint]="submitted && nounForm.controls.nounCode.errors && nounForm.controls.nounCode.errors.required ? 'Please enter noun code' : ''"
+                         [hasError]="submitted && nounForm.controls.nounCode.errors && nounForm.controls.nounCode.errors.required"></lib-input>                   
+                </div>
+    
+                <div class="mdo-field">
+                    <lib-input [type]="'text'" [formControl]="formField('nounText')" [isRequired]="true" [placeholder]="'Noun text'"
+                    [label]="'Noun text'"
+                    [hint]="submitted && nounForm.controls.nounText.errors && nounForm.controls.nounText.errors.required ? 'Please enter noun text' : ''"
+                    [hasError]="submitted && nounForm.controls.nounText.errors && nounForm.controls.nounText.errors.required">
+                    </lib-input>
+                </div>
+    
+                <div class="mdo-field">
+                    <lib-input [type]="'text'" [formControl]="formField('nounNumCode')" [placeholder]="'Noun numeric code'"
+                    [label]="'Noun numeric code'">
+                    </lib-input>
+                </div>
+    
+                <div class="mdo-field">
+                    <lib-input [type]="'text'" [formControl]="formField('nounModeSep')" [isRequired]="true" [placeholder]="'Noun modifier separator'"
+                    [label]="'Noun modifier separator'"
+                    [hint]="submitted && nounForm.controls.nounModeSep.errors && nounForm.controls.nounModeSep.errors.required ? 'Please enter noun modifier separator' : ''"
+                    [hasError]="submitted && nounForm.controls.nounModeSep.errors && nounForm.controls.nounModeSep.errors.required">
+                    </lib-input>
+                </div>
+
+                <div class="f-col mdo-field">
+                    <lib-text-line class="field-label" type="xsmall" weight="strong">Material group
+                        <span class="mandatory">*</span></lib-text-line>
+
+                    <div class="mdo-field-input">
+                        <input matInput formControlName="matlGroup"
+                            placeholder="Material group" [matAutocomplete]="matlGrpAuto" />
+                        <mat-autocomplete class="mdo-autocomplete" #matlGrpAuto="matAutocomplete" [displayWith]="displaySourceFieldFn.bind(this)">
+                            <ng-container *ngFor="let field of dropValue">
+                                <mat-option class="mdo-option" [value]="field.CODE">
+                                    {{ field.TEXT ?  field.TEXT : field.CODE }}
+                                </mat-option>
+                            </ng-container>
+                        </mat-autocomplete>
+                    </div>
+                    <mat-error
+                        *ngIf="submitted && nounForm.controls.matlGroup.errors && nounForm.controls.matlGroup.errors.required"
+                        i18n="@@source_field_missing">
+                        <lib-text-line type="small">Please select the material group</lib-text-line>
+                    </mat-error>
+                </div>
+    
+                <div class="mdo-field">
+                    <lib-slide-toggle theme="primary" labelPosition="after" formControlName="shortDescActive" label="Short description active"></lib-slide-toggle>
+                    <div class="row-spacer"></div>
+                    <lib-slide-toggle theme="primary" labelPosition="after" formControlName="active" label="Noun active"></lib-slide-toggle>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

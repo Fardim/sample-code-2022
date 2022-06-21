@@ -1,0 +1,14 @@
+<div class="f-row">
+    <lib-checkbox
+    [formControl]="copyField"
+    *ngIf="process === 'copy'"
+    class="copy-box"
+    ></lib-checkbox>
+
+  <div class="f-col mdo-field">
+    <lib-text-line type="xsmall" class="field-label" weight="strong">{{fieldObj?.fieldCtrl?.description}}</lib-text-line>
+
+    <lib-checkbox [checked]="true" [disabled]="isFieldReadOnly" [formControl]="control" theme="primary" (valueChange)="valueChange($event)"> </lib-checkbox>
+  </div>
+</div>
+

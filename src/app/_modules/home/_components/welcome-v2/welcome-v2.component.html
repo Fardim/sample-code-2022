@@ -1,0 +1,38 @@
+<mat-card class="mat-elevation-z0 root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-text-line type="leading" i18n="@@welcome-to-fuse">Welcome to MDO FUSE</lib-text-line>
+    <div image="assets\images\learning.svg" (click)="startHelp()">
+      <img width="38px" src="assets/images/learning.svg" aria-hidden="true" />
+    </div>
+  </div>
+
+
+  <div class="f-col" >
+   <lib-text-line *ngIf="isGetStartedMessageVisible" type="base" textColor="secondary">Get started</lib-text-line>
+    <div class="row-spacer"></div>
+    <div class="f-row-spacer-half"></div>
+    <div class="f-row dataset-palette">
+      <ng-container *ngFor="let item of menuItems">
+        <pros-tile
+          *ngIf="item.isVisible"
+          [tileKey]="item.tile"
+          [userDetail]="userDetail"
+          (emitRedirectPath)="redirectToSubPage($event, item.tile)"
+        >
+        </pros-tile>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="row-spacer"></div>
+
+  <div class="f-col">
+    <lib-text-line type="base" textColor="secondary">Quick links</lib-text-line>
+    <div class="row-spacer"></div>
+    <div class="f-row-spacer-half"></div>
+    <div class="f-row dataset-palette">
+      <pros-tile tileKey="data" [disableClose]="true" (emitRedirectPath)="redirectToSubPage($event)"></pros-tile>
+      <pros-tile tileKey="DIW" [disableClose]="true" (emitRedirectPath)="redirectToSubPage($event)"></pros-tile>
+    </div>
+  </div>
+</mat-card>

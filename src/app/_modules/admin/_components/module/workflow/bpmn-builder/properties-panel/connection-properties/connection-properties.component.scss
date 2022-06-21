@@ -1,0 +1,17 @@
+.mat-expansion-panel {
+  .fields-col {
+    mat-label {
+      font-weight: 500;
+      font-size: 0.7rem;
+      line-height: 14px;
+    }
+
+    mat-form-field.mat-form-field {
+      margin-bottom: 8px;
+    }
+
+    .button-row {
+      width: 100%;
+    }
+  }
+}

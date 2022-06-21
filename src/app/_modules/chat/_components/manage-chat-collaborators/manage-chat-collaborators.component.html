@@ -1,0 +1,47 @@
+<div class="modal-wrapper">
+  <div class="f-row modal-header">
+    <lib-text-line type="leading">Manage collaborators</lib-text-line>
+    <lib-button icon="times" (afterClick)="close()"></lib-button>
+  </div>
+  <div class="search-container">
+    <lib-search placeholder="Type user name to add"></lib-search>
+  </div>
+  <div class="f-row-spacer-half"></div>
+  <div class="modal-body">
+    <ng-container *ngFor="let data of collaborators">
+      <div class="collaborator-info">
+        <div class="f-row user-section">
+          <lib-avatar [size]="36" initials="SM" class="avatar"></lib-avatar>
+          <lib-text-line type="base">{{ data.name }}</lib-text-line>
+        </div>
+        <div class="f-row action">
+          <lib-label suffixIcon="caret-down" iconFontType="solid" [matMenuTriggerFor]="menu">{{ data.role + '  ' }}</lib-label>
+          <mat-menu #menu="matMenu">
+            <lib-filter-option>View</lib-filter-option>
+            <lib-filter-option>Edit</lib-filter-option>
+          </mat-menu>
+          <lib-button icon="trash-alt" fontSet="mdo-icons-solid"></lib-button>
+        </div>
+      </div>
+      <lib-section></lib-section>
+    </ng-container>
+
+    <ng-container *ngIf="!collaborators?.length">
+      <div class="empty-state-wrapper">
+        <lib-empty-state
+          primaryText="No users slected"
+          secondaryText="Please add users you want to collaborate with by typing their name in the box above"
+          icon="user"
+          [iconSize]="100"
+        >
+        </lib-empty-state>
+      </div>
+    </ng-container>
+  </div>
+  <lib-section></lib-section>
+  <div class="f-row modal-footer">
+    <lib-button (afterClick)="close()">Cancel</lib-button>
+    <div class="f-spacer"></div>
+    <lib-button type="major" (afterClick)="close()">Ok</lib-button>
+  </div>
+</div>

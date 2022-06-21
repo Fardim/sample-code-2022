@@ -1,0 +1,56 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button iconFontType="light" icon="times" (afterClick)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row">
+        <lib-text-line type="leading" i18n="@@configure_view">Configure view</lib-text-line>
+        <span class="f-col-spacer-half"></span>
+        <span class="f-spacer"></span>
+        <lib-button type="major" (afterClick)="save()" i18n="@@save" width="80px"> Save </lib-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <!-- <lib-input i18n-label="@@view_name" label="View name"></lib-input> -->
+      <div class="f-col">
+        <div class="f-row">
+          <lib-search i18n-placeholder="@@search" placeholder="Search columns" class="lib-search" (valueChange)="searchFld($event)">
+          </lib-search>
+          <lib-chip [selectable]="true" [selected]="selectedSegment==='visbleOnly'" (click)="segmentChange()"> Visible only </lib-chip>
+          
+        </div>
+    
+        <div class="f-row-spacer-half"></div>
+        <div class="f-col">
+          <div class="f-row colunm-box">
+            <div class="col"></div>
+            <div class="col col-x4"><lib-text-line i18n="@@Column" weight="strong" type="base">Column</lib-text-line></div>
+            <span class="f-spacer"></span>
+            <div class="col text-end"><lib-text-line i18n="@@Visible" weight="strong"  type="base">Visible</lib-text-line></div>
+          </div>
+          <div cdkDropList [cdkDropListData]="selectedMetadataFldList" (cdkDropListDropped)="drop($event)"
+            #scrollableContainer>
+            <div *ngFor="let fld of selectedMetadataFldList" id="{{ fld.fldId }}" cdkDrag class="colunm-list">
+              <div class="f-row colunm-box" *ngIf="suggestedFlds.indexOf(fld.fldId) !== -1">
+                <div class="col">
+                  <lib-button cdkDragHandle type="plain" iconFontType="light" icon="grip-lines"> </lib-button>
+                </div>
+
+                <div class="col col-x4">
+                  <lib-text-line type="base">{{ fld.fldDesc ? fld.fldDesc : 'Untitled' }}</lib-text-line>
+                </div>
+                <div class="f-spacer"></div>
+                <div class="col text-end">
+                  <lib-checkbox [checked]="isChecked(fld)" (valueChange)="selectionChange(fld)"> </lib-checkbox>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

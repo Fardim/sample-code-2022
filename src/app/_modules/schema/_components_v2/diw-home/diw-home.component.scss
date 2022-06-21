@@ -1,0 +1,13 @@
+div.root {
+  padding: 0 12px;
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+
+  .breadcrum-toolbar {
+    padding: 8px 0;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+}

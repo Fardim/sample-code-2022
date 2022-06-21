@@ -1,0 +1,106 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button (click)="close()" icon="times" iconFontType="light" type="plain"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" enableWrap="true">{{moduleInfo ? ( moduleInfo.moduleDesc ? moduleInfo.moduleDesc: 'Untitled') :
+          'Untitled'}}</lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-text-line type="base" textColor="link" class="cursor" *ngIf="currentStep>0" (click)="step(0); uploadedFile = null; isInprocess = false;">Choose
+          another file</lib-text-line>
+        <span class="f-col-spacer-half"></span>
+        <lib-button type="major" i18n="@@upload" *ngIf="currentStep>0" [disabled]="isInprocess"
+          (click)="uploadFileData(stepper)">Upload</lib-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <mat-horizontal-stepper linear #stepper (selectionChange)="controlStepChange($event);">
+        <!-- Upload data -->
+        <mat-step [stepControl]="uploadFileStepCtrl">
+          <form [formGroup]="uploadFileStepCtrl">
+            <ng-template matStepLabel>Upload dataset</ng-template>
+
+            <mat-card class="mat-elevation-z0 error-stackbar" *ngIf="uploadError.status && uploadError.status">
+              {{uploadError.message}}
+            </mat-card>
+
+            <div class="f-col upload-col">
+              <input class="drag-input" type="file" (change)="fileChange($event)" formControlName="uploadFileCtrl"
+                multiple="false" id="uploadFileCtrl" />
+                <div class="f-row empty-block">
+              <lib-empty-state i18n-primaryText="@@drag_drop_file" primaryText="Drag & drop or select a file to upload"
+                icon="table">
+                <lib-button  type="minor" *ngIf="!uploadedFile" i18n="@@select_a_file" [disabled]="uploadDisabled"
+                  (click)="uploadFile()">Select a file</lib-button>
+                <lib-button  type="minor" *ngIf="uploadedFile" [disabled]="uploadDisabled" (click)="uploadFile()">{{ uploadedFile.name
+                  }}</lib-button>
+              </lib-empty-state>
+            </div>
+            </div>
+          </form>
+        </mat-step>
+
+        <!-- map headers -->
+        <mat-step [stepControl]="dataTableCtrl">
+          <ng-template matStepLabel>Map fields</ng-template>
+          <lib-banner status="error" *ngIf="uploadError.status && uploadError.message" [text]="uploadError.message">
+          </lib-banner>
+          <div class="f-col upload-col" *ngIf="isUploaded && currentStep>0">
+            <div class="f-col empty-state">
+              <lib-text-line type="base" weight="strong">Uploading...</lib-text-line>
+              <lib-text-line type="base">You will receive an email once the upload is done. You can close this window.</lib-text-line>
+            </div>
+          </div>
+          <div class="field-grid">
+            <mat-table [dataSource]="dataSource" class="mat-elevation-z0">
+              <!-- Excel Field Column -->
+              <ng-container matColumnDef="excel">
+                <mat-header-cell *matHeaderCellDef class="col-type-first">Header</mat-header-cell>
+                <mat-cell *matCellDef="let row; let rowIndex = index" class="col-type-first"> {{ row.excelFld}}
+                </mat-cell>
+              </ng-container>
+
+              <!-- Excel first row data -->
+              <ng-container matColumnDef="excelfrstrowdata">
+                <mat-header-cell *matHeaderCellDef>Preview row </mat-header-cell>
+                <mat-cell *matCellDef="let row; let rowIndex = index">
+                  {{ row.excelFrstRow }}
+                </mat-cell>
+              </ng-container>
+              <!-- Map Column -->
+              <ng-container matColumnDef="mapping">
+                <mat-header-cell *matHeaderCellDef class="col-type-third"> Map to<mat-icon>arrow_forward</mat-icon>
+                </mat-header-cell>
+                <mat-cell *matCellDef="let row; let rowIndex = index" class="col-type-third"></mat-cell>
+                <!-- <mat-cell *matCellDef="let row; let rowIndex = index" class="map-icon"><button mat-mini-fab disabled><mat-icon>trending_flat</mat-icon></button></mat-cell> -->
+              </ng-container>
+
+              <!-- MDO Field Column -->
+              <ng-container matColumnDef="field">
+                <mat-header-cell *matHeaderCellDef>Target fields</mat-header-cell>
+                <mat-cell *matCellDef="let row; let rowIndex = index">
+                  <pros-map-mdo-field [cellIndex]="rowIndex" [preSelectedFld]="getSelectedFieldId(rowIndex)"
+                    [excelField]="row.excelFld" [autoSelectedFld]="moduleInfo.object" [mdoFields]="headerFieldsList"
+                    (optionSelectedEmit)="updateMapFields($event)"></pros-map-mdo-field>
+                </mat-cell>
+              </ng-container>
+
+              <mat-header-row *matHeaderRowDef="displayedColumns;"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+            </mat-table>
+          </div>
+          <div class="row-spacer"></div>
+          <!-- <div class="f-row">
+            <button mat-flat-button matStepperPrevious color="primary">Back</button>
+            <span class="f-spacer"></span>
+            <button mat-flat-button color="primary" matStepperNext (click)="uploadFileData(stepper)">Begin Import</button>
+          </div> -->
+        </mat-step>
+      </mat-horizontal-stepper>
+    </div>
+  </div>
+</div>

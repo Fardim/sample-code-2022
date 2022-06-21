@@ -1,0 +1,49 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  padding: 8px;
+  overflow: hidden;
+  margin-bottom: 12px;
+
+  &.has-border {
+    border-width: 1px;
+    border-style: solid;
+  }
+
+  .import-file-input {
+    display: none;
+  }
+
+  .data-listing {
+    width: 100%;
+    min-height: 300px;
+    overflow: auto;
+
+    .mat-table {
+      width: 100%;
+      overflow-x: auto;
+
+      .mat-cell,
+      .mat-header-cell {
+        border-right: none;
+        min-width: 200px;
+      }
+
+      .mat-column-_select,
+      .mat-column-_settings {
+        min-width: 40px;
+        width: 40px;
+      }
+    }
+  }
+
+  .expansion-view-pagination {
+    position: fixed;
+    bottom: 0;
+    margin-bottom: 15px;
+  }
+
+  .empty-block {
+    justify-content: center;
+  }
+}

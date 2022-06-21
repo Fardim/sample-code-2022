@@ -1,0 +1,60 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="compress-alt" iconFontType="light" (click)="onCancelClick()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head" style="justify-content: space-between;">
+        <lib-text-line type="leading" i18n="@@new_tenant">Reorder characteristics</lib-text-line>
+        <lib-button type="major" width="80px" i18n="@@save" (click)="save()">Save</lib-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <!--  -->
+      <div class="modal-body">
+        <lib-banner *ngIf="bannerMessage" [text]="bannerMessage" status="error"></lib-banner>
+        <div [ngClass]="{ 'char-table': true }">
+          <mat-table [dataSource]="dataSource" cdkDropList [cdkDropListData]="dataSource.data"
+            (cdkDropListDropped)="drop($event)">
+            <ng-container matColumnDef="action">
+              <mat-header-cell *matHeaderCellDef></mat-header-cell>
+              <mat-cell *matCellDef="let element">
+                <lib-button cdkDragHandle style="pointer-events: all" type="plain" iconFontType="light"
+                  icon="grip-lines">
+                </lib-button>
+              </mat-cell>
+            </ng-container>
+            <ng-container *ngFor="let column of columns">
+              <ng-container [matColumnDef]="column" *ngIf="column !== 'action'">
+                <mat-header-cell *matHeaderCellDef> {{ getLabel(column) }} </mat-header-cell>
+                <mat-cell *matCellDef="let element">
+                  <ng-container *ngIf="column !== 'language' && column !== 'fieldType'">
+                    {{ element[column] }}
+                  </ng-container>
+                  <ng-container *ngIf="column === 'fieldType'">
+                    <div [ngClass]="{ link: element[column].indexOf('DROPDOWN') !== -1 }">{{ element[column] }}</div>
+                  </ng-container>
+                  <ng-container *ngIf="column === 'language'">
+                    <lib-chip-list>
+                      <ng-container *ngFor="let opt of element.labels; let i = index">
+                        <ng-container *ngIf="i <= limit - 1">
+                          <lib-label>{{ getLanguage(opt?.language) }}</lib-label>
+                        </ng-container>
+                      </ng-container>
+                      <lib-chip *ngIf="hasLimit(element.labels)">+{{ element.labels.length - limit }} </lib-chip>
+                    </lib-chip-list>
+                  </ng-container>
+                </mat-cell>
+              </ng-container>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="columns; sticky: true"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: columns" style="pointer-events: none" cdkDrag [cdkDragData]="row">
+            </mat-row>
+          </mat-table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

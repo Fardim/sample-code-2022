@@ -1,0 +1,12 @@
+<div class="root">
+  <div class="f-col main" [ngClass]="{ 'hasError': hasError }">
+    <div class="attachment">
+      <img [src]="getAttachmentIcon(name)" class="attachment-icon" />
+      <lib-text-line type="base" [libTooltip]="name" class="file-item-name">{{ truncateAttachmentName(name) }}</lib-text-line>
+      <div class="f-spacer"></div>
+      <lib-button *ngIf="downloadable" (click)="downloadAttachment(serial, name)" icon="download" type="plain"></lib-button>
+      <lib-button *ngIf="removable" class="lib-button" (click)="remove()" icon="times" type="plain"></lib-button>
+    </div>
+    <lib-progress class="upload-progress" *ngIf="showProgressBar" [mode]="progressMode" [value]="progressValue"></lib-progress>
+  </div>
+</div>

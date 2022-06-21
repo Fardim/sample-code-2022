@@ -1,0 +1,52 @@
+<div class="f-col root">
+  <div class="f-row transaction-tab-header">
+    <div></div>
+    <div class="f-spacer"></div>
+    <lib-button type="plain" icon="caret-down" iconFontType="solid" [matMenuTriggerFor]="navigation">
+      <mat-icon fontSet="mdo-icons-light" class="x">sort-size-down</mat-icon>
+    </lib-button>
+    <mat-menu #navigation="matMenu" xPosition="before" class="navigation-menu">
+        <div class="f-col">
+          <div class="scroll-height">
+            <button mat-menu-item *ngFor="let tab of tabsObs | async" (click)="scrollTo(tab.tabid)">
+              {{tab.description}}
+            </button>
+          </div>
+        </div>
+    </mat-menu>
+  </div>
+
+  <div class="section-container">
+  <ng-container *ngFor="let tab of tabsObs | async; let i = index">
+    <mat-accordion>
+    <mat-expansion-panel *ngIf="!tab.isTabHidden" togglePosition="before" class="mat-elevation-z0" [expanded]="true" [id]="tab.tabid">
+      <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+        <mat-panel-title class="f-row">
+          <lib-text-line type="base" weight="strong">{{ tab.description }}</lib-text-line>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <div *ngIf="!isLoadingTemplate && tabsArray.controls[tab.tabid]" class="f-col">
+        <pros-tab-transaction 
+          [fGroup]="tabsArray.controls[tab.tabid]" 
+          [tabDetails]="tab" 
+          [moduleId]="moduleId"
+          [layoutId]="layoutId" 
+          [recordId]="recordId"
+          [process]="process"
+          [activeStructures]="activeStructures"
+          [dataControl]="dataControl"
+          [flowId]="flowId"
+          [stepId]="stepId"
+        ></pros-tab-transaction>
+      </div>
+      <div *ngIf="isLoadingTemplate" class="loading-state">
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line-half"></lib-skeleton>
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line-half"></lib-skeleton>
+    </div>
+    </mat-expansion-panel>
+  </mat-accordion>
+  </ng-container>
+  </div>
+</div>

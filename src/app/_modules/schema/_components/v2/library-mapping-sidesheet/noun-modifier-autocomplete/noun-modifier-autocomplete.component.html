@@ -1,0 +1,48 @@
+<mat-form-field appearance="outline" class="cell null-cell">
+    <input matInput class="mat-input" placeholder="Unmatched" [formControl]="dropdownformCtrl" #autoCompleteInput
+      [matAutocomplete]="mdofieldauto">
+      <div class="f-row input-actions">
+      <mat-icon fontSet="mdo-icons-solid" class="info-arrow">caret-down</mat-icon>
+    </div>
+   
+    <mat-autocomplete #mdofieldauto="matAutocomplete"  [displayWith]="displayFn.bind(this)" (optionSelected)="selectOption($event)">
+      <div class="autodropdown-scroll">        
+        
+          <ng-template [ngIf] ="requestFor && requestFor === 'noun'">
+            <mat-option>
+              <div (click)="emitForCreateNew('noun');" class="sticky-actions">
+                <mat-icon fontSet="mdo-icons" class="option-icon">plus</mat-icon>
+                Create new 'noun'
+              </div>
+            </mat-option>            
+          </ng-template>
+    
+          <ng-template [ngIf] ="requestFor && requestFor === 'modifier' && selectedNoun">
+            <mat-option>
+              <div (click)="emitForCreateNew('modifier');" class="sticky-actions">
+                <mat-icon fontSet="mdo-icons" class="option-icon">plus</mat-icon>
+                Create new 'modifier'
+              </div>
+            </mat-option>            
+          </ng-template>
+    
+          <ng-template [ngIf] ="requestFor && requestFor === 'attribute' && selectedNoun">
+            <mat-option>
+              <div (click)="emitForCreateNew('attribute');" class="sticky-actions">
+                <mat-icon fontSet="mdo-icons" class="option-icon">plus</mat-icon>
+                Create new 'attribute'
+              </div>
+            </mat-option>
+          </ng-template>
+         
+
+        <mat-divider></mat-divider>       
+
+        <mat-option *ngFor="let option of filteredOptions | async; trackBy :suggestedMdoFldTrkBy" [value]="option">
+            {{
+              displayDroptext(option)
+            }}
+      </mat-option>
+      </div>
+    </mat-autocomplete>
+  </mat-form-field>

@@ -1,0 +1,107 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain"  iconFontType="light" icon="times" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading">
+          Invite Partner
+        </lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="major" width="80px" (afterClick)="onSave()" [disabled]="formGroup.invalid">Save</lib-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="contentPanel">
+    <div class="f-col mdo-field">
+      <lib-text-line type="xsmall" weight="strong" class="field-label">Dataset<mat-icon fontSet="mdo-icons-light"
+        libTooltip="This field allows the user to select the dataset in which partners will be invited">
+        question-circle</mat-icon></lib-text-line>
+      <div class="mdo-field-input">
+        <input matInput placeholder="Choose a dataset" [formControl]="formGroup.controls.datasetCtrl"
+          [matAutocomplete]="datasetAuto" />
+        <mat-icon matSuffix fontSet="mdo-icons" class="autocomplete-icon">chevron-down</mat-icon>
+        <mat-autocomplete class="mdo-autocomplete" #datasetAuto="matAutocomplete" [displayWith]="datasetDisplayWith">
+          <mat-option class="mdo-option" *ngFor="let dataset of datasets" [value]="dataset">
+            {{ dataset.moduleDesc }}
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+    </div>
+
+    <!-- <div class="f-col mdo-field">
+      <lib-text-line type="xsmall" weight="strong" class="field-label">Partner<mat-icon fontSet="mdo-icons-light"
+        libTooltip="This allows you to select the partner">
+        question-circle</mat-icon></lib-text-line>
+      <div class="mdo-field-input">
+        <input matInput placeholder="Choose a partner" [formControl]="formGroup.controls.partnerCtrl"
+          [matAutocomplete]="partnerAuto" />
+        <mat-icon matSuffix fontSet="mdo-icons" class="autocomplete-icon">chevron-down</mat-icon>
+        <mat-autocomplete class="mdo-autocomplete" #partnerAuto="matAutocomplete" [displayWith]="partnerDisplayWith">
+          <mat-option class="mdo-option" *ngFor="let partner of allPartnerList?.userList?.content" [value]="partner">
+            {{ partner.userName }}
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+    </div> -->
+
+    <div class="f-col mdo-field">
+      <lib-text-line type="xsmall" weight="strong" class="field-label">Partner field<mat-icon fontSet="mdo-icons-light"
+        libTooltip="">
+        question-circle</mat-icon></lib-text-line>
+      <div class="mdo-field-input">
+        <input matInput placeholder="Choose a field" [formControl]="formGroup.controls.datasetRefFieldCtrl"
+          [matAutocomplete]="partnerFieldAuto" />
+        <mat-icon matSuffix fontSet="mdo-icons" class="autocomplete-icon">chevron-down</mat-icon>
+        <mat-autocomplete class="mdo-autocomplete" #partnerFieldAuto="matAutocomplete" [displayWith]="fieldDisplayWith">
+          <mat-optgroup *ngFor="let group of datasetRefFieldsObs | async">
+            <div [libTooltip]="group.fieldDescri" matTooltipPosition="right" class="custom-opt-grp-header">{{ group.fieldDescri }}</div>
+            <ng-container *ngFor="let child of group.childs">
+                <mat-option [libTooltip]="child.fieldDescri" matTooltipPosition="right" [value]="child">
+                    {{ child.fieldDescri }}
+                </mat-option>
+            </ng-container>
+          </mat-optgroup>
+        </mat-autocomplete>
+      </div>
+    </div>
+
+    <div class="f-col mdo-field">
+      <lib-text-line type="xsmall" weight="strong" class="field-label">Email field<mat-icon fontSet="mdo-icons-light"
+        libTooltip="">
+        question-circle</mat-icon></lib-text-line>
+      <div class="mdo-field-input">
+        <input matInput placeholder="Choose a field" [formControl]="formGroup.controls.emailFieldCtrl"
+          [matAutocomplete]="emailFieldAuto" />
+        <mat-icon matSuffix fontSet="mdo-icons" class="autocomplete-icon">chevron-down</mat-icon>
+        <mat-autocomplete class="mdo-autocomplete" #emailFieldAuto="matAutocomplete" [displayWith]="fieldDisplayWith">
+          <mat-optgroup *ngFor="let group of emailFieldsObs | async">
+            <div [libTooltip]="group.fieldDescri" matTooltipPosition="right" class="custom-opt-grp-header">{{ group.fieldDescri }}</div>
+            <ng-container *ngFor="let child of group.childs">
+                <mat-option [libTooltip]="child.fieldDescri" matTooltipPosition="right" [value]="child">
+                    {{ child.fieldDescri }}
+                </mat-option>
+            </ng-container>
+          </mat-optgroup>
+        </mat-autocomplete>
+      </div>
+    </div>
+    
+    <div class="f-col mdo-field">
+    <lib-text-line type="xsmall" weight="strong" class="field-label">Roles<mat-icon fontSet="mdo-icons-light"
+      libTooltip="This allows you to select the role which will be assigned to the partner">
+      question-circle</mat-icon></lib-text-line>
+    <div class="mdo-field-input">
+      <input matInput placeholder="Select role" [formControl]="formGroup.controls.rolesCtrl"
+        [matAutocomplete]="rolesAuto" />
+      <mat-icon matSuffix fontSet="mdo-icons" class="autocomplete-icon">chevron-down</mat-icon>
+      <mat-autocomplete class="mdo-autocomplete" #rolesAuto="matAutocomplete" [displayWith]="roleDisplayWith">
+        <mat-option class="mdo-option" *ngFor="let role of allRoles?.listPage?.content" [value]="role">
+          {{ role.description }}
+        </mat-option>
+      </mat-autocomplete>
+    </div>
+  </div> 
+</div> 
+</div>

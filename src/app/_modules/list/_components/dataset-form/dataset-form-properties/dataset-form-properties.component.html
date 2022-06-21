@@ -1,0 +1,93 @@
+<div class="root">
+  <ng-container *ngIf="showFormProperties">
+    <div class="f-row breadcrum-toolbar">
+      <lib-text-line type="leading" i18n="@@field_properties">Form properties</lib-text-line>
+    </div>
+    <div class="f-col sidesheetcontent-listing">
+      <form [formGroup]="datasetformGroup" *ngIf="datasetformGroup">
+        <div class="f-col mdo-justify">
+          <div class="f-col">
+            <lib-input matInput formControlName="description" i18n-label="@@form_name" label="Form name"
+              (afterBlur)="fireDatasetFormValue($event)"
+              [hasError]="datasetformGroup.controls.description?.errors &&
+                        (datasetformGroup.controls.description?.errors?.required || datasetformGroup.controls.description?.errors?.maxLength || datasetformGroup.controls.description?.errors?.whitespace)">
+            </lib-input>
+          </div>
+
+          <div class="f-col">
+            <lib-textarea matInput formControlName="usage" i18n-label="@@form_usage" label="Form usage"
+              placeholder="Define form usage" (afterBlur)="fireDatasetFormValue($event)">
+            </lib-textarea>
+          </div>
+
+          <div class="f-col">
+            <lib-textarea matInput formControlName="helpText" i18n-label="@@form_help" label="Form help"
+              placeholder="Define form help" (afterBlur)="fireDatasetFormValue($event)">
+            </lib-textarea>
+          </div>
+
+          <div class="f-col mdo-field">
+            <lib-text-line type="xsmall" weight="strong" class="field-label" i18n-label="@@labels">Labels
+            </lib-text-line>
+            <div class="mdo-field-input">
+              <lib-chip-list>
+                <ng-container *ngFor="let opt of selectedLabels; let i=index">
+                  <ng-container *ngIf="i<=limit-1">
+                    <lib-chip [removable]="true" (removed)="remove(opt)">{{opt}}</lib-chip>
+                  </ng-container>
+                </ng-container>
+                <lib-chip *ngIf="hasLimit()" [matMenuTriggerFor]="selectOptions">+{{selectedLabels.length - limit}}
+                </lib-chip>
+                <input matInput placeholder="Type to search" #optionInput [formControl]="optionCtrl"
+                  [matAutocomplete]="auto" />
+              </lib-chip-list>
+              <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" (optionSelected)="selected($event)">
+                <mat-option class="mdo-option" *ngFor="let tag of tags" [value]="tag.description">
+                  {{tag.description}}
+                </mat-option>
+                <mat-option [value]="optionInput.value" *ngIf="optionInput.value">
+                  {{optionInput.value}} (New Option)
+                </mat-option>
+              </mat-autocomplete>
+              <mat-menu #selectOptions="matMenu" class="navigation-menu">
+                <mat-list>
+                  <mat-list-item class="f-row" *ngFor="let label of selectedLabels.slice(limit)">
+                    <lib-text-line type="base">{{label}}</lib-text-line>
+                    <span class="f-spacer"></span>
+                    <span class="f-col-spacer-half"></span>
+                    <lib-button type="plain" iconFontType="light" icon="times" (click)="remove(label)"></lib-button>
+                  </mat-list-item>
+                </mat-list>
+              </mat-menu>
+            </div>
+          </div>
+
+          <div class="f-row mdo-field">
+            <lib-slide-toggle formControlName="descriptionGenerator" label="Enable description generator"
+              labelposition="after" (toggleChange)="setToggleValue($event)" theme="primary">
+            </lib-slide-toggle>
+            &nbsp;
+            <mat-icon fontSet="mdo-icons-light" class="label-icon"
+              libTooltip="Tool enabling the property allows the user to maintain data following the defined 'Classification' rules.ip text">
+              question-circle </mat-icon>
+          </div>
+
+          <div class="f-row mdo-field">
+            <lib-slide-toggle formControlName="isForFlow" label="Use for flow?"
+              (toggleChange)="setIsForFlowToggleValue($event)" theme="primary">
+            </lib-slide-toggle>
+            &nbsp;
+            <mat-icon fontSet="mdo-icons-light"
+              libTooltip="Toggle to mark this form is used for flow">
+              question-circle </mat-icon>
+          </div>
+
+          <div class="mdo-field">
+            <lib-button type="minor" (click)="OpenDependencyRules()" class="f-col">
+              Dependency rule</lib-button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,59 @@
+<div class="scrollable-messages">
+    <div class="inner-scrollable-area">
+       <div class="loading-container" *ngIf="!!messagesLoading; else showMessages;">
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line-half"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line-half"></lib-skeleton>
+            <div class="row-spacer"></div>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line-half"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line-half"></lib-skeleton>
+            <div class="row-spacer"></div>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line-half"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line-half"></lib-skeleton>
+            <div class="row-spacer"></div>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line-half"></lib-skeleton>
+            <lib-skeleton type="line"></lib-skeleton>
+            <lib-skeleton type="line-half"></lib-skeleton>
+       </div>
+
+       <ng-container *ngIf="!messagesLoading && !formattedMessageList?.length">
+        <div class="empty-state-wrapper f-col">
+            <lib-empty-state
+                icon="chat"
+                primaryText="No messages yet"
+                secondaryText="Start the conversation by sending a message"
+            >
+            </lib-empty-state>
+        </div>
+       </ng-container>
+
+       <ng-template #showMessages>
+        <ng-container *ngFor="let category of formattedMessageList">
+
+            <lib-section [text]="category?.date" *ngIf="category?.date !== 'New'" class="section-divider"></lib-section>
+
+            <lib-section *ngIf="category?.date === 'New'" class="section-divider">
+              <lib-label class="banner" status="error">{{category?.date}}</lib-label>
+            </lib-section>
+
+           <ng-container *ngFor="let message of category?.messageDetails">
+               <ng-container *ngIf="!message?.deleted">
+                   <pros-message-block
+                       [channelId]="channelId"
+                       [message]="message"
+                       (delete)="deleteMessage($event)"
+                       [currentUser]="currentUser">
+                   </pros-message-block>
+               </ng-container>
+           </ng-container>
+        </ng-container>
+       </ng-template>
+        <div class="f-row-spacer-half" #scrollBottom></div>
+    </div>
+</div>

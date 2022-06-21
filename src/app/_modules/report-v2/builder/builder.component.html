@@ -1,0 +1,85 @@
+<div class="root f-row" *ngIf="reportExist">
+  <div class="builder-col">
+      <div class="f-row-spacer-half"></div>
+      <div class="f-row dashboard-row">
+          <lib-text-line type="leading">{{ report && report.reportName ? report.reportName : '' }}</lib-text-line>
+          <div class="f-spacer"></div>
+          <lib-button *ngIf="showClearFilterBtn" (mouseup)="clearFilters()" type="minor">Clear filter(s) </lib-button>
+          <lib-button-group>
+              <ng-template [ngIf]="report">
+                  
+                  <ng-container *ngIf="editedMode; else notEditedMode">
+                      <lib-button *ngIf="!isFromMsteam && report" type="plain" (afterClick)="cancelReport()">Cancel</lib-button>
+                      <lib-button type="major" (afterClick)="saveReport()" [disabled]="isBluckProcessing">Save</lib-button>
+                      <lib-button type="major" icon="ellipsis-h" [matMenuTriggerFor]="moremenu"></lib-button>
+                      <mat-menu #moremenu="matMenu" class="navigation-menu">
+                          <button mat-menu-item [routerLink]="['', { outlets: { sb: 'sb/report/collaborators/' + reportId } }]">Add collaborator</button>
+                          <button mat-menu-item *ngIf="!isFromMsteam && report" [disabled]="!report.hasDraft || isBluckProcessing" (click)="discardReport()">Discard</button>
+                      </mat-menu>
+                  </ng-container>
+                  <ng-template #notEditedMode>
+                      <lib-button icon="share-alt" [matMenuTriggerFor]="shareMenu" type="minor"></lib-button>
+                      <mat-menu #shareMenu="matMenu" class="navigation-menu">
+                          <button mat-menu-item (click)="openSendEmailSideSheet()" i18n="@@send_via_email">Send via email</button>
+                      </mat-menu>
+                      <lib-button type="minor" icon="pencil-alt" *ngIf="!isFromMsteam && (collaboratorEditPermission || collaboratorAdminPermission)" (click)="editReport()"></lib-button>
+                      <lib-button *ngIf="!isFromMsteam && (collaboratorEditPermission || collaboratorDeletePermission || collaboratorAdminPermission)" [matMenuTriggerFor]="moremenu" type="minor" icon="ellipsis-h"></lib-button>
+                      <mat-menu #moremenu="matMenu" class="navigation-menu">
+                          <!-- <button mat-menu-item *ngIf="(collaboratorEditPermission || collaboratorAdminPermission)"
+                              (click)="editReport()">Edit</button> -->
+                          <button mat-menu-item *ngIf="(collaboratorEditPermission || collaboratorAdminPermission)" (click)="duplicateReport()">Duplicate</button>
+                          <button mat-menu-item *ngIf="(collaboratorEditPermission || collaboratorAdminPermission) && report.chkPackageId" (click)="cancelPublish()">Cancel publishing</button>
+                          <button [matMenuTriggerFor]="subMenu" mat-menu-item>Export</button>
+                          <mat-menu #subMenu="matMenu">
+                              <button mat-menu-item *ngIf="(collaboratorEditPermission || collaboratorAdminPermission)" (click)="exportReport()">Export to Local</button>
+                              <button mat-menu-item (click)="publishToLibrary()">Publish to Library</button>
+                          </mat-menu>
+                          <button mat-menu-item *ngIf="(collaboratorDeletePermission || collaboratorAdminPermission)" (click)="deleteReport()">Delete</button>
+                          <button mat-menu-item (click)="importLog()">Import log</button>
+                      </mat-menu>
+                  </ng-template>
+              </ng-template>
+          </lib-button-group>
+      </div>
+      <ng-container *ngIf="exportChkSuccessful">
+          <div class="f-row-spacer-half"></div>
+          <div class="dashboard-row">
+              <lib-banner class="full-width" status="success">
+                  <div class="f-row w-100">
+                      <span class="f-spacer">Thanks for taking the time to contribute to the community. We will inform you when your dashboard is available on the ConnektHub library!</span>
+                      <mat-icon fontSet="mdo-icons-light" class="cursor" (click)="exportChkSuccessful = false">times</mat-icon>
+                  </div>
+              </lib-banner>
+          </div>
+      </ng-container>
+      
+      <div class="f-row-spacer-half"></div>
+      <pros-builder-container *ngIf="report" [reportId]="reportId" [report]="report" [widgetList]="report.widgets" (getReport)="getReport(reportId)" [activeWidget]="activeWidget" (activeWidgetChange)="setActiveWidget($event)" [emitClearBtnEvent]="emitClearBtnEvent"
+          [editedMode]="editedMode" (emitFilterApplied)="showClearBtnEmit($event)" class="container" [emtClearBtnClickedEvent]="isClearBtnClicked" (emitSetPanel)="setPanel($event)" (saveDraft)="saveDraft($event)"></pros-builder-container>
+  </div>
+  <div class="property-col" *ngIf="editedMode">
+      <pros-property-panel *ngIf="report && !showPropertyPanel" [report]="report" [showReportSettings]="true" (close)="setPanel(false)" (saveDraft)="saveDraft($event)"></pros-property-panel>
+      <pros-property-panel *ngIf="showPropertyPanel && activeWidget" [report]="report" (saveDraft)="saveDraft($event)" [dataSets]="dataSets" [customDataSets]="customDataSets" [diwDataSets]="diwDataSets" [widgetInfo]="activeWidget" (close)="setPanel(false)"  [isDiscard]="isDiscard"></pros-property-panel>
+  </div>
+</div>
+<ng-template [ngIf]="!reportExist">
+    <ng-template [ngIf]="errStatusCode" [ngIfElse] ="errState">
+        <div class="f-row empty-block">
+            <lib-empty-state primaryText="Nothing to see here" icon="analytics">
+                <div class="messages">
+                    <lib-text-line type="base" class="spacer"> Oops! something is not right. </lib-text-line>
+                    &nbsp;<lib-text-line type="base" textColor="link" class="spacer cursor" onclick="window.open(`https://www.prospecta.com/support/`,`_blank`)"> Contact support </lib-text-line>
+                </div>
+            </lib-empty-state>
+        </div>
+    </ng-template>
+    <ng-template #errState>
+        <div class="f-row empty-block">
+        <lib-empty-state primaryText="Nothing to see here"
+        secondaryText="You don't have any dashboard. Would you like to create one?"
+        icon="analytics">
+        <lib-button type="minor" iconFontType="solid" (afterClick)="navigateToCreateNew()">Create</lib-button>
+        </lib-empty-state>
+    </div>
+    </ng-template>
+</ng-template>

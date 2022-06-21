@@ -1,0 +1,11 @@
+.root {
+  height: calc(100% - 44px - 68px);
+  user-select: text;
+  padding: 0;
+  overflow: auto;
+
+  .odata-login {
+    margin: 0 auto;
+    width: 62%;
+  }
+}

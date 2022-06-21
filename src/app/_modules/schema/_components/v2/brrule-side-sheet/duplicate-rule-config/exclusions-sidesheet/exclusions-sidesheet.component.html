@@ -1,0 +1,86 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" (click)="close()" icon="times" iconFontType="light" ></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading">Exclusions</lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button type="major" i18n="@@save" (click)="save();$event.stopPropagation()">Save</lib-button>
+            </div>
+        </div>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <lib-tab-group>
+                <lib-tab label="Ignore words">
+                    <div class="f-col">
+                        <mat-form-field appearance="outline">
+                            <textarea matInput [formControl]="exclusionControl" class="mdo-textarea" cdkTextareaAutosize cdkAutosizeMinRows="1"></textarea>
+                        </mat-form-field>
+                        <mat-hint>Type one word per line</mat-hint>
+                    </div>
+                </lib-tab>
+                <lib-tab label="Synonyms">
+                    <div class="f-col">
+                        <lib-search placeholder="Search word" (valueChange)="searchWords($event)"></lib-search>
+
+                        <div class="mdo-field">
+                            <lib-text-line type="base" (click)="enableGroupCreation()" textColor="link" class="cursor">
+                                <mat-icon fontSet="mdo-icons">plus</mat-icon> Add synonyms group
+                            </lib-text-line>
+                        </div>
+
+                        <div *ngIf="newGroupActive" class="f-col mdo-field">
+                            <mat-form-field appearance="outline">
+                                <textarea matInput class="mdo-textarea" #input [(ngModel)]="editText"
+                                    (blur)="addSynonymGroup(input.value)"  cdkTextareaAutosize cdkAutosizeMinRows="1"></textarea>
+                            </mat-form-field>
+                            <mat-hint>Type one word per line.Click outside the box when done-your changes are saved
+                                automatically</mat-hint>
+                        </div>
+
+                        <form [formGroup]="synonymsForm">
+                            <ng-container formArrayName="synonymsArray">
+                                <div *ngFor="let synonym of synonymsArray.controls; let index = index"
+                                    class="f-col mdo-field">
+                                    <ng-container [formGroupName]="index">
+
+                                        <ng-template [ngIf]="synonym.value.editActive" [ngIfElse]="noEdit">
+                                            <mat-form-field appearance="outline">
+                                                <textarea matInput class="mdo-textarea" #editInput="matInput"
+                                                    [value]="splitStringLines(synonym.value.text)"
+                                                    (blur)="saveSynonymGroup(index, editInput.value)" cdkTextareaAutosize cdkAutosizeMinRows="1"></textarea>
+                                            </mat-form-field>
+                                            <mat-hint>Type one word per line. Click outside the box when done-your changes
+                                                are saved automatically</mat-hint>
+                                        </ng-template>
+
+                                        <ng-template #noEdit>
+                                            <mat-form-field appearance="outline"
+                                                [ngClass]="{'cdk-visually-hidden': !synonym.value.editActive && !synonym.value.visible}"
+                                                (click)="editSynonymGroup(index)" (mouseenter)="groupHover(index)"
+                                                (mouseleave)="groupLeave(index)">
+                                                <input matInput formControlName="text" (focus)="editSynonymGroup(index)" />
+                                                <div class="f-row input-actions">
+                                                    <button mat-button matSuffix>
+                                                        <mat-icon fontSet="mdo-icons" (click)="removeSynonymGroup(index)">trash-alt</mat-icon>
+                                                    </button>
+                                                </div>
+                                            </mat-form-field>
+                                            <mat-hint *ngIf="synonym.value.hover">Click on text to edit</mat-hint>
+                                        </ng-template>
+                                    </ng-container>
+                                </div>
+                            </ng-container>
+                            <pros-null-state *ngIf="synonymsArray.controls.length === 0"
+                                message="Click on add synonym group to configure groups" [button]="null">
+                            </pros-null-state>
+                        </form>
+                    </div>
+                </lib-tab>
+            </lib-tab-group>
+        </div>
+    </div>
+</div>

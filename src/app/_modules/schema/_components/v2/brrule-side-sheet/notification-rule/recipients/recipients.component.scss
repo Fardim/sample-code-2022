@@ -1,0 +1,35 @@
+.recipients {
+  .defined-row {
+    box-sizing: border-box;
+    border-width: 1px;
+    border-style: solid;
+    align-items: center;
+    height: 54px;
+    margin: 0 0 12px 0;
+    border-radius: 3px;
+
+    .col {
+      display: block;
+      flex: 1;
+      padding: 0 8px;
+      margin-bottom: 0;
+
+      &.col-x2 {
+        flex: 1;
+      }
+
+      &.col-x8 {
+        flex: 8;
+        width: 200px;
+      }
+
+      .mdo-field {
+        margin-bottom: 0;
+      }
+
+      .end-items {
+        justify-content: flex-end;
+      }
+    }
+  }
+}

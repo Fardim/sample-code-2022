@@ -1,0 +1,200 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-col breadcrum-head">
+        <div class="f-row">
+          <lib-text-line type="leading" enableWrap="true"> {{ flowDetails.name }}</lib-text-line>
+          <span class="f-col-spacer-half"></span>
+          <span class="f-spacer"></span>
+          <lib-button-group>
+            <lib-button type="minor" (click)="mapProcessVariable()">Map process variables</lib-button>
+            <lib-button type="minor" (click)="maintainProcess()">Maintain process</lib-button>
+          </lib-button-group>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="f-row-spacer-half"></div>
+  <div class="f-col sidesheetcontent-listing">
+    <div class="mdo-justify">
+      <lib-tab-group>
+        <lib-tab label="Setting">
+          <table mat-table [dataSource]="flowData" class="mat-elevation-z0 table-vertical">
+            <ng-container matColumnDef="header" sticky>
+              <td mat-cell *matCellDef="let element">
+                {{ element.header }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="cell" sticky>
+              <td mat-cell *matCellDef="let element">
+                {{ element.cell }}
+              </td>
+            </ng-container>
+
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+
+          <div class="row-spacer"></div>
+
+          <div #filterContainer class="f-row filter-container">
+            <lib-chip-list class="mdo-chip-list">
+              <lib-search class="lib-search" [formControl]="searchBrs" placeholder="Search steps"> </lib-search>
+            </lib-chip-list>
+          </div>
+
+          <div class="f-col main-table" #tableContainer>
+            <table mat-table [dataSource]="stepsData" #table matSort>
+              <ng-container matColumnDef="step_name">
+                <th mat-header-cell *matHeaderCellDef>
+                  <div mat-sort-header>Step name</div>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  <lib-text-line>
+                    {{ element.name }}
+                  </lib-text-line>
+                </td>
+              </ng-container>
+              <ng-container matColumnDef="step_type">
+                <th mat-header-cell *matHeaderCellDef>
+                  <div mat-sort-header>Step type</div>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  <lib-text-line>
+                    {{ element.type }}
+                  </lib-text-line>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="assign">
+                <th mat-header-cell *matHeaderCellDef class="text-align-center">
+                  <div mat-sort-header>Assign</div>
+                </th>
+                <td mat-cell *matCellDef="let element" class="text-align-center">
+                  <lib-chip
+                    class="mdo-filter-matchip filter-pill"
+                    [matMenuTriggerFor]="assignMenu"
+                    class="align-center"
+                  >
+                    <mat-icon fontSet="mdo-icons-light"> plus </mat-icon>
+                  </lib-chip>
+                  <mat-menu #assignMenu="matMenu">
+                    <lib-filter-option
+                      *ngIf="element.type === 'HumanTaskNode'"
+                      (click)="editStepForms(element.uniqueId)"
+                      >Form</lib-filter-option
+                    >
+                    <lib-filter-option
+                      *ngIf="element.type === 'WorkItemNode'"
+                      (click)="editStepInterfaces(element.uniqueId)"
+                      >Interface</lib-filter-option
+                    >
+                    <lib-filter-option (click)="editStepNotification(element.uniqueId)">Notification</lib-filter-option>
+                    <lib-filter-option (click)="editStepRules(element.uniqueId, element.type)"
+                      >Business rule</lib-filter-option
+                    >
+                    <lib-filter-option
+                      *ngIf="element.type === 'WorkItemNode'"
+                      (click)="editStepPartner(element.uniqueId)"
+                      >Invite partner</lib-filter-option
+                    >
+                  </mat-menu>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="forms">
+                <th mat-header-cell *matHeaderCellDef>
+                  <div mat-sort-header>Forms</div>
+                </th>
+
+                <td mat-cell *matCellDef="let element">
+                  <div class="f-row" *ngIf="element.type === 'HumanTaskNode'">
+                    <lib-chip-list class="mdo-chip-list" vertical="true">
+                      <lib-chip *ngFor="let data of element?.forms" class="mdo-filter-matchip filter-pill">
+                        {{ data.formDesc }}
+                        <mat-icon fontSet="mdo-icons-light" (click)="deleteRuleForm(element, data, true)"
+                          >times</mat-icon
+                        >
+                      </lib-chip>
+                    </lib-chip-list>
+                    <lib-chip-list class="mdo-chip-list" vertical="true">
+                      <ng-container *ngFor="let data of element?.forms">
+                        <lib-chip *ngFor="let data1 of data?.refrenceDataSet" class="mdo-filter-matchip filter-pill">
+                          {{ data1?.formDesc }}
+                          <mat-icon fontSet="mdo-icons-light" (click)="deleteRuleForm(element, data, true)"
+                            >times</mat-icon
+                          >
+                        </lib-chip>
+                      </ng-container>
+                    </lib-chip-list>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="interfaces">
+                <th mat-header-cell *matHeaderCellDef>
+                  <div mat-sort-header>Interface</div>
+                </th>
+
+                <td mat-cell *matCellDef="let element">
+                  <div *ngIf="element.type === 'WorkItemNode'" class="f-row">
+                    <lib-chip-list class="mdo-chip-list" vertical="true">
+                      <lib-chip *ngFor="let data of element?.interfaces" class="mdo-filter-matchip filter-pill">
+                        {{ data.interfaceDesc || data.scenarioId }}
+                        <mat-icon fontSet="mdo-icons-light" (click)="deleteInterface(element, data)">times</mat-icon>
+                      </lib-chip>
+                    </lib-chip-list>
+                  </div>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="business_rule">
+                <th mat-header-cell *matHeaderCellDef>
+                  <div mat-sort-header>Business rule</div>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  <lib-chip-list class="mdo-chip-list" vertical="true">
+                    <lib-chip
+                      *ngFor="let data of element?.rules"
+                      class="f-row mdo-filter-matchip"
+                      [label]="getTitle(data)"
+                    >
+                      <mat-icon fontSet="mdo-icons-light" (click)="deleteRuleForm(element, data, false)">
+                        times</mat-icon
+                      >
+                    </lib-chip>
+                  </lib-chip-list>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="notification">
+                <th mat-header-cell *matHeaderCellDef>
+                  <div mat-sort-header>Notification</div>
+                </th>
+                <td mat-cell *matCellDef="let element">
+                  <lib-chip-list class="mdo-chip-list" vertical="true">
+                    <lib-chip
+                      *ngFor="let data of element?.notification"
+                      class="f-row mdo-filter-matchip"
+                      [label]="getTitle(data)"
+                    >
+                      <mat-icon fontSet="mdo-icons-light">times</mat-icon>
+                    </lib-chip>
+                  </lib-chip-list>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedFields; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedFields"></tr>
+            </table>
+          </div>
+        </lib-tab>
+        <lib-tab label="Diagram">
+          <div *ngIf="svg" [innerHTML]="svg"></div>
+        </lib-tab>
+      </lib-tab-group>
+    </div>
+  </div>
+</div>

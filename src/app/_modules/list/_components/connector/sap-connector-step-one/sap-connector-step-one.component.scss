@@ -1,0 +1,44 @@
+div.root {
+  height: calc(100% - 44px - 68px);
+  user-select: text;
+  padding: 0;
+  overflow: auto;
+
+  .manually-dataset {
+    margin: 0 auto;
+    width: 62%;
+
+    .upload-container {
+      .attachment-section {
+        margin-bottom: 6px;
+        padding: 6px;
+
+        .attachment {
+          display: flex;
+          align-items: center;
+
+          .attachment-icon {
+            width: 14px;
+            height: 14px;
+            margin-right: 6px;
+          }
+        }
+      }
+
+      .file {
+        border-radius: 3px;
+        min-height: 34px;
+        position: relative;
+
+        .placeholder {
+          padding: 8px;
+          display: block;
+        }
+      }
+    }
+
+    .field-label {
+      margin-bottom: 6px;
+    }
+  }
+}

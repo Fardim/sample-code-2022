@@ -1,0 +1,49 @@
+<div class="bpmn-builder">
+<div class="root-container">
+
+<div class="breadcrumb-wrapper">
+    <pros-breadcrumb [crumbs]="breadcrumb"></pros-breadcrumb>
+</div>
+
+<mat-card class="mat-elevation-z3">
+    <mat-toolbar class="builder-toolbar">
+        <mat-toolbar-row>
+            <button mat-raised-button color="primary" (click)="resetZoom()">
+                <mat-icon>zoom_out_map</mat-icon>Center</button>
+            <span class="f-col-spacer-half"></span>
+            <button mat-raised-button color="primary" (click)="zoomIn()"> 
+                <mat-icon>zoom_in</mat-icon> Zoom in
+            </button>
+            <span class="f-col-spacer-half"></span>
+            <button mat-raised-button color="primary" (click)="zoomOut()">
+                <mat-icon>zoom_out</mat-icon> Zoom out</button> 
+
+            <span class="f-spacer"></span>
+                
+            <button mat-raised-button color="primary" (click)="clearDiagram()">
+                <mat-icon>clear</mat-icon> Clear
+            </button>
+            <span class="f-col-spacer-half"></span>
+            <input type="file" hidden="true" #loadDiagram (change)="load($event)" />
+            <button mat-raised-button color="primary" (click)="loadDiagram.click()">
+                <mat-icon>cloud_upload</mat-icon> Load
+            </button>
+            <span class="f-col-spacer-half"></span>
+            <button mat-raised-button color="primary" (click)="save()">
+                <mat-icon>save</mat-icon> Save
+            </button>   
+        </mat-toolbar-row>
+    </mat-toolbar>
+    <div class="f-row">
+        <mat-card class="mat-elevation-z0 modeler-container">     
+            <div id="canvas" class="bpmn-modeler"></div>
+        </mat-card>
+
+    <mat-card>
+        <pros-properties-panel [bpmnElement]="selectedElement" (updateProperties)="onUpdateProperties($event)" [hidden]="!selectedElement"></pros-properties-panel>
+    </mat-card>
+    </div>
+</mat-card>
+</div>
+</div>
+

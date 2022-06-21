@@ -1,0 +1,312 @@
+<div class="mat-elevation-z0 root">
+    <div class="f-row breadcrum-toolbar">
+        <div class="display-heading-large">
+            {{ schemaInfo ? schemaInfo.moduleDescription : 'Unknown' }} /
+            {{ schemaInfo ? schemaInfo.schemaDescription : 'Unknown' }} /
+            {{ (!variantId || variantId === '0') ? 'Entire dataset' : 'Unknown' }}
+        </div>
+        <button mat-button [matMenuTriggerFor]="check">
+            <mat-icon fontSet="mdo-icons-solid">caret-down</mat-icon>
+        </button>
+        <mat-menu #check="matMenu" class="navigation-menu">
+            <button mat-menu-item (click)="openDataScopeSideSheet()">[Add data scope]</button>
+            <button mat-menu-item (click)="variantChange('0')"> Entire dataset </button>
+            <ng-container *ngIf="dataScope && dataScope.length">
+                <button mat-menu-item *ngFor="let scope of dataScope" (click)="variantChange(scope.variantId)">
+                    {{scope.variantName}}
+                </button>
+            </ng-container>
+        </mat-menu>
+        <div class="f-col-spacer-half"></div>
+        <div class="f-spacer"></div>
+        <div class="f-row action-iconbtns">
+            <button mat-flat-button color="accent" (click)="openSummarySideSheet()">
+                <mat-icon fontSet="mdo-icons">square-root-alt</mat-icon> Check data
+            </button>
+            <button mat-fab color="accent" (click)="openExecutionTrendSideSheet()">
+                <mat-icon fontSet="mdo-icons">chart-line</mat-icon>
+            </button>
+            <button mat-fab color="accent" [matMenuTriggerFor]="moreactionfile">
+                <mat-icon fontSet="mdo-icons">ellipsis-h</mat-icon>
+            </button>
+            <mat-menu #moreactionfile="matMenu" class="navigation-menu">
+                <button mat-menu-item (click)="downloadExecutionDetails()">Export to CSV</button>
+            </mat-menu>
+        </div>
+    </div>
+
+    <ng-template [ngIf]="isInRunning" [ngIfElse]="schemaInfoTemplate">
+        <pros-schema-progress [schemaId]="schemaId"></pros-schema-progress>
+    </ng-template>
+
+    <ng-template #schemaInfoTemplate>
+        <mat-divider></mat-divider>
+        <div class="row-spacer"></div>
+        <div class="f-row">
+            <mat-chip-list>
+                <mat-chip disableRipple="true" (click)="changeTabStatus('success')" class="error-status">
+                    {{ schemaInfo ? schemaInfo.totalCount : 0 }} all</mat-chip>
+                <!-- <mat-chip disableRipple="true" class="warning-status">0 warning</mat-chip> -->
+                <mat-chip disableRipple="true" (click)="changeTabStatus('review')" class="info-status">
+                    {{ schemaInfo ? schemaInfo.correctionValue : 0 }} corrections</mat-chip>
+            </mat-chip-list>
+        </div>
+        <div class="row-spacer"></div>
+        <mat-divider></mat-divider>
+        <div class="row-spacer"></div>
+        <div class="f-col data-container">
+            <div class="f-row dataset-grid">
+                <div class="f-col dataset-grid-listing">
+                    <!-- Filters  -->
+                    <mat-chip-list>
+                        <pros-search-input placeholder="Search text" (value)="inlineSearch($event)"
+                            [preValue]="preInpVal">
+                        </pros-search-input>
+                        <div class="f-col-spacer-half"></div>
+                        <!-- Append dynamic filter here...-->
+                        <ng-template ngFor let-ctrl [ngForOf]="filterCriteria | async">
+                            <ng-template [ngIf]="ctrl.type !== 'INLINE'">
+                                <mat-chip class="mdo-filter-matchip" disableRipple="true"
+                                    [matMenuTriggerFor]="appliedfiltermenu" (click)="loadDropValues(ctrl)">
+                                    <label>
+                                        {{ ctrl.filterCtrl ? ctrl.filterCtrl.fldCtrl.fieldDescri : 'Unknown' }} :
+                                    </label>
+                                    <ng-template [ngIf]="ctrl.filterCtrl.selectedValeus.length > 1"
+                                        [ngIfElse]="showText">
+                                        <span class="info">
+                                            {{ prepareTextToShow(ctrl) }}
+                                        </span>
+                                    </ng-template>
+                                    <ng-template #showText>
+                                        <span class="info">
+                                            <!-- {{ ctrl.filterCtrl ? (ctrl.filterCtrl.selectedValeus[0].TEXT ? ctrl.filterCtrl.selectedValeus[0].TEXT : ctrl.filterCtrl.selectedValeus[0].CODE) : ''}} -->
+                                            {{ prepareTextToShow(ctrl)}}
+                                        </span>
+                                    </ng-template>
+                                    <mat-icon matChipRemove (click)="removeAppliedFilter(ctrl)">clear</mat-icon>
+                                </mat-chip>
+                                <!-- Append dynamic filter MatMenu -->
+                                <mat-menu #appliedfiltermenu="matMenu">
+                                    <pros-filter-values 
+                                        [moduleId]="moduleId"
+                                        [fieldId]="loadDopValuesFor ? loadDopValuesFor.fieldId : ''"
+                                        [checkedValue]="loadDopValuesFor ? loadDopValuesFor.checkedValue : []"
+                                        (selectedValues)="updateFilterCriteria($event)">
+                                    </pros-filter-values>
+                                </mat-menu>
+                            </ng-template>
+                        </ng-template>
+                        <!-- Add filter control -->
+                        <mat-chip class="mdo-filter-matchip" disableRipple="true" [matMenuTriggerFor]="addfiltermenu"
+                            (click)="reInilize = !reInilize">
+                            <mat-icon fontSet="mdo-icons-light">filter</mat-icon>
+                        </mat-chip>
+                        <!-- Add filter control MatMenu -->
+                        <mat-menu #addfiltermenu="matMenu">
+                            <pros-add-filter-menu 
+                                [moduleId]="moduleId" 
+                                (evtReadyForApply)="makeFilterControl($event)"
+                                [reInilize]="reInilize"
+                                [alreadySelectedValues]="filterCriteria.getValue()">
+                            </pros-add-filter-menu>
+                        </mat-menu>
+                        <!-- More control -->
+                        <mat-chip class="mdo-filter-matchip" disableRipple="true" [matMenuTriggerFor]="moreFilterMenu">
+                            <mat-icon fontSet="mdo-icons">ellipsis-h</mat-icon>
+                        </mat-chip>
+                        <!-- More control MatMenu -->
+                        <mat-menu #moreFilterMenu="matMenu" class="navigation-menu">
+                            <button mat-menu-item (click)="opnDialogSaveVariant()">Save as...</button>
+                            <button mat-menu-item (click)="resetAppliedFilter()">Reset</button>
+                        </mat-menu>
+                    </mat-chip-list>
+                    <div class="row-spacer"></div>
+                    <div class="f-row action-iconbtns"
+                        *ngIf="activeTab && activeTab === 'review' && selection.selected.length !== 0">
+                        <ng-template [ngIf]="(isReviewer || isApprover) && isGlobalActionsEnabled">
+                            <button mat-flat-button (click)="approveRecords('all')" color="accent">
+                                <!-- <mat-icon fontSet="mdo-icons">check-mark</mat-icon> -->
+                                Approve
+                            </button>
+                            <button mat-flat-button (click)="resetRec('','all')" color="accent">
+                                <!-- <mat-icon fontSet="mdo-icons">block</mat-icon> -->
+                                Reject
+                            </button>
+                        </ng-template>
+                        <button mat-flat-button (click)="selection.clear()" color="accent">
+                            <!-- <mat-icon fontSet="mdo-icons">close</mat-icon> -->
+                            Unselect
+                        </button>
+                    </div>
+                    <!-- Data Table -->
+                    <div class="data" (scroll)="onTableScroll($event)">
+                        <mat-table matSort [dataSource]="dataSource" class="mat-elevation-z0">
+                            <!-- Checkbox Column -->
+                            <ng-container matColumnDef="checkbox_select" sticky>
+                                <mat-header-cell *matHeaderCellDef class="fixed-width-c1">
+                                    <mat-checkbox (change)="$event ? masterToggle() : null"
+                                        [checked]="selection.hasValue() && isAllSelected()"
+                                        [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                        [aria-label]="checkboxLabel()" color="primary">
+                                    </mat-checkbox>
+                                </mat-header-cell>
+                                <mat-cell class="fixed-width-c1" *matCellDef="let row">
+                                    <mat-checkbox (click)="$event.stopPropagation()"
+                                        (change)="$event ? selection.toggle(row) : null"
+                                        [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)"
+                                        color="primary">
+                                    </mat-checkbox>
+                                </mat-cell>
+                            </ng-container>
+
+                            <!-- Name Column -->
+                            <ng-container matColumnDef="bucket_assigned" sticky>
+                                <mat-header-cell *matHeaderCellDef class="fixed-width-c1"></mat-header-cell>
+                                <mat-cell class="fixed-width-c1" *matCellDef="let element">
+                                    <mat-card-header>
+                                        <div mat-card-avatar>
+                                            {{ userDetails ? (userDetails.firstName ?
+                                            userDetails.firstName.substring(0,1).toUpperCase() : '') : '' }}{{
+                                            userDetails ? ( userDetails.lastName ?
+                                            userDetails.lastName.substring(0,1).toUpperCase() : '') : '' }}
+                                        </div>
+                                    </mat-card-header>
+                                </mat-cell>
+                            </ng-container>
+
+                            <!-- Action Column -->
+                            <ng-container matColumnDef="action" sticky>
+                                <mat-header-cell *matHeaderCellDef class="fixed-width-c2">
+                                    <button mat-button (click)="openTableColumnSettings()">
+                                        <mat-icon fontSet="mdo-icons">cog</mat-icon>
+                                    </button>
+                                </mat-header-cell>
+                                <mat-cell *matCellDef="let element" class="fixed-width-c2">
+                                    <div class="f-row action-iconbtns">                                        
+                                        <ng-template [ngIf]="!element['OBJECTNUMBER'].isReviewed">
+                                            <!-- Secondary actions -->
+                                            <button mat-fab color="accent" *ngIf="secondaryActions.length"
+                                                [matMenuTriggerFor]="secondaryActionsMenu">
+                                                <mat-icon fontSet="mdo-icons">ellipsis-h</mat-icon>
+                                            </button>
+                                            <mat-menu #secondaryActionsMenu="matMenu" class="navigation-menu">
+                                                <ng-container *ngFor="let sAction of secondaryActions">
+                                                    <button mat-menu-item *ngIf="(activeTab === 'review' || sAction.isCustomAction) && hasActionPermission(sAction)"
+                                                        (click)="doAction(sAction, element)">
+                                                        <mat-icon fontSet="mdo-icons"
+                                                            *ngIf="!sAction.isCustomAction && (sAction.actionViewType=== TableActionViewType.ICON || sAction.actionViewType=== TableActionViewType.ICON_TEXT)">
+                                                            {{ sAction.actionIconLigature }}
+                                                        </mat-icon>
+                                                        <ng-template
+                                                            [ngIf]="(sAction.actionViewType === TableActionViewType.TEXT) || (sAction.actionViewType === TableActionViewType.ICON_TEXT)">
+                                                            {{ sAction.actionText }}
+                                                        </ng-template>
+                                                    </button>
+                                                </ng-container>
+                                            </mat-menu>
+                                            <!-- Primary actions -->
+                                            <ng-container *ngFor="let pAction of primaryActions">
+                                                <button *ngIf="(activeTab === 'review' || pAction.isCustomAction) && hasActionPermission(pAction)" mat-flat-button
+                                                    color="accent" (click)="doAction(pAction, element)">
+                                                    <mat-icon fontSet="mdo-icons"
+                                                        *ngIf="(pAction.actionViewType=== TableActionViewType.ICON) || (pAction.actionViewType=== TableActionViewType.ICON_TEXT)">
+                                                        {{ pAction.actionIconLigature }}
+                                                    </mat-icon>
+                                                    <ng-template
+                                                        [ngIf]="(pAction.actionViewType=== TableActionViewType.TEXT) || (pAction.actionViewType=== TableActionViewType.ICON_TEXT)">
+                                                        {{ pAction.actionText }}
+                                                    </ng-template>
+                                                </button>
+                                            </ng-container>
+                                        </ng-template>
+                                    </div>
+                                </mat-cell>
+                            </ng-container>
+
+                            <!-- Object number -->
+                            <ng-container matColumnDef="OBJECTNUMBER" sticky>
+                                <mat-header-cell *matHeaderCellDef> Module object number </mat-header-cell>
+                                <mat-cell mat-cell *matCellDef="let element">
+                                    {{ element['OBJECTNUMBER'] && element['OBJECTNUMBER'].fieldData ?
+                                    element['OBJECTNUMBER'].fieldData : '' }}
+
+                                </mat-cell>
+                            </ng-container>
+
+                            <!-- load dynamic columns-->
+                            <ng-template ngFor let-dynCols [ngForOf]="(displayedFields | async)">
+                                <ng-template
+                                    [ngIf]="(dynCols === 'action') || (dynCols === 'checkbox_select') || (dynCols === 'bucket_assigned') || (dynCols === 'OBJECTNUMBER')"
+                                    [ngIfElse]="other">
+                                    <!-- skip all static columns -->
+                                </ng-template>
+                                <ng-template #other>
+
+                                    <ng-container [matColumnDef]="dynCols">
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header>
+                                            {{ metadataFldLst[dynCols] ? metadataFldLst[dynCols].fieldDescri : 'Unknown'
+                                            }}
+                                        </mat-header-cell>
+                                        <mat-cell *matCellDef="let element; let rIndex = index;"
+                                            [class.error-cell]="element[dynCols] ? element[dynCols].isInError : false"
+                                            (click)="editCurrentCell(dynCols,element, rIndex, containerRef)">
+                                            <div class="f-col grid-cell-editable">
+                                                <div class="mdo-form-input f-col" style="display: none;"
+                                                    id="inpctrl_{{ dynCols + '_' + rIndex }}">
+
+                                                    <!-- container to hold input field when cell gets edited  -->
+                                                    <ng-template prosContainerRef #containerRef="prosContainerRef">
+                                                    </ng-template>
+                                                </div>
+                                            </div>
+                                            <ng-template [ngIf]="element[dynCols] && element[dynCols].isCorrected"
+                                                [ngIfElse]="normalCell">
+                                                <ng-template
+                                                    [ngIf]="element[dynCols].oldData !== element[dynCols].fieldData"
+                                                    [ngIfElse]="other">
+                                                    <div class="f-col">
+                                                        <span id="viewctrl_{{ dynCols + '_' + rIndex }}">
+                                                            {{ element[dynCols] ? formatCellData(dynCols,
+                                                            element[dynCols].fieldData) : '' }}
+                                                        </span>
+                                                        <span class="text-correction">
+                                                            {{ element[dynCols] ? formatCellData(dynCols,
+                                                            element[dynCols].oldData) : '' }}
+                                                        </span>
+                                                    </div>
+                                                </ng-template>
+                                                <ng-template #other>
+                                                    <div class="f-col">
+                                                        <span id="viewctrl_{{ dynCols + '_' + rIndex }}">
+                                                            {{ element[dynCols] ? formatCellData(dynCols,
+                                                            element[dynCols].fieldData) : '' }}
+                                                        </span>
+                                                    </div>
+                                                </ng-template>
+                                            </ng-template>
+                                            <ng-template #normalCell>
+                                                <div class="f-col">
+                                                    <span id="viewctrl_{{ dynCols + '_' + rIndex }}">
+                                                        {{ element[dynCols] ? formatCellData(dynCols,
+                                                        element[dynCols].fieldData) : '' }}
+                                                    </span>
+                                                    <span class="text-correction">
+                                                        {{ element[dynCols] ? element[dynCols].errorMsg : '' }}
+                                                    </span>
+                                                </div>
+                                            </ng-template>
+                                        </mat-cell>
+                                    </ng-container>
+                                </ng-template>
+                            </ng-template>
+
+                            <mat-header-row *matHeaderRowDef="displayedFields | async; sticky: true"></mat-header-row>
+                            <mat-row *matRowDef="let row; columns: displayedFields | async;">
+                            </mat-row>
+                        </mat-table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</div>

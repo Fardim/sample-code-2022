@@ -1,0 +1,445 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="compress-alt" iconFontType="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@characteristics_expansion_view">Characteristics - Expansion view
+        </lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button (click)="saveForm()" width="80px" type="major" i18n="@@save">Save</lib-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <div class="modal-body">
+        <div #messageContainer>
+          <lib-banner *ngIf="bannerMessage" [text]="bannerMessage" status="error"></lib-banner>
+        </div>
+        <div class="f-col">
+          <form [formGroup]="form">
+            <div class="f-col colunm-box">
+              <lib-text-line type="base" i18n="@@name">
+                Name
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                  libTooltip="Allows the user to maintain a unique name for the characteristic. Characteristic name once maintained cannot be changed.">
+                  question-circle
+                </mat-icon>
+                <span class="mandatory"> *</span>
+              </lib-text-line>
+              <lib-input class="lib-input input-upper-case" i18n-placeholder="@@type_name" placeholder="Type name"
+                inputPreventKey [keyList]="['Space']" formControlName="charCode"
+                [hasError]="form.controls.charCode.touched && form.controls.charCode.errors && form.controls.charCode.errors.required">
+              </lib-input>
+            </div>
+
+            <div class="f-col colunm-box">
+              <div class="col">
+                <lib-text-line type="base" i18n="@@language">Language</lib-text-line>
+              </div>
+              <div class="f-col mdo-field">
+                <mat-form-field appearance="outline">
+                  <input matInput [matAutocomplete]="moduleAutoCmpLanguage" [value]="selectedLanguage" />
+                  <lib-button icon="chevron-down" matSuffix></lib-button>
+                  <mat-autocomplete class="mdo-autocomplete" #moduleAutoCmpLanguage="matAutocomplete"
+                    [displayWith]="displayLanguageFn.bind(this)" (optionSelected)="onLanguageChange($event)">
+                    <mat-option class="mdo-option" *ngFor="let obj of allLanguages" [value]="obj.id">
+                      {{obj.name}}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="f-col colunm-box">
+              <lib-text-line type="base" i18n="@@description">
+                Description
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                  libTooltip="Allows the user to maintain the characteristic description.">
+                  question-circle
+                </mat-icon>
+                <span class="mandatory"> *</span>
+              </lib-text-line>
+              <div class="mdo-field">
+                <lib-input type="text" [expanded]="true" formControlName="charDesc" placeholder="Type description"
+                  (valueChange)="onDescChange($event)"
+                  [hasError]="form.controls.charDesc.touched && form.controls.charDesc.errors && form.controls.charDesc.errors.required">
+                </lib-input>
+              </div>
+            </div>
+
+            <div class="f-col colunm-box">
+              <lib-text-line type="base" i18n="@@characteristic_numeric_code">
+                Characteristic numeric code
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                  libTooltip="Allows user to define a numeric code associated with the characteristic that should be considered for generating the record number, based on defined number setting rule.">
+                  question-circle
+                </mat-icon>
+              </lib-text-line>
+              <lib-input type="number" class="lib-input numberInput" formControlName="numCode"
+                [hasError]="form.controls.numCode.touched && form.controls.numCode.errors && form.controls.numCode.errors.required">
+              </lib-input>
+            </div>
+
+            <div class="f-col colunm-box">
+              <lib-text-line type="base" i18n="@@characteristic_type">
+                Characteristic Type
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                  libTooltip="Allows the user to maintain the type of characteristic from a list of available options.">
+                  question-circle
+                </mat-icon>
+                <span class="mandatory"> *</span>
+              </lib-text-line>
+              <div class="f-col mdo-field">
+                <mat-form-field appearance="outline">
+                  <input matInput formControlName="fieldType" [matAutocomplete]="moduleAutoCmpField" />
+                  <lib-button icon="chevron-down" matSuffix></lib-button>
+                  <mat-autocomplete class="mdo-autocomplete" #moduleAutoCmpField="matAutocomplete"
+                    (optionSelected)="onFieldTypeChange($event)">
+                    <mat-option class="mdo-option" *ngFor="let obj of fieldTypeList" [value]="obj.name">
+                      {{obj.name}}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="f-col colunm-box">
+              <lib-text-line type="base" i18n="@@data_type">
+                Data Type
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                  libTooltip="Allows the user to maintain the applicable data type for the characteristic.">
+                  question-circle
+                </mat-icon>
+                <span class="mandatory"> *</span>
+              </lib-text-line>
+              <div class="f-col mdo-field"
+                [ngClass]="{'mdo-form-error': form.controls.dataType.touched && form.controls.dataType.invalid}">
+                <mat-form-field appearance="outline">
+                  <input matInput formControlName="dataType" [matAutocomplete]="moduleAutoCmpData" />
+                  <lib-button icon="chevron-down" matSuffix></lib-button>
+                  <mat-autocomplete class="mdo-autocomplete" #moduleAutoCmpData="matAutocomplete"
+                    (optionSelected)="onDataTypeChange($event)">
+                    <mat-option class="mdo-option" *ngIf="!typeList?.length" disabled i18n="@@no_data_types_found">
+                      No data types found
+                    </mat-option>
+                    <mat-option class="mdo-option" *ngFor="let obj of typeList" [value]="obj.name">
+                      {{obj.name}}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="f-col colunm-box">
+              <lib-text-line type="base" i18n="@@length">
+                Length
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                  libTooltip="Allows the user to specify the maximum length characteristic value can take.">
+                  question-circle
+                </mat-icon>
+                <span *ngIf="isRequiredField('length')" class="mandatory"> *</span>
+              </lib-text-line>
+              <lib-input type="number" class="lib-input" formControlName="length"
+                [hasError]="form.controls.length.touched && form.controls.length.errors && (form.controls.length.errors.required || form.controls.length.errors.pattern)">
+              </lib-input>
+            </div>
+
+            <div *ngIf="!form.controls['decimal'].disabled" class="f-row colunm-box">
+              <div class="col col-x4 mdo-field">
+                <lib-text-line type="base" i18n="@@decimal_places">
+                  Decimal places
+                  <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                    libTooltip="Allows the user to specify the decimal value precision if applicable for the characteristic.">
+                    question-circle
+                  </mat-icon>
+                  <span *ngIf="isRequiredField('decimal')" class="mandatory"> *</span>
+                </lib-text-line>
+              </div>
+              <div class="col col-x5">
+                <lib-input type="number" class="lib-input" formControlName="decimal" min="0" max="9"
+                  [hasError]="form.controls.decimal.touched && form.controls.decimal.errors && (form.controls.decimal.errors.required || form.controls.decimal.errors.pattern)">
+                </lib-input>
+              </div>
+            </div>
+
+            <div *ngIf="!form.controls['currency'].disabled" class="f-row colunm-box">
+              <div class="col col-x4">
+                <lib-text-line type="base" i18n="@@currency">
+                  Currency
+                  <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                    libTooltip="Allows the user to specify the unit to be defaulted for Currency type characteristics.">
+                    question-circle
+                  </mat-icon>
+                </lib-text-line>
+              </div>
+              <div class="col col-x5">
+                <lib-input class="lib-input" formControlName="currency"
+                  [hasError]="form.controls.currency.touched && form.controls.currency.errors && form.controls.currency.errors.required">
+                </lib-input>
+              </div>
+            </div>
+
+            <div class="f-col colunm-box">
+              <lib-text-line type="base" i18n="@@characteristic_prefix_for_short_description">
+                Characteristic prefix for short description
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                  libTooltip="Allows the user to maintain a prefix that needs to be part of the generated short description, if data is maintained for the respective characteristic.">
+                  question-circle
+                </mat-icon>
+              </lib-text-line>
+              <lib-input class="lib-input" formControlName="prefix">
+              </lib-input>
+            </div>
+
+            <div class="f-col colunm-box">
+              <lib-text-line type="base" i18n="@@characteristic_prefix_for_long_description">
+                Characteristic prefix for long description
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                  libTooltip="Allows the user to maintain a prefix that needs to be part of the generated long description, if data is maintained for the respective characteristic.">
+                  question-circle
+                </mat-icon>
+              </lib-text-line>
+              <lib-input class="lib-input" formControlName="longPrefix">
+              </lib-input>
+            </div>
+
+            <div class="f-col colunm-box">
+              <lib-text-line type="base" i18n="@@characteristic_suffix_for_short_description">
+                Characteristic suffix for short description
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                  libTooltip="Allows the user to maintain a suffix that needs to be part of the generated short description, if data is maintained for the respective characteristic.">
+                  question-circle
+                </mat-icon>
+              </lib-text-line>
+              <lib-input class="lib-input" formControlName="suffix">
+              </lib-input>
+            </div>
+
+            <div class="f-col colunm-box">
+              <lib-text-line type="base" i18n="@@characteristic_suffix_for_long_description">
+                Characteristic suffix for long description
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                  libTooltip="Allows the user to maintain a suffix that needs to be part of the generated long description, if data is maintained for the respective characteristic.">
+                  question-circle
+                </mat-icon>
+              </lib-text-line>
+              <lib-input class="lib-input" formControlName="longSuffix">
+              </lib-input>
+            </div>
+
+            <div class="f-row colunm-box">
+              <div class="col col-x4">
+                <lib-text-line type="base" i18n="@@allows_maintaining_multiple_values">
+                  Allows maintaining multiple values
+                  <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                    libTooltip="Allows the user to maintain more than one values for the characteristic.">
+                    question-circle
+                  </mat-icon>
+                </lib-text-line>
+              </div>
+              <div class="col col-x5">
+                <lib-slide-toggle theme="primary" formControlName="isAllowMultipleValue"></lib-slide-toggle>
+              </div>
+            </div>
+
+            <div class="f-row colunm-box">
+              <div class="col col-x4">
+                <lib-text-line type="base" i18n="@@required_characteristic">
+                  Required characteristic
+                  <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                    libTooltip="Allows the user to define a characteristic as a required characteristic for the class.">
+                    question-circle
+                  </mat-icon>
+                </lib-text-line>
+              </div>
+              <div class="col col-x5">
+                <lib-slide-toggle theme="primary" formControlName="isManatory"></lib-slide-toggle>
+              </div>
+            </div>
+
+            <div *ngIf="!form.controls['isAllowValueRange'].disabled" class="f-row colunm-box">
+              <div class="col col-x4">
+                <lib-text-line type="base" i18n="@@allow_maintaining_value_range">
+                  Allows maintaining value range
+                  <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                    libTooltip="Allows the user to maintain range of values for the characteristic.">
+                    question-circle
+                  </mat-icon>
+                </lib-text-line>
+              </div>
+              <div class="col col-x5">
+                <lib-slide-toggle theme="primary" formControlName="isAllowValueRange"></lib-slide-toggle>
+              </div>
+            </div>
+
+            <div *ngIf="!form.controls['isAllowUpperCase'].disabled" class="f-row colunm-box">
+              <div class="col col-x4">
+                <lib-text-line type="base" i18n="@@allow_maintaining_data_in_upper_case_only">
+                  Allow maintaining data in upper case only
+                  <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                    libTooltip="Allows the user to restrict maintaining values in upper case only for a characteristic. Users can disable the property to maintain data in lower case.">
+                    question-circle
+                  </mat-icon>
+                </lib-text-line>
+              </div>
+              <div class="col col-x5">
+                <lib-slide-toggle theme="primary" formControlName="isAllowUpperCase"></lib-slide-toggle>
+              </div>
+            </div>
+
+            <div *ngIf="!form.controls['isAllowNegative'].disabled" class="f-row colunm-box">
+              <div class="col col-x4">
+                <lib-text-line type="base" i18n="@@allow_maintaining_negative_values">
+                  Allow maintaining negative values
+                  <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                    libTooltip="Allows the user to maintain negative values for the characteristic.">
+                    question-circle
+                  </mat-icon>
+                </lib-text-line>
+              </div>
+              <div class="col col-x5">
+                <lib-slide-toggle theme="primary" formControlName="isAllowNegative"></lib-slide-toggle>
+              </div>
+            </div>
+
+            <div *ngIf="!form.controls['isAllowNewValue'].disabled" class="f-row colunm-box">
+              <div class="col col-x4">
+                <lib-text-line type="base" i18n="@@allow_maintaining_new_value">
+                  Allow maintaining new values
+                  <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                    libTooltip="Allows the user to add new values for a Dropdown type characteristic.">
+                    question-circle
+                  </mat-icon>
+                </lib-text-line>
+              </div>
+              <div class="col col-x5">
+                <lib-slide-toggle theme="primary" formControlName="isAllowNewValue"></lib-slide-toggle>
+              </div>
+            </div>
+
+            <div class="f-row colunm-box">
+              <div class="col col-x4">
+                <lib-text-line type="base" i18n="@@enable_for_duplicate_check">
+                  Enable for duplicate check
+                  <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                    libTooltip="Allows the system to perform a duplicate check on combination of attributes defined for the class and enabled for this property, when a duplicate type rule is maintained to identify duplicates on classification attributes.">
+                    question-circle
+                  </mat-icon>
+                </lib-text-line>
+              </div>
+              <div class="col col-x5">
+                <lib-slide-toggle theme="primary" formControlName="enableDuplicateCheck"></lib-slide-toggle>
+              </div>
+            </div>
+
+            <div class="f-col colunm-box">
+              <lib-text-line type="base" i18n="@@dimension">
+                Dimension
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                  libTooltip="Allows the user to maintain the dimension which is applicable for the characteristic, for maintaining data in related units.">
+                  question-circle
+                </mat-icon>
+              </lib-text-line>
+              <div class="f-col mdo-field"
+                [ngClass]="{'mdo-form-error': form.controls.dataType.touched && form.controls.dataType.invalid}">
+                <mat-form-field appearance="outline">
+                  <input matInput formControlName="dimensionType" [matAutocomplete]="moduleAutoCmpDimension"
+                    [value]="selectedDimensionName" />
+                  <lib-button *ngIf="form.controls.dimensionType.value" icon="times" matSuffix prosClickStopPropagation
+                    (click)="clearSelectedDimension()"></lib-button>
+                  <lib-button icon="chevron-down" matSuffix></lib-button>
+                  <mat-autocomplete class="mdo-autocomplete" #moduleAutoCmpDimension="matAutocomplete"
+                    [displayWith]="displayDimensionFn.bind(this)" (optionSelected)="onDimensionTypeChange($event)">
+                    <mat-option class="mdo-option" *ngIf="!dimensionTypeList?.length" disabled
+                      i18n="@@no_dimensions_found">
+                      No dimensions found
+                    </mat-option>
+                    <mat-option class="mdo-option" *ngFor="let obj of dimensionTypeList" [value]="obj.uuid">
+                      {{obj.description}}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="f-col colunm-box">
+              <lib-text-line type="base" i18n="@@default_unit_of_measure">
+                Default Unit of measure
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                  libTooltip="Allows the user to define a default unit of measure for the characteristic, belonging to the maintained dimension.">
+                  question-circle
+                </mat-icon>
+                <span *ngIf="isRequiredField('defaultUoM')" class="mandatory"> *</span>
+              </lib-text-line>
+              <div class="f-col mdo-field">
+                <mat-form-field appearance="outline">
+                  <input matInput formControlName="defaultUoM" [required]="isRequiredField('defaultUoM')"
+                    [matAutocomplete]="moduleAutoCmpDefaultMeasure" />
+                  <lib-button icon="chevron-down" matSuffix></lib-button>
+                  <mat-autocomplete class="mdo-autocomplete" #moduleAutoCmpDefaultMeasure="matAutocomplete">
+                    <mat-option class="mdo-option" *ngIf="!defaultMeasureList?.length" disabled
+                      i18n="@@no_unit_of_measure_found">
+                      No unit of measure found
+                    </mat-option>
+                    <mat-option class="mdo-option" *ngFor="let obj of defaultMeasureList" [value]="obj.uomValue">
+                      {{obj.uomValue}}
+                    </mat-option>
+                  </mat-autocomplete>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="f-row colunm-box">
+              <div class="col col-x4">
+                <lib-text-line type="base" i18n="@@status">Status</lib-text-line>
+              </div>
+              <div class="col col-x5">
+                <lib-slide-toggle theme="primary" formControlName="status"></lib-slide-toggle>
+              </div>
+            </div>
+
+            <div class="f-col colunm-box">
+              <lib-text-line type="base" i18n="@@valid_from">Valid from</lib-text-line>
+              <lib-date-picker class="date-picker" formControlName="validFrom" [selectedDate]="getValidFromValue()"
+                (valueChange)="validFromChanged($event)"></lib-date-picker>
+            </div>
+            <div class="f-col colunm-box">
+              <lib-text-line type="base" i18n="@@valid_to">Valid to</lib-text-line>
+              <lib-date-picker class="date-picker" formControlName="validTo" [selectedDate]="getValidToValue()"
+                (valueChange)="validToChanged($event)"></lib-date-picker>
+            </div>
+
+            <div class="f-col colunm-box">
+              <lib-text-line type="base" i18n="@@help_text">
+                Help text
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                  libTooltip="Allows the user to maintain a Help text for the characteristic, which is then available on the transaction screen in the Description generator, or in the Classification component.">
+                  question-circle
+                </mat-icon>
+              </lib-text-line>
+              <div class="text-editor">
+                <pros-rich-text-editor [tabFieldId]="helpTextEditorId" [formControl]="helpTextControl"
+                  (valueChange)="helpTextEditorValueChange($event)"></pros-rich-text-editor>
+              </div>
+            </div>
+
+            <div class="f-col colunm-box">
+              <lib-text-line type="base" i18n="@@sap_characteristics">
+                SAP characteristics
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                  libTooltip="Allows the user to maintain the equivalent characteristic from target system, for the linked SAP class.">
+                  question-circle
+                </mat-icon>
+              </lib-text-line>
+              <lib-input class="lib-input" formControlName="sapChars">
+              </lib-input>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,46 @@
+div.root {
+  .colunm-box {
+    box-sizing: border-box;
+    min-height: 48px;
+
+    .col {
+      display: flex;
+      flex: 1 0 auto;
+      width: 1px;
+      align-items: center;
+
+      &.col-x2 {
+        flex: 2;
+      }
+
+      &.col-x8 {
+        flex: 8;
+      }
+
+      &.col-x16 {
+        flex: 16;
+      }
+
+      &.mat-item-center {
+        justify-content: center;
+      }
+
+      &.mat-item-end {
+        justify-content: flex-end;
+      }
+
+      mat-form-field {
+        width: 100%;
+      }
+
+      .divided-matfield {
+        flex: 0 0 47%;
+      }
+
+      mat-icon.mat-icon {
+        width: 12px;
+        font-size: 10px;
+      }
+    }
+  }
+}

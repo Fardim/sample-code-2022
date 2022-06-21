@@ -1,0 +1,13 @@
+mat-card.widget {
+  box-sizing: border-box;
+  padding: 8px;
+  height: 100%;
+
+  .img-content {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100%;
+    width: 100%;
+  }
+}

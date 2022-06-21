@@ -1,0 +1,111 @@
+<mat-card class="mat-elevation-z0 widget" *ngIf="isFetchingData">
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+</mat-card>
+<mat-card class="mat-elevation-z0 widget f-col" [ngClass]="{'hide':isFetchingData}">
+    <div class="f-row">
+        <div #displayHeading [libTooltip]="widgetInfo.widgetTitle" matTooltipPosition="right"
+            [matTooltipDisabled]="false">
+            <lib-text-line type="base" enableWrap="true">{{ widgetInfo.widgetTitle }}</lib-text-line>
+        </div>
+        <div class="f-spacer"></div>
+        <lib-button type="plain" icon="pencil-alt" *ngIf="editedMode" (click)="openPanel.emit()"></lib-button>
+        <lib-button [matMenuTriggerFor]="menu" type="plain" icon="ellipsis-h" (menuOpened)="menuOpened()"></lib-button>
+        <mat-menu #menu="matMenu" class="navigation-menu">
+            <lib-filter-option *ngIf="editedMode" (click)="deleteWidget.emit()">Delete</lib-filter-option>
+            <lib-filter-option *ngIf="!editedMode" (click)="downloadImage()">Image download (.png)
+            </lib-filter-option>
+            <lib-filter-option *ngIf="!editedMode" (click)="downloadCSV()">Data download (.csv)</lib-filter-option>
+            <button *ngIf="!editedMode" mat-menu-item [matMenuTriggerFor]="tcOptionMenu" #viewasItem="matMenuItem"
+                #viewasTrigger="matMenuTrigger" libClickStopPropagation (click)="viewasTrigger.openMenu()"
+                i18n="@@viewAs">View as</button>
+            <mat-menu #tcOptionMenu="matMenu" class="mat-elevation-z0 tooltip-fields-menu">
+                <lib-radio-group layout="vertical" [(value)]="displayCriteriaOption" [options]="displayCriteriaOptions"
+                    (valueChange)="saveDisplayCriteria()" name="displayCriteria{{widgetId}}"></lib-radio-group>
+            </mat-menu>
+            <!-- <ng-template [ngIf]="permissons && permissons.isAdmin && !editedMode"> -->
+            <button mat-menu-item (click)="openColorPalette()" *ngIf="!editedMode">Color palette</button>
+            <!-- </ng-template> -->
+            <lib-filter-option *ngIf="!editedMode">
+                <lib-slide-toggle labelPosition="before" class="lib-toggle" [checked]="isTableView"
+                    (toggleChange)="viewChange($event)" label="Table view" theme="primary" prosClickStopPropagation>
+                </lib-slide-toggle>
+            </lib-filter-option>
+        </mat-menu>
+    </div>
+
+    <div class="row-spacer"></div>
+    <ng-container *ngIf="!isTableView && widgetInfo.chartProperties?.isEnableLegend && widgetInfo.chartProperties?.legendPosition === LegendPosition.top">
+        <ng-container *ngTemplateOutlet="legendColRef"></ng-container>
+        <div class="row-spacer"></div>
+    </ng-container>
+    <mat-card-content #contentRef class="fex-1" [ngStyle]="{'overflow-y': !isTableView && widgetInfo.height > computedSizeHeight ? 'hidden' : 'auto'}" [ngClass]="{'f-row legend-position-row': !isTableView && widgetInfo.chartProperties?.isEnableLegend && (widgetInfo.chartProperties?.legendPosition === LegendPosition.left || widgetInfo.chartProperties?.legendPosition === LegendPosition.right)}">
+        <ng-container *ngIf="!isTableView && widgetInfo.chartProperties?.isEnableLegend && widgetInfo.chartProperties?.legendPosition === LegendPosition.left">
+            <ng-container *ngTemplateOutlet="legendRowRef"></ng-container>
+        </ng-container>
+        <div class="graph" [ngClass]="{'hide':isTableView}">
+            <div class="graph-container" [ngStyle]="{'height': widgetInfo.height >= computedSizeHeight ? '100%' :'calc(100% + ' + computedSizeHeight + 'px)'}">
+                <canvas #mainChart baseChart [datasets]="pieChartData" [labels]="lablels" [options]="pieChartOptions"
+                    [plugins]="plugins">
+                </canvas>
+            </div>
+            <div class="graph-container invisible" [ngStyle]="{'height': widgetInfo.height >= computedSizeHeight ? '100%' :'calc(100% + ' + computedSizeHeight + 'px + ' + legendHeight + 'px)', 'display': imageCanvasDisplay}">
+                <canvas #imageChart baseChart [datasets]="pieChartData" [labels]="lablels" [options]="pieChartImmageOptions ? pieChartImmageOptions : pieChartOptions"
+                            [plugins]="plugins">
+                </canvas>
+            </div>
+        </div>
+        <ng-container *ngIf="!isTableView && widgetInfo.chartProperties?.isEnableLegend && widgetInfo.chartProperties?.legendPosition === LegendPosition.right">
+            <ng-container *ngTemplateOutlet="legendRowRef"></ng-container>
+        </ng-container>
+        <pros-table-view [displayedColumnsId]="displayedColumnsId" [tableDataSource]="tableDataSource"
+            [ngClass]="{'hide':!isTableView}">
+        </pros-table-view>
+    </mat-card-content>
+    <ng-container *ngIf="!isTableView && widgetInfo.chartProperties?.isEnableLegend && widgetInfo.chartProperties?.legendPosition === LegendPosition.bottom">
+        <div class="row-spacer"></div>
+        <ng-container *ngTemplateOutlet="legendColRef"></ng-container>
+    </ng-container>
+</mat-card>
+
+<ng-template #legendColRef>
+    <div class="f-row" #legendElRef>
+        <ul class="pie-legend">
+            <ng-container *ngFor="let item of legendList">
+                <li *ngIf="item.show" (click)="legendClick(item)">
+                    <span [ngStyle]="{'background-color': item.backgroundColor }"></span>
+                    {{ item.lablel }}
+                </li>
+            </ng-container>
+
+            <li class="cut-list-drop" *ngIf="showLegendFilter">
+                <lib-button type="plain" [matMenuTriggerFor]="legendMenu">
+                    Show more
+                </lib-button>
+            </li>
+        </ul>
+    </div>
+</ng-template>
+<ng-template #legendRowRef>
+    <div class="f-col" style="width: 50%; overflow: hidden;">
+        <ng-container *ngFor="let item of legendList">
+            <lib-button type="plain" *ngIf="item.show" (click)="legendClick(item)">
+                <span [ngStyle]="{'background-color': item.backgroundColor }"
+                    style="display: inline-block;width: 40px;height: 14px;margin-right: 4px;margin-bottom: -2px;"></span>
+                {{ item.lablel }}
+            </lib-button>
+        </ng-container>
+        <lib-button type="plain" *ngIf="showLegendFilter" [matMenuTriggerFor]="legendMenu">
+            Show more
+        </lib-button>
+    </div>
+</ng-template>
+<mat-menu #legendMenu="matMenu">
+    <ng-container *ngFor="let item of legendList">
+        <lib-filter-option *ngIf="!item.show" (click)="legendClick(item)">
+            <span style="display: inline-block;width: 40px;height: 14px;margin-right: 4px;margin-bottom: -2px;"
+                [ngStyle]="{'background-color': item.backgroundColor }"></span>{{ item.lablel }}
+        </lib-filter-option>
+    </ng-container>
+</mat-menu>

@@ -1,0 +1,62 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" icon="times" iconfonttype="light" (click)="close()"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+          <div class="f-row breadcrum-head">
+            <lib-text-line type="leading">Add DAXE</lib-text-line>
+            <div class="f-spacer"></div>
+            <lib-button type="major">Save</lib-button>
+          </div>
+        </div>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing">
+
+        <lib-segment
+            [optionsList]="segmentOptions"
+            labelKey="label"
+            valueKey="value"
+            [multiple]="false"
+            [vertical]="false"
+            selected="newDaxe"
+            (valueChange)="segmentChanged($event)"
+        ></lib-segment>
+
+        <div class="f-spacer"></div>
+
+        <div class="f-col mdo-field col-x10">
+
+            <form>
+                <div *ngIf="showSelectedForm == 'new'; else existing">
+                    <lib-input label="Property"></lib-input>
+                    <lib-input label="Property"></lib-input>
+                    <lib-input label="Property"></lib-input>
+                    <lib-input label="Property"></lib-input>
+                </div>
+    
+                <ng-template #existing>
+                    <div class="f-col mdo-field">
+
+                        <mat-label class="mdo-field-label">DAXE</mat-label>
+                        
+                        <div class="mdo-field-input">
+                                {{Selected}}
+                                <input matInput placeholder="Select daxe"
+                                #optionsInput/>
+                            
+                            <!-- <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" (optionSelected)="selectSingle($event)">
+                                <mat-option class="mdo-option" *ngFor="let opt of filteredOptions | async" [value]="opt">
+                                {{opt}}
+                                </mat-option>
+                            </mat-autocomplete> -->
+                        </div>
+                    </div>
+                </ng-template>
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

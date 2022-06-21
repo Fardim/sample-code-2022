@@ -1,0 +1,244 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button (click)="close()" icon="times" type="plain" iconFontType="light"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@new_condition">
+        {{structureDetails?.type === 'new' ? 'New condition' : (newConditionFormGroup && newConditionFormGroup.get('name').value ? (newConditionFormGroup.get('name').value) : 'condition') }}
+        </lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-button type="major" (click)="onSave()" width="80px">Save</lib-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidesheetcontent-listing">
+    <div class="mdo-justify">
+      <lib-banner *ngIf="validationError.status" status="error" [text]="validationError.message"></lib-banner>
+      <form [formGroup]="newConditionFormGroup" class="user-defined-set">
+        <div class="f-col mdo-field">
+          <lib-input matInput placeholder="Type Condition name" [isRequired]="true" formControlName="name" i18n-label="@@rule_name" label="Name"
+            [hasError]="submitted && newConditionFormGroup.controls.name.errors && newConditionFormGroup.controls.name.errors.required"
+            [hint]="(submitted && newConditionFormGroup.controls.name.dirty && newConditionFormGroup.controls.name.errors && newConditionFormGroup.controls.name.errors.required) ? 'This is required Field' : ''">
+          </lib-input>
+        </div>
+
+        <div class="f-col">
+          <lib-text-line weight="strong" type="xsmall" class="field-label">Source fields</lib-text-line>
+        </div>
+
+        <div formArrayName="source">
+          <div *ngFor="let item of source.controls; let i = index; let last = last;">
+            <ng-container [formGroupName]="i">
+              <div class="f-row defined-row">
+                <div class="col col-x8">
+                  <div class="f-col mdo-field">
+                    <div class="mdo-field-input">
+                      <input matInput #keyFieldInputEl #srcFldAutoTrigger="matAutocompleteTrigger" [matAutocomplete]="srcFldAuto"
+                        formControlName="fieldCtrl" (keyup)="keyFieldSearchSub.next({s: keyFieldInputEl.value, type:'source', index: i})"
+                        (click)="initKeyFieldList('source',i)" autocomplete="off" />
+                      <mat-autocomplete class="mdo-autocomplete" #srcFldAuto="matAutocomplete" [displayWith]="displayFieldFn.bind(this)"
+                        (optionSelected)="sourceFieldIdSelected($event,i)">
+                        <!-- <ng-template [ngIf]="!isDropdownInitializing"> -->
+                          <mat-option *ngFor="let field of keyFieldsListObs | async" [value]="field">
+                            {{field?.shortText[locale]?.description}}
+                          </mat-option>
+                        <!-- </ng-template> -->
+                      </mat-autocomplete>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col col-x8">
+                  <div class="f-col mdo-field ">
+                    <div class="mdo-field-input">
+                      <input matInput #keyFieldValueInputEl #fldValueAutoTrigger="matAutocompleteTrigger" [matAutocomplete]="fldValue"
+                        formControlName="valueCtrl"
+                        (keyup)="fieldDropvalueSearchSub.next({s: keyFieldValueInputEl.value, type:'source', index: i})"
+                        (click)="initDropValueList('source',i)" />
+                      <mat-autocomplete class="mdo-autocomplete" #fldValue="matAutocomplete" [displayWith]="displayDropvalueFn"
+                        (optionSelected)="sourceFieldValueSelected($event,i)">
+                        <!-- <ng-template [ngIf]="!isDropdownInitializing"> -->
+                          <ng-template [ngIf]="(fieldDropValuesSub | async)?.length !== 0 && !valueFieldLoading" [ngIfElse]="noKeyFieldsValue">
+                            <mat-option *ngFor="let dropValue of fieldDropValuesSub | async" [value]="dropValue">
+                              {{ dropValue.text }}
+                            </mat-option>
+                          </ng-template>
+                          <ng-template #noKeyFieldsValue>
+                            <mat-option disabled>{{valueFieldLoading? 'Loading...': 'No data found'}}</mat-option>
+                          </ng-template>
+                        <!-- </ng-template> -->
+                      </mat-autocomplete>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col col-x2 end-items">
+                  <div class="f-row end-items">
+                    <lib-button type="plain" *ngIf="last"
+                      [disabled]="keyFieldList.length>0 && source.controls.length >= keyFieldList.length" iconFontType="light" icon="plus"
+                      (afterClick)="addSourceField()"></lib-button>
+                    <lib-button type="plain" icon="trash-alt" iconFontType="light" (afterClick)="removeSourceField(i)"></lib-button>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+        <div class="f-col">
+          <lib-text-line weight="strong" type="xsmall" class="field-label">Target fields</lib-text-line>
+        </div>
+
+        <div formArrayName="target">
+          <div *ngFor="let item of target.controls; let i = index; let last = last;">
+            <ng-container [formGroupName]="i">
+              <div class="f-row defined-row">
+                <div class="col col-x8">
+                  <div class="f-col mdo-field">
+                    <div class="mdo-field-input">
+                      <input matInput #targetFieldInputEl #targetFldAutoTrigger="matAutocompleteTrigger" [matAutocomplete]="targetFldAuto"
+                        formControlName="fieldCtrl" (keyup)="keyFieldSearchSub.next({s: targetFieldInputEl.value, type:'target', index: i})"
+                        (click)="initKeyFieldList('target',i)" autocomplete="off" />
+                      <mat-autocomplete class="mdo-autocomplete" #targetFldAuto="matAutocomplete" [displayWith]="displayFieldFn.bind(this)"
+                        (optionSelected)="targetKeyFieldSelected($event,i)">
+                        <!-- <ng-template [ngIf]="!isDropdownInitializing"> -->
+                          <mat-option *ngFor="let field of keyFieldsListObs | async" [value]="field">
+                            {{field?.shortText[locale]?.description}}
+                          </mat-option>
+                        <!-- </ng-template> -->
+                      </mat-autocomplete>
+                    </div>
+                  </div>
+                </div>
+                <div class="col col-x8">
+                  <div class="f-col mdo-field ">
+                    <div class="mdo-field-input">
+                      <input matInput #targetFieldValueInputEl #targetValueAutoTrigger="matAutocompleteTrigger"
+                        [matAutocomplete]="targetValue" formControlName="valueCtrl"
+                        (keyup)="fieldDropvalueSearchSub.next({s: targetFieldValueInputEl.value, type:'target', index: i})"
+                        (click)="initDropValueList('target',i)" />
+                      <mat-autocomplete class="mdo-autocomplete" #targetValue="matAutocomplete" [displayWith]="displayDropvalueFn"
+                        (optionSelected)="targetKeyFieldValueSelected($event,i)">
+                        <!-- <ng-template [ngIf]="!isDropdownInitializing"> -->
+                          <ng-template [ngIf]="(fieldDropValuesSub | async)?.length !== 0 && !valueFieldLoading" [ngIfElse]="noSortOption">
+                            <mat-option *ngFor="let dropValue of fieldDropValuesSub | async" [value]="dropValue">
+                              {{ dropValue.text }}
+                            </mat-option>
+                          </ng-template>
+                          <ng-template #noSortOption>
+                            <mat-option disabled>{{valueFieldLoading? 'loading...': 'No data found'}}</mat-option>
+                          </ng-template>
+                        <!-- </ng-template> -->
+                      </mat-autocomplete>
+                    </div>
+                  </div>
+                </div>
+                <div class="col col-x2 end-items">
+                  <div class="f-row end-items">
+                    <lib-button type="plain" *ngIf="last"
+                      [disabled]="keyFieldList.length>0 && target.controls.length >= keyFieldList.length" iconFontType="light" icon="plus"
+                      (afterClick)="addTargetField()"></lib-button>
+                    <lib-button type="plain" icon="trash-alt" iconFontType="light" (afterClick)="removeTargetField(i)"></lib-button>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+        <div class="f-col mdo-field">
+          <lib-text-line weight="strong" type="xsmall" class="field-label">Trigger condition</lib-text-line>
+          <div class="mdo-field-input">
+            <input matInput [matAutocomplete]="triggerCon" formControlName="triggerConId"/>
+            <mat-icon fontSet="mdo-icons-light" class="autocomplete-icon">chevron-down</mat-icon>
+            <mat-autocomplete class="mdo-autocomplete" #triggerCon="matAutocomplete" [displayWith]="displayLookupRule">
+              <mat-option *ngFor="let rule of udrRulesObs | async" [value]="rule">
+                {{ rule.brInfo }}
+              </mat-option>
+            </mat-autocomplete>
+          </div>
+        </div>
+
+      </form>
+
+      <div class="f-col">
+        <lib-text-line weight="strong" type="xsmall" class="field-label">Mapping</lib-text-line>
+      </div>
+
+      <div class="f-row">
+        <lib-chip-list class="mdo-chip-list">
+          <lib-search prosClickStopPropagation class="lib-search" (valueChange)="searchSub.next($event)" i18n-placeholder="@@search"
+            placeholder="Search">
+          </lib-search>
+          <div class="f-col-spacer-half"></div>
+          <lib-chip (click)="mappedFields()" [selectable]="true" [selected]="isMappedFieldsSelected">Mapped fields</lib-chip>
+        </lib-chip-list>
+      </div>
+
+      <div class="f-row-spacer-half"></div>
+
+      <div class="f-row listing-container">
+        <div class="f-col listset-navigation">
+          <mat-accordion>
+            <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" [expanded]="true">
+              <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+                <mat-panel-title class="f-row">
+                  <lib-text-line type="base" enableWrap="true">{{structureDetails.structureDesc || 'structure'}}</lib-text-line>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+            </mat-expansion-panel>
+          </mat-accordion>
+          <div class="hierarchy-list" prosInfiniteScroll bufferPercentage="10" (scrollEnd)="onScroll()">
+            <mat-accordion multi="true">
+              <pros-hierarchy-field-list [structureDetails]="structureDetails" [structureFieldList]="selectedStructureFieldsObs | async">
+              </pros-hierarchy-field-list>
+            </mat-accordion>
+          </div>
+        </div>
+        <div class="f-col mapping-form-container">
+          <div class="row-spacer"></div>
+          <form [formGroup]="mappingFormGroup" class="user-defined-set" *ngIf="mappingFormGroup">
+            <div class="f-col mdo-field"  [class.has-error]="submitted && autoExtensionRuleForm.controls.mappingType.invalid">
+              <lib-text-line weight="strong" type="xsmall" class="field-label">Field mapping rule<span class="mandatory">*</span></lib-text-line>
+              <div class="mdo-field-input">
+                <input matInput [matAutocomplete]="fieldMapping" formControlName="mappingType"/>
+                <mat-icon fontSet="mdo-icons-light" class="autocomplete-icon">chevron-down</mat-icon>
+                <mat-autocomplete class="mdo-autocomplete" #fieldMapping="matAutocomplete" [displayWith]="displayFieldMappingRule"
+                  (optionSelected)="selectedFieldMappingRule($event)">
+                  <mat-option *ngFor="let rule of fieldMappingRules" [value]="rule">
+                    {{ rule.ruleLabel }}
+                  </mat-option>
+                </mat-autocomplete>
+              </div>
+            </div>
+            <div class="f-col mdo-field">
+              <ng-container [ngSwitch]="mappingFormGroup.get('mappingType').value?.ruleValue">
+
+                <lib-input *ngSwitchCase="fieldMappingRulesEnum.STATIC_VALUE" matInput placeholder="Field Value"
+                [formControl]="mappingFormGroup.controls['value']"
+                  (afterBlur)="applyMappingValue()" i18n-label="@@static_value" label="Static Value">
+                </lib-input>
+
+                <div class="f-col mdo-field" *ngSwitchCase="fieldMappingRulesEnum.LOOKUP">
+                  <lib-text-line weight="strong" type="xsmall" class="field-label">Lookup rule</lib-text-line>
+                  <div class="mdo-field-input">
+                    <input matInput [matAutocomplete]="lookupRule" formControlName="lookupRule"/>
+                    <mat-icon fontSet="mdo-icons-light" class="autocomplete-icon">chevron-down</mat-icon>
+                    <mat-autocomplete class="mdo-autocomplete" #lookupRule="matAutocomplete" [displayWith]="displayLookupRule"
+                      (optionSelected)="lookupRuleSelected($event)">
+                      <mat-option *ngFor="let rule of businessRulesObs | async" [value]="rule">
+                        {{ rule.brInfo }}
+                      </mat-option>
+                    </mat-autocomplete>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

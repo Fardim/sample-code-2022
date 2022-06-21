@@ -1,0 +1,230 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  overflow-x: auto;
+  width: 900px;
+
+  &.cross-dataset-rule {
+    width: 1100px;
+  }
+
+  .breadcrum-toolbar {
+    padding: 8px 12px;
+
+    .mdo-constrained-right {
+      align-items: center;
+      width: 100%;
+      margin-right: 0;
+
+      .breadcrum-head {
+        width: 100%;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px);
+    overflow: auto;
+    overflow-x: hidden;
+
+    .mdo-justify {
+      margin: 0 16px;
+
+      .field-label {
+        margin-bottom: 6px;
+      }
+
+      .slider-row {
+        flex: 1;
+
+        .lib-slider {
+          height: 48px;
+          width: 100%;
+        }
+
+        .percentage {
+          width: 36px;
+        }
+      }
+
+      mat-icon.mat-icon {
+        width: 12px;
+        font-size: 12px;
+        margin-left: 2px;
+      }
+
+      .mat-error {
+        line-height: 16px;
+      }
+
+      .mat-head-icon {
+        font-size: 12px;
+        height: 14px;
+        width: 12px;
+        margin-left: 3px;
+      }
+
+      .user-defined-set {
+        position: relative;
+        padding: 0 0 0 8px;
+        overflow: auto;
+
+        &::before {
+          display: block;
+          content: "";
+          height: 100%;
+          width: 1px;
+          position: absolute;
+          top: 0;
+          left: 16px;
+        }
+
+        .defined-row {
+          border-width: 1px;
+          border-style: solid;
+          align-items: center;
+          height: 54px;
+          margin: 0 0 16px 0;
+          border-radius: 3px;
+
+          div.col {
+            display: block;
+            flex: 1;
+            min-width: 0;
+            position: relative;
+            padding: 0 8px;
+
+            &:first-of-type,
+            &:last-of-type {
+              min-width: auto;
+              flex: 0 0 auto;
+              padding: 0;
+            }
+
+            &.select-col {
+              width: 16px;
+              height: 54px;
+              align-items: center;
+              display: flex;
+              z-index: 1;
+              justify-content: center;
+              text-align: center;
+            }
+          }
+        }
+
+        .button-add-block {
+          margin-left: -8px;
+        }
+      }
+
+      pros-udr-value-control {
+        display: flex;
+        flex: 1;
+      }
+
+      .field-chip-list {
+        flex-wrap: wrap;
+
+        .lib-chip {
+          display: flex;
+          flex-direction: row;
+          width: auto;
+          padding: 2px;
+        }
+
+        .mat-input {
+          width: auto;
+          flex: 1;
+        }
+      }
+
+      .view-table {
+        height: 380px;
+        border-width: 1px;
+        border-style: solid;
+        padding: 8px;
+        margin-bottom: 8px;
+
+        .condition-table {
+          height: calc(100% - 36px);
+          overflow: auto;
+
+          table.mat-table {
+            width: 100%;
+            overflow: auto;
+
+            td.mat-cell {
+              border-right: none;
+              min-width: 100px;
+            }
+          }
+        }
+      }
+
+      .condition-button {
+        justify-content: center;
+      }
+    }
+  }
+}
+
+.skeleton-loading {
+  width: 100%;
+  margin-right: 50px;
+
+  > div {
+    flex-grow: 1;
+  }
+}
+
+.colunm-box {
+  box-sizing: border-box;
+  min-height: 48px;
+
+  .col {
+    display: flex;
+    flex: 1 0 auto;
+    width: 1px;
+    align-items: center;
+    flex-wrap: wrap;
+
+    &.col-x4 {
+      flex: 4;
+    }
+
+    &.mat-item-center {
+      justify-content: center;
+    }
+
+    &.mat-item-end {
+      justify-content: flex-end;
+    }
+
+    .cursor {
+      cursor: pointer;
+    }
+  }
+}
+
+.add-block {
+  text-align: center;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 62px;
+      }
+    }
+  }
+}

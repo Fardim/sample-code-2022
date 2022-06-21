@@ -1,0 +1,12 @@
+<div class="f-row attachment-section">
+  <pros-file-item *ngFor="let attachment of attachments;let index=index"
+    class="file-item"
+    [name]="attachment?.block?.fileName"
+    [serial]="attachment?.block?.sno"
+    [removable]="removable"
+    [hasError]="attachment?.status === 'error'"
+    [downloadable]="downloadable"
+    [showProgressBar]="attachment?.status === 'uploading'"
+    (removed)="removeAttachment(index)">
+  </pros-file-item>
+</div>

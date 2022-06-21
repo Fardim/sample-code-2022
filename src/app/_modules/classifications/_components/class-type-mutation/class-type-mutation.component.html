@@ -1,0 +1,123 @@
+<div class="f-row breadcrum-toolbar">
+    <lib-button *ngIf="closable" type="plain" icon="times" iconFontType="light" (click)="closeDialog()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+        <div class="f-row breadcrum-head">
+            <lib-text-line type="leading" i18n="@@new_class_type">{{ classTypeDetails?.classType ? 'Edit class type' : 'New class type' }}</lib-text-line>
+            <div class="f-spacer"></div>
+            <lib-button width="80px" type="major" i18n="@@submit" (click)="save()">Submit</lib-button>
+        </div>
+    </div>
+</div>
+
+<div class="f-col sidesheetcontent-listing">
+  <div #messageContainer class="f-col mdo-justify">
+    <lib-banner *ngIf="submitError.status" status="error" [text]="submitError.message"></lib-banner>
+  </div>
+    <form [formGroup]="classTypeForm">
+        <div class="f-col mdo-justify">
+            <div class="f-row-spacer-half"></div>
+            <div class="f-col">
+                <lib-input label="Class type" type="text" [isRequired]="true" formControlName="classType" i18n="@@class_type"
+                    placeholder="Unique identifier for class type" [disabled]="classTypeId"
+                    class="input-upper-case" inputPreventKey [keyList]="['Space']"
+                    [hint]="(classTypeForm.controls.classType.touched && classTypeForm.controls.classType.errors && classTypeForm.controls.classType.errors.required) ? 'This is a required field' : ''"
+                    [hasError]="classTypeForm.controls.classType.touched &&classTypeForm.controls.classType.errors && classTypeForm.controls.classType.errors.required">
+                </lib-input>
+            </div>
+            <div class="f-col">
+                <lib-input label="Name" type="text" [isRequired]="true" formControlName="className" i18n="@@name"
+                    placeholder="Name of the class type"
+                    [hint]="(classTypeForm.controls.className.touched && classTypeForm.controls.className.errors && classTypeForm.controls.className.errors.required) ? 'This is a required field' : ''"
+                    [hasError]="classTypeForm.controls.className.touched && classTypeForm.controls.className.errors && classTypeForm.controls.className.errors.required">
+                </lib-input>
+            </div>
+
+            <div class="f-col mdo-field">
+                <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@description">Description</lib-text-line>
+                <div class="f-col">
+                    <pros-rich-text-editor [tabFieldId]="editorId" [control]="control" placeholder="Description and usage of class type"
+                        (valueChange)="editorValueChange($event)">
+                    </pros-rich-text-editor>
+                </div>
+            </div>
+
+            <div class="f-col mdo-field">
+                <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@related_datasets">Related
+                    datasets <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                        libTooltip="Allows users to assign the class type to datasets and maintain data for them.">
+                        question-circle</mat-icon>
+                </lib-text-line>
+                <div class="mdo-field-input">
+                    <lib-chip-list >
+                        <ng-container *ngFor="let opt of classTypeForm.get('relatedDatasets').value; let i=index">
+                            <ng-container *ngIf="i<=limit-1">
+                                <lib-chip [removable]="!classTypeDetails?.enableSync" (removed)="removeRelatedDatasetsValues(opt)">
+                                    {{opt?.moduleDesc}}</lib-chip>
+                            </ng-container>
+                        </ng-container>
+                        <lib-chip *ngIf="hasLimit()">+{{classTypeForm.get('relatedDatasets').value.length - limit}}
+                        </lib-chip>
+                        <input *ngIf="!classTypeDetails?.enableSync" matInput placeholder="Type to search" #relatedDatasetsValuesInput
+                            [formControl]="optionCtrl" [matAutocomplete]="auto" />
+                    </lib-chip-list>
+
+                    <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete"
+                        (optionSelected)="selectedRelatedDatasetsValues($event)">
+                        <mat-option class="mdo-option" *ngFor="let opt of filteredOptions | async" [value]="opt">
+                          <lib-checkbox [checked]="isItemChecked(opt)" [label]="opt.moduleDesc">
+                          </lib-checkbox>
+                        </mat-option>
+                    </mat-autocomplete>
+                </div>
+            </div>
+
+            <div class="f-row mdo-field">
+                <lib-slide-toggle class="toggle-col"  theme="primary" formControlName="nountype"></lib-slide-toggle>
+                <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@description_generation">Enable
+                    for description generation <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                        libTooltip="Enabling this indicator will allow the users to maintain short and long descriptions for the dataset records following the defined taxonomy and classification rules.">
+                        question-circle</mat-icon>
+                </lib-text-line>
+            </div>
+
+            <div class="f-row mdo-field">
+                <lib-slide-toggle class="toggle-col"  theme="primary" formControlName="allowMultipleclass" i18n="@@allow_multiple_class">
+                </lib-slide-toggle>
+                <lib-text-line type="xsmall" weight="strong" class="field-label"
+                    i18n="@@allow_multiple_classifications">Allows
+                    multiple classifications <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                        libTooltip=" Enabling this indicator will allow maintaining dataset records by assigning multiple classes associated to the referenced class type.">
+                        question-circle</mat-icon>
+                </lib-text-line>
+                
+            </div>
+
+            <div class="f-row mdo-field">
+                <lib-slide-toggle class="toggle-col"  theme="primary" formControlName="enableSync"></lib-slide-toggle>
+                <lib-text-line type="xsmall" weight="strong" class="field-label"
+                i18n="@@enable_sync">Enable sync <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                libTooltip="Enabling this indicator allows the user to enable the class and characteristics maintenance for syncing from a configured target system.">
+                        question-circle</mat-icon>
+                </lib-text-line>
+            </div>
+
+            <div class="f-col mdo-field" *ngIf="classTypeForm.get('enableSync').value">
+              <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@systems">Systems
+                <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows user to select the system from which Class type needs to be synced.">question-circle</mat-icon>
+              </lib-text-line>
+              <mat-form-field class="field-divider" appearance="outline">
+                  <mat-select placeholder="select system" formControlName="system" required>
+                      <mat-option [value]="item.connectionId" *ngFor="let item of cpiConnections"> {{item.connectionName}} </mat-option>
+                  </mat-select>
+              </mat-form-field>
+              <mat-error
+                  *ngIf="classTypeForm.controls?.system.invalid && classTypeForm.controls?.system.touched && classTypeForm.controls.system.errors?.required"
+                  i18n="@@this_is_a_required_field"
+                  >
+                  This is a required field
+              </mat-error>
+            </div>
+        </div>
+    </form>
+</div>

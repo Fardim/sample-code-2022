@@ -1,0 +1,167 @@
+<!-- IN RUNNING -->
+<ng-template [ngIf]="state === 'inRunning'">
+  <mat-card class="mat-elevation-z0 root highlight processing">
+    <mat-toolbar class="header">
+      <mat-toolbar-row>
+        <h3 class="mat-h3" [matTooltip]="title">{{ title }}</h3>
+      </mat-toolbar-row>
+    </mat-toolbar>
+    <mat-card-content class="f-col run-data">
+      <mat-spinner diameter="50"></mat-spinner>
+      <strong>Processing run…</strong>
+      <span class="row-spacer"></span>
+      <!-- <div class="f-row bottom-actions">
+        <button mat-button prosClickStopPropagation matTooltip="">Cancel</button>
+      </div> -->
+      
+    </mat-card-content>
+  </mat-card>
+  
+</ng-template>
+
+<!-- RUN ALL SCHEDULE SCHEM -->
+<ng-template [ngIf]="state === 'readyForRun'">
+  <mat-card class="mat-elevation-z0 root highlight">
+    <mat-toolbar class="header">
+      <mat-toolbar-row>
+        <h3 class="mat-h3" [matTooltip]="title">{{ title }}</h3>
+      </mat-toolbar-row>
+    </mat-toolbar>
+    <mat-card-content class="f-col run-data">
+      <div class="f-row">
+        <div class="f-col record-text">
+          <p>The schema will be executed on {{ totalCount | thousandconvertor }} records</p>
+        </div>
+  
+        <div class="f-col right-record">
+          <mat-icon class="check-icon">check_circle</mat-icon>
+          <span class="records">{{ totalCount | thousandconvertor }}</span>
+        </div>
+      </div>
+      <span class="row-spacer"></span>
+      <div class="f-row bottom-actions">
+        <button mat-button prosClickStopPropagation (click)="state = 'cool'">Cancel</button>
+        <button mat-button prosClickStopPropagation>Scheduling</button>
+        <button mat-flat-button color="primary" prosClickStopPropagation (click)="scheduleSchema()">Run now</button>
+      </div>
+      
+    </mat-card-content>
+  </mat-card>
+</ng-template>
+
+<!-- COOL -->
+<ng-template [ngIf]="state === 'cool'">
+  <mat-card class="mat-elevation-z0 root">
+    <mat-toolbar class="header">
+      <mat-toolbar-row>
+        <h3 class="mat-h3" [matTooltip]="title">{{ title }}</h3>
+        <span class="f-spacer"></span>
+        <button mat-icon-button [matMenuTriggerFor]="menu" prosClickStopPropagation><mat-icon>more_vert</mat-icon></button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item *ngIf="edit" prosClickStopPropagation (click)="onEdit();">Edit</button>
+          <button mat-menu-item *ngIf="delete" prosClickStopPropagation (click)="onDelete();">Delete</button>
+          <button mat-menu-item *ngIf="info" prosClickStopPropagation matTooltip="Coming Soon..." (click)="onInfo();">Info</button>
+        </mat-menu>
+      </mat-toolbar-row>
+    </mat-toolbar>
+    <mat-card-content class="f-row tile-data">
+      <div class="f-col"> 
+        <span class="display-per error" [class.error] ="thresholdRes && thresholdRes.thresHoldStatus ==='DANGER'" [class.success] ="thresholdRes && thresholdRes.thresHoldStatus ==='GOOD'" >{{ thresholdRes.threshold ? thresholdRes.threshold : 0 }}%</span>
+        <span class="mat-caption row1text">Last Run: {{ timestamp }}</span>
+        <div class="f-row">
+          <button mat-flat-button color="primary" class="Runbtn" prosClickStopPropagation (click)="scheduleSchemaGetCnt()">{{ runAllLebal }}</button>
+          <span class="f-col-spacer-half"></span>
+          <button mat-icon-button><mat-icon class="alert-icon" prosClickStopPropagation>error</mat-icon></button>
+        </div>
+        <span class="f-row-spacer-half"></span> 
+        <button mat-button color="primary" *ngIf="isVariant" prosClickStopPropagation (click)="onBottomLeft();">Run variants</button>
+      </div>
+      
+      <div class="f-col links-col">
+        <a  class="total">Total: {{ showUnique ? totalUniqueValue : totalValue }}</a>
+        <a  class="error">Error: {{ showUnique ? errorUniqueValue : errorValue }}</a>
+        <a  class="success">Success: {{ showUnique ? successUniqueValue : successValue }}</a>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</ng-template>
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <mat-card-content class="f-col">
+    <div class="f-row">
+      <ng-template [ngIf]="totalValue && showingErrors">
+        <h2 class="perc err">{{ percentageErrorStr() }}</h2>
+        <h2 class="perc-symbol err">%</h2>
+        <span class="f-col-spacer-half"></span>
+        <span class="mat-caption row1text">Error in last run</span>
+      </ng-template>
+      <ng-template [ngIf]="totalValue && !showingErrors">
+        <h2 class="perc scs">{{ percentageSuccessStr() }}</h2>
+        <h2 class="perc-symbol scs">%</h2>
+        <span class="f-col-spacer-half"></span>
+        <span class="mat-caption row1text">Success in last run</span>
+      </ng-template>
+      <ng-template [ngIf]="!totalValue">
+        <mat-icon class="na">report</mat-icon>
+        <span class="f-col-spacer-half"></span>
+        <span class="mat-caption row1text">no results to show</span>
+      </ng-template>
+      <span class="f-spacer"></span>
+      <button *ngIf="totalValue" mat-icon-button prosClickStopPropagation matTooltip="Toggle Error/Success" (click)="toggle();"><mat-icon>shuffle</mat-icon></button>
+    </div>
+    <div class="row-spacer"></div>
+    <div class="f-row">
+      <ng-template [ngIf]="showingErrors">
+        <mat-icon *ngIf="!errorTrendValue || errorTrendValue === 0" class="err">trending_flat</mat-icon>
+        <mat-icon *ngIf="errorTrendValue && errorTrendValue > 0" class="err">trending_up</mat-icon>
+        <mat-icon *ngIf="errorTrendValue && errorTrendValue < 0" class="err">trending_down</mat-icon>
+      </ng-template>
+      <ng-template [ngIf]="!showingErrors">
+        <mat-icon *ngIf="!successTrendValue || successTrendValue === 0" class="scs">trending_flat</mat-icon>
+        <mat-icon *ngIf="successTrendValue && successTrendValue > 0" class="scs">trending_up</mat-icon>
+        <mat-icon *ngIf="successTrendValue && successTrendValue < 0" class="scs">trending_down</mat-icon>
+      </ng-template>
+      <div class="f-col-spacer-half"></div>
+      <ng-template [ngIf]="showingErrors">
+        <h2>{{ errorTrendValue ? errorTrendValue > 0 ? '+' + errorTrendValue : errorTrendValue : 0 }}</h2>
+      </ng-template>
+      <ng-template [ngIf]="!showingErrors">
+        <h2>{{ successTrendValue ? successTrendValue > 0 ? '+' + successTrendValue : successTrendValue : 0 }}</h2>
+      </ng-template>
+      <div class="f-col-spacer-half"></div>
+      <span class="mat-caption week">(This Week)</span>
+      <span class="f-spacer"></span>
+      <mat-slide-toggle *ngIf="totalUniqueValue" color="primary" prosClickStopPropagation matTooltip="Show unique record counts" (change)="toggleUnique($event);"></mat-slide-toggle>
+    </div>
+    <div class="row-spacer"></div>
+    <mat-chip-list class="f-row">
+      <mat-chip class="total">Total - {{ showUnique ? totalUniqueValue : totalValue }}</mat-chip>
+      <mat-chip class="error">Error - {{ showUnique ? errorUniqueValue : errorValue }}</mat-chip>
+      <mat-chip class="success">Success - {{ showUnique ? successUniqueValue : successValue }}</mat-chip>
+      <mat-chip *ngIf="skippedValue" class="skipped">Skipped - {{ showUnique ? skippedUniqueValue : skippedValue }}</mat-chip>
+      <mat-chip *ngIf="duplicateValue" class="duplicate">Duplicate - {{ duplicateValue }}</mat-chip>
+      <mat-chip *ngIf="correctionValue" class="correction">Correction - {{ correctionValue }}</mat-chip>
+    </mat-chip-list>
+    <div class="row-spacer"></div>
+    <div *ngIf="timestamp" class="mat-caption timestamp">
+      Last run at: {{ timestamp }}
+    </div>
+  </mat-card-content>
+  <ng-template [ngIf]="bottomLeftLabel || bottomRightLabel">
+    <mat-divider class="btm-divider"></mat-divider>
+    <mat-card-footer>
+      <button *ngIf="bottomLeftLabel" prosClickStopPropagation mat-button color="primary" (click)="onBottomLeft();">{{ bottomLeftLabel }}</button>
+      <span class="f-spacer"></span>
+      <button *ngIf="bottomRightLabel" prosClickStopPropagation mat-button color="primary" (click)="onBottomRight();">{{ bottomRightLabel }}</button>
+    </mat-card-footer>
+  </ng-template> -->

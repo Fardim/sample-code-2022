@@ -1,0 +1,20 @@
+<div class="modal-wrapper root">
+    <div class="f-row modal-header">
+        <lib-text-line type="leading" [enableWrap]="true">Reject task</lib-text-line>
+        <lib-button icon="times" iconFontType="light" (click)="close(false)"></lib-button>
+    </div>
+    <div class="modal-body">
+        <lib-banner *ngIf="errorMsg" status="error" [text]="errorMsg"></lib-banner>
+
+        <lib-textarea label="Comments" type="text" placeholder="Add comment here..." [formControl]="comment"
+            [hint]="(comment.touched && comment.errors && comment.errors.requirde) ? 'This is a required field' : ''"
+            [hasError]="comment.touched && comment.errors && comment.errors.required">
+        </lib-textarea>
+    </div>
+    <div class="f-row modal-footer">
+        <lib-button (click)="close(false)">Cancel</lib-button>
+        <div class="f-spacer"></div>
+        <lib-button type="major" [disabled]='!comment|| comment.value.trim().length<1' (click)="rejectTask()">Submit
+        </lib-button>
+    </div>
+</div>

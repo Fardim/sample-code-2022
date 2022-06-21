@@ -1,0 +1,269 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@team_title">
+          Invite {{ isFromPartner ? 'partners' : 'people' }} to your team
+        </lib-text-line>
+        <div class="f-spacer"></div>
+        <div class="f-row">
+          <lib-text-line type="base" textColor="secondary">Inviting {{!enableMultipleAddress? infoMessage : multipleEmails?.length}} users</lib-text-line>
+          <span class="col-spacer"></span>
+          <lib-button width="80px" type="major" (afterClick)="invite()" i18n="@@invite"
+          [disabled]="canInvite">Invite</lib-button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row-spacer"></div>
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <lib-skeleton-overview *ngIf="showSkeleton"></lib-skeleton-overview>
+      <div class="f-col banner-alerts" [style.display]="!enableMultipleAddress && !showSkeleton ? 'block' : 'none'">
+        <form *ngIf="inviteForm" [formGroup]="inviteForm">
+          <div formArrayName="invitations" *ngFor="let child of invitationsFormArray.controls; let i = index">
+            <div class="f-row colunm-box" [formGroupName]="i" [ngStyle]="applyErrorsFilter && !child.invalid && {'display': 'none'}">
+              <div class="f-col mdo-field col-x10" [class.mdo-form-error]="invitationsFormArray.controls[i]?.controls?.email.invalid && invitationsFormArray.controls[i]?.controls?.email.touched">
+                <div class="mdo-field-input">
+                  <input matInput placeholder="Email address" formControlName="email" class="lib-input" (blur)="updateEmailList($event.target.value)"
+                    i18n-placeholder="@@email_address" />
+                </div>
+                <mat-error class="mdo-field-hint" *ngIf="invitationsFormArray.controls[i]?.controls?.email.invalid && invitationsFormArray.controls[i]?.controls?.email.touched">
+                <ng-container *ngIf="invitationsFormArray.controls[i]?.controls.email.errors?.required"
+                i18n="@@email_required">  Email address is required</ng-container>
+              <ng-container *ngIf="invitationsFormArray.controls[i]?.controls.email.errors?.pattern"
+                    i18n="@@email_invalid">
+                    Email address is not valid</ng-container>
+              <ng-container *ngIf="invitationsFormArray.controls[i]?.controls.email.errors?.inviteError">
+                    {{ invitationsFormArray.controls[i]?.controls.email.errors?.inviteError}}
+                  </ng-container>
+                  <ng-container *ngIf="invitationsFormArray.controls[i]?.controls.email.errors?.uniqenessError">
+                    This Email already exist
+                  </ng-container>
+                </mat-error>
+               
+              </div>
+
+              <div class="f-col-spacer-half"></div>
+
+              <div class="f-col mdo-field col-x10" [class.mdo-form-error]="invitationsFormArray.controls[i]?.controls?.roles.invalid && invitationsFormArray.controls[i]?.controls?.roles.touched">
+                <div class="mdo-field-input" matAutocompleteOrigin #origin="matAutocompleteOrigin">
+                  <lib-chip-list>
+                    <ng-container *ngFor="let role of getSelectedRoles(i); let roleIndex=index">
+                      <ng-container *ngIf="roleIndex<1">
+                        <lib-chip [removable]="true" (removed)="updateSingleInvitRoles(i, role)">{{ getRoleDesc(role) }}
+                        </lib-chip>
+                      </ng-container>
+                    </ng-container>
+                    <lib-chip *ngIf="getSelectedRoles(i).length > 1">
+                      +{{getSelectedRoles(i).length - 1}}
+                    </lib-chip>
+                    <input matInput [placeholder]="getSelectedRoles(i).length ? '' : 'Search for role...'" [formControl]="optionCtrl" [matAutocomplete]="auto"
+                      [matAutocompleteConnectedTo]="origin"  (blur)="OnRoleInputBlur(invitationsFormArray.controls[i]?.controls.roles)" />
+                  </lib-chip-list>
+                  <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete">
+                    <mat-option class="mdo-option" *ngFor="let role of filteredOptions | async" [value]="role.roleId">
+                      <lib-filter-option libClickStopPropagation>
+                        <lib-checkbox [label]="role.description" [checked]="getSelectedRoles(i).includes(role.roleId)"
+                          (valueChange)="updateSingleInvitRoles(i, role.roleId)"></lib-checkbox>
+                      </lib-filter-option>
+                    </mat-option>
+                    <mat-option class="mdo-option" *ngIf="!allRoles.length">
+                      <lib-filter-option libClickStopPropagation>
+                        No options available
+                      </lib-filter-option>
+                    </mat-option>
+                  </mat-autocomplete>
+                </div>
+                <mat-error class="mdo-field-hint">
+                  <ng-container
+                    *ngIf="invitationsFormArray.controls[i]?.controls.roles.invalid && invitationsFormArray.controls[i]?.controls?.roles.touched"
+                    i18n="@@roles_invalid">
+                               At least one role should be selected
+                  </ng-container>
+                </mat-error>
+               
+              </div>
+
+              <div class="f-col-spacer-half"></div>
+
+              <ng-template [ngIf]="isFromPartner">
+                <!-- Dataset -->
+                <div class="f-col mdo-field col-x8" [class.mdo-form-error]="child?.controls?.dataset.invalid && child?.controls?.dataset.touched">
+                  <div class="mdo-field-input" matAutocompleteOrigin #datasetOrigin="matAutocompleteOrigin">
+                      <input matInput #datasetInputEl #srcDatasetAutoTrigger="matAutocompleteTrigger"
+                          placeholder="Dataset"
+                          [matAutocompleteConnectedTo]="datasetOrigin"
+                          [matAutocomplete]="srcDatasetAuto" formControlName="dataset"
+                          (input)="datasetSearchSub.next(datasetInputEl.value)" />
+                      <mat-autocomplete class="mdo-autocomplete" #srcDatasetAuto="matAutocomplete"
+                          [displayWith]="displayDatasetFn"> <!-- (optionSelected)="getData('', i)" -->
+                          <mat-option *ngFor="let dataset of datasetListObs | async"
+                              [value]="{datasetId: dataset.moduleId, datasetDesc: dataset.moduleDesc}">
+                              {{ dataset.moduleDesc }}
+                          </mat-option>
+                      </mat-autocomplete>
+                  </div>
+                  <mat-error class="mdo-field-hint" >
+                    <ng-container *ngIf="child?.controls.dataset.errors?.required && child?.controls?.dataset.touched" >This is required</ng-container>
+                    <ng-container  *ngIf="child?.controls.dataset.errors?.datasetError && child?.controls?.dataset.touched">Select a valid option</ng-container>
+                  </mat-error>
+                  
+                </div>
+  
+                <div class="f-col-spacer-half"></div>
+                <!-- Record -->
+                <div class="f-col mdo-field col-x8" [class.mdo-form-error]="child?.controls?.recordId.invalid && child?.controls?.recordId.touched">
+                  <div class="mdo-field-input">
+                      <input matInput #recordInputEl [matAutocomplete]="recordIdAuto"
+                          placeholder="Search records"
+                          formControlName="recordId"
+                          (focus)="recordSearchSub.next({s: recordInputEl.value, index: i})"
+                          (input)="recordSearchSub.next({s: recordInputEl.value, index: i})"/>
+                      <mat-autocomplete class="mdo-autocomplete" #recordIdAuto="matAutocomplete">
+                              <mat-option *ngFor="let record of recordsList" [value]="record">
+                                  {{ record }}
+                              </mat-option>
+                      </mat-autocomplete>
+                  </div>
+                  <mat-error class="mdo-field-hint" >
+                    <ng-container *ngIf="child?.controls?.recordId?.touched && child?.controls?.recordId?.errors?.required">
+                         This is required
+                    </ng-container>
+                </mat-error>
+
+                </div>
+  
+                <div class="f-col-spacer-half"></div>
+              </ng-template>
+
+              <div class="col mdo-field"  [style.display]="applyErrorsFilter && !child.invalid ? 'none' : 'block'">
+                <lib-button type="plain" icon="trash-alt" iconFontType="light" (click)="removeItem(i)"></lib-button>
+              </div>
+            </div>
+          </div>
+        </form>
+        <div class="f-row">
+          <lib-text-line i18n="@@add_another" class="cursor" (click)="addAnother()" type="xsmall" textColor="link">Add
+            another</lib-text-line>
+          <span class="f-col-spacer-half"></span>
+          <lib-text-line i18n="@@add_multiple" class="cursor" (click)="enableMultipleAddress = true" type="xsmall"
+            textColor="link">Add multiple</lib-text-line>
+        </div>
+      </div>
+
+      <div class="f-col filters-list" [style.display]="enableMultipleAddress && !showSkeleton ? 'block' : 'none'">
+        <!-- <lib-text-line *ngIf="multipleEmails?.length" type="base" textColor="info">Invite {{multipleEmails?.length}}
+          users</lib-text-line> -->
+        <div class="f-col mdo-field">
+          <lib-text-line type="xsmall" weight="strong" class="field-label">Email addresses</lib-text-line>
+          <div class="mdo-field-input bulk-container">
+            <!-- dummy chip list for matChipInput -->
+            <mat-chip-list #chipList></mat-chip-list>
+            <lib-chip-list>
+              <lib-chip *ngFor="let email of multipleEmails" [removable]="true" (removed)="remove(email)">{{email}}
+              </lib-chip>
+              <input placeholder="Paste email addresses separated by comma or semicolon" i18n-placeholder="@@email_address" [matChipInputFor]="chipList"
+                [matChipInputSeparatorKeyCodes]="separatorKeysCodes" matChipInputAddOnBlur="true"
+                (matChipInputTokenEnd)="add($event)" (paste)="paste($event)" />
+            </lib-chip-list>
+          </div>
+        </div>
+
+        <div class="f-col mdo-field" [class.mdo-form-error]="multipleEmails?.length && !multipleRoles?.length">
+          <lib-text-line type="xsmall" weight="strong" class="field-label">Role</lib-text-line>
+          <div class="mdo-field-input" matAutocompleteOrigin #origin="matAutocompleteOrigin">
+            <lib-chip-list>
+              <ng-container *ngFor="let role of multipleRoles; let roleIndex=index">
+                <ng-container *ngIf="roleIndex<1">
+                  <lib-chip [removable]="true" (removed)="updateMultipleInvitRoles(role)">
+                    {{ getRoleDesc(role) }}
+                  </lib-chip>
+                </ng-container>
+              </ng-container>
+              <lib-chip *ngIf="multipleRoles?.length > 1">
+                +{{multipleRoles?.length - 1}}
+              </lib-chip>
+              <input matInput placeholder="Search for role..." [formControl]="optionCtrl" [matAutocomplete]="auto"
+                [matAutocompleteConnectedTo]="origin" />
+            </lib-chip-list>
+            <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete">
+              <mat-option class="mdo-option" *ngFor="let role of filteredOptions | async" [value]="role.roleId">
+                <lib-filter-option libClickStopPropagation>
+                  <lib-checkbox [label]="role.description" [checked]="multipleRoles.includes(role.roleId)"
+                    (valueChange)="updateMultipleInvitRoles(role.roleId)"></lib-checkbox>
+                </lib-filter-option>
+              </mat-option>
+              <mat-option class="mdo-option" *ngIf="!(filteredOptions | async)?.length">
+                <lib-filter-option libClickStopPropagation>
+                  No options available
+                </lib-filter-option>
+              </mat-option>
+            </mat-autocomplete>
+          </div>
+          <mat-error class="mdo-field-hint" *ngIf="multipleEmails?.length && !multipleRoles?.length">
+              The same role will be assigned to all members being invited
+            </mat-error>
+
+        </div>
+
+        <div class="f-col colunm-box" *ngIf="isFromPartner">
+          <lib-text-line type="xsmall" weight="strong" class="field-label required">
+            All users above will be allocated the following dataset and record
+          </lib-text-line>
+          <div class="f-row row-line">
+            <!-- Dataset -->
+            <div class="col col-x10 mdo-field"  [class.mdo-form-error]="multipleEmails?.length && !datasetForBulk?.datasetId">
+              <div class="mdo-field-input">
+                <input matInput #datasetInputEl #srcDatasetAutoTrigger="matAutocompleteTrigger"
+                    placeholder="Dataset"
+                    [matAutocomplete]="srcDatasetAuto"
+                    [ngModel]="datasetForBulk"
+                    (ngModelChange)="datasetForBulk=$event; recordIdForBulk=null;"
+                    (keyup)="datasetSearchSub.next(datasetInputEl.value)" />
+                <mat-autocomplete class="mdo-autocomplete" #srcDatasetAuto="matAutocomplete"
+                    [displayWith]="displayDatasetFn"> <!-- (optionSelected)="getData('', null, datasetForBulk?.datasetId)" -->
+                    <mat-option *ngFor="let dataset of datasetListObs | async"
+                        [value]="{datasetId: dataset.moduleId, datasetDesc: dataset.moduleDesc}">
+                        {{ dataset.moduleDesc }}
+                    </mat-option>
+                </mat-autocomplete>
+            </div>
+            <mat-error class="mdo-field-hint" *ngIf="multipleEmails?.length && !datasetForBulk?.datasetId">
+             This is Required</mat-error>
+  
+            </div>
+            <div class="f-col-spacer-half"></div>
+            <!-- Record -->
+            <div class="col col-x10 mdo-field" [class.mdo-form-error]="multipleEmails?.length && !recordIdForBulk">
+              <div class="mdo-field-input">
+                  <input matInput #recordInputEl [matAutocomplete]="recordIdAuto"
+                    placeholder="Record"
+                    [disabled]="!datasetForBulk?.datasetId"
+                    [(ngModel)]="recordIdForBulk"
+                    (focus)="getData('', null, datasetForBulk?.datasetId)"
+                    (keyup)="recordSearchSub.next({s: recordInputEl.value, index: i})"/>
+                  <mat-autocomplete class="mdo-autocomplete" #recordIdAuto="matAutocomplete">
+                          <mat-option *ngFor="let record of recordsList" [value]="record">
+                              {{ record }}
+                          </mat-option>
+                  </mat-autocomplete>
+              </div>
+              <mat-error class="mdo-field-hint"  *ngIf="multipleEmails?.length && !recordIdForBulk">
+               This is Required</mat-error>
+              </div>
+          </div>
+        </div>
+
+        <!-- <div class="f-row action-buttons">
+          <lib-button type="plain" i18n="@@cancel" (afterClick)="enableMultipleAddress = false">Cancel</lib-button>
+          <div class="col-spacer"></div>
+          <lib-button type="minor" i18n="@@add_user" [disabled]="multipleEmails?.length <= 0 || !multipleRoles?.length || !datasetForBulk || !recordIdForBulk"
+            (afterClick)="addMultipleUser()"> {{ isFromPartner ? 'Add partners' : 'Add users' }} </lib-button>
+        </div> -->
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+
+.usage-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 12px;
+
+  .dashboard-item {
+    overflow: hidden;
+    border-width: 1px;
+    border-style: solid;
+    max-height: 376px;
+
+    &.col-1 {
+      grid-column: span 1;
+    }
+
+    &.col-2 {
+      grid-column: span 2;
+    }
+
+    mat-card-content {
+      &.usage-conatiner {
+        display: flex;
+        justify-content: center;
+        height: calc(100% - 36px);
+        overflow: auto;
+        margin-top: 6px;
+
+        table.mat-table {
+          width: 100%;
+        }
+      }
+
+      .pie {
+        width: 240px;
+      }
+    }
+  }
+}

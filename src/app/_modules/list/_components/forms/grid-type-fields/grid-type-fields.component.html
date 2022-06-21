@@ -1,0 +1,48 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="closePropertyPanel()"></lib-button>
+    <div class="f-col-spacer-half"></div>
+    <lib-text-line type="leading" i18n="@@field_properties">Field properties</lib-text-line>
+  </div>
+  <div class="f-col sidesheetcontent-listing" [ngStyle]="{'pointer-events': isReadOnlyMode ? 'none' : 'inherit'}">
+    <form [formGroup]="formGroup" *ngIf="formGroup">
+      <div class="f-col mdo-justify">
+
+        <div class="f-col" formGroupName="shortText">
+          <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@name">Name</lib-text-line>
+          <div formGroupName="en" *ngIf="locale == 'en'" class="f-col">
+            <lib-input placeholder="Description of field" formControlName="description" class="lib-input" type="text"
+              (afterBlur)="fireValidationStatus($event)" i18n-placeholder="@@description" [hasError]="
+                formGroup.get('shortText').get('en').controls.description?.errors &&
+                (formGroup.get('shortText').get('en').controls.description?.errors?.required ||
+                formGroup.get('shortText').get('en').controls.description?.errors?.whitespace)"
+                [hint]="(formGroup.get('shortText').get('en').controls.description?.errors &&
+                  (formGroup.get('shortText').get('en').controls.description?.errors?.required ||
+                  formGroup.get('shortText').get('en').controls.description?.errors?.whitespace)) ? 'Name is required': ''"></lib-input>
+          </div>
+          <div formGroupName="fr" *ngIf="locale == 'fr'" class="f-col">
+            <lib-input placeholder="Description of field" formControlName="description" class="lib-input" type="text"
+              (afterBlur)="fireValidationStatus($event)" i18n-placeholder="@@description" [hasError]="
+                formGroup.get('shortText').get('fr').controls.description?.errors &&
+                (formGroup.get('shortText').get('fr').controls.description?.errors?.required ||
+                formGroup.get('shortText').get('fr').controls.description?.errors?.whitespace)"
+                [hint]="(formGroup.get('shortText').get('fr').controls.description?.errors &&
+                  (formGroup.get('shortText').get('fr').controls.description?.errors?.required ||
+                  formGroup.get('shortText').get('fr').controls.description?.errors?.whitespace)) ? 'Name is required' : ''"></lib-input>
+          </div>
+        </div>
+
+        <div class="f-col mdo-field" formGroupName="longtexts"
+          *ngIf="['CHAR', 'NUMC', 'DEC', 'ALTN', 'ISCN'].indexOf(formGroup.get('dataType').value) >= 0">
+          <lib-text-line class="field-label" type="xsmall" weight="strong">
+            <span i18n="@@field_help">Field help</span>&nbsp;<mat-icon fontSet="mdo-icons-light" libTooltip="This is to maintain additional information in relation to a field. It will get displayed on the form when user clicks on the Eye icon against the field.">question-circle</mat-icon>
+        </lib-text-line>
+          <pros-quill-editor *ngIf="locale == 'en'" [editorConfig]="editorConfig" formControlName="en"
+            (afterBlur)="fireValidationStatus($event)" [fieldid]="getQuillEditorId()"></pros-quill-editor>
+          <pros-quill-editor *ngIf="locale == 'fr'" formControlName="fr" [editorConfig]="editorConfig"
+            (afterBlur)="fireValidationStatus($event)" [fieldid]="getQuillEditorId()"></pros-quill-editor>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

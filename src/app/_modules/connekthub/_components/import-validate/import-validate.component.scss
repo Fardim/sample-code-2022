@@ -1,0 +1,35 @@
+div.modal-wrapper {
+  height: 600px;
+  overflow: hidden;
+
+  .modal-body {
+    height: calc(100% - 60px * 2);
+    overflow: auto;
+
+    table.mat-table {
+      width: 100%;
+    }
+
+    .colunm-box {
+      box-sizing: border-box;
+      display: flex;
+      padding: 8px 12px;
+      margin: 6px;
+      width: 100%;
+      max-width: 500px;
+      cursor: pointer;
+
+      .col {
+        display: flex;
+        flex: 1 0 auto;
+        width: 1px;
+        align-items: center;
+        margin: 0 4px;
+
+        &.col-x5 {
+          flex: 5;
+        }
+      }
+    }
+  }
+}

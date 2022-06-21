@@ -1,0 +1,36 @@
+mat-card.root {
+  height: 100%;
+  user-select: text;
+  padding: 0;
+  overflow: hidden;
+
+  .breadcrum-toolbar {
+    padding-top: 8px;
+  }
+
+  .dataset-list {
+    height: calc(100% - 44px - 8px * 4 - 36px);
+    overflow: auto;
+    align-items: center;
+
+    .dataset-palette {
+      mat-card.mat-card {
+        width: 174px;
+        height: 202px;
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        margin: 12px;
+        text-align: center;
+
+        .cursor {
+          cursor: pointer;
+        }
+      }
+    }
+  }
+
+  .manually-dataset {
+    width: 100%;
+  }
+}

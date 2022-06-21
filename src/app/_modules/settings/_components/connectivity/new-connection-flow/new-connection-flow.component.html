@@ -1,0 +1,16 @@
+<form [formGroup]="newConnectionDetailsForm" class="new-connection-flow">
+  <pros-new-connection
+    *ngIf="activeView === 'new-system'"
+    (navigate)="setActiveView($event)"
+    (connectionChange)="setActiveConnection($event)"
+    (afterClose)="closeDialog($event)">
+  </pros-new-connection>
+
+  <pros-connection-description
+    *ngIf="activeView === 'connection-description'"
+    [connectionDetails]="selectedConnection"
+    (navigate)="setActiveView($event)"
+    formControlName="connectionDescription"
+    (afterClose)="closeDialog($event)">
+  </pros-connection-description>
+</form>

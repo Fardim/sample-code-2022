@@ -1,0 +1,86 @@
+<form [formGroup]="autoExtensionRuleForm">
+  <div class="f-col">
+    <lib-input matInput placeholder="Type rule name" [isRequired]="true" formControlName="brInfo"
+      i18n-label="@@rule_name" label="Rule name"
+      [hasError]="submitted && autoExtensionRuleForm.controls.brInfo.errors && autoExtensionRuleForm.controls.brInfo.errors.required"
+      [hint]="(submitted && autoExtensionRuleForm.controls.brInfo.errors && autoExtensionRuleForm.controls.brInfo.errors.required) ? 'This is required Field' : ''">
+    </lib-input>
+  </div>
+
+  <div class="f-col">
+    <lib-textarea label="Description" placeholder="Type business rules details and usage"
+      formControlName="brDescription" [rows]="3"></lib-textarea>
+  </div>
+
+  <div class="f-col mdo-field"
+    [class.mdo-form-error]="submitted && (autoExtensionRuleForm.controls.structure.invalid || autoExtensionRuleForm.controls?.structure?.value && !autoExtensionRuleForm.controls?.structure?.value?.strucDesc) ">
+    <lib-text-line type="xsmall" weight="strong" class="field-label">Structure<mat-icon fontSet="mdo-icons-light"
+        class="label-icon"
+        libTooltip="Allows the user to define the structure which the master data needs to be extended.">
+        question-circle </mat-icon><span class="mandatory">*</span>
+    </lib-text-line>
+    <div class="mdo-field-input">
+      <input matInput #inputAutoComplete placeholder="Select" formControlName="structure"
+        [matAutocomplete]="structureList" />
+      <mat-icon matSuffix fontSet="mdo-icons-light" class="autocomplete-icon" prosClickStopPropagation>chevron-down
+      </mat-icon>
+      <mat-autocomplete class="mdo-autocomplete" #structureList="matAutocomplete" [displayWith]="displayStructureDetail"
+        (optionSelected)="selectedStructure($event,inputAutoComplete)">
+        <ng-template [ngIf]="(structureObs | async)?.length !== 0" [ngIfElse]="noOption">
+          <mat-option class="mdo-option" *ngFor="let structureDetail of structureObs | async" [value]="structureDetail">
+            {{ structureDetail?.strucDesc }}
+          </mat-option>
+        </ng-template>
+        <ng-template #noOption>
+          <mat-option disabled>No data found</mat-option>
+        </ng-template>
+      </mat-autocomplete>
+    </div>
+
+    <mat-error class="mdo-field-hint" *ngIf="submitted && autoExtensionRuleForm.controls.structure.errors?.required">
+      <lib-text-line type="small">This is a required field</lib-text-line>
+    </mat-error>
+    <mat-error class="mdo-field-hint"
+      *ngIf="submitted && autoExtensionRuleForm.controls?.structure?.value && !autoExtensionRuleForm.controls?.structure?.value?.strucDesc">
+      <lib-text-line type="small">Please select a structure from list</lib-text-line>
+    </mat-error>
+  </div>
+
+  <div class="f-col">
+    <div class="f-row colunm-box">
+      <div class="col col-x8">
+        <lib-text-line type="small" weight="strong" i18n="@@mapping">Mapping</lib-text-line>
+      </div>
+      <div class="col col-x8">
+        <lib-text-line type="small" weight="strong">Enabled</lib-text-line>
+      </div>
+      <div class="col col-x4"></div>
+    </div>
+    <lib-section></lib-section>
+    <ng-container *ngFor="let condition of autoExtensionRuleForm.get('conditions').value; let i = index">
+      <div class="f-row colunm-box">
+        <div class="col col-x8 hover-value">
+          <lib-text-line type="base" enableWrap="true">{{ condition.name }}</lib-text-line>
+        </div>
+        <div class="col col-x8 hover-value">
+          <lib-checkbox [checked]="condition.enable" theme="primary" (valueChange)="condition.enable = $event">
+          </lib-checkbox>
+        </div>
+        <div class="col col-x4 end-item" prosClickStopPropagation>
+          <lib-button type="plain" icon="clone" iconFontType="light" (afterClick)="cloneConditionValues(condition, i)">
+          </lib-button>
+          <lib-button type="plain" icon="pencil-alt" iconFontType="light" (click)="openConditionSidesheet('edit',i)">
+          </lib-button>
+          <lib-button type="plain" icon="trash-alt" iconFontType="light" (afterClick)="removeConditionValues(i)"></lib-button>
+        </div>
+      </div>
+    </ng-container>
+    <div class="f-row" *ngIf="autoExtensionRuleForm?.get('conditions')?.value?.length">
+      <lib-button (afterClick)="openConditionSidesheet('new','')" type="minor">New condition</lib-button>
+    </div>
+    <div class="f-row empty-block" *ngIf="!autoExtensionRuleForm.get('conditions').value?.length">
+      <lib-empty-state icon="search" primaryText="Nothing to see here" secondaryText="No conditions available.">
+        <lib-button (afterClick)="openConditionSidesheet('new','')" type="minor">New condition</lib-button>
+      </lib-empty-state>
+    </div>
+  </div>

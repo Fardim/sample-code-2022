@@ -1,0 +1,19 @@
+<div class="f-col mdo-field">
+    <mat-label class="mdo-field-label" *ngIf="label">{{label}}</mat-label>
+    <div class="mdo-field-input {{error? 'mdo-form-error': ''}}">
+        <lib-chip-list class="chips-list">
+            <ng-container *ngFor="let value of selectedValues;">
+                <lib-chip [removable]="true" (removed)="remove(value)">{{value}}</lib-chip>
+            </ng-container>
+            <input matInput
+                (focus)="registerOnTouched($event)"
+                (blur)="emitValueChange()"
+                [placeholder]="placeholder"
+                [formControl]="control"
+                #inputEl
+                (keyup)="afterKeyPress($event)" />
+        </lib-chip-list>
+    </div>
+    <mat-hint class="mdo-field-hint" *ngIf="hint && !error">{{hint}}</mat-hint>
+    <mat-error class="mdo-field-hint" *ngIf="error">{{error}}</mat-error>
+</div>

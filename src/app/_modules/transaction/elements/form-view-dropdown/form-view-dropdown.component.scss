@@ -1,0 +1,21 @@
+.mdo-field {
+  .multi-select {
+    width: 100%;
+
+    .field-chip-list {
+      flex-wrap: wrap;
+
+      .lib-chip {
+        display: flex;
+        flex-direction: row;
+        width: auto;
+        padding: 2px;
+      }
+
+      .mat-input {
+        width: auto;
+        flex: 1;
+      }
+    }
+  }
+}

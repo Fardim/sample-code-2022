@@ -1,0 +1,106 @@
+.breadcrum-toolbar {
+  padding: 8px 12px;
+
+  .mdo-constrained-right {
+    align-items: center;
+    width: 100%;
+
+    .breadcrum-head {
+      width: 100%;
+    }
+  }
+}
+
+.sidesheetcontent-listing {
+  height: calc(100% - 52px - 16px);
+  overflow: auto;
+
+  .mdo-justify {
+    margin: 0 16px;
+
+    .field-label {
+      margin-bottom: 6px;
+      flex: 1;
+
+      .label-icon {
+        font-size: 12px;
+        font-weight: 400;
+      }
+    }
+
+    .toggle-col {
+      flex: 1;
+    }
+
+    .mat-error {
+      margin-top: 6px;
+    }
+
+    .display-images {
+      width: 100%;
+      min-height: 60px;
+      border-radius: 3px;
+      padding: 7px 10px;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+
+      .attachment {
+        display: flex;
+        align-items: center;
+
+        span {
+          margin-left: 12px;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .import-files {
+      .drag-input {
+        position: absolute;
+        width: 100%;
+        opacity: 0;
+      }
+
+      .cursor {
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.mat-accordion {
+  width: 100%;
+}
+
+.mat-expansion-panel-header {
+  padding-right: 10px !important;
+  height: 40px !important;
+}
+
+.mat-expansion-panel:last-of-type {
+  background: none;
+  box-shadow: none;
+}
+
+.h-40 {
+  height: 40px;
+}
+
+.pt-10 {
+  padding-top: 10px;
+}
+
+@media (min-width: 1024px) {
+  .breadcrum-toolbar {
+    .mdo-constrained-right {
+      margin-right: 50px;
+    }
+  }
+
+  .sidesheetcontent-listing {
+    .mdo-justify {
+      margin: 0 62px;
+    }
+  }
+}

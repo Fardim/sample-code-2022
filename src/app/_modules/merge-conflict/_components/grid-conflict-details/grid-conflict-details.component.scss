@@ -1,0 +1,55 @@
+.cr-expanded {
+  border-radius: 0;
+
+  .mat-expansion-panel-header {
+    padding: 0 12px;
+
+    .mat-panel-title {
+      margin: 0;
+    }
+  }
+
+  .cr-expanded-data {
+    border-top: 1px solid;
+  }
+
+  table.mat-table {
+    width: 100%;
+
+    tr.mat-row {
+      &:hover {
+        background-color: unset;
+      }
+
+      .summary-cell {
+        align-items: center;
+      }
+
+      .mat-cell:not(.actions-cell) {
+        min-width: 200px;
+      }
+    }
+
+    tr.mat-header-row {
+      .mat-header-cell:not(.actions-cell) {
+        min-width: 200px;
+      }
+    }
+
+    .lib-radio {
+      height: 32px;
+    }
+
+    .second-level {
+      padding-left: 30px;
+    }
+
+    .third-level {
+      padding-left: 60px;
+    }
+
+    .fourth-level {
+      padding-left: 80px;
+    }
+  }
+}

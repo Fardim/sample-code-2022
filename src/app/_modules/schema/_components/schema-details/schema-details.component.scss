@@ -1,0 +1,23 @@
+.root {
+  .crumbrow {
+    align-items: center;
+
+    > button {
+      min-width: 38px;
+      padding: 0 8px;
+      margin-right: 16px;
+    }
+
+    mat-form-field {
+      height: 40px;
+    }
+  }
+
+  .root-row {
+    padding: 16px;
+
+    mat-card {
+      width: calc(100% - 32px);
+    }
+  }
+}

@@ -1,0 +1,28 @@
+<mat-form-field class="mat-form-field" [ngClass]="{'has-error': hasError}" appearance="outline">
+    <input matInput class="mat-input" #textInput placeholder="{{fieldLabel}}" [formControl]="selectedMdoFldCtrl"
+      [matAutocomplete]="mdofieldauto" #trigger="matAutocompleteTrigger">
+      <div *ngIf="isSuffixButton" class="f-row input-actions">
+        <button mat-button matSuffix (click)="$event.stopPropagation(); trigger.closePanel(); emitOptionSelected(viewMoreAction)">
+          <mat-icon fontSet="mdo-icons-light">external-link-alt</mat-icon>
+        </button>
+        <!-- <mat-icon fontSet="mdo-icons" class="info-arrow">menu-arrow1</mat-icon> -->
+      </div>
+    <mat-autocomplete #mdofieldauto="matAutocomplete" [displayWith]="mdoFieldDisplayWith.bind(this)"
+      (optionSelected)="emitOptionSelected($event)">
+      <div class="autodropdown-scroll" prosInfiniteScroll bufferPercentage="20" (scrollEnd)="onScrollEnd($event)">
+        <mat-option *ngFor="let option of filteredOptions | async; trackBy :suggestedMdoFldTrkBy"
+          [value]="getValue(option)" [matTooltip]="getTooltipText(option)">
+          {{ getLabel(option) || 'UNTITLED' }}
+        </mat-option>
+        <div class="f-row no-result" *ngIf="!hasResult">
+          <mat-icon class="mdo-icons">search</mat-icon>
+          <span class="f-col-spacer-half"></span>
+          {{loader === false? 'No results found...' : 'Searching...' }}
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <mat-option *ngIf="isExtraLabel" [value]="extraOption" (click)="emitClickEvent()">
+        <lib-text-line type="base" textColor="link">{{extraOptionLabel}}</lib-text-line>
+    </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>

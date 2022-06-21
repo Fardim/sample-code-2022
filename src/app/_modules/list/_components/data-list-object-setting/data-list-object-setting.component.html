@@ -1,0 +1,88 @@
+<div class="f-row root">
+    <div class="f-col setting-tabs" *ngIf="!dataLoaders.loadObjectTypeDetails; else showLoader">
+      <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+        <span class="f-col-spacer-half"></span>
+        <lib-text-line type="leading" i18n-label="@@dataset_settings" class="text-over">{{ (objectType && objectType.objectInfo ? objectType.objectInfo:
+          'Untitled') | slice:0:30 }}</lib-text-line>
+      </div>
+      <div class="f-row-spacer-half"></div>
+      <mat-list role="navigation" [disableRipple]="true" class="mdo-list">
+        <ng-container *ngFor="let dataset of objectType.submenus">
+          <ng-container *ngIf="dataset.id == 'fields'; else formsTemplate">
+            <mat-list-item [routerLink]="['fields', moduleId]"
+              [routerLinkActive]="'selected'">
+              <lib-text-line type="base">{{dataset.label ? dataset.label : 'Untitled'}}</lib-text-line>
+              <span class="f-spacer"></span>
+              <lib-text-line type="base" textColor="secondary">{{dataset.count}}</lib-text-line>
+            </mat-list-item>
+          </ng-container>
+          <ng-template #formsTemplate>
+            <mat-list-item *ngIf="dataset.id == 'forms'; else businessTemplate" [routerLink]="['forms', moduleId]"
+              [routerLinkActive]="'selected'">
+              <lib-text-line type="base">{{dataset.label ? dataset.label : 'Untitled'}}</lib-text-line>
+              <span class="f-spacer"></span>
+              <lib-text-line type="base" textColor="secondary">{{dataset.count}}</lib-text-line>
+            </mat-list-item>
+          </ng-template>
+
+          <!-- BUSINESS RULE -->
+          <ng-template #businessTemplate>
+            <mat-list-item *ngIf="dataset.id == 'business-rule'; else numberSettingsTemplate" [routerLink]="['business-rule', moduleId]"
+              [routerLinkActive]="'selected'">
+              <lib-text-line type="base">{{dataset.label ? dataset.label : 'Untitled'}}</lib-text-line>
+              <span class="f-spacer"></span>
+              <lib-text-line type="base" textColor="secondary">{{dataset.count}}</lib-text-line>
+            </mat-list-item>
+          </ng-template>
+
+          <!-- Number Setting Rules -->
+          <ng-template #numberSettingsTemplate>
+            <mat-list-item *ngIf="dataset.id == 'number-settings'; else pdfbuilderTemplate" [routerLink]="['number-settings', moduleId]"
+              [routerLinkActive]="'selected'">
+              <lib-text-line type="base">{{dataset.label ? dataset.label : 'Untitled'}}</lib-text-line>
+              <span class="f-spacer"></span>
+              <lib-text-line type="base" textColor="secondary">{{dataset.count}}</lib-text-line>
+            </mat-list-item>
+          </ng-template>
+          
+          <!-- PDF Template Builder -->
+          <ng-template #pdfbuilderTemplate>
+            <mat-list-item *ngIf="dataset.id == 'pdf-template-builder'; else default" [routerLink]="['pdf-template-builder', moduleId]"
+              [routerLinkActive]="'selected'">
+              <lib-text-line type="base">{{dataset.label ? dataset.label : 'Untitled'}}</lib-text-line>
+              <span class="f-spacer"></span>
+              <lib-text-line type="base" textColor="secondary">{{dataset.count}}</lib-text-line>
+            </mat-list-item>
+          </ng-template>
+
+          <ng-template #default>
+            <mat-list-item>
+              <div class="sublist-item">
+                <lib-text-line type="base">{{dataset.label ? dataset.label : 'Untitled'}}</lib-text-line>
+              </div>
+              <span class="f-spacer"></span>
+              <lib-text-line type="base" textColor="secondary">{{dataset.count}}</lib-text-line>
+            </mat-list-item>
+          </ng-template>
+
+        </ng-container>
+      </mat-list>
+    </div>
+    <ng-template #showLoader>
+      <div class="f-col setting-tabs loader">
+        <pros-skeleton-title class="w-100"></pros-skeleton-title>
+        <div class="f-row-spacer-half"></div>
+        <div class="f-row-spacer-half"></div>
+        <lib-skeleton-listmenu></lib-skeleton-listmenu>
+        <div class="f-row-spacer-half"></div>
+        <lib-skeleton-listmenu></lib-skeleton-listmenu>
+        <div class="f-row-spacer-half"></div>
+        <lib-skeleton-listmenu></lib-skeleton-listmenu>
+      </div>
+    </ng-template>
+
+    <div class="f-col tabs-result">
+      <router-outlet></router-outlet>
+    </div>
+  </div>

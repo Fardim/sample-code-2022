@@ -1,0 +1,50 @@
+<!-- single select -->
+<div class="f-col mdo-field" [ngClass]="{'has-error': hasError}" [class.mdo-form-error]="error && hasError">
+    <mat-label class="mdo-field-label" [ngClass]="{'mdo-required': isRequired}" *ngIf="label">
+        {{label}}
+        <mat-icon *ngIf="!!tooltip" class="label-icon"  fontSet="mdo-icons-light" [libTooltip]="tooltip">question-circle</mat-icon>
+    </mat-label>
+    <!-- input container -->
+    <div class="mdo-field-input">
+        <!-- chip list -->
+        <lib-chip-list *ngIf="multiCheck">
+            <ng-container *ngFor="let opt of selectedOptions; let i=index">
+                <ng-container>
+                    <lib-chip [removable]="true"
+                    (removed)="remove(opt)">{{opt}}</lib-chip>
+                </ng-container>
+            </ng-container>
+            <input placeholder="Type to search"
+            class="multiCheck-search"
+            [matAutocomplete]="auto"/>
+            <mat-icon _ngcontent-eie-c256="" role="img" matsuffix="" fontset="mdo-icons" class="mat-icon notranslate autocomplete-icon mdo-icons mat-icon-no-color" aria-hidden="true" data-mat-icon-type="font" data-mat-icon-namespace="mdo-icons">chevron-down</mat-icon>
+        </lib-chip-list>
+
+        <input matInput #optionsInput
+            *ngIf="!multiCheck"
+            autocomplete="off"
+            (click)="registerOnTouched($event)"
+            (blur)="registerOnBlur()"
+            (focus)="registerOnTouched($event)"
+            [placeholder]="placeholder"
+            [formControl]="control"
+            [matAutocomplete]="auto" />
+
+        <!-- autocomplete -->
+        <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" [displayWith]="formatValue.bind(this)"
+            (optionSelected)="emitSelectedValue($event.option.value)">
+            <mat-option class="mdo-option" *ngFor="let data of filteredOptions" [value]="data">
+                <lib-checkbox
+                    *ngIf="multiCheck"
+                    [checked]="selectedOptions.indexOf(data[labelKey]) > -1"
+                    [disabled]="false"
+                    theme="primary"
+                    [disableRipple]="false"
+                    [indeterminate]="false"
+                ></lib-checkbox> {{data[labelKey] || 'UNTITLED'}}
+            </mat-option>
+        </mat-autocomplete>
+    </div>
+    <mat-hint class="mdo-field-hint" *ngIf="hint && !hasError">{{hint}}</mat-hint>
+    <mat-error class="mdo-field-hint" *ngIf="error && hasError">{{error}}</mat-error>
+</div>

@@ -1,0 +1,417 @@
+<form [formGroup]="duplicateRuleForm">
+
+    <div class="f-col mdo-field">
+        <mat-expansion-panel togglePosition="before" class="mat-elevation-z0 confining-fields" hideToggle
+            #expansionPanel="matExpansionPanel" [expanded]="false">
+            <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+                <mat-panel-title class="f-row">
+                    <lib-text-line type="xsmall" weight="strong" i18n="@@fields" class="field-label">
+                        <span> <mat-icon fontSet="mdo-icons-light"> {{ expansionPanel.expanded ? 'chevron-down' : 'chevron-right ' }} </mat-icon>
+                            Confining duplicate identification 
+                        </span>
+                        <mat-icon fontSet="mdo-icons-light" i18n-libTooltip="@@confining_duplicate_tooltip" libTooltip="Allows user to define rules to confine the duplicate identification by defining some conditions in relation to the data maintained by the user in the record and confine duplicate checks to be done across only those records where the condition gets satisfied.">
+                            question-circle</mat-icon>
+                    </lib-text-line>
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <pros-blocks-hierarchy
+                [createDefaultBloc]="false"
+                [blocksGrp]="duplicateRuleForm"
+                [operatorsList]="udrOperators"
+                [submitted]="submitted"
+                [sourceList]="filteredFieldList"
+                [blocksList]="udrBlockList"
+                [isNewModule]="!moduleId"
+                [targetListMetaData]="metataData"
+                (updateFldList)="updateUDRFldList($event.searchString)"
+            ></pros-blocks-hierarchy>
+        </mat-expansion-panel>
+    </div>
+
+    <div class="f-col mdo-field">
+        <lib-text-line type="xsmall" weight="strong" i18n="@@fields" class="field-label">
+            Fields <span class="mandatory">*</span>
+        </lib-text-line>
+        <div class="f-col">
+            <mat-form-field appearance="outline">
+                <input matInput placeholder="Type field name to add" formControlName="fieldSearch"
+                    [matAutocomplete]="auto" />
+                <mat-autocomplete #auto="matAutocomplete" [displayWith]="getFieldDesc">
+                    <mat-option *ngFor="let field of duplicateFieldsObs | async" (click)="addFieldRecord(field.fieldId)"
+                        [value]="field.fieldId">
+                        {{ field.fieldDescri }}
+                    </mat-option>
+                </mat-autocomplete>
+            </mat-form-field>
+        </div>
+        <div class="colunm-listing">
+            <ng-container formArrayName="addFields">
+                <div cdkDropList (cdkDropListDropped)="dropField($event, 'addFields')">
+                    <div *ngFor="let item of fieldRecords.controls; let i = index"
+                        class="f-row colunm-box rule-border-row" cdkDrag>
+                        <ng-container [formGroupName]="i">
+                            <div class="col col-x2 action-drag">
+                                <lib-button cdkDragHandle icon="grip-lines"></lib-button>
+                            </div>
+                            <div class="col col-x4">
+                                <lib-text-line type="base" enableWrap="true">{{ getFieldDesc(item.value.fId)}}
+                                </lib-text-line>
+                            </div>
+                            <div class="col col-x8">
+                                <div class="f-row slider-row">
+                                    <lib-range-slider class="lib-slider" [minValue]="0"
+                                        [maxValue]="100"
+                                        tickInterval="1"
+                                        libTooltip="Allows the user to define field weightage for calculating the overall duplicate score"
+                                        [value]="getWeightage(item.value.weightage)" color="primary"
+                                        (valueChange)="fieldRecordWeightageChange($event, i)">
+                                    </lib-range-slider>
+                                    &nbsp;
+                                    <lib-text-line type="base" [libBadge]="(submitted && totalFieldsWeightage!==100) ? '!' : ''" matBadgeOverlap="true" matBadgeSize="small"
+                                        matBadgePosition="after">
+                                        {{getWeightage(item.value.weightage)}}%
+                                    </lib-text-line>
+                                </div>
+                            </div>
+                            <div class="col col-x8">
+                                <div class="f-col">
+                                    <lib-label text="{{ getDuppCriteriaDesc(item.value.criteria) }}"
+                                        [matMenuTriggerFor]="fieldMatchMenu" suffixIcon="caret-down"
+                                        iconFontType="solid"></lib-label>
+                                    <mat-menu #fieldMatchMenu="matMenu" class="navigation-menu">
+                                        <button i18n-libTooltip="@@exact_match_tooltip"
+                                            libTooltip="Exact match allows to identify duplicates where field is a 100% match." mat-menu-item
+                                            (click)="setControlValue('addFields', 'criteria', 'Exact_Match', i)">
+                                            Exact Match</button>
+                                        <button mat-menu-item i18n-libTooltip="@@fuzzy_tooltip"
+                                            libTooltip="Fuzzy match allows to identify duplicates such that 2 characters difference is identified between records." i18n="@@fuzzy"
+                                            (click)="setControlValue('addFields', 'criteria', 'Fuzzy', i)">
+                                            Fuzzy </button>
+                                        <button mat-menu-item i18n-libTooltip=""
+                                            *ngIf="valueForAttributeMatchObj && valueForAttributeMatchObj[item.value.fId]?.pickList === '0' && valueForAttributeMatchObj[item.value.fId]?.isDescription === true"
+                                            libTooltip="Performing exact matcho on enabled attribues"
+                                            (click)="setControlValue('addFields', 'criteria', 'Attribute_Match', i)">
+                                            Attribute Match</button>
+                                        <button mat-menu-item i18n-libTooltip="@@Tokenized_match_tooltip"
+                                            libTooltip="Tokenized match allows to identify duplicates by splitting the field value into smaller tokens and performing a token based fuzzy match." i18n="@@Tokenized_match"
+                                            (click)="setControlValue('addFields', 'criteria', 'Tokenized_Match', i)">
+                                            Tokenized match </button>
+                                    </mat-menu>
+                                    <mat-error i18n="@@pls_select_value"
+                                        *ngIf="submitted && item.get('criteria').errors && item.get('criteria').errors.required">
+                                        Please select value</mat-error>
+                                    <div class="f-row-spacer-half"></div>
+                                    <lib-label *ngIf="item.value.criteria === 'Tokenized_Match'"
+                                        text="{{ getTokenizedMatch(item.value.separator) }}"
+                                        [matMenuTriggerFor]="tokenizedMatchMenu" suffixIcon="caret-down"
+                                        iconFontType="solid" libTooltip="Allows the user to define the separator to be considered for identifying tokens for fuzzy match."></lib-label>
+                                    <mat-menu #tokenizedMatchMenu="matMenu" class="navigation-menu">
+                                        <button mat-menu-item *ngFor="let match of TOKENIZED_MATCH_TYPE"
+                                            (click)="setControlValue('addFields', 'separator', match.value, i)">
+                                            {{ match.label }}
+                                        </button>
+                                    </mat-menu>
+                                    <mat-error i18n="@@pls_select_value"
+                                        *ngIf="submitted && item.get('separator').errors && item.get('separator').errors.required">
+                                        Please select value</mat-error>
+                                </div>
+                            </div>
+                            <div class="col col-x2">
+                                <lib-text-line type="base" textColor="link" (click)="exclusionConf(item)"
+                                    class="cursor"
+                                    libTooltip="Allows the user to define words that should not be considered for tokens. Further, users can define similar words and group them together, for them to be considered while identifying duplicates."
+                                    >{{ item.value.exclusion }}</lib-text-line>
+                            </div>
+                            <div class="col mat-item-end">
+                                <lib-button (click)="removeFormArrayRow('addFields', i)" icon="trash-alt">
+                                </lib-button>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+                <div *ngIf="fieldRecords.length" class="f-row colunm-box rule-border-row">
+                    <div class="col col-x2">
+                    </div>
+                    <div class="col col-x4">
+                    </div>
+                    <div class="col col-x8">
+                    </div>
+                    <div class="col col-x8">
+                        <div class="f-col">
+                            <div class="f-row">
+                                <lib-text-line [textColor]="totalFieldsWeightage===100 ? 'success' : 'error'">
+                                    {{ totalFieldsWeightage + '%' }} &nbsp;
+                                </lib-text-line>
+                                <mat-icon fontSet="mdo-icons-light" i18n-libTooltip="@@total_fields_weightage_tooltip" libTooltip="">
+                                    info-circle</mat-icon>
+                            </div>
+                            <lib-text-line textColor="secondary">
+                                {{ totalFieldsWeightage < 101 ? (100-totalFieldsWeightage)+'% remaining' : (totalFieldsWeightage - 100)+ '% exceeding' }}
+                            </lib-text-line>
+                        </div>
+                    </div>
+                    <div class="col col-x2">
+                    </div>
+                    <div class="col mat-item-end">
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+
+    <div class="f-col mdo-field">
+        <lib-text-line type="xsmall" class="field-label" weight="strong"><span i18n="@@Duplicate_threshold">Duplicate threshold</span>&nbsp;<mat-icon fontSet="mdo-icons-light" class="mat-icon" i18n-libTooltip="@@weightage_tooltip" libTooltip="	
+          Allow user to  define an acceptable threshold percentage for a record not to be considered as a duplicate">question-circle</mat-icon>&nbsp;<span
+            class="mandatory">*</span></lib-text-line>
+        <div class="f-row slider-row">
+          <lib-range-slider class="lib-slider" formControlName="brWeightage" tickInterval="1" minValue="0"
+            [value]="duplicateRuleForm.controls.brWeightage.value"
+            [maxValue]="100" color="primary"></lib-range-slider> &nbsp;
+          <lib-text-line type="base" class="percentage">{{duplicateRuleForm.controls.brWeightage.value}}%
+          </lib-text-line>
+        </div>
+        <mat-error i18n="@@weightage_missing_msg"
+          *ngIf="submitted && duplicateRuleForm.controls.brWeightage.errors && duplicateRuleForm.controls.brWeightage.errors.required">
+          <lib-text-line type="small">Please enter weightage</lib-text-line>
+        </mat-error>
+    </div>
+    <div class="f-col mdo-field">
+        <lib-text-line type="xsmall" class="field-label" weight="strong"><span i18n="@@error_warning_level">Set error or warning level</span>&nbsp;<mat-icon fontSet="mdo-icons-light" i18n-libTooltip="@@weightage_tooltip" libTooltip="	
+          allow user to define warning/error levels over the defined duplicate threshold and let system propose duplicates as warning/errors">question-circle</mat-icon>&nbsp;<span
+            class="mandatory">*</span></lib-text-line>
+        <div class="f-col user-defined-set" formArrayName="errWarLevels">
+            <ng-container
+                *ngFor="let item of errWarLevels.controls; let i = index">
+                <ng-container [formGroupName]="i">
+                    <div class="f-row defined-row">
+                        <div class="col select-col udr-select-col"></div>
+                        <div class="col slider-col">
+                            <div class="f-row slider-row">
+                                <lib-range-slider class="lib-slider" color="primary"
+                                    [value]="getWeightage(item.value.st)" [highValue]="getWeightage(item.value.et)"
+                                    [formatLabelFn]="rangeSliderLabelFormat"
+                                    [minValue]="getErrWarnLimit(i, 'min')"
+                                    [maxValue]="getErrWarnLimit(i, 'max')"
+                                    (valueChange)="errWarnWeightageChange($event, i)">
+                                </lib-range-slider>
+                                &nbsp;<lib-text-line type="base">{{item.value.st + '-' + item.value.et}}%</lib-text-line>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <lib-label [ngClass]="{'disabled-label':errWarLevels.length===2}"
+                            [matMenuTriggerFor]="errorMenu" suffixIcon="caret-down"
+                        iconFontType="solid"> {{ ( item.value.type | titlecase ) || 'Select' }} </lib-label>
+                        <mat-menu #errorMenu="matMenu" class="navigation-menu">
+                            <button mat-menu-item i18n="@@error"
+                                (click)="setControlValue('errWarLevels', 'type', 'ERROR', i)">
+                                Error</button>
+                            <button mat-menu-item i18n="@@warning"
+                                (click)="setControlValue('errWarLevels', 'type', 'WARNING', i)">
+                                Warning </button>
+                        </mat-menu>
+                        </div>
+    
+                        <div class="col f-col mdo-field" [class.has-error]="submitted && item.controls?.message.errors?.required">
+                            <div class="mdo-field-input" *ngIf="item.value.type==='ERROR'">
+                                <input matInput placeholder="Type error message..." formControlName="message">
+                            </div>
+                            <div class="mdo-field-input" *ngIf="item.value.type==='WARNING'">
+                                <input matInput placeholder="Type warning message..." formControlName="message">
+                            </div>
+                        </div>
+
+    
+                        <!-- Remove -->
+                        <div class="col">
+                            <lib-button icon="trash-alt" (afterClick)="removeFormArrayRow('errWarLevels', i)">
+                            </lib-button>
+                        </div>
+                    </div>
+                </ng-container>
+            </ng-container>
+            <div class="col-spacer"></div>
+            <div class="f-row button-add-block">
+                <lib-button *ngIf="errWarLevels.length<2" type="minor" iconFontType="light"
+                    icon="plus" rounded="true" (afterClick)="addErrorWarLevel()">
+                </lib-button>
+            </div>
+        </div>
+    </div>
+
+    <div class="f-col mdo-field">
+        <lib-text-line type="xsmall" weight="strong" class="field-label">
+            Master record identification rules
+        </lib-text-line>
+        <pros-form-input-autoselect [isSuffixButton]="false" i18n-fieldLabel="@@type_rule_name_to_add"
+            fieldLabel="Type rule name to add" [updatedOptionsList]="businessRulesList" [labelKey]="'brInfo'"
+            (emitExtraLabelClick)="openBusinessRuleSideSheet(false)"
+            (optionSelectedEmit)="addBusinessRule($event, false)" i18n-extraOptionLabel="@@new_br_rule"
+            extraOptionLabel="New business rule" (emitSearchValue)="triggerSearch($event)">
+        </pros-form-input-autoselect>
+
+        <ng-template [ngIf]="masterRules.length>0">
+            <div class="colunm-listing">
+                <div class="row-spacer"></div>
+                <div cdkDropList [cdkDropListData]="masterRules" (cdkDropListDropped)="drop($event, 'tie')">
+                    <div cdkDrag *ngFor="let businessRule of masterRules; let i=index; trackBy:trackByBrId">
+                        <div class="f-row colunm-box rule-border-row">
+                            <div class="col col-x2 action-drag">
+                                <lib-button cdkDragHandle type="plain" iconFontType="light" icon="grip-lines">
+                                </lib-button>
+                            </div>
+                            <div class="col col-x4">
+                                <lib-text-line enableWrap="true" (click)="configureRule(businessRule)" type="base"
+                                    textColor="link" class="cursor">{{businessRule.coreSchemBrInfo.brInfo}}
+                                </lib-text-line>
+                            </div>
+
+                            <div class="col col-x4">
+                                <lib-text-line type="base" enableWrap="true">
+                                    {{getRuleDesc(businessRule.coreSchemBrInfo.brType)}}
+                                </lib-text-line>
+                            </div>
+                            <div class="col col-x8">
+                                <div class="f-row slider-row"
+                                    *ngIf="businessRule.coreSchemBrInfo.isConfigured; else notConfigured">
+                                    <lib-range-slider class="lib-slider" [minValue]="0"
+                                        [maxValue]="availableWeightage(businessRule.coreSchemBrInfo.brWeightage)"
+                                        tickInterval="1" [formatLabelFn]="rangeSliderLabelFormat"
+                                        [value]="getWeightage(businessRule.coreSchemBrInfo?.brWeightage)" color="primary"
+                                        (valueChange)="weightageChange({value:$event}, businessRule)">
+                                    </lib-range-slider>
+                                    &nbsp;
+                                    <lib-text-line type="base">{{getWeightage(businessRule.coreSchemBrInfo?.brWeightage)}}%</lib-text-line>
+                                </div>
+                                <ng-template #notConfigured>
+                                    <lib-label (click)="configureRule(businessRule)" i18n="@@not_configured"
+                                        status="error" text="Not configured">
+                                    </lib-label>
+                                </ng-template>
+                            </div>
+                            <div class="col col-x2 mat-item-end">
+                                <lib-checkbox [disabled]="!(businessRule.coreSchemBrInfo?.isConfigured)" color="primary"
+                                    [checked]="businessRule.coreSchemBrInfo.status === '1'"
+                                    (valueChange)="toggleBrStatus(businessRule)"></lib-checkbox>
+                                &nbsp;&nbsp;
+                                <lib-button type="plain" (click)="deleteBrAfterConfirm(businessRule)" icon="trash-alt">
+                                </lib-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row-spacer"></div>
+            </div>
+        </ng-template>
+
+        <ng-container *ngIf="duplicateMasterRules.length">
+            <div class="f-col mdo-field">
+                <lib-text-line type="xsmall" weight="strong" class="field-label">Tie breaker rule </lib-text-line>
+                <pros-form-input-autoselect [isSuffixButton]="false" i18n-fieldLabel="@@type_rule_name_to_add"
+                    fieldLabel="Type rule name to add" [updatedOptionsList]="tieBreakerbusinessRulesList"
+                    [labelKey]="'brInfo'" (emitExtraLabelClick)="openBusinessRuleSideSheet(true)"
+                    (optionSelectedEmit)="addBusinessRule($event, true)" i18n-extraOptionLabel="@@new_br_rule"
+                    extraOptionLabel="New business rule" (emitSearchValue)="triggerSearch($event)">
+                </pros-form-input-autoselect>
+            </div>
+
+
+            <ng-template [ngIf]="tieBreakerRules.length>0">
+                <div class="colunm-listing">
+                    <div cdkDropList [cdkDropListData]="tieBreakerRules" (cdkDropListDropped)="drop($event, 'tie')">
+                        <div cdkDrag *ngFor="let businessRule of tieBreakerRules; let i=index; trackBy:trackByBrId">
+                            <div class="f-row colunm-box rule-border-row">
+                                <div class="col col-x2 action-drag">
+                                    <lib-button cdkDragHandle type="plain" iconFontType="light" icon="grip-lines">
+                                    </lib-button>
+                                </div>
+                                <div class="col col-x4">
+                                    <lib-text-line enableWrap="true" (click)="configureRule(businessRule)" type="base"
+                                        textColor="link" class="cursor">{{businessRule.coreSchemBrInfo.brInfo}}
+                                    </lib-text-line>
+                                </div>
+
+                                <div class="col col-x4">
+                                    <lib-text-line type="base" enableWrap="true">
+                                        {{getRuleDesc(businessRule.coreSchemBrInfo.brType)}}
+                                    </lib-text-line>
+                                </div>
+
+                                <div class="col mat-item-end">
+                                    <lib-button type="plain" (click)="deleteBrAfterConfirm(businessRule)"
+                                        icon="trash-alt">
+                                    </lib-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row-spacer"></div>
+                </div>
+            </ng-template>
+
+        </ng-container>
+    </div>
+
+    <!-- <div class="f-col temp-field">
+        <mat-accordion>
+            <mat-expansion-panel togglePosition="before" class="mat-elevation-z0">
+                <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+                    <mat-panel-title class="panel-title">
+                        Master record parameters
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <div class="colunm-listing">
+
+                    <div class="f-row colunm-box rule-border-row">
+                        <div class="col col-x4"> <mat-label>Parameter</mat-label></div>
+                        <div class="col col-x4"> <mat-label> Attribute </mat-label></div>
+                        <div class="col col-x4"></div>
+                        <div class="col"></div>
+                    </div>
+
+                    <div class="f-col mdo-form-field">
+                            <mat-form-field appearance="outline">
+                                <input matInput placeholder="Type parameter name to add"
+                                       [matAutocomplete]="paramAuto" />
+                                <mat-autocomplete #paramAuto="matAutocomplete">
+                                    <mat-option *ngFor="let field of filter(input.value)" (click)="addSelectionRow(field.fieldId)">
+                                        {{ field.fieldDescri }}
+                                    </mat-option>
+                                  </mat-autocomplete>
+                            </mat-form-field>
+                    </div>
+                    <ng-container formArrayName="selCriteria">
+                        <div *ngFor="let item of duplicateRuleForm.get('selCriteria').controls; let i = index"
+                            class="f-row colunm-box rule-border-row">
+
+                            <ng-container [formGroupName]="i">
+                                <div class="col col-x4">
+                                    <div mat-line> {{ getFieldDesc(item.value.fldId)}} </div>
+                                </div>
+                                <div class="col col-x4">
+                                    <button mat-stroked-button [matMenuTriggerFor]="fieldMatchMenu">
+                                        {{ item.value.selection }}
+                                            <mat-icon>arrow_drop_down</mat-icon></button>
+                                    <mat-menu #fieldMatchMenu="matMenu" class="hidden-arrow">
+                                        <button mat-menu-item (click)="setControlValue('selCriteria', 'selection', 'Pick_From_The_Record', i)" > Pick From The Record </button>
+                                        <button mat-menu-item (click)="setControlValue('selCriteria', 'selection', 'Custom', i)"> Custom </button>
+                                    </mat-menu>
+                                </div>
+                                <div class="col col-x4">
+                                    <mat-form-field appearance="outline" *ngIf="item.value.selection === 'Custom'">
+                                        <input matInput formControlName="txtVal" />
+                                    </mat-form-field>
+                                </div>
+                                <div class="col">
+                                    <button mat-button (click)="removeFormArrayRow('selCriteria', i)">
+                                        <mat-icon>delete_outline</mat-icon>
+                                    </button>
+                                </div>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div> -->
+</form>

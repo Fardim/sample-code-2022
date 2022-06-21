@@ -1,0 +1,106 @@
+<div class="root">
+    <div class="f-row-spacer-half"></div>
+    <div class="f-row">
+      <lib-text-line type="leading"> PDF template builder </lib-text-line>
+      <div class="f-spacer"></div>
+      <lib-button-group>
+        <lib-button type="minor" (click)="createNewPDFTemplate(null)">New PDF template</lib-button>
+      </lib-button-group>
+    </div>
+  
+    <div class="f-row-spacer-half"></div>
+  
+    <!-- Empty State  -->
+    <lib-empty-state
+      class="f-col load-empty"
+      primaryText="Nothing to see here"
+      icon="table"
+      iconSize="200"
+      secondaryText="You don't have any number settings created yet. Would you like to create one?"
+      *ngIf="!formListHasData"
+    >
+      <lib-button type="minor" (click)="createNewPDFTemplate(null)">New PDF template</lib-button>
+    </lib-empty-state>
+  
+    <ng-container *ngIf="formListHasData">
+      <!-- Search and Filters Section -->
+      <div class="f-row filters-list">
+        <pros-pdf-template-list-filters [reqParam]="reqParam" (emitReqParam)="emitReqParam($event)">
+        </pros-pdf-template-list-filters>
+        
+      </div>
+
+      <!-- Number Settings Table -->
+      <div class="f-row-spacer-half"></div>
+  
+      <lib-skeleton-overview *ngIf="showSkeleton"></lib-skeleton-overview>
+  
+      <div class="teams">
+        <table #table [ngStyle]="{ display: showSkeleton ? 'none' : '' }" mat-table [dataSource]="dataSource" class="mat-elevation-z0">
+          <!-- dynamic columns -->
+          <ng-template ngFor let-dynCol [ngForOf]="displayedColumns">
+            <ng-container [matColumnDef]="dynCol">
+              <th class="action-column" mat-header-cell *matHeaderCellDef>
+                <ng-container *ngIf="dynCol !== 'action'">
+                {{ getLabel(dynCol) }}
+              </ng-container>
+              </th>
+  
+              <td mat-cell *matCellDef="let element" [ngClass]="{ 'action-cell': dynCol == 'action'}">
+                <div class="f-row" *ngIf="dynCol == 'description'; else dateTemplate">
+                  <lib-text-line textColor="link" class="cursor" type="base" enableWrap="true" *ngIf="dynCol == 'description'; else dateTemplate" (click)="gotoEditPage(element)">
+                   {{ element[dynCol] }}
+                  </lib-text-line>
+                </div>
+  
+                <ng-template #dateTemplate>
+                  <lib-text-line type="base" enableWrap="true" *ngIf="dynCol == 'dateModified'; else userAvatarTemplate">
+                    {{ element[dynCol] | prosDatePipe }}
+                  </lib-text-line>
+                </ng-template>
+  
+                <ng-template #userAvatarTemplate>
+                  <lib-avatar *ngIf="dynCol == 'userModified'; else actionCellTemplate" [initials]="shortName(element[dynCol])" [libTooltip]="element[dynCol]"></lib-avatar>
+                </ng-template>
+  
+                <ng-template #actionCellTemplate>
+                  <div *ngIf="dynCol == 'action'; else defaultCellTemplate" class="f-row">
+                    <lib-button type="plain" icon="ellipsis-h" (click)="$event.stopPropagation()" [matMenuTriggerFor]="actionMenu">
+                    </lib-button>
+                    <mat-menu #actionMenu="matMenu" class="navigation-menu">
+                      <button mat-menu-item i18n="@@edit" (click)="createNewPDFTemplate(element)">Edit</button>
+                      <lib-section></lib-section>
+                      <button mat-menu-item i18n="@@delete" (click)="delete(element)">Delete</button>
+                    </mat-menu>
+                  </div>
+                </ng-template>
+  
+                <ng-template #defaultCellTemplate>
+                  <lib-text-line type="base" enableWrap="true">
+                    {{ element[dynCol] ? element[dynCol] : '' }}
+                  </lib-text-line>
+                </ng-template>
+              </td>
+            </ng-container>
+          </ng-template>
+  
+          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+        </table>
+      </div>
+      <div class="f-row-spacer-half"></div>
+  
+      <div class="f-row">
+        <lib-pagination
+          [currentPageIndex]="recordsPageIndex"
+          [totalCount]="totalCount"
+          [pageSize]="recordsPageSize"
+          (pageChangeEvent)="onPageChange($event)">
+        </lib-pagination>
+        <lib-text-line type="base" enableWrap="true">
+          {{ displayedRecordsRange }}
+        </lib-text-line>
+      </div>
+    </ng-container>
+  </div>
+  

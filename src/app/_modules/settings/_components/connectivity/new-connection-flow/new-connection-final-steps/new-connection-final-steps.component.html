@@ -1,0 +1,30 @@
+<div class="modal-wrapper">
+    <div class="f-row modal-header">
+      <lib-text-line type="leading">Next steps</lib-text-line>
+      <div class="f-row">
+        <lib-search placeholder="Search connectors"></lib-search>
+        <div class="f-col-spacer-half"></div>
+        <lib-button icon="times" (afterClick)="close()"></lib-button>
+      </div>
+    </div>
+
+    <div class="modal-header" *ngIf="!!bannerText">
+      <div class="f-col mdo-field">
+          <lib-banner status="error" [text]="bannerText"></lib-banner>
+        </div>
+    </div>
+
+    <div class="modal-body">
+
+    </div>
+
+    <div class="f-row modal-footer space-between">
+      <lib-button (afterClick)="close()">Cancel</lib-button>
+      <div class="f-row">
+        <lib-button>Back</lib-button>
+        <div class="f-col-spacer-half"></div>
+        <lib-button type="major" [disabled]="!createConnectionForm?.valid || saveLoader" (click)="createConnection()">Submit</lib-button>
+      </div>
+    </div>
+  </div>
+  

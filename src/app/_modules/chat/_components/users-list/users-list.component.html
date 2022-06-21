@@ -1,0 +1,20 @@
+<div class="overlay-content-container" *ngIf="users">
+    <lib-filter-option *ngFor="let option of users?.defaultOptions" (click)="select(option, 'default')">
+        <lib-text-line type="base">{{option.label}}</lib-text-line>
+    </lib-filter-option>
+    <lib-section></lib-section>
+    <lib-filter-option *ngIf="!users?.inChannel?.length && !users?.outsideChannel?.length">
+        No matches found
+    </lib-filter-option>
+    <lib-filter-option *ngFor="let user of users?.inChannel" (click)="select(user, 'inChannel')">
+        <lib-text-line type="base">{{user.name}}</lib-text-line>
+    </lib-filter-option>
+    <lib-section></lib-section>
+    <lib-filter-option *ngFor="let user of users?.outsideChannel" (click)="select(user, 'outsideChannel')">
+       <div class="f-row">
+            <lib-text-line type="base">{{user.name}}</lib-text-line>
+            <div class="f-spacer"></div>
+            <lib-text-line type="base" textColor="secondary">Not in channel</lib-text-line>
+       </div>
+    </lib-filter-option>
+</div>

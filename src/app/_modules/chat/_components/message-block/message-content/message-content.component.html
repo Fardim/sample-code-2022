@@ -1,0 +1,6 @@
+<pros-expandable-text-block [text]="message?.text"></pros-expandable-text-block>
+<pros-attachment-section class="attachment-section" *ngIf="message?.attachments?.length"
+    [downloadable]="true"
+    [attachments]="message.attachments"
+    [removable]="false">
+</pros-attachment-section>

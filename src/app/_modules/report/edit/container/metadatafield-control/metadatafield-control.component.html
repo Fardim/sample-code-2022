@@ -1,0 +1,40 @@
+<ng-template [ngIf]="isCustomdataset" [ngIfElse]="metadatafields">
+    <div class="f-col mdo-field">
+        <mat-label class="mdo-field-label">{{ lebel }}</mat-label>
+        <!-- input container -->
+        <div class="mdo-field-input">
+            <input matInput placeholder="Type to search" #optionsInput [formControl]="fieldFrmCtrl" [matAutocomplete]="fieldsCtrl" [value]="preSelectedCtrl ? preSelectedCtrl.fieldDescri: ''" matTooltip="{{preSelectedCtrl ? preSelectedCtrl.fieldDescri: ''}}" matTooltipPosition="right"
+            />
+            <!-- autocomplete -->
+            <mat-autocomplete class="mdo-autocomplete" #fieldsCtrl="matAutocomplete" [displayWith]="displayFn" (optionSelected)="selected($event)">
+                <mat-option class="mdo-option" *ngFor="let fld of customFieldsObs | async" [value]="fld" matTooltip="{{fld.fieldDescri}}" matTooltipPosition="right">
+                    {{fld.fieldDescri}}
+                </mat-option>
+            </mat-autocomplete>
+        </div>
+    </div>
+
+</ng-template>
+
+<ng-template #metadatafields>
+
+    <div class="f-col mdo-field">
+        <mat-label class="mdo-field-label">{{ lebel }}</mat-label>
+        <!-- input container -->
+        <div class="mdo-field-input">
+            <ng-container *ngIf="preSelectedCtrl?.fieldType?.fieldDescri"><span>{{preSelectedCtrl.fieldType.fieldDescri}}</span>/</ng-container>
+            {{Selected}}
+            <input matInput #optionsInput [formControl]="fieldFrmCtrl" [matAutocomplete]="fieldsCtrl" matTooltipPosition="right" [value]="preSelectedCtrl ? preSelectedCtrl.fieldDescri: ''" matTooltip="{{ preSelectedCtrl?.fieldType?.fieldDescri ?   preSelectedCtrl?.fieldType?.fieldDescri +' / '+ preSelectedCtrl?.fieldDescri: preSelectedCtrl ? preSelectedCtrl?.fieldDescri : ''}}"
+            />
+            <!-- autocomplete -->
+            <mat-autocomplete class="mdo-autocomplete" #fieldsCtrl="matAutocomplete" [displayWith]="displayFn" (optionSelected)="selected($event)">
+                <mat-optgroup *ngFor="let object of fieldsObs | async" [label]="object.fieldDescri">
+                    <mat-option class="mdo-option" *ngFor="let fld of object.childs" [value]="fld" matTooltip="{{fld.fieldDescri}}" matTooltipPosition="right">
+                        {{fld.fieldDescri}}
+                    </mat-option>
+                </mat-optgroup>
+            </mat-autocomplete>
+        </div>
+    </div>
+
+</ng-template>

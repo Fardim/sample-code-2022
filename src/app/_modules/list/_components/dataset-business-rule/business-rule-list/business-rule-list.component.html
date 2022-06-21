@@ -1,0 +1,239 @@
+<div class="root">
+  <div class="f-row-spacer-half"></div>
+  <div class="f-row">
+    <lib-text-line i18n="@@business_rules" type="leading"> Business rules </lib-text-line>
+    <div class="f-spacer"></div>
+    <lib-button i18n="@@new_br_rule" type="minor" (click)="createBusinessRule()">New business rule
+    </lib-button>
+  </div>
+
+  <div class="f-row-spacer-half"></div>
+
+  <!-- Empty State -->
+  <lib-empty-state class="f-col load-empty" primaryText="Nothing to see here" icon="table" iconSize="200"
+    secondaryText="You don't have any business rules created yet. Would you like to create one?"
+    *ngIf="!formListHasData">
+    <lib-button i18n="@@new_br_rule" type="minor" (click)="createBusinessRule()">New business rule
+    </lib-button>
+  </lib-empty-state>
+
+  <lib-skeleton-overview *ngIf="showSkeleton"></lib-skeleton-overview>
+
+  <div class="f-row filter-row">
+    <lib-search class="lib-search" i18n-placeholder="@@search" placeholder="Search"
+      (valueChange)="searchFieldSub.next($event)">
+    </lib-search>
+
+    <lib-chip-list class="mdo-chip-list">
+      <!-- STATUS -->
+      <lib-chip label="Status:" type="info" [matMenuTriggerFor]="statusType"
+        [removable]="filterData?.status == null ? false : true" (removed)="selectCurrentStatusType()">
+        {{ filterData?.status === false ? 'Inactive' : filterData?.status === true ? 'Active' : 'All' }}
+      </lib-chip>
+      <mat-menu #statusType="matMenu" xPosition="after" class="navigation-menu">
+        <button mat-menu-item (click)="selectCurrentStatusType()">All</button>
+        <button mat-menu-item (click)="selectCurrentStatusType(true)">Active</button>
+        <button mat-menu-item (click)="selectCurrentStatusType(false)">Inactive</button>
+      </mat-menu>
+      <!-- RULE TYPE -->
+      <lib-chip label="Rule type:" type="info" [matMenuTriggerFor]="ruleType"
+        [removable]="filterData?.ruleType ? true : false" (removed)="selectCurrentRuleType('')">
+        {{ filterData?.ruleType ? getRuleDesc(filterData?.ruleType) : 'All' }}
+      </lib-chip>
+      <mat-menu #ruleType="matMenu" xPosition="after" class="navigation-menu">
+        <button mat-menu-item (click)="selectCurrentRuleType('')">All</button>
+        <ng-container *ngFor="let type of businessRuleTypes">
+          <button mat-menu-item *ngIf="type.isImplemented" [libTooltip]="type.ruleDesc"
+            (click)="selectCurrentRuleType(type.ruleType)">
+            {{ type.ruleDesc }}
+          </button>
+        </ng-container>
+      </mat-menu>
+
+      <!-- MODIFIED BY -->
+      <lib-chip label="Modified by:" i18n-label="@@role" [matMenuTriggerFor]="modifiedbyMenu" type="info"
+        [removable]="filterData?.userModified?.length ? true : false"
+        (removed)="setSelectedModifyby(null); afterFilterMenuClosed()">
+        {{ filterData?.userModified?.length > 0 ? filterData?.userModified?.slice(0, 2)?.join(', ') : 'All' }}
+      </lib-chip>
+
+      <ng-container *ngIf="filterData?.userModified?.length > 2">
+        <lib-chip class="lib-chip" type="info" [matMenuTriggerFor]="selectedUserMenu"> +{{
+          filterData?.userModified?.length - 2 }} </lib-chip>
+
+        <mat-menu #selectedUserMenu="matMenu" class="navigation-menu">
+          <ng-container *ngFor="let label of filterData?.userModified | slice: 2">
+            <button mat-menu-item>
+              {{ label }}
+            </button>
+          </ng-container>
+        </mat-menu>
+      </ng-container>
+
+      <mat-menu #modifiedbyMenu="matMenu" xPosition="after" class="filter-menudropdown">
+        <lib-filter-dropdown class="chip-filters">
+          <div class="dropdown-search-wrapper">
+            <lib-search #searchInput prosClickStopPropagation (valueChange)="searchModifyBySub.next($event)">
+            </lib-search>
+          </div>
+          <div class="dropdown-options-wrapper f-col">
+            <div class="dropdown-options-inner-container" prosInfiniteScroll bufferPercentage="20"
+              (scrollEnd)="modifybyScrollEnd()">
+              <div class="default-options">
+                <lib-filter-option>
+                  <lib-checkbox label="All" (valueChange)="setSelectedModifyby(null)"></lib-checkbox>
+                </lib-filter-option>
+                <lib-section></lib-section>
+              </div>
+              <div class="options">
+                <lib-filter-option prosClickStopPropagation *ngFor="let item of filteredmodifybyUsers">
+                  <lib-checkbox [label]="item.userName" prosClickStopPropagation
+                    [checked]="filterData?.userModified?.length && filterData?.userModified?.indexOf(item.userName) >= 0"
+                    (valueChange)="setSelectedModifyby(item)">
+                  </lib-checkbox>
+                </lib-filter-option>
+              </div>
+            </div>
+            <div class="filter-button-wrapper">
+              <lib-button type="minor" (click)="afterFilterMenuClosed()">Apply</lib-button>
+            </div>
+          </div>
+        </lib-filter-dropdown>
+      </mat-menu>
+    </lib-chip-list>
+  </div>
+
+  <!-- BUSINESS LISTING -->
+  <div class="data-listing" *ngIf="formListHasData">
+    <table #table [ngStyle]="{ display: showSkeleton ? 'none' : '' }" mat-table [dataSource]="dataSource"
+      class="mat-elevation-z0">
+      <ng-template ngFor let-dynCol [ngForOf]="displayedColumns">
+        <!-- Checkbox Column -->
+        <ng-container *ngIf="dynCol === '_select' || dynCol ===  'action'" [matColumnDef]="dynCol"  sticky>
+          <th mat-header-cell *matHeaderCellDef>
+            <lib-checkbox *ngIf="dynCol !== 'action'" prosClickStopPropagation [checked]="selection.hasValue() && isAllSelected()"
+              (valueChange)="masterToggle()">
+            </lib-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row">
+            <lib-checkbox *ngIf="dynCol === '_select'" prosClickStopPropagation [checked]="selection.isSelected(row)"
+              (valueChange)="selection.toggle(row)">
+            </lib-checkbox>
+
+            <div *ngIf="dynCol == 'action'" class="f-row">
+              <lib-button type="plain" icon="ellipsis-h" (click)="$event.stopPropagation()"
+                [matMenuTriggerFor]="actionMenu">
+              </lib-button>
+              <mat-menu #actionMenu="matMenu" class="navigation-menu">
+                <button mat-menu-item i18n="@@duplicate" (click)="duplicateBusinessRule(row)">Duplicate</button>
+                <lib-section></lib-section>
+                <button mat-menu-item i18n="@@delete" (click)="deleteBusinessRule(row)">Delete</button>
+              </mat-menu>
+            </div>
+          </td>
+        </ng-container>
+
+        <ng-container *ngIf="dynCol !== '_select' && dynCol !== 'action'" [matColumnDef]="dynCol">
+          <th class="action-column" mat-header-cell *matHeaderCellDef>
+            <ng-container *ngIf="dynCol !== 'action'">
+             {{ getLabel(dynCol) }}
+          </ng-container>
+          </th>
+       
+
+          <td mat-cell *matCellDef="let element" [ngClass]="{ 'action-cell': dynCol == 'action'}">
+            <div class="f-row" *ngIf="isArray(element[dynCol]); else descriptionTemplate">
+              <lib-chip-list *ngIf="element[dynCol]">
+                <ng-container *ngFor="let label of element[dynCol]; let firstIndex = first">
+                  <lib-label *ngIf="firstIndex" class="lib-chip">
+                    {{ label?.schemaName || label?.formName || label?.flowName || label }}
+                  </lib-label>
+                </ng-container>
+
+                <ng-container *ngIf="element[dynCol]?.length > 1">
+                  <lib-label class="lib-chip" type="info" [matMenuTriggerFor]="newFormtypeMenu">
+                    +{{ element[dynCol]?.length - 1 }}
+                  </lib-label>
+
+                  <mat-menu #newFormtypeMenu="matMenu" class="navigation-menu">
+                    <ng-container *ngFor="let label of element[dynCol]; let firstIndex = first">
+                      <button mat-menu-item *ngIf="!firstIndex">
+                        {{ label?.schemaName || label?.formName || label?.flowName }}
+                      </button>
+                    </ng-container>
+                  </mat-menu>
+                </ng-container>
+              </lib-chip-list>
+            </div>
+
+            <ng-template #descriptionTemplate>
+              <div *ngIf="dynCol == 'brName'; else ruleTemplate" class="f-row">
+                <lib-text-line textColor="link" class="cursor" type="base" (click)="getRuleInfo(element)">
+                  {{ element[dynCol] ? element[dynCol] : '' }}
+                </lib-text-line>
+              </div>
+            </ng-template>
+
+            <ng-template #ruleTemplate>
+              <div *ngIf="dynCol == 'ruleType'; else dateTemplate" class="f-row">
+                <lib-text-line type="base">
+                  {{ element[dynCol] ? getRuleDesc(element[dynCol]) : '' }}
+                </lib-text-line>
+              </div>
+            </ng-template>
+
+            <ng-template #dateTemplate>
+              <lib-text-line type="base" enableWrap="true" *ngIf="dynCol == 'modifiedDate'; else userTemplate">
+                {{ element[dynCol] | date }}
+              </lib-text-line>
+            </ng-template>
+
+            <ng-template #userTemplate>
+              <lib-text-line type="base" enableWrap="true" *ngIf="dynCol == 'modifiedBy'; else statusTemplate">
+                {{ element[dynCol]?.fullName }}
+              </lib-text-line>
+            </ng-template>
+
+            <ng-template #statusTemplate>
+              <ng-container *ngIf="dynCol == 'status'; else actionCellTemplate">
+                <lib-label *ngIf="element[dynCol]" text="Active" appearance="solid" status="success">
+                </lib-label>
+                <lib-label *ngIf="!element[dynCol]" text="Inactive" appearance="solid" status="error">
+                </lib-label>
+              </ng-container>
+            </ng-template>
+
+            <!-- <lib-text-line type="base" enableWrap="true">
+              {{ element[dynCol] ? element[dynCol] : '' }}
+            </lib-text-line> -->
+          </td>
+        </ng-container>
+      </ng-template>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell no-result" [colSpan]="displayedColumns.length">
+          <div class="f-row empty-block">
+            <lib-empty-state icon="search" primaryText="Nothing to see here"
+            secondaryText="No business rules are available">
+          </lib-empty-state>
+          </div>
+
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="f-row-spacer-half"></div>
+
+  <!-- PAGINATION -->
+  <div class="f-row" *ngIf="totalCount">
+    <lib-pagination [currentPageIndex]="recordsPageIndex" [totalCount]="totalCount" [pageSize]="recordsPageSize"
+      (pageChangeEvent)="onPageChange($event)">
+    </lib-pagination>
+    <lib-text-line type="base" enableWrap="true">
+      {{ displayedRecordsRange }}
+    </lib-text-line>
+  </div>
+</div>

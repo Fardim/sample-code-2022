@@ -1,0 +1,20 @@
+<div class="f-row">
+  <lib-checkbox
+  [formControl]="copyField"
+  *ngIf="process === 'copy'"
+  class="copy-box"
+  ></lib-checkbox>
+
+  <div class="f-col w-100">
+    <lib-time-range-picker
+      (valueChange)="timeChange($event)"
+      [enableTimeInput]="true"
+      [emitDateOnSave]="false"
+      [disabled]="isFieldReadOnly || control.disabled"
+      [selectedRange]="control.value"
+      [isRequired]="isRequired"
+      [label]="fieldObj?.fieldCtrl?.description"
+      [hint]="getHint"
+    ></lib-time-range-picker>
+  </div>
+</div>

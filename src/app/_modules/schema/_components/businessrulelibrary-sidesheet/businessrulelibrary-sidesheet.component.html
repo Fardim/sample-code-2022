@@ -1,0 +1,57 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" (click)="closeDialogComponent()" iconFontType="light" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row">
+                <lib-text-line type="leading" i18n="@@business_rule_library">{{ isOnlyTransformation ? 'Transformation
+                    rule library' : 'Business rule library' }}</lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-button type="major" i18n="@@save" width="80px" (click)="saveSelection()">Save</lib-button>
+            </div>
+            <div class="f-row-spacer-half"></div>
+            <div class="f-row business-filters">
+                <lib-chip-list class="mdo-chip-list" *ngIf="!isOnlyTransformation">
+                    <lib-search class="lib-search" (valueChange)="brSearchSubject.next($event)"
+                        i18n-placeholder="@@search" placeholder="Search"></lib-search>
+                    <lib-chip class="mdo-filter-matchip" *ngIf="!crossDatasetRuleInfo?.isForCrossDatasetRule" [matMenuTriggerFor]="businessRuleType"
+                        label="Business rule type:" type="info" [removable]="selectedRuleType"
+                        (removed)="selectCurrentRuleType('')">
+                        {{selectedRuleType ? getRuleDesc(selectedRuleType) : 'All'}} </lib-chip>
+                </lib-chip-list>
+                <mat-menu #businessRuleType="matMenu" class="navigation-menu">
+                    <button mat-menu-item (click)="selectCurrentRuleType('')"> All </button>
+                    <ng-container *ngFor="let type of businessRuleTypes">
+                        <button mat-menu-item *ngIf="type.isImplemented" [libTooltip]="type.ruleDesc"
+                            (click)="selectCurrentRuleType(type.ruleType)">{{type.ruleDesc}}</button>
+                    </ng-container>
+                </mat-menu>
+            </div>
+        </div>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing" prosInfiniteScroll bufferPercentage="20" (scrollEnd)="onScrollEnd()">
+        <div class="mdo-justify">
+            <div class="loading-spinner" *ngIf="loader">
+                <lib-spinner diameter="30"></lib-spinner>
+            </div>
+            <div class="f-row empty-block" *ngIf="!loader && !businessRulesList.length">
+                <lib-empty-state i18n-primaryText="@@nothing_to_see_here" primaryText="Nothing to see here" i18n-secondaryText="@@no_results_found" secondaryText="No results found" icon="search" iconSize="200">
+                </lib-empty-state>
+            </div>
+            
+            <mat-list *ngIf="!loader" role="list" class="rule-list">
+                <mat-list-item role="listitem" *ngFor="let brItem of businessRulesList; trackBy: trackByFn">
+                    <lib-text-line type="base" class="br-info" enableWrap="true">{{brItem.brInfo}}</lib-text-line>
+                    <lib-text-line type="base" class="br-info" enableWrap="true">{{getRuleDesc(brItem.brType)}}</lib-text-line>
+                    <lib-button width="80px" *ngIf="!isSelected(brItem); else doneButton"
+                        (click)="selectBusinessRule(brItem, constants.ADD)" type="minor" i18n="@@add">Add</lib-button>
+                    <ng-template #doneButton>
+                        <lib-button width="80px" (click)="selectBusinessRule(brItem, constants.REMOVE)"
+                            type="minor" icon="check"></lib-button>
+                    </ng-template>
+                </mat-list-item>
+            </mat-list>
+        </div>
+    </div>
+</div>

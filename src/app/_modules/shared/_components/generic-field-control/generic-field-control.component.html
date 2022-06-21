@@ -1,0 +1,51 @@
+<div *ngIf="showBadge"
+    matBadge prosStatusBadge class="field-badge"
+    badgeIcon="info"
+    [statusBadgePosition]="{ top: 0, right: -11 }"
+    badgeIconFont="solid"
+    badgeType="" [matMenuTriggerFor]="regax" libTooltip="Apply regex">
+</div>
+
+<mat-label *ngIf="lebel">{{ lebel }}</mat-label>
+<mat-form-field appearance="outline">
+    <ng-template [ngIf]="isMultiSelection" [ngIfElse]="singleSelection">
+        <mat-chip-list #chipList aria-label="Select">
+            <mat-chip
+            *ngFor="let option of preSelectedCtrl"
+            (removed)="remove(option)">
+            {{ option.fieldDescri }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip>
+
+            <input matInput
+            [formControl]="fieldFrmCtrl"
+            [matAutocomplete]="fieldsCtrl"
+            [matChipInputFor]="chipList"
+            [placeholder]="placeholder"
+            [matChipInputAddOnBlur]="'true'"
+            (matChipInputTokenEnd)="add($event)" 
+            (click)="openPanel()">
+        </mat-chip-list> 
+    </ng-template>
+    <ng-template #singleSelection>
+        <input matInput (input)="clear()"
+        [formControl]="fieldFrmCtrl"
+        [matAutocomplete]="fieldsCtrl"
+        [placeholder]="placeholder"
+        [value]="(preSelectedCtrl && preSelectedCtrl[0]) ? preSelectedCtrl[0].fieldDescri : ''">
+    </ng-template>
+    <mat-autocomplete #fieldsCtrl="matAutocomplete" [displayWith]="displayFn" (optionSelected)="selected($event)">
+        <mat-optgroup *ngFor="let object of fieldsObs | async" [label]="object.fieldDescri">
+            <mat-option *ngFor="let fld of object.childs" [value]="fld"  matTooltip="{{fld.fieldDescri}}" matTooltipPosition="right">
+                {{fld.fieldDescri}}
+            </mat-option>  
+        </mat-optgroup>
+    </mat-autocomplete>
+</mat-form-field>
+
+<mat-menu #regax="matMenu">
+    <div class="field-badge-dropdown" prosClickStopPropagation>
+        <lib-textarea [rows]="4" label="Enter regex" [formControl]="regexCtrl"></lib-textarea>
+        <!-- <lib-input label="Enter regex" > </lib-input> -->
+    </div>
+</mat-menu>

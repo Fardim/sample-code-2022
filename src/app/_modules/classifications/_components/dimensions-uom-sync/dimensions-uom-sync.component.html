@@ -1,0 +1,24 @@
+<div class="modal-wrapper">
+  <div class="f-row modal-header">
+    <lib-text-line type="leading">Dimensions and UoM mapping - sync now</lib-text-line>
+    <lib-button i18n="@@close" icon="times" iconFontType="light" (click)="close()"></lib-button>
+  </div>
+  <div class="modal-body">
+    <div class="f-col mdo-field">
+      <lib-text-line type="xsmall" weight="strong" class="field-label">System to sync dimension and UoM</lib-text-line>
+      <mat-form-field class="operator" appearance="outline">
+        <mat-select>
+          <mat-option *ngFor="let dim of systemDimensionMap" [value]="dim">
+            {{dim}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="f-row modal-footer space-between">
+    <lib-button i18n="@@cancel" (click)="close()">Cancel</lib-button>
+    <div class="f-row">
+      <lib-button i18n="@@sync_now" type="major">Sync now</lib-button>
+    </div>
+  </div>
+</div>

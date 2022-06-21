@@ -1,0 +1,27 @@
+<mat-card class="root bxshadow-variant-1" routerLink={{linker()}}>
+    <mat-card-header>
+        <div mat-card-avatar>
+            <button *ngIf="icon" mat-fab aria-label="icon-button" class="TileAvtar__Admin" [ngStyle]="{'background-color': color}">
+                <mat-icon class="avtar_iconsrule" [ngStyle]="{'color': iconColor}">{{icon}}</mat-icon>
+            </button>
+            <img *ngIf="image" src={{image}} />
+        </div>
+    <span class="f-spacer"></span>
+        <mat-card-actions>            
+            <a prosClickStopPropagation mat-icon-button aria-label="open_in_new icon" matTooltip="Help" target="_blank" href={{help}}>
+                <mat-icon>open_in_new</mat-icon>
+            </a>
+            <button prosClickStopPropagation mat-icon-button aria-label="info icon" matTooltip="info">
+                <mat-icon>info</mat-icon>
+            </button>
+        </mat-card-actions>
+    </mat-card-header>
+<mat-divider></mat-divider>
+    <mat-card-content>
+        <span class="mat-h2">{{title}}</span>
+        <p class="mat-small">{{text}}</p>
+    </mat-card-content>
+    <mat-chip-list *ngIf="count>0">
+      <mat-chip >{{count}} {{chip}}</mat-chip>
+    </mat-chip-list>
+</mat-card>

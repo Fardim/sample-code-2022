@@ -1,0 +1,26 @@
+mat-card.widget {
+  box-sizing: border-box;
+  padding: 8px;
+  height: 100%;
+
+  mat-card-content {
+    height: calc(100% - 36px - 16px);
+    overflow: auto;
+  }
+
+  .hide {
+    display: none !important;
+  }
+
+  .invisible {
+    visibility: hidden;
+  }
+
+  .vw-100 {
+    width: 100vw !important;
+  }
+
+  .bar-height1 {
+    height: 100%;
+  }
+}

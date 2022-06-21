@@ -1,0 +1,30 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@conditions">Conditions</lib-text-line>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <mat-drawer-container class="sideNav-container" [hasBackdrop]="'false'">
+        <mat-drawer #drawer [mode]="'side'" [opened]="true">
+          <lib-search placeholder="Search module"></lib-search>
+          <div class="f-row-spacer-half"></div>
+          <mat-list role="list" class="mdo-list">
+            <mat-list-item role="listitem">List item 1</mat-list-item>
+            <mat-list-item role="listitem">List item 2</mat-list-item>
+            <mat-list-item role="listitem">List item 3</mat-list-item>
+          </mat-list>
+        </mat-drawer>
+        <mat-drawer-content>
+          <!-- <pros-list-filter-field-elements></pros-list-filter-field-elements> -->
+        </mat-drawer-content>
+      </mat-drawer-container>
+    </div>
+  </div>
+</div>

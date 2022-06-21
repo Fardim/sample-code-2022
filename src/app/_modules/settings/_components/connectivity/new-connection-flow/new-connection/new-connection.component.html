@@ -1,0 +1,45 @@
+<div class="root modal-wrapper">
+  <div class="f-row modal-header">
+    <lib-text-line type="leading">New SAP BTP instance</lib-text-line>
+    <div class="f-row">
+      <lib-search placeholder="Search connectors" class="lib-search" [formControl]="searchControl" class="li">
+      </lib-search>
+      <div class="f-col-spacer-half"></div>
+      <lib-button icon="times" iconFontType="light" (afterClick)="afterClose.emit()"></lib-button>
+    </div>
+  </div>
+
+  <div class="modal-body">
+    <div class="f-col dataset-list">
+      <div class="f-row dataset-palette">
+        <mat-card class="mat-elevation-z0 cursor" (click)="selectConnector(connection)" *ngFor="let connection of connectionsList | async">
+          <div class="f-row">
+            <lib-text-line type="base" weight="strong">{{ connection.title }}</lib-text-line>
+            &nbsp;
+            <mat-icon fontSet="mdo-icons-light" class="plain-icon" [libTooltip]="connection.description">
+              question-circle</mat-icon>
+          </div>
+          <div class="f-row-spacer-half"></div>
+          <pros-svg-icon [viewBox]="connection.viewPort" [height]="connection.height" [icon]="connection.iconTitle"
+            class="f-row svg-block"></pros-svg-icon>
+            <div class="row-spacer"></div>
+          <lib-text-line type="small" textColor="secondary">{{ connection.subtitle }}</lib-text-line>
+          <div class="row-spacer"></div>
+          <lib-text-line type="base" textColor="link" class="cursor" (click)="selectConnector(connection)"> Select </lib-text-line>
+          
+          <!-- <lib-text-line  class="cursor" type="base" textColor="link"
+        (afterClick)="selectConnector(connection)">Select
+            </lib-text-line> -->
+        </mat-card>
+      </div>
+    </div>
+  </div>
+  <div class="f-row modal-footer space-between">
+    <lib-button (afterClick)="afterClose.emit()">Cancel</lib-button>
+    <div class="f-row">
+      <!-- <lib-button>Back</lib-button>
+      <div class="f-col-spacer-half"></div>
+      <lib-button type="major">Next</lib-button> -->
+    </div>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+
+<ng-template [ngIf]="!isFilterWidget" [ngIfElse]="filterWidget">
+    <ng-template [ngIf]="isTableFilter === 'true'">
+        <div class="f-col lib-input" [matMenuTriggerFor]="datasearch" #trigger="matMenuTrigger">
+            <lib-input [placeholder]="placeholder" isReadOnly="true" [value]="isApplied ? control.value : ''">
+            </lib-input>
+        </div>
+        <mat-menu #datasearch="matMenu">
+            <div class="f-col singlepickcheck" prosClickStopPropagation>
+                <div class="menu-spacing">
+                    <lib-checkbox [label]="label" [checked]="isChecked()" [formControl]="control">
+                    </lib-checkbox>
+                </div>
+                <div class="filter-button-wrapper">
+                    <lib-button type="minor" (click)="trigger.closeMenu();applyFilter()" i18n="@@apply">Apply
+                    </lib-button>
+                </div>
+            </div>
+        </mat-menu>
+    </ng-template>
+
+    <ng-template [ngIf]="isTableFilter !== 'true'">
+        <lib-checkbox [label]="label" [checked]="isChecked()" [formControl]="control"
+            (valueChange)="applyFilter($event)">
+        </lib-checkbox>
+    </ng-template>
+</ng-template>
+<ng-template #filterWidget>
+    <div class="f-col singlepickcheck" prosClickStopPropagation>
+        <div class="menu-spacing">
+            <lib-checkbox [label]="label" [checked]="isChecked()" [formControl]="control">
+            </lib-checkbox>
+        </div>
+        <div class="filter-button-wrapper">
+            <lib-button type="minor" (click)="applyFilter()" i18n="@@apply">Apply
+            </lib-button>
+        </div>
+    </div>
+</ng-template>

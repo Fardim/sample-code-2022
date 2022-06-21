@@ -1,0 +1,67 @@
+<div *ngIf="moduleData && !loading && moduleId!=='new'" class="root">
+    <div class="f-col breadcrum-toolbar">
+        <div class="f-row">
+            <lib-text-line type="leading">
+                {{ moduleData ? ( moduleData.moduleDesc ? moduleData.moduleDesc: 'Untitled') : 'Untitled'}}
+            </lib-text-line>
+            <span class="f-spacer"></span>
+            <lib-button type="plain" (click)="openUploadSideSheet()" iconPosition="before" icon="arrow-from-bottom">
+                Upload data </lib-button>
+        </div>
+        <div class="row-spacer"></div>
+        <lib-banner status="info" [text]="datasetCountMsg"></lib-banner>
+    </div>
+
+    <table mat-table [dataSource]="moduleData.schemaLists" class="table-vertical">
+        <ng-container matColumnDef="schema">
+            <th mat-header-cell *matHeaderCellDef> Schema </th>
+            <td mat-cell *matCellDef="let element">
+                <lib-text-line (click)="openSchemaInfo(element.schemaId)" type="base" textColor="link" enableWrap="true"
+                    class="cursor">
+                    {{element.schemaDescription? element.schemaDescription:
+                    'Untitled'}}</lib-text-line>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef class="align-end"> Last run </th>
+            <td mat-cell *matCellDef="let element" class="align-end">
+                <lib-text-line type="base">{{ element.executionEndTime ?
+                    (element.executionEndTime | date:'MMM d, y, h:mm:ss a'): 'N/A'
+                    }}</lib-text-line>
+            </td>
+        </ng-container>
+        <ng-container matColumnDef="icon">
+            <th mat-header-cell *matHeaderCellDef class="align-end"> </th>
+            <td mat-cell *matCellDef="let element" class="align-end">
+                <lib-button icon="ellipsis-h" [matMenuTriggerFor]="menu"></lib-button>
+                <mat-menu #menu="matMenu" class="navigation-menu">
+                    <button mat-menu-item i18n="@@schedule"
+                        (click)="openScheduleSideSheet(element.schemaId)">Schedule</button>
+                    <button mat-menu-item i18n="@@statistics"
+                        (click)="openExecutionTrendSidesheet(element)">Statistics</button>
+                    <button mat-menu-item i18n="@@delete" (click)="deleteSchema(element.schemaId)">Delete</button>
+                </mat-menu>
+            </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+</div>
+
+<mat-card *ngIf="moduleId==='new'" class="mat-elevation-z0 new-module-creation root">
+    <div class="f-row empty-state">
+        <lib-empty-state primaryText="Nothing to see here"
+            secondaryText="You don't have any schemas. Would you like to create one?" icon="table"
+            iconSize="100">
+            <lib-button type="minor" [matMenuTriggerFor]="check" iconFontType="solid" icon="caret-down">Check data</lib-button>
+            <!-- module-menu -->
+            <mat-menu #check="matMenu" class="navigation-menu">
+                <button mat-menu-item (click)="openUploadScreen()">
+                    <mat-icon fontSet="mdo-icons" class="mat-menu-icon">plus</mat-icon> New module...
+                </button>
+            </mat-menu>
+        </lib-empty-state>
+    </div>
+</mat-card>
+
+<!-- <pros-skeleton-loader *ngIf="loading"></pros-skeleton-loader> -->

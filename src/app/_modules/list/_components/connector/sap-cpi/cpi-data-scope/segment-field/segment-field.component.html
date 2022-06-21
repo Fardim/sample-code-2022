@@ -1,0 +1,11 @@
+<lib-filter-option class="segment-field">
+    <div class="segment-field-text">
+      <lib-text-line class="target-name" type="base" textColor="primary" [enableWrap]="false">
+          <div [innerHTML]="(targetField?.externalFieldDesc || targetField?.externalFieldId) | highlight: searchTerm">
+              {{(targetField?.externalFieldDesc || targetField?.externalFieldId)}}
+          </div>
+      </lib-text-line>
+    </div>
+    <div class="f-spacer" *ngIf="removable"></div>
+    <lib-button iconFontType="light" *ngIf="removable" icon="times" (afterClick)="removeField()"></lib-button>
+</lib-filter-option>

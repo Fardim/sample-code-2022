@@ -1,0 +1,24 @@
+.root {
+  user-select: text;
+  margin: 0 12px;
+  overflow: hidden;
+
+  .classification-container {
+    align-items: flex-start;
+  }
+
+  .container {
+    flex: 1;
+    padding-left: 6px;
+    width: calc(100% - 224px);
+
+    .filter,
+    .table-data {
+      display: flex;
+    }
+
+    .class-data {
+      overflow: auto;
+    }
+  }
+}

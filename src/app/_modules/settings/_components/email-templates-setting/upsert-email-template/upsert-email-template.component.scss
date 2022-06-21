@@ -1,0 +1,93 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+
+  .breadcrum-toolbar {
+    padding: 8px 12px;
+
+    .mdo-constrained-right {
+      align-items: center;
+      width: 100%;
+      margin-right: 0;
+
+      .breadcrum-head {
+        width: 100%;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px);
+    overflow-y: scroll;
+    overflow-x: hidden;
+
+    .mdo-justify {
+      margin: 0 16px;
+
+      .field-label {
+        margin-bottom: 6px;
+      }
+
+      .import-files {
+        .drag-input {
+          position: absolute;
+          width: 100%;
+          opacity: 0;
+        }
+      }
+
+      .attachment-listrow {
+        flex-wrap: wrap;
+        display: flex;
+        gap: 6px;
+
+        .lib-class {
+          margin: 0 3px 6px 3px;
+          max-width: 300px;
+        }
+
+        .attachment-section {
+          align-items: stretch;
+          padding-left: 6px;
+
+          .attachment-icon {
+            width: 14px;
+            height: 14px;
+            margin-right: 6px;
+          }
+        }
+      }
+
+      .dynamic-attachment {
+        border-width: 1px;
+        border-style: solid;
+        padding: 6px;
+        margin-bottom: 18px;
+      }
+    }
+  }
+}
+
+/* stylelint-disable */
+:host ::ng-deep {
+  .ql-editor {
+    min-height: 350px;
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 66px;
+      }
+    }
+  }
+}

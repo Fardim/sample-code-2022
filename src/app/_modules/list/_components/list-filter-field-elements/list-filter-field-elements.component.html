@@ -1,0 +1,156 @@
+<div class="root" [ngSwitch]="getFieldControlType(currentFilter.fieldId)">
+  <lib-input
+    *ngSwitchCase="[FieldControlType.EMAIL, FieldControlType.PASSWORD].includes(getFieldControlType(currentFilter.fieldId)) ? getFieldControlType(currentFilter.fieldId): !getFieldControlType(currentFilter.fieldId) "
+    i18n-placeholder="@@type_filter_value" placeholder="Type filter value" [value]="getFilterValue(currentFilter)"
+    (valueChange)="updateFilterValue($event)">
+  </lib-input>
+
+  <lib-input *ngSwitchCase="FieldControlType.NUMBER" type="number" i18n-placeholder="@@type_filter_value" placeholder="Type filter value"
+    [value]="getFilterValue(currentFilter)" (valueChange)="updateFilterValue($event)">
+  </lib-input>
+
+  <!-- input type Text area -->
+  <mat-form-field *ngSwitchCase="FieldControlType.TEXT_AREA" appearance="outline">
+    <textarea matInput class="mdo-textarea" i18n-placeholder="@@type_filter_value" placeholder="Type filter value"
+      [value]="getFilterValue(currentFilter)" (change)="updateFilterValue($event.target.value)"></textarea>
+  </mat-form-field>
+
+  <!-- input type Text -->
+  <ng-container *ngSwitchCase="FieldControlType.TEXT">
+    <div class="f-col mdo-field">
+      <div class="mdo-field-input" *ngIf="!showRuleToggled">
+        <input matInput placeholder="Search terms" [formControl]="control" #searchInput
+          (keyup)="afterKeyPress($event,searchInput,'search')" />
+        <lib-button type="plain" icon="times" iconFontType="light" *ngIf="searchInput.value"
+          (click)="searchInput.value = '';searchTearm = ''"></lib-button>
+        <div class="f-row-spacer-half"></div>
+      </div>
+
+      <div class="mdo-field-input chip-input">
+        <lib-chip-list class="chips-list">
+          <ng-container *ngFor="let value of selectedInputValues;">
+            <lib-chip [removable]="true" (removed)="remove(value)">
+              <lib-text-line type="small" [weight]="(searchTearm === value) ? 'strong' : 'default'"
+                [innerHTML]="value  | highlight: searchTearm"></lib-text-line>
+            </lib-chip>
+          </ng-container>
+          <input matInput [formControl]="control" #inputEl (keyup)="afterKeyPress($event,inputEl)" />
+        </lib-chip-list>
+      </div>
+      <mat-label><lib-text-line type="small" textColor="secondary">Hit enter to add a new value</lib-text-line></mat-label>
+      
+    </div>
+  </ng-container>
+
+  <!-- Multi select -->
+  <ng-container *ngSwitchCase="FieldControlType.MULTI_SELECT">
+    <ng-template [ngIf]="showRuleToggled">
+      <lib-segment [optionsList]="rulelist" labelKey="label" valueKey="value" [(ngModel)]="currentFilter.operator"
+        (valueChange)="ruleChange()"></lib-segment>
+      <div class="row-spacer"></div>
+    </ng-template>
+
+    <lib-search *ngIf="filteredDropdownValues.length" placeholder="Search" [formControl]="dropdownSearchCtrl"></lib-search>
+    <div class="row-spacer"></div>
+    <mat-list>
+      <mat-list-item *ngIf="filteredDropdownValues.length">
+        <lib-checkbox *ngIf="!isSelectedEnable" label="All" labelPosition="after" theme="primary" prosClickStopPropagation
+          [checked]="selection.hasValue() && isAllSelected()" (valueChange)="masterToggle()">
+        </lib-checkbox>
+
+        <div class="f-row" *ngIf="isSelectedEnable && selection.hasValue()">
+          <lib-button type="plain" icon="times" iconFontType="light" (click)="isSelectedEnable = false"></lib-button>
+          <div class="col-spacer"></div>
+          <lib-button [disabled]="false" [hasDropdown]="false"
+            (afterClick)="selection.clear();onMultiSelectToggle(false);isSelectedEnable = false">Remove all</lib-button>
+        </div>
+      </mat-list-item>
+      <mat-list-item *ngFor="let option of filteredDropdownValues">
+        <lib-checkbox [label]="option.value" labelPosition="after" theme="primary" prosClickStopPropagation
+          [checked]="selection.isSelected(option.value)" (valueChange)="selection.toggle(option.value);checkSelectedValue()">
+        </lib-checkbox>
+      </mat-list-item>
+    </mat-list>
+  </ng-container>
+
+  <!-- Date -->
+  <ng-container *ngSwitchCase="FieldControlType.DATE">
+    <div class="f-row system">
+      <div class="f-col date-list">
+        <mat-list>
+          <!-- Add class for selected list-item -->
+          <mat-list-item [ngClass]="{activeList: selectedList?.toLowerCase() === filterMetadata?.label?.toLowerCase() }" *ngFor="let filterMetadata of DATE_FILTERS_METADATA" (click)="dateFilterSelected(filterMetadata);">
+            <lib-text-line type="base"> {{ filterMetadata.label }}
+            </lib-text-line>
+            <span class="f-spacer"></span>
+            <mat-icon fontSet="mdo-icons-light">long-arrow-right</mat-icon>
+          </mat-list-item>
+        </mat-list>
+      </div>
+      <div class="col-spacer"></div>
+      <ng-container>
+        <ng-container [ngSwitch]="currentFilter.unit" libClickStopPropagation>
+          <!-- static date -->
+          <ng-container *ngSwitchCase="'static_date'">
+            <div class="static-date-picker">
+              <lib-date-picker libClickStopPropagation prosClickStopPropagation [selectedDate]="dateValue" [hideInput]="false"
+                (valueChange)="dateChanged($event);updateFilterValue($event);"></lib-date-picker>
+            </div>
+          </ng-container>
+
+          <!-- static date range -->
+          <ng-container *ngSwitchCase="'static_range'">
+            <lib-date-range-picker libClickStopPropagation prosClickStopPropagation [selectedDate]="dateRangeValue" [hideInput]="false"
+              [enableTimeInput]="true" (valueChange)="dateRangeChanged($event);updateFilterValue($event)"></lib-date-range-picker>
+          </ng-container>
+
+          <!-- Dynamic date range -->
+          <div *ngSwitchDefault class="f-col date-list">
+            <lib-radio-group layout="vertical" *ngIf="dateFilterOptions.length" [options]="dateFilterOptions"
+              [value]="getFilterValue(currentFilter)" (valueChange)="updateFilterValue($event)">
+            </lib-radio-group>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </ng-container>
+
+  <!-- Time -->
+  <ng-container *ngSwitchCase="FieldControlType.TIME">
+    <lib-tab-group disableRipple="true" class="time-range-picker">
+      <lib-tab i18n-label="@@start" label="Start">
+        <div class="f-row">
+          <div class="col-spacer"></div>
+          <lib-input type="number" minimum="0" maximum="23" #startHour [value]="getFilterValue(currentFilter).startHour"
+            (valueChange)="timefilterChange($event, 'startHour')" class="lib-time-input">
+          </lib-input>
+          <span class="semicolon"> : </span>
+          <lib-input type="number" minimum="0" maximum="59" #startMinutes [value]="getFilterValue(currentFilter).startMinutes"
+            (valueChange)="timefilterChange($event, 'startMinutes')" class="lib-time-input">
+          </lib-input>
+          <span class="f-spacer"></span>
+        </div>
+      </lib-tab>
+      <lib-tab i18n-label="@@end" label="End">
+        <div class="f-row">
+          <div class="col-spacer"></div>
+          <lib-input type="number" [minimum]="startHour.control.value" maximum="23" #endHour [value]="getFilterValue(currentFilter).endHour"
+            (valueChange)="timefilterChange($event, 'endHour')" class="lib-time-input">
+          </lib-input>
+          <span class="semicolon"> : </span>
+          <lib-input type="number" [minimum]="startHour.control.value === endHour.control.value ? startMinutes.control.value : 0"
+            maximum="59" #endMinutes [value]="getFilterValue(currentFilter).endMinutes"
+            (valueChange)="timefilterChange($event, 'endMinutes')" class="lib-time-input">
+          </lib-input>
+          <span class="f-spacer"></span>
+        </div>
+      </lib-tab>
+    </lib-tab-group>
+    <div class="f-col">
+      <lib-text-line type="base">{{getTimeFilterString()}}</lib-text-line>
+    </div>
+  </ng-container>
+
+  <lib-input *ngSwitchDefault i18n-placeholder="@@type_filter_value" placeholder="type filter value" [value]="getFilterValue(currentFilter)"
+    (valueChange)="updateFilterValue($event)"></lib-input>
+</div>

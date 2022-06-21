@@ -1,0 +1,11 @@
+<div class="root" [id]="id">
+    <lib-filter-option class="lib-filter-option" [ngClass]="{'selected': !!selected}">
+        <!-- <lib-button [disabled]="true"></lib-button> -->
+        <div class="f-col-spacer-half"></div>
+        <lib-text-line [title]="name" class="source-title" type="base" textColor="primary" [enableWrap]="false">
+            <div [innerHTML]="name | highlight: searchTerm">
+                {{name}}
+            </div>
+        </lib-text-line>
+    </lib-filter-option>
+</div>

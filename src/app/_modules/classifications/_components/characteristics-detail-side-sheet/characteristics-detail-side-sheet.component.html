@@ -1,0 +1,22 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading">{{ title }}</lib-text-line>
+        <div class="f-spacer"></div>
+        <!-- <lib-button width="80px" type="major" i18n="@@submit" (click)="save()">Submit</lib-button> -->
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <pros-characteristics-detail
+      [classId]="classId"
+      [relatedDatasetId]="relatedDatasetId === '0' ? '' : relatedDatasetId"
+      [title]="title"
+      [showAction]="showActions"
+      [showPaginator]="true"></pros-characteristics-detail>
+  </div>
+</div>

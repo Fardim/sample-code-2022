@@ -1,0 +1,24 @@
+<div class="f-col">
+    <mat-label *ngIf="label && isRequired;else notRequired">{{label}}<span class="mandatory">*</span></mat-label>
+    <ng-template #notRequired><mat-label>{{label}}</mat-label></ng-template>
+    <mat-form-field appearance="outline">
+        <input [id]="id" matInput class="mat-input"
+         [type]="type"
+         [placeholder]="placeholder"
+         autocomplete="off"
+         [value]="value" 
+         [formControl]="control" 
+         [maxlength]="maxLength" 
+         [min]="type==='number'? minimum : null"
+         [max]="type==='number' ? maximum:null"
+         [name]="name"
+         (blur)="onBlur($event.target.value)">
+        <div class="f-row input-actions" *ngIf="isHelpIcon">
+            <button mat-button matSuffix [matTooltip]="toolTipInfo">
+                <mat-icon fontSet="mdo-icons">{{helpIcon}}</mat-icon> 
+            </button>
+        </div>
+    <!-- <mat-error *ngIf="control.invalid">{{getErrorMessage(label)}}</mat-error> -->
+    </mat-form-field>
+    <mat-hint>{{hint}}</mat-hint>
+</div>

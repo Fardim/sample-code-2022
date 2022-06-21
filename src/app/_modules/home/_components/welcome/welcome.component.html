@@ -1,0 +1,112 @@
+<mat-card class="mat-elevation-z0 root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-text-line type="leading">Welcome to Master Data Online</lib-text-line>
+    </div>
+
+    <div class="f-row">
+
+        <lib-text-line type="base" enableWrap="true" class="paragraph-text">Master Data Online (MDO) delivers
+            trustworthy and reliable data to business users. By
+            mediating, managing and governing master data it can be shared by multiple master data domains. It enables
+            business users to easily create information with standardized business rules, workflows and approval
+            processes. Available both on cloud and enterprise models, MDO can integrate with SAP, Salesforce, Microsoft
+            and other leading enterprise solutions.</lib-text-line>
+
+        <pros-svg-icon size="100" icon="MDO_LOGO" class="welcome-logo"></pros-svg-icon>
+    </div>
+
+    <div class="row-spacer"></div>
+
+    <lib-progress mode="determinate" value="40"></lib-progress>
+
+    <div class="row-spacer"></div>
+
+    <mat-list>
+        <mat-list-item class="f-row">
+            <mat-icon mat-list-icon fontSet="mdo-icons-solid">graduation-cap</mat-icon>
+            <div class="f-col grid-line">
+                <lib-text-line type="leading" enableWrap="true">Show me around</lib-text-line>
+                <lib-text-line type="small" textColor="secondary" enableWrap="true">Take a tour and discover MDO</lib-text-line>
+            </div>
+            <div class="f-row">
+                <div class="col-spacer"></div>
+                <mat-icon fontSet="mdo-icons">check</mat-icon>
+                <div class="col-spacer"></div>
+            </div>
+            <lib-button class="lib-button" type="minor">Learn</lib-button>
+        </mat-list-item>
+
+        <lib-section></lib-section>
+
+        <mat-list-item>
+            <mat-icon mat-list-icon fontSet="mdo-icons">sliders-h</mat-icon>
+            <div class="f-col grid-line">
+                <lib-text-line type="leading">Configure your profile</lib-text-line>
+                <lib-text-line type="small" textColor="secondary">Set up your system preferences and upload your profile picture</lib-text-line>
+            </div>
+             <lib-button class="lib-button" type="minor">Configure</lib-button>
+        </mat-list-item>
+
+        <lib-section></lib-section>
+
+        <mat-list-item>
+            <mat-icon mat-list-icon fontSet="mdo-icons">user-plus</mat-icon>
+            <div class="f-col grid-line">
+                <lib-text-line type="leading">Invite your colleagues</lib-text-line>
+                <lib-text-line type="small" textColor="secondary">Invite others to join your team in MDO and start collaborating</lib-text-line>
+            </div>
+            <lib-button class="lib-button" type="minor">Invite</lib-button>
+        </mat-list-item>
+
+        <lib-section></lib-section>
+
+        <mat-list-item>
+            <mat-icon mat-list-icon fontSet="mdo-icons-solid">magic</mat-icon>
+            <div class="f-col grid-line">
+                <lib-text-line type="leading">Check your data</lib-text-line>
+                <lib-text-line type="small" textColor="secondary">Validate your data by uploading a new or using existing dataset</lib-text-line>
+            </div>
+             <lib-button class="lib-button" type="minor" [matMenuTriggerFor]="check" iconFontType="solid" icon="caret-down"
+                (menuOpened)="moduleSearchInput.clearSearch();">Check</lib-button>
+
+
+            <!-- module-menu -->
+            <mat-menu #check="matMenu" class="navigation-menu">
+                <lib-search class="field-mat-menu" #moduleSearchInput [placeholder]="'Search modules'"
+                    prosClickStopPropagation (value)="searchModule($event)"></lib-search>
+                <div class="menu-customdropdown">
+                    <ng-container *ngFor="let module of filteredModulesList; let i=index; trackBy:moduleTrackBy">
+                        <button [focus]="false" mat-menu-item [matMenuTriggerFor]="schemaMenu"
+                            (mouseenter)="schemaList(module.moduleId);">
+                            {{ module.moduleDesc || 'UNTITLED'}}
+                        </button>
+                    </ng-container>
+                </div>
+                <lib-section></lib-section>
+                <button mat-menu-item (click)="openUploadScreen()">
+                    <mat-icon fontSet="mdo-icons" class="mat-menu-icon">plus</mat-icon> New module...
+                </button>
+            </mat-menu>
+
+            <!-- schema-menu -->
+            <mat-menu #schemaMenu="matMenu" class="navigation-menu">
+                <lib-search class="field-mat-menu" [placeholder]="'Search schemas'" prosClickStopPropagation
+                    #searchInput (value)="searchSchema($event)"></lib-search>
+                <div class="menu-customdropdown">
+                    <ng-container *ngFor="let schema of filteredSchemaList;let i=index; trackBy:schemaTrackBy">
+                        <button mat-menu-item [focus]="false" (click)="selectschema(schema)">
+                            {{ schema.schemaDescription || 'UNTITLED'}}
+                        </button>
+                    </ng-container>
+                </div>
+                <lib-section></lib-section>
+                <button mat-menu-item (click)="selectschema()">
+                    <mat-icon fontSet="mdo-icons" class="mat-menu-icon">plus</mat-icon> New schema...
+                </button>
+            </mat-menu>
+        </mat-list-item>
+
+        <lib-section></lib-section>
+
+    </mat-list>
+</mat-card>

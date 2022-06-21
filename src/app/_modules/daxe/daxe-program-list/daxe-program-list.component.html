@@ -1,0 +1,112 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button class="times" (click)="close()" type="plain" iconFontType="light" icon="times"></lib-button>
+
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading">DAXE programs list</lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-button type="major" (click)="newDaxe()">New DAXE</lib-button>
+            </div>
+            <lib-banner status="info" text="Only one DAXE can be added to the business rule"></lib-banner>
+            <div class="f-row">
+                <lib-chip-list>
+                    <lib-search (valueChange)="search($event)" placeholder="Search" class="lib-search"></lib-search>
+                    <lib-chip type="info" label="Status:"> All</lib-chip>
+                    <lib-chip type="info" label="Created on:"> All</lib-chip>
+                    <lib-chip type="info" label="Created by:"> All</lib-chip>
+                    <lib-chip type="info" label="Modified on:"> All</lib-chip>
+                    <lib-chip type="info" label="Modified by:"> All</lib-chip>
+                </lib-chip-list>
+                <!--  [matMenuTriggerFor]="businessRuleType"
+                <mat-menu #businessRuleType="matMenu" class="navigation-menu">
+                    <button mat-menu-item (click)="selectCurrentRuleType(null)"> All </button>
+                    <ng-container *ngFor="let type of businessRuleTypes">
+                        <button mat-menu-item *ngIf="type.isImplemented" [libTooltip]="type.ruleDesc"
+                            (click)="selectCurrentRuleType(type)">{{type.ruleDesc}}</button>
+                    </ng-container>
+                </mat-menu> -->
+            </div>
+        </div>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <table mat-table [dataSource]="dataSource | async" class="table-vertical">
+                <ng-container matColumnDef="settings" sticky>
+                    <th mat-header-cell *matHeaderCellDef></th>
+                    <td mat-cell *matCellDef="let element">
+                        <lib-button-group>
+                            <lib-button type="minor" icon="ellipsis-h" [matMenuTriggerFor]="rowMeny"></lib-button>
+                            <lib-button type="minor" icon="check" iconFontType="light" [disabled]="!element.assignedState" (click)="toggleAssign(element)"></lib-button>
+                        </lib-button-group>
+                        <mat-menu #rowMeny="matMenu" class="navigation-menu">
+                            <lib-filter-option (click)="editDaxe(element)">Edit</lib-filter-option>
+                            <lib-filter-option>Duplicate</lib-filter-option>
+                            <lib-filter-option (click)="openDaxeChangeHistory(element)">View change history</lib-filter-option>
+                            <lib-filter-option>Activate/Deactivate</lib-filter-option>
+                        </mat-menu>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="name" sticky>
+                    <th mat-header-cell *matHeaderCellDef>DAXE</th>
+                    <td mat-cell *matCellDef="let element">
+                        <lib-text-line type="base" textColor="link">
+                            {{element.name}}
+                        </lib-text-line>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="status" sticky>
+                    <th mat-header-cell *matHeaderCellDef>Status</th>
+                    <td mat-cell *matCellDef="let element">
+                        <lib-text-line type="base">
+                            <ng-container [ngSwitch]="element.status">
+                                <ng-container *ngSwitchCase="DaxeStatus.DRAFT">
+                                    <lib-label status="info" class="mdo-filter-matchip" text="Drafted"></lib-label>
+                                </ng-container>
+                                <ng-container *ngSwitchCase="DaxeStatus.INACTIVE">
+                                    <lib-label status="error" class="mdo-filter-matchip" text="Inactive"></lib-label>
+                                </ng-container>
+                                <ng-container *ngSwitchDefault>
+                                    <lib-label status="success" class="mdo-filter-matchip" text="Active"></lib-label>
+                                </ng-container>
+                            </ng-container>
+                        </lib-text-line>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="createdOn" sticky>
+                    <th mat-header-cell *matHeaderCellDef>Created on</th>
+                    <td mat-cell *matCellDef="let element">
+                        <lib-text-line type="base">
+                            {{element.createdOn | date:'dd.MM.yyyy'}}
+                        </lib-text-line>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="createdBy" sticky>
+                    <th mat-header-cell *matHeaderCellDef>Created by</th>
+                    <td mat-cell *matCellDef="let element">
+                        <lib-avatar size="small" initials="TU"></lib-avatar>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="modifiedOn" sticky>
+                    <th mat-header-cell *matHeaderCellDef>Modified on</th>
+                    <td mat-cell *matCellDef="let element">
+                        <lib-text-line type="base">
+                            {{element.modifiedOn | date:'dd.MM.yyyy'}}
+                        </lib-text-line>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="modifiedBy" sticky>
+                    <th mat-header-cell *matHeaderCellDef>Modified by</th>
+                    <td mat-cell *matCellDef="let element">
+                        <lib-avatar size="small" initials="TU"></lib-avatar>
+                    </td>
+                </ng-container>
+    
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+        </div>
+    </div>
+</div>

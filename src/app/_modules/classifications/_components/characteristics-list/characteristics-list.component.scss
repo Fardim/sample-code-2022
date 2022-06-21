@@ -1,0 +1,36 @@
+.char-table {
+  overflow: auto;
+  height: 312px;
+
+  table.mat-table {
+    width: 100%;
+    overflow: auto;
+
+    td.mat-cell {
+      border-right: none;
+      min-width: 160px;
+
+      .lib-chips {
+        margin: 3px 6px 3px 0;
+      }
+
+      &.mat-column-select,
+      &.mat-column-action {
+        min-width: 48px;
+      }
+
+      &.mat-column-fieldType,
+      &.mat-column-decimalPlaces {
+        min-width: 120px;
+      }
+
+      &.mat-column-dataType {
+        min-width: 100px;
+      }
+
+      &.mat-column-length {
+        min-width: 80px;
+      }
+    }
+  }
+}

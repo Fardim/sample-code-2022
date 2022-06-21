@@ -1,0 +1,56 @@
+<!-- This component is only for decide view perspective ,, 
+     
+     Don't write any html code here ..
+-->
+
+<ng-container *ngIf="schemaDetails">
+
+    <!-- DATA QUALITIY VIEW -->
+    <pros-schema-details *ngIf="(displayFormat === 'DATAQUALITY_VIEW' || displayFormat === 'POTEXT_VIEW')" 
+        [schemaId]="schemaId" 
+        [moduleId]="moduleId"
+        [variantId]="variantId" 
+        [activeTab]="activeTab"
+        (runCompleted)="runCompleted()"
+        [schemaInfo] = "schemaDetails"
+        [isInRunning]="schemaDetails.isInRunning">
+    </pros-schema-details>
+
+
+    <!-- DUPLICATE VIEW -->
+    <pros-duplicacy *ngIf="displayFormat === 'DUPLICACY_VIEW'" 
+        [schemaId]="schemaId" 
+        [moduleId]="moduleId"
+        [activeTab]="activeTab"
+        [schemaInfo] = "schemaDetails"
+        [isInRunning]="schemaDetails.isInRunning">
+    </pros-duplicacy>
+
+
+    <!-- POTEXT VIEW -->
+    <!-- <pros-potext-view *ngIf="displayFormat === 'POTEXT_VIEW'" 
+        [schemaId]="schemaId" 
+        [moduleId]="moduleId"
+        [variantId]="variantId" 
+        [activeTab]="activeTab"
+        > 
+    </pros-potext-view> -->
+
+    <!-- CLASSIFICATION VIEW -->
+    <!-- <pros-classification-builder *ngIf="displayFormat === 'MRO_CLASSIFICATION_VIEW'" 
+        [schemaId]="schemaId"
+        [moduleId]="moduleId" 
+        [variantId]="variantId" 
+        [activeTab]="activeTab"
+        [schemaInfo] = "schemaDetails"
+        (runCompleted)="runCompleted()"
+        [isInRunning]="schemaDetails.isInRunning">
+    </pros-classification-builder> -->
+
+    <pros-description-datatable *ngIf="displayFormat === 'MRO_CLASSIFICATION_VIEW'"
+        dataFrom="DIW"
+        [schemaId]="schemaId"
+        [moduleId]="moduleId">
+    </pros-description-datatable>
+
+</ng-container>

@@ -1,0 +1,18 @@
+.chat-editor-inner {
+  .display-none {
+    display: none;
+  }
+
+  .upload-container {
+    flex-wrap: wrap;
+
+    .attachment-section {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+}
+
+.info-text {
+  padding: 6px 0;
+}

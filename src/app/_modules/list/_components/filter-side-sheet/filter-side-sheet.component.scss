@@ -1,0 +1,260 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  overflow-x: auto;
+  width: 768px;
+
+  .breadcrum-toolbar {
+    padding: 8px 16px;
+
+    .mdo-constrained-right {
+      align-items: center;
+      width: 100%;
+      margin-right: 0;
+
+      .breadcrum-head {
+        width: 100%;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px);
+    overflow: auto;
+    overflow-x: hidden;
+
+    .mdo-justify {
+      margin: 0 16px;
+
+      .field-label {
+        margin-bottom: 6px;
+      }
+
+      .slider-row {
+        flex: 1;
+
+        .lib-slider {
+          height: 48px;
+          width: 100%;
+        }
+
+        .percentage {
+          width: 36px;
+        }
+      }
+
+      mat-icon.mat-icon {
+        width: 12px;
+        font-size: 10px;
+      }
+
+      .mat-error {
+        margin-top: 6px;
+      }
+
+      .mat-head-icon {
+        font-size: 12px;
+        height: 14px;
+        width: 12px;
+        margin-left: 4px;
+      }
+
+      .user-defined-set {
+        position: relative;
+        padding: 0 0 0 16px;
+        overflow: auto;
+
+        &::before {
+          display: block;
+          content: "";
+          height: 100%;
+          width: 1px;
+          position: absolute;
+          top: 0;
+          left: 58px;
+        }
+
+        .defined-row {
+          border-width: 1px;
+          border-style: solid;
+          align-items: center;
+          height: 54px;
+          margin: 0 0 16px 0;
+          border-radius: 3px;
+
+          div.col {
+            display: block;
+            flex: 1;
+            min-width: 0;
+            // overflow: hidden;
+            position: relative;
+            padding: 0 8px;
+
+            &:first-of-type,
+            &:last-of-type {
+              min-width: auto;
+              flex: 0 0 auto;
+              padding: 0;
+            }
+
+            &.range-col {
+              flex: 2;
+            }
+
+            &.select-col {
+              width: 54px;
+              padding: 0 16px;
+              height: 54px;
+              align-items: center;
+              display: flex;
+              z-index: 1;
+              justify-content: center;
+              text-align: center;
+            }
+
+            .udr-change {
+              position: absolute;
+              left: -18px;
+            }
+          }
+        }
+
+        .subrule-row {
+          position: relative;
+
+          &::before {
+            display: block;
+            content: "";
+            height: 100%;
+            width: 1px;
+            position: absolute;
+            top: -16px;
+            left: 130px;
+          }
+        }
+
+        .sub-row {
+          position: relative;
+
+          &::before {
+            display: block;
+            content: "";
+            height: 100%;
+            width: 1px;
+            position: absolute;
+            top: -16px;
+            left: 228px;
+          }
+        }
+
+        .sub-defined {
+          padding-left: 88px;
+          margin: 0;
+          width: 648px;
+          display: flex;
+          position: relative;
+
+          .inline-row {
+            width: 594px;
+          }
+
+          .inline-add-block {
+            display: none;
+          }
+
+          &:hover {
+            .inline-add-block {
+              display: block;
+              margin-top: -14px;
+            }
+          }
+        }
+
+        .add-col {
+          margin: 0 0 0 25px;
+        }
+      }
+
+      pros-udr-value-control {
+        display: flex;
+        flex: 1;
+      }
+
+      .field-chip-list {
+        flex-wrap: wrap;
+
+        .lib-chip {
+          display: flex;
+          flex-direction: row;
+          width: auto;
+          padding: 2px;
+        }
+
+        .mat-input {
+          width: auto;
+          flex: 1;
+        }
+      }
+    }
+  }
+}
+
+.skeleton-loading {
+  width: 100%;
+  margin-right: 50px;
+
+  > div {
+    flex-grow: 1;
+  }
+}
+
+.colunm-box {
+  box-sizing: border-box;
+  min-height: 48px;
+
+  .col {
+    display: flex;
+    flex: 1 0 auto;
+    width: 1px;
+    align-items: center;
+    flex-wrap: wrap;
+
+    &.col-x4 {
+      flex: 4;
+    }
+
+    &.mat-item-center {
+      justify-content: center;
+    }
+
+    &.mat-item-end {
+      justify-content: flex-end;
+    }
+
+    .cursor {
+      cursor: pointer;
+    }
+  }
+}
+
+.add-block {
+  text-align: center;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 66px;
+      }
+    }
+  }
+}

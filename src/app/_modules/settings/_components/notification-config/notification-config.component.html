@@ -1,0 +1,80 @@
+<div class="f-col root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-text-line type="leading" i18n="@@notifications">Notifications</lib-text-line>
+    <span class="f-spacer"></span>
+    <lib-slide-toggle i18n-label="@@allow_notifications" [checked]="showNotifications" label="Allow notifications"
+      labelPosition="before" theme="primary" (toggleChange)="toggleNotifications()">
+    </lib-slide-toggle>
+  </div>
+
+  <div class="f-row-spacer-half"></div>
+
+  <lib-empty-state class="f-row empty-state" *ngIf="!showNotifications" i18n-primaryText="@@nothing_to_see_here" primaryText="Nothing to see here"
+    icon="order" iconSize="100" i18n-secondaryText="@@notifications_are_not_allowed"
+    secondaryText="Notifications are not currently allowed">
+    <lib-button type="minor" i18n="@@allow_notifications" (click)="toggleNotifications()">Allow notifications
+    </lib-button>
+  </lib-empty-state>
+
+  <div *ngIf="showNotifications">
+    <table mat-table [dataSource]="tableDataSource" matSort class="mat-elevation-z0" >
+      <ng-container matColumnDef="eventName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header i18n="@@event_name">
+          <lib-text-line type="base" weight="strong">Event name</lib-text-line>
+        </th>
+        <td mat-cell *matCellDef="let element">{{element.eventName}}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="allowDesktopNotification">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          <div class="f-row">
+            <lib-text-line type="base" weight="strong" i18n="@@desktop">Desktop</lib-text-line>
+            &nbsp;
+            <mat-icon fontSet="mdo-icons-light" i18n-title="@@desktop_tooltip"
+              [matTooltip]="'Notification will be displayed in the system tray'">question-circle</mat-icon>
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let element">
+          <lib-checkbox (valueChange)="masterToggle(element.eventId, 'allowDesktopNotification' , $event)"
+            [checked]="element.allowDesktopNotification" [aria-label]="'Desktop'">
+          </lib-checkbox>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="allowMobileNotification">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
+          <div class="f-row">
+            <lib-text-line type="base" weight="strong" i18n="@@mobile">Mobile</lib-text-line>
+            &nbsp;
+            <mat-icon fontSet="mdo-icons-light" i18n-title="@@mobile_tooltip"
+              [matTooltip]="'Notification will be displayed in the mobile'">question-circle</mat-icon>
+          </div>
+        </th>
+        <td mat-cell *matCellDef="let element">
+          <lib-checkbox (valueChange)="masterToggle(element.eventId, 'allowMobileNotification' , $event)"
+            [checked]="element.allowMobileNotification" [aria-label]="'Mobile'">
+          </lib-checkbox>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="emailNotification">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header i18n="@@email">
+          <lib-text-line type="base" weight="strong">Email</lib-text-line>
+        </th>
+        <td mat-cell *matCellDef="let element">
+          <mat-select [(value)]="element.emailNotification"
+            (selectionChange)="masterToggle(element.eventId,'emailNotification',$event.value)">
+            <mat-option value="1" i18n="@@do_not_send">Do not send</mat-option>
+            <mat-option value="2" i18n="@@when_event_occurs">When event occurs
+            </mat-option>
+            <mat-option value="3" i18n="@@weekly_digest">Weekly digest</mat-option>
+          </mat-select>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </div>
+</div>

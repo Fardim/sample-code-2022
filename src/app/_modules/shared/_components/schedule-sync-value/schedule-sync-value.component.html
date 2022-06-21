@@ -1,0 +1,125 @@
+<div class="root schedule-dropdown-sync">
+  <form [formGroup]="scheduleForm">
+    <div class="f-col">
+      <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@repeat">Repeat</lib-text-line>
+      <lib-segment class="lib-segment" formControlName="repeat" [optionsList]="repeatSegmentList" labelKey="label" valueKey="value" (valueChange)="repeatSegmentChange($event)">
+      </lib-segment>
+    </div>
+    <div *ngIf="everyInputLabel !== 'none'">
+      <div class="row-spacer"></div>
+      <ng-template [ngIf]="!businessRuleSync">
+        <lib-section></lib-section>
+        <div class="row-spacer"></div>
+      </ng-template>
+      <div class="f-row frequency-list"  *ngIf="everyInputLabel !== 'Years'">
+        <lib-input label="Every" formControlName="every" type="number" minimum="1" [isRequired]="true"
+            (valueChange)="everyInputValueChanged($event)">
+          </lib-input>
+          <div class="col-spacer"></div>
+          <lib-text-line type="base">{{everyInputLabel}}</lib-text-line>
+      </div>
+
+      <div class="f-col" *ngIf="everyInputLabel === 'Months' && !businessRuleSync">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@repeatBy">Repeat by<span class="mandatory">*</span>
+        </lib-text-line>
+        <div class="f-row frequency-list">
+          <div *ngFor="let dayOption of repeatByMonthOption; let i = index" class="frequecy-checkbox">
+            <lib-checkbox [label]="dayOption.label" labelPosition="after" theme="primary" [checked]="dayOption.checked"
+              (valueChange)="repeatByValueChange(dayOption)">
+            </lib-checkbox>
+            <div class="f-row-spacer-half"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="f-col" *ngIf="everyInputLabel === 'Weeks'">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@frequency">Frequency</lib-text-line>
+        <div class="f-row frequency-list">
+          <div *ngFor="let frequency of frequencyOptionList; let i = index" class="frequecy-checkbox">
+            <lib-checkbox [label]="frequency.label" labelPosition="after" theme="primary" [checked]="frequency.checked"
+              (valueChange)="onFrequencyChange($event,frequency)">
+            </lib-checkbox>
+            <div class="f-row-spacer-half"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="f-row-spacer-half"></div>
+      <ng-template [ngIf]="!businessRuleSync">
+        <lib-section></lib-section>
+        <div class="row-spacer"></div>
+      </ng-template>
+
+      <ng-template [ngIf]="showStartWithDateTime">
+        <div class="f-col">
+          <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@start">Starts on</lib-text-line>
+          <lib-segment formControlName="starts" [optionsList]="startOptionList" labelKey="label" valueKey="value"
+            (valueChange)="startSegmentChange($event)"></lib-segment>
+        </div>
+
+        <div class="row-spacer"></div>
+
+        <div class="f-col mdo-field" *ngIf="showCustomDateSelection">
+          <lib-date-time-picker class="datepicker" prosClickStopPropagation [hideInput]="false" [minDate]="today" [emitDateOnSave]="false"
+            [enableTimeInput]='true' (valueChange)="dateChanged($event,'dateTime')" afterBlur="dateChanged($event)"
+            formControlName="customDate">
+          </lib-date-time-picker>
+        </div>
+      </ng-template>
+
+      <ng-template [ngIf]="!showStartWithDateTime">
+        <div class="f-col">
+          <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@start">Starts on</lib-text-line>
+          <lib-date-picker class="datepicker" prosClickStopPropagation [hideInput]="false" [minDate]="today" [emitDateOnSave]="false"
+            [selectedDate]="getCustomDateValue()"
+            [enableTimeInput]='true' (valueChange)="dateChanged($event,'date')" formControlName="customDate">
+          </lib-date-picker>
+        </div>
+      </ng-template>
+
+      <div class="f-col mdo-field">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@ends">Ends</lib-text-line>
+        <lib-segment class="lib-segment" formControlName="ends" [optionsList]="endOptionList" labelKey="label" valueKey="value"
+          (valueChange)="endsSegmentChange($event)"></lib-segment>
+      </div>
+
+      <div class="f-col" *ngIf="scheduleForm.get('ends')?.value === 'AFTER' && businessRuleSync">
+        <lib-input label="Occurrences" formControlName="occurrence" type="number" minimum="1" [isRequired]="true"
+            (valueChange)="everyInputValueChanged($event)">
+        </lib-input>
+      </div>
+
+      <div class="f-col" *ngIf="scheduleForm.get('ends')?.value === 'ON' && businessRuleSync">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@date">Date</lib-text-line>
+        <lib-date-picker class="datepicker" prosClickStopPropagation [hideInput]="false" [minDate]="today" [emitDateOnSave]="false"
+          [selectedDate]="getOnDateValue()"
+          formControlName="occurrenceDate"
+          [enableTimeInput]='true' (valueChange)="onDateChanged($event)">
+        </lib-date-picker>
+      </div>
+
+      <div class="row-spacer"></div>
+      <ng-template [ngIf]="!businessRuleSync">
+        <lib-section></lib-section>
+        <div class="row-spacer"></div>
+      </ng-template>
+
+      <div class="f-row">
+        <lib-text-line weight="strong" type="base">Occurs ever {{scheduleForm.get('every').value}} {{everyInputLabel}}</lib-text-line>
+        &nbsp;
+        <lib-text-line weight="strong" type="base"*ngIf="scheduleForm.get('customDate').value">
+          from {{getFormattedCustomDate()}}&nbsp;
+        </lib-text-line>
+        <lib-text-line weight="strong" type="base">
+          and ending {{scheduleForm.get('ends').value}}&nbsp;
+        </lib-text-line>
+        <lib-text-line weight="strong" type="base" *ngIf="businessRuleSync && scheduleForm.get('occurrenceDate')?.value">
+          {{getOccurrenceDate()}}&nbsp;
+        </lib-text-line>
+        <lib-text-line weight="strong" type="base" *ngIf="businessRuleSync && scheduleForm.get('occurrence')?.value">
+          {{scheduleForm.get('occurrence').value}} occurrences
+        </lib-text-line>
+      </div>
+    </div>
+  </form>
+</div>

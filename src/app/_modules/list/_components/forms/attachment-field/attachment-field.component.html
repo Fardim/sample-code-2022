@@ -1,0 +1,135 @@
+<div class="root">
+   <div class="f-row breadcrum-toolbar">
+      <lib-button type="plain" icon="times" iconFontType="light" (click)="closePropertyPanel()"></lib-button>
+      <div class="f-col-spacer-half"></div>
+      <lib-text-line type="leading" i18n="@@field_properties">Field properties</lib-text-line>
+   </div>
+   <div class="f-col sidesheetcontent-listing">
+      <form [formGroup]="formGroup" *ngIf="formGroup">
+         <div class="f-col mdo-justify">
+          <div class="f-col" formGroupName="shortText">
+            <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@name">Name</lib-text-line>
+            <div formGroupName="en" *ngIf="locale == 'en'" class="f-col">
+              <lib-input placeholder="Description of Field" formControlName="description" class="lib-input" type="text"
+                (afterBlur)="fireValidationStatus($event)" i18n-placeholder="@@description" [hasError]="
+                  formGroup.get('shortText').get('en').controls.description?.errors &&
+                  (formGroup.get('shortText').get('en').controls.description?.errors?.required ||
+                  formGroup.get('shortText').get('en').controls.description?.errors?.whitespace)"
+                  [hint]="(formGroup.get('shortText').get('en').controls.description?.errors &&
+                    (formGroup.get('shortText').get('en').controls.description?.errors?.required ||
+                    formGroup.get('shortText').get('en').controls.description?.errors?.whitespace)) ? 'Name is required': ''"></lib-input>
+            </div>
+            <div formGroupName="fr" *ngIf="locale == 'fr'" class="f-col">
+              <lib-input placeholder="Description of Field" formControlName="description" class="lib-input" type="text"
+                (afterBlur)="fireValidationStatus($event)" i18n-placeholder="@@description" [hasError]="
+                  formGroup.get('shortText').get('fr').controls.description?.errors &&
+                  (formGroup.get('shortText').get('fr').controls.description?.errors?.required ||
+                  formGroup.get('shortText').get('fr').controls.description?.errors?.whitespace)"
+                  [hint]="(formGroup.get('shortText').get('fr').controls.description?.errors &&
+                    (formGroup.get('shortText').get('fr').controls.description?.errors?.required ||
+                    formGroup.get('shortText').get('fr').controls.description?.errors?.whitespace)) ? 'Name is required' : ''"></lib-input>
+            </div>
+          </div>
+
+
+            <div class="f-col mdo-field" *ngIf="['CHAR'].indexOf(formGroup.get('dataType').value) >= 0">
+               <mat-label class="mdo-field-label">
+                  Attachment type
+               </mat-label>
+               <div class="mdo-field-input">
+                  <input matInput placeholder="Attachment Type" (afterBlur)="fireValidationStatus($event)" #optionsInput
+                     [formControl]="attachmentTypeOptionCtrl" [matAutocomplete]="textCaseFilterAuto" />
+                  <mat-icon matSuffix fontSet="mdo-icons-light" class="autocomplete-icon">chevron-down</mat-icon>
+                  <mat-autocomplete class="mdo-autocomplete" #textCaseFilterAuto="matAutocomplete">
+                     <mat-option [libTooltip]="data?.tooltip" class="mdo-option"
+                        *ngFor="let data of filteredattachmentTypeOptions" [value]="data.value">
+                        {{ data.key }}
+                     </mat-option>
+                  </mat-autocomplete>
+               </div>
+            </div>
+
+            <!-- <div class="f-col mdo-field attachfield">
+               <lib-text-line class="field-label" type="xsmall" weight="strong">
+                  <span i18n-label="@@length">Attachment size (KB)</span>&nbsp;<mat-icon fontSet="mdo-icons-light" libTooltip="Maintain the maximum file size in KB, that can be uploaded by the user in the field.">question-circle</mat-icon>
+              </lib-text-line>
+               <lib-input matInput formControlName="attachmentSize" type="number" min="0"
+                  (afterBlur)="fireValidationStatus($event)"
+                  placeholder="Maximum Allowed Length" step="1" i18n-placeholder="@@maximum_length"
+                  [hasError]="formGroup.get('attachmentSize')?.errors?.required && !formGroup.get('attachmentSize')?.pristine"
+                  [hint]="(formGroup.get('attachmentSize')?.errors?.required && !formGroup.get('attachmentSize')?.pristine) ? 'Attachment size is required' : ''">
+               </lib-input>
+            </div> -->
+
+            <div class="f-col mdo-field" [class.mdo-form-error]="formGroup.controls?.attachmentSize.invalid"
+            [class.has-error]="formGroup.controls?.attachmentSize.invalid">
+               <lib-text-line class="field-label" type="xsmall" weight="strong">
+                  <span i18n-label="@@length">Attachment size (KB)</span>&nbsp;<mat-icon fontSet="mdo-icons-light" libTooltip="Maintain the maximum file size in KB, that can be uploaded by the user in the field.">question-circle</mat-icon>
+              </lib-text-line>
+               <div class="mdo-field-input">
+                 <input matInput placeholder="Maximum file size" formControlName="attachmentSize" type="number" min="1" autocomplete="off"
+                   step="1" (blur)="fireValidationStatus($event)" />
+               </div>
+               <mat-hint *ngIf="formGroup.controls.attachmentSize.errors?.required" class="mdo-field-hint">This is required</mat-hint>
+               <mat-hint  *ngIf="formGroup.controls.attachmentSize.errors?.min" class="mdo-field-hint">Minimum is 1</mat-hint>
+               <!-- <mat-error>
+                 <mat-error *ngIf="formGroup.controls.attachmentSize.errors?.required">
+                   <lib-text-line type="small"> This is required</lib-text-line>
+                 </mat-error>
+                 <mat-error *ngIf="formGroup.controls.attachmentSize.errors?.min">
+                   <lib-text-line type="small">Minimum is 0</lib-text-line>
+                 </mat-error>
+               </mat-error> -->
+             </div>
+
+            <div class="f-col mdo-field" [ngClass]="!options.length ? 'mdo-form-error' : ''">
+               <lib-text-line class="field-label" type="xsmall" weight="strong">
+                  <span>Attachment file type</span>&nbsp;<mat-icon fontSet="mdo-icons-light" libTooltip="Maintain the type of file that can be uploaded by the user in the field.">question-circle</mat-icon>
+              </lib-text-line>
+
+               <div class="mdo-field-input">
+                  <lib-chip-list>
+                     <ng-container *ngFor="let opt of options; let i=index">
+                        <ng-container>
+                           <lib-chip (removed)="remove(opt)" [removable]="true">{{opt?.key}}</lib-chip>
+                        </ng-container>
+                     </ng-container>
+                     <input matInput
+                        [formControl]="attachmentFileTypeCtrl"
+                        (afterBlur)="fireValidationStatus($event)"
+                        #trigger="matAutocompleteTrigger"
+                        placeholder="Select Attachment file type"
+                        [matAutocomplete]='auto'
+                        (click)="trigger.openPanel()"/>
+                     <mat-icon (click)="trigger.openPanel()" prosClickStopPropagation matSuffix fontSet="mdo-icons-light" class="autocomplete-icon">chevron-down</mat-icon>
+                     <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete">
+                        <mat-option (click)="selected(data)" class="mdo-option" *ngFor="let data of filteredAttachmentFileType | async">
+                           {{ data.key }}
+                        </mat-option>
+                     </mat-autocomplete>
+                  </lib-chip-list>
+               </div>
+            </div>
+
+            <div class="f-col mdo-field" formGroupName="longtexts"
+            *ngIf="['CHAR', 'NUMC', 'DEC', 'ALTN', 'ISCN'].indexOf(formGroup.get('dataType').value) >= 0">
+            <lib-text-line class="field-label" type="xsmall" weight="strong">
+               <span i18n="@@field_help"> Field help</span>&nbsp;<mat-icon fontSet="mdo-icons-light" libTooltip="This is to maintain additional information in relation to a field. It will get displayed on the form when user clicks on the Eye icon against the field.">question-circle</mat-icon>
+           </lib-text-line>
+                 <pros-quill-editor *ngIf="locale == 'en'" [fieldid]="getQuillEditorId()" formControlName="en" [editorConfig]="editorConfig"
+                    (afterBlur)="fireValidationStatus($event)"></pros-quill-editor>
+                 <pros-quill-editor *ngIf="locale == 'fr'" [fieldid]="getQuillEditorId()" formControlName="fn" [editorConfig]="editorConfig"
+                    (afterBlur)="fireValidationStatus($event)"></pros-quill-editor>
+              </div>
+
+            <div class="mdo-field" *ngIf="['CHAR'].indexOf(formGroup.get('dataType').value) >= 0">
+               <lib-slide-toggle formControlName="isCheckList" labelposition="after" label="Multi select"
+                  (toggleChange)="fireValidationStatus($event)" i18n-label="@@description_field" theme="primary"
+                  libTooltip="Selecting this property will allow you to upload multiple attachments when maintaining data.">
+               </lib-slide-toggle>
+            </div>
+
+         </div>
+      </form>
+   </div>
+</div>

@@ -1,0 +1,54 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading">Connection setting</lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-button [disabled]="isSave" width="80px" type="major" (click)="saveConnection()">Save</lib-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify" [formGroup]="editConnectionForm">
+      <div class="f-row-spacer-half"></div>
+      <lib-banner *ngIf="showTestConnectionMsg" status="error">
+        <lib-text-line type="base">Something went wrong!</lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="plain" icon="times" iconFontType="light" (click)="showTestConnectionMsg = false;"></lib-button>
+      </lib-banner>
+      
+      <div class="f-col mdo-field">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@name">Name
+        </lib-text-line>
+        <div class="mdo-field-input">
+          <div class="f-col-spacer-half"></div>
+          <lib-text-line>{{editConnectionForm.get('connectionName').value}}</lib-text-line>
+        </div>
+      </div>
+
+      <div class="f-col">
+        <lib-input label="Connection description" formControlName="connectionDescription" type="text" [isRequired]="true"
+          i18n-label="@@connectionDescription">
+        </lib-input>
+      </div>
+
+      <div class="f-col">
+        <lib-input label="Hostname URL" formControlName="hostName" type="text" [isRequired]="true" i18n-label="@@hostName">
+        </lib-input>
+      </div>
+
+      <div class="f-col">
+        <lib-input label="Username" formControlName="user" type="text" [isRequired]="true" i18n-label="@@user">
+        </lib-input>
+      </div>
+
+      <div class="f-col">
+        <lib-input label="Password" i18n-label="@@password" formControlName="password" type="password" [isRequired]="true">
+        </lib-input>
+      </div>
+    </div>
+  </div>
+</div>

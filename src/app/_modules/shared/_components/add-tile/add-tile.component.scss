@@ -1,0 +1,10 @@
+.root {
+  border-width: 2px;
+  border-style: dashed;
+  height: calc(100% - 36px); //16px * 2 padding and 2px * 2 border
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}

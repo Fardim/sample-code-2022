@@ -1,0 +1,80 @@
+<div class="f-row root">
+  <div class="f-col setting-tabs">
+    <div class="f-row breadcrum-toolbar">
+      <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+      <span class="f-col-spacer-half"></span>
+      <lib-text-line type="leading" i18n="@@settings">Settings</lib-text-line>
+    </div>
+
+    <div class="f-col">
+      <span class="f-row-spacer-half"></span>
+      <lib-section text="Personal"></lib-section>
+      <span class="f-row-spacer-half"></span>
+    </div>
+
+    <mat-list role="list" class="mdo-list">
+      <mat-list-item role="listitem" class="list-item" [routerLink]="['profile']" [routerLinkActive]="'selected'">
+        <lib-text-line type="base" i18n="@@profile">Profile</lib-text-line>
+      </mat-list-item>
+      <!-- <mat-list-item role="listitem" class="list-item" [routerLink]="['notif-config']" [routerLinkActive]="'selected'">
+        <lib-text-line type="base" i18n="@@notifications">Notifications</lib-text-line>
+      </mat-list-item> -->
+      <!-- <mat-list-item role="listitem" class="list-item" [routerLink]="['default-values']"
+        [routerLinkActive]="'selected'">
+        <lib-text-line type="base">Default values</lib-text-line>
+      </mat-list-item> -->
+      <mat-list-item role="listitem" class="list-item" [routerLink]="['extensions']" [routerLinkActive]="'selected'">
+        <lib-text-line type="base">Extensions</lib-text-line>
+      </mat-list-item>
+    </mat-list>
+
+    <div class="f-col" *ngIf="userDetail?.hasAdminAccess">
+      <span class="f-row-spacer-half"></span>
+      <lib-section text="System"></lib-section>
+      <span class="f-row-spacer-half"></span>
+    </div>
+
+    <mat-list role="list" class="mdo-list" *ngIf="userDetail?.hasAdminAccess">
+      <mat-list-item role="listitem" [routerLink]="['connectivity']" [routerLinkActive]="'selected'">
+        <lib-text-line type="base" i18n="@@connectivity">Connectivity</lib-text-line>
+      </mat-list-item>
+      <mat-list-item role="listitem" [routerLink]="['roles-permissions']" [routerLinkActive]="'selected'">
+        <lib-text-line type="base" i18n="@@roles_permissions">Roles and Permissions</lib-text-line>
+      </mat-list-item>
+      <mat-list-item role="listitem" [routerLink]="['password-policy']" [routerLinkActive]="'selected'">
+        <lib-text-line type="base" i18n="@@password_policy">Password Policy</lib-text-line>
+      </mat-list-item>
+      <mat-list-item role="listitem" [routerLink]="['teams']" [routerLinkActive]="'selected'">
+        <lib-text-line type="base" i18n="@@team">Team</lib-text-line>
+      </mat-list-item>
+      <!-- <mat-list-item role="listitem" [routerLink]="['tags']" [routerLinkActive]="'selected'">
+        <lib-text-line type="base" i18n="@@tags">Tags</lib-text-line>
+      </mat-list-item> -->
+      <mat-list-item role="listitem" [routerLink]="['classifications']" [routerLinkActive]="'selected'">
+        <lib-text-line type="base">Classification</lib-text-line>
+      </mat-list-item>
+      <mat-list-item role="listitem" [routerLink]="['email-templates']" [routerLinkActive]="'selected'">
+        <lib-text-line type="base" i18n="@@emailtemplates">Templates</lib-text-line>
+      </mat-list-item>
+      <!-- <mat-list-item role="listitem">
+        <lib-text-line type="base">Translation</lib-text-line>
+      </mat-list-item> -->
+      <mat-list-item role="listitem" [routerLink]="['organization']" [routerLinkActive]="'selected'">
+        <lib-text-line type="base">Organization</lib-text-line>
+      </mat-list-item>
+      <mat-list-item role="listitem" [routerLink]="['saml-configuration']" [routerLinkActive]="'selected'">
+        <lib-text-line type="base">SAML Configuration</lib-text-line>
+      </mat-list-item>
+      <mat-list-item role="listitem" [routerLink]="['packages']" [routerLinkActive]="'selected'">
+        <lib-text-line type="base" i18n="@@packages">Packages</lib-text-line>
+      </mat-list-item>
+      <mat-list-item role="listitem" [routerLink]="['data-model']" [routerLinkActive]="'selected'">
+        <lib-text-line type="base" i18n="@@data_model">Data model</lib-text-line>
+      </mat-list-item>
+    </mat-list>
+  </div>
+
+  <div class="f-col tabs-result">
+    <router-outlet></router-outlet>
+  </div>
+</div>

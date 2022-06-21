@@ -1,0 +1,93 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@properties">Properties</lib-text-line>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <lib-input value="Value" label="Name" i18n="@@name"></lib-input>
+
+      <div class="colunm-box">
+        <lib-text-line type="base" i18n="@@datasetlabel">
+          Label
+          <mat-icon fontSet="mdo-icons-light" class="label-icon"
+            libTooltip="Allows the user to define the name for the dataset level in the data model. Data when displayed in timeshe data model applications displays the label.">
+            question-circle
+          </mat-icon>
+        </lib-text-line>
+        <div class="mdo-field">
+          <lib-input type="text" placeholder="Dataset label" [expanded]="true">
+          </lib-input>
+        </div>
+      </div>
+
+      <div [formGroup]="formRelationShip">
+        <ng-container formArrayName="dataRelationShip">
+          <ng-container *ngFor="let relationForm of dataModelRelation.controls; let i = index">
+            <div class="relationship" [formGroup]="relationForm">
+              <lib-text-line type="base" i18n="@@datasetlabel">
+                Define the relationship between the datasets
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                  libTooltip="Allows the user to define the relationship between parent dataset. There can be more than one field defining the relationship">
+                  question-circle
+                </mat-icon>
+              </lib-text-line>
+              <div class="f-row rel-select ">
+                <div class="f-col mdo-field">
+                  <div class="mdo-field-input">
+                    <input matInput placeholder="Type to search" formControlName="parent" #numInput2
+                      [formControl]="numCtrl2" [matAutocomplete]="auto2" />
+                    <mat-icon matSuffix fontSet="mdo-icons" class="autocomplete-icon">chevron-down</mat-icon>
+                    <mat-autocomplete class="mdo-autocomplete" #auto2="matAutocomplete"
+                      (optionSelected)="selectSingle($event)">
+                      <mat-option class="mdo-option" *ngFor="let num of filteredNumbers2 | async" [value]="num">
+                        {{num}}
+                      </mat-option>
+                    </mat-autocomplete>
+                  </div>
+                </div>
+                <div class="f-col mdo-field">
+                  <div class="mdo-field-input">
+                    <input matInput placeholder="Type to search" formControlName="child" #numInput2
+                      [formControl]="numCtrl2" [matAutocomplete]="auto2" />
+                    <mat-icon matSuffix fontSet="mdo-icons" class="autocomplete-icon">chevron-down</mat-icon>
+                    <mat-autocomplete class="mdo-autocomplete" #auto2="matAutocomplete"
+                      (optionSelected)="selectSingle($event)">
+                      <mat-option class="mdo-option" *ngFor="let num of filteredNumbers2 | async" [value]="num">
+                        {{num}}
+                      </mat-option>
+                    </mat-autocomplete>
+                  </div>
+                </div>
+                <lib-button [icon]="'trash-alt'" iconFontType="light" [type]="'plain'" (click)="deleteRelationShip(i)">
+                </lib-button>
+
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+      <div class="add-more">
+        <lib-text-line i18n="@@add_another" class="cursor" (click)="addRelationShip()" type="xsmall" textColor="link">+
+          Add another field</lib-text-line>
+      </div>
+      <div class="row-spacer"></div>
+      <div class="f-row">
+        <lib-slide-toggle labelPosition="after" label="Enable recursive search" theme="primary"></lib-slide-toggle>
+        <mat-icon fontSet="mdo-icons-light" class="label-icon"
+          libTooltip="Allows the user to define if the dataset is required to be storing the data ince extacted from third-party systems.">
+          question-circle
+        </mat-icon>
+      </div>
+      <div class="row-spacer"></div>
+
+      <lib-button [type]="'minor'" width="100%" (click)="conditionButtonHandler()">Conditions</lib-button>
+    </div>
+  </div>
+</div>

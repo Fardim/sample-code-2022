@@ -1,0 +1,53 @@
+.collaborators-card {
+  padding: 8px;
+  margin: 4px 16px;
+
+  .f-row {
+    align-items: center;
+
+    .action-editable {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .f-col {
+    padding: 4px 8px;
+
+    .mat-line {
+      margin: 0;
+    }
+  }
+
+  .mat-card-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mat-icon-button {
+    width: 30px;
+    height: 30px;
+  }
+
+  .permissions {
+    justify-content: space-between;
+
+    mat-slide-toggle {
+      margin: 4px 8px;
+    }
+  }
+
+  .icon-user {
+    color: #0d66d0;
+  }
+
+  .icon-role {
+    color: #cb6f10;
+  }
+
+  .icon-group {
+    color: #12805c;
+  }
+}

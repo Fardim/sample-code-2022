@@ -1,0 +1,53 @@
+div.join-mapping {
+  flex: 1;
+  padding: 24px;
+  align-items: flex-start;
+
+  .table-left,
+  .table-right {
+    width: 400px;
+  }
+
+  .table-connector {
+    width: 100px;
+  }
+
+  .mapping-division {
+    align-items: center;
+    margin: 16px 0;
+
+    .mapconnect-button {
+      border: solid 1px;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    &::before {
+      content: '';
+      border-bottom-width: 1px;
+      border-bottom-style: solid;
+      width: 100%;
+      position: relative;
+      top: 19px;
+    }
+
+    .connections {
+      position: relative;
+      display: flex;
+      width: 100%;
+
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        top: -20px;
+        border-width: 1px;
+        border-style: solid;
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        z-index: 2;
+      }
+    }
+  }
+}

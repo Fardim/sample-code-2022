@@ -1,0 +1,253 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading" i18n="@@data_scope">{{ variantName.value || 'New data scope' }}
+                </lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button *ngIf="!saveInProgress" i18n="@@save" type="major" class="save-btn" (afterClick)="saveVarient()">Save</lib-button>
+                <lib-button *ngIf="saveInProgress" i18n="@@save" type="major" class="save-btn spinner" [disabled]="true">
+                    <lib-spinner type="major" [size]="30"></lib-spinner>
+                </lib-button>
+            </div>
+        </div>
+    </div>
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <lib-banner *ngIf="connectivityDataScope.currentComponent === 'connectivity'" status="warning" text="Warning: Making changes to the dataset will permanently modify your dataset. You will not be able to recover it!"></lib-banner>
+            <lib-banner *ngIf="connectivityDataScope.currentComponent !== 'connectivity'" status="info" text="Your scope contains {{scopeCnt || '0'}} records"></lib-banner>
+            <lib-banner *ngIf="errMsg" status="error" [text]="errMsg"></lib-banner>
+            <div class="f-col">
+                <lib-input class="mdo-scheduler-input" [formControl]="variantName" type="text"
+                    [value]="variantInfo.variantName" i18n-label="@@name" label="Name" [hasError]="submitted && variantName.invalid"
+                    [hint]="submitted && variantName.invalid ? 'Name is required' : ''"></lib-input>
+            </div>
+            <div class="f-row filter-section">
+                <div class="f-col filter-list">
+                    <lib-search placeholder="Search filters" class="lib-search"
+                        (valueChange)=(triggerFilterSearch($event))></lib-search>
+                    <div #filterScrollEl (scroll)="updateFiltersList(filterScrollEl)" class="f-col filter-scroll" *ngIf="allFilters.length">
+                        <mat-accordion>
+                            <mat-expansion-panel togglePosition="before" class="mat-elevation-z0"
+                                *ngFor="let filter of selectedFiltersDisplayList; let i=index; trackBy:filterTrackBy"
+                                [hideToggle]="filter.type === 'header'" (click)="selectDynamicFilter(filter, true)">
+                                <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+                                    <mat-panel-title class="mat-panel-title selected">
+                                        <lib-text-line type="base" enableWrap="true"
+                                            [matTooltip]="filter.fieldDescri || ''">{{ filter.fieldDescri || '' }}
+                                        </lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <lib-button *ngIf="filter.type === 'header'" type="plain"
+                                            (click)="removeField(filter)" iconFontType="light" icon="times">
+                                        </lib-button>
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <mat-nav-list role="navigation" *ngIf="filter.child && filter.child.length">
+                                    <mat-list-item *ngFor="let child of filter.child" class="f-row selected"
+                                        (click)="selectDynamicFilter(child, true)">
+                                        <lib-text-line type="base" enableWrap="true"
+                                            [matTooltip]="child.fieldDescri || ''">{{ child.fieldDescri
+                                            || '' }}</lib-text-line>
+                                        <div class="f-spacer"></div>
+                                        <lib-button type="plain" (click)="removeField(child, true)" iconFontType="light"
+                                            icon="times"></lib-button>
+                                    </mat-list-item>
+                                </mat-nav-list>
+                            </mat-expansion-panel>
+                            <lib-section></lib-section>
+                            <mat-expansion-panel togglePosition="before" class="mat-elevation-z0"
+                                *ngFor="let filter of filtersDisplayList; let i=index; trackBy:filterTrackBy"
+                                [hideToggle]="filter.type === 'header'" (click)="selectFilter(filter)"
+                                [class.hide]="!filter.show">
+                                <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+                                    <mat-panel-title class="mat-panel-title">
+                                        <lib-text-line type="base" enableWrap="true" class="list-item"
+                                            [matTooltip]="filter.fieldDescri || ''">{{
+                                            filter.fieldDescri || '' }}</lib-text-line>
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <mat-nav-list role="navigation" *ngIf="filter.child && filter.child.length">
+                                    <mat-list-item *ngFor="let child of filter.child"
+                                        (click)="selectFilter(child, true)" [class.hide]="!child.show" class="selected">
+                                        <lib-text-line type="base" enableWrap="true"
+                                            [matTooltip]="child.fieldDescri || ''">{{ child.fieldDescri
+                                            || '' }}</lib-text-line>
+                                    </mat-list-item>
+                                </mat-nav-list>
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                    </div>
+                </div>
+                <div class="f-col dynamic-container">
+                    <ng-container *ngIf="filterControlType === 'input_text' || filterControlType === 'input_desc'">
+                        <!-- <div class="f-col mdo-form-field">
+                            <lib-input [(ngModel)]="filterData.inputTextVal" (valueChange)="updateFilterValue($event)"
+                                type="text" label="Value"></lib-input>
+                        </div> -->
+                        <pros-chips-input label="Value"
+                            [(ngModel)]="filterData.inputTextVal"
+                            (valueChange)="updateFilterValue($event)">
+                        </pros-chips-input>
+                    </ng-container>
+                    <ng-container *ngIf="filterControlType === 'input_numeric'">
+                        <div class="f-col mdo-form-field">
+                            <lib-input [(ngModel)]="filterData.inputNumericVal"
+                                (valueChange)="updateFilterValue($event)" type="number" label="Value"></lib-input>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="filterControlType === 'textarea'">
+                        <div class="f-col mdo-form-field">
+                            <lib-textarea label="Description" [(ngModel)]="filterData.textareaVal" [rows]="4"
+                                (valueChange)="updateFilterValue($event)"></lib-textarea>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="filterControlType === 'checkbox'">
+                        <div class="f-col mdo-form-field">
+                            <lib-checkbox *ngFor="let field of dropdownValues; let i = index" [checked]="field.checked"
+                                (valueChange)="checkboxChanged($event, field.CODE, i)" [label]="field.TEXT"
+                                labelPosition="after" theme="primary" class="lib-checkbox"></lib-checkbox>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="filterControlType === 'radio'">
+                        <div class="f-col mdo-form-field">
+                            <lib-radio-group layout="vertical" [value]="filterData.selectedValue"
+                                [options]="dropdownValues" (valueChange)="updateFilterValue($event)"></lib-radio-group>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="filterControlType === 'picker_date'">
+                        <div class="f-row date-picker-section">
+                            <mat-list role="list" class="mdo-list date-picker-list">
+                                <mat-list-item [class.selected]="item === currentPickerType" role="listitem"
+                                    *ngFor="let item of datePickerList" (click)="updateDatePickerType(item)">
+                                    <span>{{ item }}</span>
+                                    <span class="f-spacer"></span>
+                                    <lib-button type="plain" icon="long-arrow-right"></lib-button>
+                                </mat-list-item>
+                                <mat-list-item [matMenuTriggerFor]="datePickerMenu"
+                                    [class.selected]="currentPickerType === 'Specific Date'"
+                                    (click)="updateDatePickerType('Specific Date')">
+                                    <span>Specific Date</span>
+                                    <span class="f-spacer"></span>
+                                    <lib-button type="plain" icon="long-arrow-right"></lib-button>
+                                </mat-list-item>
+                                <mat-menu #datePickerMenu="matMenu" class="date-picker-menu navigation-menu">
+                                    <div class="f-col">
+                                        <lib-date-picker prosClickStopPropagation [selectedDate]="dateValue" [hideInput]="true" (valueChange)="dateChanged($event)"></lib-date-picker>
+                                    </div>
+                                </mat-menu>
+                                <mat-list-item [matMenuTriggerFor]="dateRangePickerMenu"
+                                    [class.selected]="currentPickerType === 'Date Range'"
+                                    (click)="updateDatePickerType('Date Range')">
+                                    <span>Date Range</span>
+                                    <span class="f-spacer"></span>
+                                    <lib-button type="plain" icon="long-arrow-right"></lib-button>
+                                </mat-list-item>
+                                <mat-menu #dateRangePickerMenu="matMenu" class="date-picker-menu navigation-menu">
+                                    <div class="f-col">
+                                        <lib-date-range-picker prosClickStopPropagation [selectedDate]="dateRangeValue"
+                                            [hideInput]="true" [enableTimeInput]="true"
+                                            (valueChange)="dateRangeChanged($event)"></lib-date-range-picker>
+                                    </div>
+                                </mat-menu>
+                            </mat-list>
+                            <span class="f-col-spacer-half"></span>
+                            <mat-list class="date-picker-list" *ngIf="currentPickerType !== 'Date Range' && currentPickerType !== 'Specific Date'">
+                                <lib-radio-group layout="vertical" [options]="datePickerOptionsList"
+                                    [value]="filterData.dateCriteria" (valueChange)="updateFilterValue($event)">
+                                </lib-radio-group>
+                            </mat-list>
+                        </div>
+                    </ng-container>
+                    <ng-container *ngIf="filterControlType === 'picker_time'">
+                        <lib-time-range-picker [selected]="selectedTimeRange" [enableTimeInput]="true"
+                            (valueChange)="timeRangeChanged($event)"></lib-time-range-picker>
+                    </ng-container>
+
+                    <ng-container *ngIf="filterControlType === 'dropdown_single'">
+                        <div class="f-col mdo-field">
+                            <lib-text-line type="xsmall" weight="strong" class="field-label">Value</lib-text-line>
+                            <div class="mdo-field-input">
+                                <input matInput placeholder="Type to search" [formControl]="dropdownSearchCtrl"
+                                    [matAutocomplete]="auto" />
+                                <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete"
+                                    (optionSelected)="selectSingle($event)">
+                                    <mat-option class="mdo-option" *ngFor="let opt of dropdownFilteredValues"
+                                        [value]="opt.value">
+                                        {{ opt.value }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </div>
+                        </div>
+                    </ng-container>
+
+                    <ng-container *ngIf="filterControlType === 'dropdown_multi'">
+                        <lib-chip-list class="mdo-chip-list">
+                            <lib-chip [removable]="true" *ngFor="let field of dropdownSelectedChips"
+                                (removed)="selectMulti(field.TEXT, 'remove', dropdownSearchInput)">{{ field.TEXT }}</lib-chip>
+                        </lib-chip-list>
+
+
+                        <div class="f-col mdo-field">
+                            <lib-text-line type="xsmall" weight="strong" class="field-label">Value</lib-text-line>
+                            <div class="mdo-field-input">
+                                <input matInput placeholder="Type to search" [formControl]="dropdownSearchCtrl"
+                                    [matAutocomplete]="auto" #dropdownSearchInput/>
+                                <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete"
+                                    (optionSelected)="selectMulti($event, 'add', dropdownSearchInput)">
+                                    <mat-option class="mdo-option" *ngFor="let opt of dropdownFilteredValues"
+                                        [value]="opt.TEXT">
+                                        {{ opt.TEXT }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--<div class="f-col mdo-field">
+                <lib-text-line class="field-label" type="xsmall" weight="strong" i18n="@@scope">Scope</lib-text-line>
+                <div class="f-row">
+                    <mat-chip-list class="data-allocation-list">
+                        <ng-template ngFor let-ctrl [ngForOf]="variantInfo.filterCriteria">
+                            <mat-chip class="mdo-filter-matchip" disableRipple="true"
+                                [matMenuTriggerFor]="appliedfiltermenu" (click)="loadDropValues(ctrl)">
+                                <lib-text-line class="selected-text">
+                                    <label>
+                                        {{ ctrl.fldCtrl?.fieldDescri || ctrl.fldCtrl?.fieldDesc || 'Unknown' }}
+                                        :
+                                    </label>
+                                    <span class="info">
+                                        {{ prepareTextToShow(ctrl) }}
+                                    </span>
+                                </lib-text-line>
+                                <mat-icon matChipRemove (click)="removeFilter(ctrl)">
+                                    clear
+                                </mat-icon>
+                            </mat-chip>
+                        </ng-template>
+                        <lib-chip class="mdo-filter-matchip" [matMenuTriggerFor]="addfiltermenu"
+                            (click)="reInilize = !reInilize" iconFontType="solid" icon="filter"></lib-chip>
+                    </mat-chip-list>
+
+                    <mat-menu #appliedfiltermenu="matMenu">
+                        <pros-filter-values [moduleId]="moduleId"
+                            (selectedValues)="updateChipFilter($event, loadDropValuesFor.fieldId)"
+                            [fieldId]="loadDropValuesFor ? loadDropValuesFor.fieldId : ''"
+                            [checkedValue]="loadDropValuesFor ? loadDropValuesFor.checkedValue : []">
+                        </pros-filter-values>
+                    </mat-menu>
+
+                    <mat-menu #addfiltermenu="matMenu">
+                        <pros-add-filter-menu [alreadySelectedValues]="variantInfo.filterCriteria"
+                            [moduleId]="moduleId" (evtReadyForApply)="makeFilterCtrl($event)" [isSearchEnable]="true"
+                            [reInilize]="reInilize">
+                        </pros-add-filter-menu>
+                    </mat-menu>
+                </div>
+            </div>-->

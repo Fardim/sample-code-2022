@@ -1,0 +1,35 @@
+<div class="root" #rootContainer cdkScrollable>
+    <ng-template ngFor let-widget [ngForOf]="widgetList">
+        <div [ngStyle]="{ 'width.px' : (widget.width * boxSize),
+            'height.px': (widget.height * boxSize), 'top.px':(widget.positionY * boxSize) ,
+            'left.px': (widget.positionX * boxSize) }" class="widget-main-container">
+        
+            <!-- COUNT WIDGET -->
+            <pros-count *ngIf ="widget.widgetType ==='COUNT'" [widgetInfo]="widget" [boxSize]="boxSize" [widgetId] ="widget.widgetId" [reportId]="reportId" [filterCriteria]="filterCriteria" (evtFilterCriteria)="changeFilterCriteria($event)"></pros-count>
+                
+            <!-- FILTER WIDGET -->
+            <pros-filter *ngIf ="widget.widgetType ==='FILTER'" [widgetInfo]="widget" [boxSize]="boxSize" [widgetId] ="widget.widgetId" [reportId]="reportId" [filterCriteria]="filterCriteria" [isClearButtonClicked]="isClearButtonClicked" [hasFilterCriteria] = "emitClearBtnEvent" (evtFilterCriteria)="changeFilterCriteria($event, true)"></pros-filter>
+                
+            <!-- BARCHART WIDGET -->
+            <pros-bar-chart *ngIf ="widget.widgetType ==='BAR_CHART'" [widgetInfo]="widget" [boxSize]="boxSize" [widgetId] ="widget.widgetId" [reportId]="reportId" [filterCriteria]="filterCriteria" [permissons]="permissons" (evtFilterCriteria)="changeFilterCriteria($event)"></pros-bar-chart>
+            
+            <!-- STACKBARCHART WIDGET -->
+            <pros-stackedbar-chart *ngIf ="widget.widgetType ==='STACKED_BAR_CHART'" [widgetInfo]="widget" [boxSize]="boxSize" [widgetId] ="widget.widgetId" [reportId]="reportId" [filterCriteria]="filterCriteria" [permissons]="permissons" (evtFilterCriteria)="changeFilterCriteria($event)"></pros-stackedbar-chart>
+
+            <!-- PIEBARCHART WIDGET -->
+           <pros-pie-chart *ngIf ="widget.widgetType ==='PIE_CHART'" [widgetInfo]="widget" [boxSize]="boxSize" [widgetId] ="widget.widgetId" [reportId]="reportId" [filterCriteria]="filterCriteria" [permissons]="permissons" (evtFilterCriteria)="changeFilterCriteria($event)"></pros-pie-chart>
+             
+            <!-- DATATABLE WIDGET -->
+            <pros-reporting-list *ngIf ="widget.widgetType ==='TABLE_LIST'" [widgetInfo]="widget" [boxSize]="boxSize" [widgetId] ="widget.widgetId" [reportId]="reportId" [filterCriteria]="filterCriteria" (evtFilterCriteria)="changeFilterCriteria($event)" [hasFilterCriteria]="emtClearBtnClickedEvent"></pros-reporting-list>
+                
+            <!-- TIMESERIES WIDGET -->
+            <pros-timeseries-widget *ngIf ="widget.widgetType ==='TIMESERIES'" [widgetInfo]="widget" [boxSize]="boxSize" [widgetId] ="widget.widgetId" [reportId]="reportId" [filterCriteria]="filterCriteria" [hasFilterCriteria] = "emitClearBtnEvent" (evtFilterCriteria)="changeFilterCriteria($event)"></pros-timeseries-widget>
+                
+            <!-- IMAGE WIDGET -->
+            <pros-image *ngIf ="widget.widgetType ==='IMAGE'" [widgetInfo]="widget" [boxSize]="boxSize" [widgetId] ="widget.widgetId" [reportId]="reportId"></pros-image>
+                
+            <!-- HTML-EDiTOR WIDGET -->
+            <pros-html-editor *ngIf ="widget.widgetType ==='HTML'" [widgetId] ="widget.widgetId" [reportId]="reportId" [height]="widget.height * boxSize"></pros-html-editor>
+        </div>
+    </ng-template> 
+</div>

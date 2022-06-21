@@ -1,0 +1,229 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  padding: 0 12px;
+  overflow: hidden;
+
+  .breadcrumb-toolbar {
+    align-items: flex-start;
+    padding-top: 8px;
+
+    .dataset-filters {
+      flex: 1;
+
+      .lib-search {
+        width: 213px;
+      }
+    }
+  }
+
+  .listing-container {
+    height: calc(100% - 36px * 2 - 8px * 3 - 0px);
+    padding-left: 48px;
+    overflow: hidden;
+    align-items: flex-start;
+
+    .listset-navigation {
+      height: calc(100% - 8px);
+      width: 300px;
+      max-width: 300px;
+      border-right-width: 1px;
+      border-right-style: solid;
+      margin-right: 12px;
+      overflow: auto;
+      padding: 0 6px;
+
+      .lib-section {
+        display: block;
+        margin: 12px 0;
+      }
+
+      mat-accordion.mat-accordion {
+        mat-expansion-panel {
+          border-radius: 0;
+
+          .mat-expansion-panel-header {
+            padding: 0 12px;
+
+            mat-panel-title {
+              width: 100%;
+              margin-right: 0;
+
+              .expand-title {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+              }
+            }
+
+            &.undertree-expansion-panel {
+              padding-left: 42px;
+            }
+          }
+
+          .level-down {
+            padding-left: 32px;
+
+            .header-data-item {
+              .task-search-list-drag-el {
+                width: 100%;
+
+                .list-icon {
+                  width: 24px;
+                }
+
+                .list-title {
+                  width: calc(100% - 24px - 3px);
+                  padding-left: 3px;
+                }
+              }
+            }
+          }
+
+          .two-level-down {
+            padding-left: 56px;
+          }
+        }
+      }
+
+      .default-badge {
+        margin: 0 8px;
+        min-width: 24px;
+        text-align: right;
+      }
+    }
+
+    .listset-grid {
+      width: calc(100% - 202px - 24px);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .field-list-container {
+      width: calc(100% - 220px - 48px);
+      padding: 0 24px;
+      overflow: auto;
+      height: calc(100% - 8px);
+      align-items: start;
+      position: relative;
+
+      .colunm-box {
+        box-sizing: border-box;
+        display: flex;
+        padding: 8px 8px;
+        margin: 6px;
+        width: 100%;
+        max-width: 500px;
+        cursor: pointer;
+
+        .col {
+          display: flex;
+          flex: 1 0 auto;
+          width: 1px;
+          align-items: center;
+          margin: 0 4px;
+
+          &.col-x4 {
+            flex: 4;
+          }
+
+          &.col-x5 {
+            flex: 5;
+          }
+
+          &.col-x6 {
+            flex: 6;
+
+            .min {
+              min-width: 40px;
+              min-height: 24px;
+            }
+          }
+
+          &.end-item {
+            justify-content: flex-end;
+            visibility: hidden;
+          }
+
+          .fields-icons {
+            width: 24px;
+          }
+        }
+
+        .lib-input {
+          height: 36px;
+        }
+
+        &.loading-state {
+          .col-x6,
+          .col-x4 {
+            .w-100 {
+              width: 100%;
+            }
+          }
+        }
+      }
+
+      .add-fields {
+        min-width: 600px;
+        width: 100%;
+        margin-bottom: 24px;
+
+        .form-tab-widget {
+          margin: 0 14px 0 26px;
+
+          .form-tab {
+            margin-bottom: 12px;
+
+            mat-expansion-panel-header.mat-expansion-panel-header {
+              padding-left: 12px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .flex {
+    display: flex;
+    align-items: center;
+
+    &.node-label {
+      height: 48px;
+      padding-left: 32px;
+    }
+  }
+
+  .mat-tree-node {
+    justify-content: space-between;
+  }
+
+  mat-tree .mat-tree-node mat-icon {
+    height: 25px;
+    font-size: 20px;
+  }
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+  width: 100%;
+  height: 48px;
+}
+
+.define-contents {
+  padding: 12px;
+  text-align: center;
+  width: calc(100% - 200px);
+}
+
+.drag-drop.row-spacer {
+  height: 100%;
+}
+
+.cdk-drop-list-dragging {
+  border-radius: 3px;
+
+  .drag-drop {
+    display: none;
+  }
+}

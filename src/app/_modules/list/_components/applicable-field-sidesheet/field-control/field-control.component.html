@@ -1,0 +1,169 @@
+<ng-container [ngSwitch]="getFieldControlType">
+
+  <!-- Text, Password, Email -->
+  <lib-input
+    *ngSwitchCase="[FieldControlType.TEXT, FieldControlType.EMAIL, FieldControlType.PASSWORD].includes(getFieldControlType) ? getFieldControlType: !getFieldControlType "
+    i18n-placeholder="@@type_filter_value" placeholder="Type filter value" [value]="getFilterValue"
+    (valueChange)="updateValue($event)">
+  </lib-input>
+
+  <!-- input type Text area -->
+  <lib-textarea *ngSwitchCase="FieldControlType.TEXT_AREA" placeholder="Type filter value" [value]="getFilterValue"
+    (valueChange)="updateValue($event)"></lib-textarea>
+
+  <!-- input type text editor -->
+  <pros-rich-text-editor *ngSwitchCase="FieldControlType.HTML"
+    [tabFieldId]="fieldObj?.fieldId"
+    [control]="control"
+    (valueChange)="updateValue($event)"
+  ></pros-rich-text-editor>
+
+  <!-- Input type number -->
+  <lib-input *ngSwitchCase="FieldControlType.NUMBER"
+    [value]="getValueByKey('startValue') || 0"
+    type="number"
+    (valueChange)="updateValue(+$event)">
+  </lib-input>
+
+  <!-- <lib-range-slider *ngSwitchCase="FieldControlType.NUMBER" thumbLabel [value]="getValueByKey('startValue') || 0"
+    [highValue]="getValueByKey('endValue') || 1" (valueChange)="updateValue($event)"></lib-range-slider> -->
+
+  <!-- Single select -->
+  <ng-container *ngSwitchCase="FieldControlType.SINGLE_SELECT">
+    <div class="f-col mdo-field">
+      <!-- input container -->
+      <div class="mdo-field-input">
+        <input matInput placeholder="Type to search" [matAutocomplete]="auto" (keyup)="searchString = $event;filterOptionSearch($event.target.value, 'value', true)" [value]="getFilterValue"/>
+        <!-- autocomplete -->
+        <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" (optionSelected)="updateValue($event)">
+            <mat-option class="mdo-option" *ngFor="let opt of filteredDropdownValues" [value]="opt.key">
+              {{opt.key}}
+            </mat-option>
+        </mat-autocomplete>
+      </div>
+    </div>
+
+  </ng-container>
+
+  <!-- Multi select -->
+  <ng-container *ngSwitchCase="FieldControlType.MULTI_SELECT">
+    <div class="f-col mdo-field">
+      <lib-text-line type="xsmall" weight="strong" class="field-label">Restrictive value</lib-text-line>
+      <div class="mdo-field-input">
+        <lib-chip-list>
+          <ng-container *ngFor="let opt of existedValues; let i=index">
+              <ng-container *ngIf="i <= limit - 1">
+                  <lib-chip [removable]="true" (removed)="removeValue(opt.key, defaultInputRef)">{{opt.value}}</lib-chip>
+              </ng-container>
+          </ng-container>
+          <lib-chip *ngIf="hasLimit()">+{{fieldObj.restrictedVal.length - limit}}</lib-chip>
+          <input matInput placeholder="Type to search" (keyup)="searchString = $event;filterOptionSearch($event.target.value, 'value')" [matAutocomplete]="auto" #multiSelectInput/>
+        </lib-chip-list>
+        <!-- autocomplete -->
+        <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" (optionSelected)="updateRestrictedValue($event, defaultInputRef); multiSelectInput.value = ''">
+            <mat-option class="mdo-option" *ngFor="let opt of defaultFilteredDropdownValues" [value]="opt.key">
+              {{opt.value}}
+            </mat-option>
+        </mat-autocomplete>
+      </div>
+    </div>
+
+    <div class="f-col mdo-field">
+      <lib-text-line type="xsmall" class="field-label" weight="strong">Default value</lib-text-line>
+      <!-- input container -->
+      <div class="mdo-field-input">
+        <input matInput placeholder="Type to search" [matAutocomplete]="default" (keyup)="searchString = $event;filterOptionSearch($event.target.value, 'value', true)"  [value]="getFilterValue" #defaultInputRef/>
+        <!-- autocomplete -->
+        <mat-autocomplete class="mdo-autocomplete" #default="matAutocomplete"  (optionSelected)="updateValue($event);">
+            <mat-option class="mdo-option" *ngFor="let opt of restrictedFilteredDropdownValues" [value]="opt.key">
+              {{opt.value}}
+            </mat-option>
+        </mat-autocomplete>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Radio -->
+  <ng-container *ngSwitchCase="FieldControlType.RADIO">
+    <div class="f-col mdo-field">
+      <lib-text-line type="xsmall" weight="strong" class="field-label">Restrictive value</lib-text-line>
+      <div class="mdo-field-input">
+        <lib-chip-list>
+          <ng-container *ngFor="let opt of fieldObj.restrictedVal; let i=index">
+              <ng-container *ngIf="i <= limit - 1">
+                  <lib-chip [removable]="true" (removed)="removeValue(opt)">{{getSelectedValueLabel(opt, filteredDropdownValues)}}</lib-chip>
+              </ng-container>
+          </ng-container>
+          <lib-chip *ngIf="hasLimit()">+{{fieldObj.restrictedVal.length - limit}}</lib-chip>
+          <input matInput placeholder="Type to search" (keyup)="searchString = $event;filterOptionSearch($event.target.value, 'key')" [matAutocomplete]="auto" #multiSelectInput/>
+        </lib-chip-list>
+        <!-- autocomplete -->
+        <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" (optionSelected)="updateRestrictedValue($event); multiSelectInput.value = ''" [displayWith]="displayWithFn">
+            <mat-option class="mdo-option" *ngFor="let opt of filteredDropdownValues" [value]="opt.value">
+              {{opt.key}}
+            </mat-option>
+        </mat-autocomplete>
+      </div>
+    </div>
+
+    <div class="f-col mdo-field">
+      <lib-text-line type="xsmall" class="field-label" weight="strong">Default value</lib-text-line>
+      <!-- input container -->
+      <div class="mdo-field-input">
+        <input matInput placeholder="Type to search" [matAutocomplete]="default" (keyup)="searchString = $event;filterOptionSearch($event.target.value, 'key', true)"  [value]="getFilterValue"/>
+        <!-- autocomplete -->
+        <mat-autocomplete class="mdo-autocomplete" #default="matAutocomplete" (optionSelected)="updateValue($event);" [displayWith]="displayWithFn">
+            <mat-option class="mdo-option" *ngFor="let opt of defaultFilteredDropdownValues" [value]="opt">
+              {{opt.key}}
+            </mat-option>
+        </mat-autocomplete>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-container *ngSwitchCase="FieldControlType.ATTACHMENT">
+    <pros-transaction-attachment
+            [moduleId]="moduleId"
+            [control]="fileUploadFormCtrl"
+            [controlName]="fieldObj.fieldId"
+            [multiSelect]="fieldObj.fieldCtrl.isMultiSelect"
+            [fieldObj]="fieldObj"
+          ></pros-transaction-attachment>
+  </ng-container>
+
+  <!-- Checkbox -->
+  <ng-container *ngSwitchCase="FieldControlType.CHECKBOX">
+    <mat-list>
+      <mat-list-item>
+        <lib-checkbox label="Algeria" labelPosition="after" theme="primary"></lib-checkbox>
+      </mat-list-item>
+      <mat-list-item>
+          <lib-checkbox label="America" labelPosition="after" theme="primary"></lib-checkbox>
+      </mat-list-item>
+    </mat-list>
+  </ng-container> 
+
+  <!-- Date -->
+  <ng-container *ngSwitchCase="FieldControlType.DATE">
+    <lib-date-picker [selectedDate]="getFilterValue" (valueChange)="updateValue($event)"></lib-date-picker>
+  </ng-container>
+  <!-- Time -->
+  <ng-container *ngSwitchCase="FieldControlType.TIME">
+    <ng-template [ngIf]="fieldObj">
+      <lib-time-range-picker [enableTimeInput]="true" [selected]="getFilterValue" (valueChange)="updateValue($event)">
+      </lib-time-range-picker>
+    </ng-template>
+  </ng-container>
+  <!-- Date & Time -->
+  <ng-container *ngSwitchCase="FieldControlType.DATE_TIME">
+    <lib-date-time-picker [selectedDate]="getFilterValue" (valueChange)="updateValue($event)" [enableTimeInput]="true"
+      [emitDateOnSave]="false"></lib-date-time-picker>
+  </ng-container>
+  <!--Grid-->
+  <ng-container *ngSwitchCase="FieldControlType.GRID">
+    <pros-transaction-grid 
+    [moduleId]="fieldObj.moduleId" 
+    [fieldObj]="fieldObj"
+    ></pros-transaction-grid>
+  </ng-container>
+</ng-container>

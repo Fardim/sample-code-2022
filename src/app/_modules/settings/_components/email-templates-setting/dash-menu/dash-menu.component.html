@@ -1,0 +1,172 @@
+<ng-container>
+    <ng-container *ngIf="isLoading; else hasData">
+       <div class="loading-container">
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line-half"></lib-skeleton>
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line-half"></lib-skeleton>
+       </div>
+    </ng-container>
+    
+    <ng-template #hasData>
+        <div class="f-row breadcrum-toolbar" *ngIf="currentSelection" prosClickStopPropagation>
+            <lib-button type="plain" icon="arrow-left" iconFontType="light" (click)="back()" prosClickStopPropagation></lib-button>
+            <div class="col-spacer"></div>
+            <div class="f-row mdo-constrained-right">
+              <lib-text-line type="leading">{{selectedPathText}}</lib-text-line>
+            </div>
+            <span class="f-spacer"></span>
+            <lib-button type="plain" icon="times" iconFontType="light" (click)="close()" prosClickStopPropagation></lib-button>
+        </div>
+
+        <ng-container *ngIf="!currentSelection && menuDataType === 'header'">
+            <button mat-menu-item *ngFor="let item of filteredHeaderData" (click)="selectedMenuItem(item)" prosClickStopPropagation>
+                <mat-icon>{{item.icon}}</mat-icon>
+                <span>{{item.value}}</span>
+            </button>
+        </ng-container>
+        <ng-container *ngIf="currentSelection && currentSelection.value === 'Dataset' && currentSelection.dataType && currentSelection.dataType === DataTypes.header">
+            <div class="dropdown-search-wrapper">
+                <lib-search prosClickStopPropagation placeholder="Search" [formControl]="moduelListCtrl"></lib-search>
+            </div>
+           <div class="scrollable-menu-section" itemsize="20" buffersize="20" prosInfiniteScroll (scrollEnd)="scrolled()">
+            <button *ngFor="let item of moduleList" mat-menu-item (click)="selectedMenuItem(item)" prosClickStopPropagation>
+                {{item.value}}
+              </button>
+           </div>
+        </ng-container>
+        <ng-container *ngIf="currentSelection && currentSelection.dataType && currentSelection.dataType === DataTypes.datasetlist">
+            <div class="dropdown-search-wrapper">
+                <lib-search prosClickStopPropagation placeholder="Search" [formControl]="datasetlistItemsCtrl"></lib-search>
+            </div>
+            <button *ngFor="let item of filtereddatasetlistItems" mat-menu-item (click)="selectedMenuItem(item)" prosClickStopPropagation>
+              {{item.value}}
+            </button>
+        </ng-container>
+        <ng-container *ngIf="currentSelection && currentSelection.dataType && currentSelection.dataType === DataTypes.recordno">
+            <div class="dropdown-search-wrapper">
+                <lib-search prosClickStopPropagation placeholder="Search" [formControl]="recordnoItemsCtrl"></lib-search>
+            </div>
+            <button *ngFor="let item of filteredrecordnoItems" mat-menu-item (click)="selectedMenuItem(item)" prosClickStopPropagation>
+              {{item.value}}
+            </button>
+        </ng-container>
+        <ng-container *ngIf="currentSelection && currentSelection.dataType && currentSelection.dataType === DataTypes.recordnoitem">
+            <div class="dropdown-search-wrapper">
+                <lib-search prosClickStopPropagation placeholder="Search" [formControl]="recordnoEndItemsCtrl"></lib-search>
+            </div>
+            <button *ngFor="let item of filteredrecordnoEndItems" mat-menu-item (click)="selectedMenuItem(item)" prosClickStopPropagation>
+              {{item.value}}
+            </button> -->
+            <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+                <!-- This is the tree node template for leaf nodes -->
+                <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+                    <!-- use a disabled button to provide padding for tree leaf -->
+                    <button mat-icon-button disabled></button>
+                    <button mat-menu-item prosClickStopPropagation (click)="selectedMenuItem(node)"> {{node.name}} </button>
+                </mat-tree-node>
+                <!-- This is the tree node template for expandable nodes -->
+                <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
+                    <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
+                        <mat-icon class="mat-icon-rtl-mirror">
+                            {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                        </mat-icon>
+                    </button>
+                    {{node.name}}
+                </mat-tree-node>
+            </mat-tree>
+        </ng-container>
+        <ng-container *ngIf="currentSelection && currentSelection.dataType && currentSelection.dataType === DataTypes.datasetfields">
+            <div class="dropdown-search-wrapper">
+                <lib-search prosClickStopPropagation placeholder="Search" [formControl]="datasetfieldsItemsCtrl"></lib-search>
+            </div>
+            <!-- <button *ngFor="let item of filtereddatasetfieldsItems" mat-menu-item (click)="selectedMenuItem(item)" prosClickStopPropagation>
+              {{item.value}}
+            </button> -->
+            <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+                <!-- This is the tree node template for leaf nodes -->
+                <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+                    <!-- use a disabled button to provide padding for tree leaf -->
+                    <button mat-icon-button disabled></button>
+                    <button mat-menu-item prosClickStopPropagation (click)="selectedMenuItem(node)"> {{node.name}} </button>
+                </mat-tree-node>
+                <!-- This is the tree node template for expandable nodes -->
+                <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
+                    <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
+                        <mat-icon class="mat-icon-rtl-mirror">
+                            {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                        </mat-icon>
+                    </button>
+                    {{node.name}}
+                </mat-tree-node>
+            </mat-tree>
+        </ng-container>
+        <ng-container *ngIf="currentSelection && currentSelection.dataType && currentSelection.dataType === DataTypes.datasetfielditem">
+            <div class="dropdown-search-wrapper">
+                <lib-search prosClickStopPropagation placeholder="Search" [formControl]="datasetfieldendItemsCtrl"></lib-search>
+            </div>
+            <button *ngFor="let item of filtereddatasetfieldendItems" mat-menu-item (click)="selectedMenuItem(item)" prosClickStopPropagation>
+              {{item.value}}
+            </button>
+        </ng-container>
+        <ng-container *ngIf="currentSelection && currentSelection.dataType && currentSelection.dataType === DataTypes.recorddata">
+            <div class="dropdown-search-wrapper">
+                <lib-search prosClickStopPropagation placeholder="Search" [formControl]="recordDataRecordnoCtrl"></lib-search>
+            </div>
+            <button *ngFor="let item of filteredrecordDataRecordnoItems" mat-menu-item (click)="selectedMenuItem(item)" prosClickStopPropagation>
+              {{item.value}}
+            </button>
+        </ng-container>
+        <ng-container *ngIf="currentSelection && currentSelection.dataType && currentSelection.dataType === DataTypes.recordDataRecordno">
+            <div class="dropdown-search-wrapper">
+                <lib-search prosClickStopPropagation placeholder="Search" [formControl]="systemFieldCtrl"></lib-search>
+            </div>
+            <lib-section text="System fields"></lib-section>
+            <button *ngFor="let item of filteredsystemFieldItems" mat-menu-item (click)="selectedMenuItem(item)" prosClickStopPropagation>
+                {{item.value}}
+              </button>
+            <lib-section text="Record fields"></lib-section>
+            <button *ngFor="let item of filteredrecordFieldItems" mat-menu-item (click)="selectedMenuItem(item)" prosClickStopPropagation>
+              {{item.value}}
+            </button>
+        </ng-container>
+
+
+
+
+        <ng-container *ngIf="currentSelection && currentSelection.value && currentSelection.value === 'Flow' && currentSelection.dataType && currentSelection.dataType === DataTypes.header">
+            <div class="dropdown-search-wrapper">
+                <lib-search prosClickStopPropagation placeholder="Search" [formControl]="flowItemsCtrl"></lib-search>
+            </div>
+            <button *ngFor="let item of filteredflowItems" mat-menu-item (click)="selectedMenuItem(item)" prosClickStopPropagation>
+              {{item.value}}
+            </button>
+        </ng-container>
+        <ng-container *ngIf="currentSelection && currentSelection.dataType && currentSelection.dataType === DataTypes.flowcomment">
+            <div class="dropdown-search-wrapper">
+                <lib-search prosClickStopPropagation placeholder="Search" [formControl]="flowcommentItemsCtrl"></lib-search>
+            </div>
+            <button *ngFor="let item of filteredflowcommentItems" mat-menu-item (click)="selectedMenuItem(item)" prosClickStopPropagation>
+              {{item.value}}
+            </button>
+        </ng-container>
+        <ng-container *ngIf="currentSelection && currentSelection.dataType && currentSelection.dataType === DataTypes.flowusertype">
+            <div class="dropdown-search-wrapper">
+                <lib-search prosClickStopPropagation placeholder="Search" [formControl]="flowusertypeItemsCtrl"></lib-search>
+            </div>
+            <button *ngFor="let item of filteredflowusertypeItems" mat-menu-item (click)="selectedMenuItem(item)" prosClickStopPropagation>
+              {{item.value}}
+            </button>
+        </ng-container>
+        <ng-container *ngIf="currentSelection && currentSelection.dataType && currentSelection.dataType === DataTypes.flowfield">
+            <div class="dropdown-search-wrapper">
+                <lib-search prosClickStopPropagation placeholder="Search" [formControl]="flowfieldItemsCtrl"></lib-search>
+            </div>
+            <button *ngFor="let item of flowfieldItemsSubject" mat-menu-item (click)="selectedMenuItem(item)" prosClickStopPropagation>
+              {{item.value}}
+            </button>
+        </ng-container>
+    </ng-template>
+</ng-container>

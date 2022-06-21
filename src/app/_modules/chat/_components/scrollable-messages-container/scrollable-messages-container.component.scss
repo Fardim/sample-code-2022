@@ -1,0 +1,14 @@
+.scrollable-messages {
+  height: 100%;
+
+  .inner-scrollable-area {
+    .loading-container {
+      padding: 12px;
+    }
+
+    .empty-state-wrapper {
+      min-height: 98%;
+      justify-content: center;
+    }
+  }
+}

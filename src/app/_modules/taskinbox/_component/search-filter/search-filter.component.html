@@ -1,0 +1,95 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-col breadcrum-head">
+                <div class="f-row">
+                    <lib-segment [optionsList]="optionsList" labelKey="label" valueKey="value"></lib-segment>
+                    <span class="f-col-spacer-half"></span>
+                    <span class="f-spacer"></span>
+                    <lib-button type="type"><mat-icon fontSet="mdo-icons-solid">sliders-h</mat-icon></lib-button>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="row-spacer"></div>
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <div class="f-row filter-container">
+                <div class="f-col filter-fields-col">
+                    <lib-search placeholder="Search filters">
+                    </lib-search>
+                    <div class="row-spacer"></div>
+                    <div class="filters-list">
+                        <mat-list>
+                            <mat-list-item class="f-row">
+                                <lib-text-line type="base">Material group</lib-text-line>
+                                <span class="f-spacer"></span>
+                                <span class="f-col-spacer-half"></span>
+                                <lib-button type="plain" iconFontType="solid" icon="times"></lib-button>
+                            </mat-list-item>
+                            <mat-list-item class="f-row">
+                                <lib-text-line type="base">Material type</lib-text-line>
+                                <span class="f-spacer"></span>
+                                <span class="f-col-spacer-half"></span>
+                                <lib-button type="plain" iconFontType="solid" icon="times"></lib-button>
+                            </mat-list-item>
+                        </mat-list>
+                        <lib-section></lib-section>
+                        <mat-list>
+                            <mat-list-item class="f-row">
+                                <lib-text-line type="base">Plant</lib-text-line>
+                            </mat-list-item>
+
+                            <mat-list-item class="f-row">
+                                <lib-text-line type="base">Modified date</lib-text-line>
+                            </mat-list-item>
+
+                            <mat-list-item class="f-row">
+                                <lib-text-line type="base">Created</lib-text-line>
+                            </mat-list-item>
+
+                            <mat-list-item class="f-row">
+                                <lib-text-line type="base">Industry sector</lib-text-line>
+                            </mat-list-item>
+
+                            <mat-list-item class="f-row">
+                                <lib-text-line type="base">Net weight in KG</lib-text-line>
+                            </mat-list-item>
+                            
+                        </mat-list>
+                    </div>
+                </div>
+                <div class="col-spacer"></div>
+                <div class="f-col filter-values-col">
+                    <div class="f-row">
+                        <lib-text-line type="base" weight="strong"> Material group
+                        </lib-text-line>
+                        <span class="f-spacer"></span>
+                        <lib-button type="minor">Apply</lib-button>
+                    </div>
+                    <div class="row-spacer"></div>
+                    <lib-search placeholder="Search material groups">
+                    </lib-search>
+                    <div class="f-col">
+                    <mat-list>
+                        <mat-list-item>
+                            <lib-checkbox label="31191507-Abrasive Belts" labelPosition="after" theme="primary"></lib-checkbox>
+                        </mat-list-item>
+                        <mat-list-item>
+                            <lib-checkbox label="31191517-Abrasive brush" labelPosition="after" theme="primary"></lib-checkbox>
+                        </mat-list-item>
+                        <mat-list-item>
+                            <lib-checkbox label="31191516-Abrasive Cartridge" labelPosition="after" theme="primary"></lib-checkbox>
+                        </mat-list-item>
+                        <mat-list-item>
+                            <lib-checkbox label="31191519-Abrasive cloths" labelPosition="after" theme="primary"></lib-checkbox>
+                        </mat-list-item>
+                    </mat-list>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

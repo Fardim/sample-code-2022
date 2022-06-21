@@ -1,0 +1,224 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-row mdo-constrained-right">
+      <lib-text-line type="leading" i18n="@@list_values">List values</lib-text-line>
+      <span class="f-spacer"></span>
+      <ng-template [ngIf]="!isReadOnlyMode" [ngIfElse]="enableSync">
+        <lib-search i18n-placeholder="@@search" placeholder="Search" (valueChange)="searchFieldSub.next($event)">
+        </lib-search>
+        <div class="col-spacer"></div>
+        <lib-button type="plain" [matMenuTriggerFor]="importExportMenu" icon="ellipsis-h"></lib-button>
+        <mat-menu #importExportMenu="matMenu" class="navigation-menu">
+          <label for="uploader" class="cursor" mat-menu-item prosClickStopPropagation>
+            Import values
+            <input class="drag-input" type="file" id="uploader" #uploadInput (change)="importValues($event)" />
+          </label>
+          <button mat-menu-item (click)="exportValues()">Export values</button>
+        </mat-menu>
+      </ng-template>
+
+      <ng-template #enableSync>
+        <lib-button type="major" [matMenuTriggerFor]="moreactionSync" icon="ellipsis-h"></lib-button>
+        <mat-menu #moreactionSync="matMenu" class="navigation-menu">
+          <button mat-menu-item (click)="syncNow()" i18n="@@sync_now">Sync now</button>
+          <button mat-menu-item (click)="scheduleSync()" i18n="@@schedule_now">Schedule now</button>
+        </mat-menu>
+      </ng-template>
+
+
+    </div>
+  </div>
+  <div class="f-row-spacer-half"></div>
+  <div class="f-col sidesheetcontent-listing" prosInfiniteScroll bufferPercentage="20" (scrollEnd)="scroll(true)">
+
+    <div class="f-col mdo-justify">
+      <lib-banner *ngIf="showInfoBanner" status="info" [text]="bannerErrorMsg"></lib-banner>
+      <ng-template [ngIf]="isReadOnlyMode" [ngIfElse]="normalView">
+        <div class="f-row">
+          <lib-search i18n-placeholder="@@search" placeholder="Search" (valueChange)="searchFieldSub.next($event)">
+          </lib-search>
+          <div class="col-spacer"></div>
+          <lib-chip-list class="mdo-chip-list">
+            <lib-chip>All</lib-chip>
+            <lib-chip>Active</lib-chip>
+            <lib-chip>Inactive</lib-chip>
+          </lib-chip-list>
+        </div>
+        <div class="row-spacer"></div>
+        <div class="row-spacer"></div>
+        <div class="f-row">
+          <div class="list-values">
+
+            <div class="f-row action-header" *ngIf="!isReadOnlyMode">
+              <lib-button-group *ngIf="selection.hasValue()">
+                <lib-button type="minor">Activate</lib-button>
+                <lib-button type="minor">Inactivate</lib-button>
+              </lib-button-group>
+              <span class="f-col-spacer-half"></span>
+              <div *ngIf="selection.hasValue()" class="text-muted">
+                {{ selectedPages.includes('all') ? totalCount : selection.selected?.length }} of
+                {{totalCount}} records selected.
+              </div>
+            </div>
+
+            <table #table [ngStyle]="{ display: showSkeleton ? 'none' : '' }" mat-table [dataSource]="dataSource"
+              class="mat-elevation-z0" prosMultiSort>
+              <ng-template ngFor let-dynCol [ngForOf]="displayedColumns">
+                <!-- Checkbox Column -->
+                <ng-container *ngIf="dynCol === '_select'" matColumnDef="_select">
+                  <th mat-header-cell *matHeaderCellDef>
+                    <div class="toggle-selection f-row">
+                      <lib-checkbox-option [menuOptions]="CheckboxOptions" (valueChange)="masterToggle($event)"
+                        [checked]="selection.hasValue() && selectedPages.includes('all')"
+                        [indeterminate]="selection.hasValue()  && !selectedPages.includes('all')"></lib-checkbox-option>
+                    </div>
+                  </th>
+                  <td mat-cell *matCellDef="let element">
+                    <lib-checkbox prosClickStopPropagation [checked]="selection.isSelected(element)"
+                      (valueChange)="toggle(element)" [aria-label]="checkboxLabel(element)">
+                    </lib-checkbox>
+                  </td>
+                </ng-container>
+
+                <ng-container *ngIf="dynCol !== '_select'" [matColumnDef]="dynCol">
+                  <th mat-header-cell *matHeaderCellDef>
+                    <p *ngIf="!selection.hasValue() || isReadOnlyMode">{{ getLabel(dynCol) }}</p>
+                  </th>
+
+                  <td mat-cell *matCellDef="let element; let i = index">
+                    <div class="f-row" *ngIf="dynCol == 'code'; else languageElementTemplate">
+                      <lib-text-line type="base" enableWrap="true">
+                        {{ element[dynCol] ? element[dynCol] : '' }}
+                      </lib-text-line>
+
+                    </div>
+
+                    <ng-template #languageElementTemplate>
+                      <div class="f-row" *ngIf="dynCol == 'language'; else textElementTemplate">
+                        <lib-text-line type="base" enableWrap="true">
+                          {{ element[dynCol] ? element[dynCol] : '' }}
+                        </lib-text-line>
+
+                      </div>
+                    </ng-template>
+
+                    <ng-template #textElementTemplate>
+                      <div class="f-row" *ngIf="dynCol == 'text'; else syncEnableElementTemplate">
+                        <lib-text-line type="base" enableWrap="true">
+                          {{ element[dynCol] ? element[dynCol] : '' }}
+                        </lib-text-line>
+                      </div>
+                    </ng-template>
+
+                    <ng-template #syncEnableElementTemplate>
+                      <div *ngIf="dynCol == 'sync_enable'; else copyElementTemplate" class="f-row">
+                        <lib-slide-toggle (toggleChange)="toggleSelection($event,element,dynCol)" theme="primary"
+                          [checked]="element.syncEnable"></lib-slide-toggle>
+                      </div>
+                    </ng-template>
+
+
+                    <ng-template #defaultCellTemplate>
+                      <lib-text-line type="base" enableWrap="true">
+                        {{ element[dynCol] ? element[dynCol] : '' }}
+                      </lib-text-line>
+                    </ng-template>
+                  </td>
+                </ng-container>
+              </ng-template>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell no-result" [colSpan]="displayedColumns.length">No results found...</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="row-spacer"></div>
+        <div class="f-row">
+          <lib-pagination [currentPageIndex]="recordsPageIndex" [totalCount]="totalCount" [pageSize]="recordsPageSize"
+            (pageChangeEvent)="onPageChange($event)">
+          </lib-pagination>
+          <lib-text-line type="base">{{ displayedRecordsRange }}</lib-text-line>
+        </div>
+      </ng-template>
+
+      <ng-template #normalView>
+        <div class="f-col">
+          <form [formGroup]="newListValueFormGroup" *ngIf="newListValueFormGroup">
+            <div class="f-row gap-12">
+              <div class="f-col half">
+                <lib-input class="lib-input" placeholder="Value" i18n-placeholder="@@value" formControlName="value"
+                    #valueInput [id]="'dropdown_list_value_sidesheet_focus'"
+                    [hasError]="newListValueFormGroup.get('value')?.errors && newListValueFormGroup.get('value')?.errors?.required && newListValueFormGroup.get('value').touched"
+                    [hint]="(newListValueFormGroup.get('value')?.errors && newListValueFormGroup.get('value')?.errors?.required) && newListValueFormGroup.get('value').touched ? 'Value is required': ''"
+                  >
+                  </lib-input>
+              </div>
+              <div class="f-col half">
+                <lib-input class="lib-input" placeholder="Code" i18n-placeholder="@@code" suffixIcon="times" formControlName="code"
+                    #codeInput (keydown.enter)="addNewListValueOnEnter();" 
+                    [hasError]="newListValueFormGroup.get('code')?.errors && newListValueFormGroup.get('code')?.errors?.required && newListValueFormGroup.get('code').touched"
+                    [hint]="(newListValueFormGroup.get('code')?.errors && newListValueFormGroup.get('code')?.errors?.required) && newListValueFormGroup.get('code').touched ? 'Code is required': ''"
+                  >
+                  </lib-input>
+              </div>
+            </div>
+          </form>
+          <div class="row-spacer"></div>
+          <div class="f-col filtered-empty-state" *ngIf="listValues.length<=0">
+            <lib-empty-state
+              icon="table" iconSize="200"
+              primaryText="Nothing to see here"
+              secondaryText="You don't have any values yet. Would you like to add one?">
+            </lib-empty-state>
+          </div>
+          <ng-container *ngFor="let listValue of listValues; let i = index; trackBy: listValueCode">
+            <div class="f-row colunm-box">
+              <div class="col col-half hover-value">
+
+                <lib-text-line type="small" enableWrap="true" *ngIf="listValue.editvalue != true" (click)="listValue.editvalue = true"
+                  matTooltip="{{ listValue?.text }}">{{ listValue?.text |
+                  slice:0:25}} <ng-container *ngIf="listValue?.text?.length >= 25">...</ng-container>
+                </lib-text-line>
+                <lib-text-line type="small" textColor="link" *ngIf="listValue.editvalue != true" class="hide"
+                  (click)="listValue.editvalue = true" i18n="@@click_to_edit">Click to edit...</lib-text-line>
+                <lib-input class="lib-input" placeholder="New Value" i18n-placeholder="@@new_value"
+                  *ngIf="listValue.editvalue == true" [value]="listValue?.text"
+                  (afterBlur)="listValue.text = valueInput.control.value; listValue.editvalue = false; OnSave()"
+                  (keydown.enter)="listValue.text = valueInput.control.value; listValue.editvalue = false; OnSave()"
+                  #valueInput>
+                </lib-input>
+              </div>
+              <div class="col col-half hover-code">
+                <lib-text-line type="small" enableWrap="true" *ngIf="listValue.editcode != true" (click)="listValue.editcode = true">{{ listValue?.code }}</lib-text-line>
+                <lib-text-line type="small" textColor="link" *ngIf="listValue.editcode != true" class="hide"
+                  (click)="listValue.editcode = true" i18n="@@click_to_edit">Click to edit...</lib-text-line>
+                <lib-input class="lib-input" placeholder="New Code" i18n-placeholder="@@new_code"
+                  *ngIf="listValue.editcode == true" [value]="listValue.code" [type]="inputType"
+                  [maxLength]="maxLength"
+                  [maximum]="maxLength"
+                  (afterBlur)="listValue.code = codeInput.control.value; listValue.editcode = false; OnSave()"
+                  (keydown.enter)="listValue.code = codeInput.control.value; listValue.editcode = false; OnSave()"
+                  #codeInput>
+                </lib-input>
+              </div>
+              <div class="col col-x4 end-item" prosClickStopPropagation>
+                <lib-button type="plain" icon="clone" iconFontType="light"
+                  [disabled]="limit>0 && listValues.length >= limit" (afterClick)="cloneListValues(listValue, i)">
+                </lib-button>
+                <lib-button type="plain" icon="trash-alt" iconFontType="light"
+                  (click)="deleteSelectedListValues(listValue)"></lib-button>
+              </div>
+            </div>
+            <lib-section></lib-section>
+          </ng-container>
+        </div>
+      </ng-template>
+
+    </div>
+  </div>
+</div>

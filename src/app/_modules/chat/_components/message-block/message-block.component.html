@@ -1,0 +1,42 @@
+<div class="message-block" (mouseenter)="toggleActionButtons(true)" (mouseleave)="toggleActionButtons(false)">
+    <div class="message-action-buttons" #actionButons>
+        <div class="message-actions">
+            <mat-icon class="action-icon" (click)="addReply(replyContainerRef)" fontSet="material-icons">reply
+            </mat-icon>
+        </div>
+        <div class="message-actions">
+            <mat-icon class="action-icon"  [matMenuTriggerFor]="messageActionMenu" #menuState="matMenuTrigger" fontSet="mdo-icons-light">ellipsis-h</mat-icon>
+            <mat-menu #messageActionMenu="matMenu">
+                <lib-filter-option (click)="editContent(replyContainerRef, message?.text)">
+                    Edit
+                </lib-filter-option>
+                <lib-filter-option (click)="deleteMessage()">
+                    Delete
+                </lib-filter-option>
+            </mat-menu>
+        </div>
+    </div>
+
+    <lib-avatar [initials]="getInitials(message?.senderName)" class="avatar"></lib-avatar>
+
+    <div class="message-content">
+        <div class="message-info">
+            <lib-text-line class="name" type="base" weight="strong">{{ message?.senderName || 'Unknown' }}</lib-text-line>
+            <lib-text-line class="timestamp" type="xsmall" textColor="secondary">{{ message?.time }}</lib-text-line>
+        </div>
+
+        <ng-container *ngIf="message?.quotedMessage">
+            <div class="quoted-message">
+                <pros-message-content [message]="message?.quotedMessage"></pros-message-content>
+            </div>
+            <div class="f-row-spacer-half"></div>
+        </ng-container>
+
+        <pros-message-content [message]="message" class="content">
+        </pros-message-content>
+
+        <div class="f-col add-reply-container">
+            <ng-template prosContainerRef #replyContainerRef="prosContainerRef"></ng-template>
+        </div>
+    </div>
+</div>

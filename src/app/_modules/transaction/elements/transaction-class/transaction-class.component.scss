@@ -1,0 +1,36 @@
+.class-widget {
+  padding: 12px;
+
+  .lib-search {
+    margin: 6px 0;
+  }
+
+  .rich-editor {
+    display: block;
+    margin: 6px 0;
+  }
+}
+
+.mdo-field {
+  margin-bottom: 0;
+}
+
+.multi-select {
+  width: 100%;
+
+  .field-chip-list {
+    flex-wrap: wrap;
+
+    .lib-chip {
+      display: flex;
+      flex-direction: row;
+      width: auto;
+      padding: 2px;
+    }
+
+    .mat-input {
+      width: auto;
+      flex: 1;
+    }
+  }
+}

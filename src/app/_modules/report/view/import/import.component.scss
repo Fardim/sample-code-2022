@@ -1,0 +1,31 @@
+div.modal-wrapper {
+  height: 100%;
+
+  .modal-body {
+    &.import-body {
+      height: 350px;
+      overflow: auto;
+    }
+  }
+
+  .upload-col {
+    align-items: center;
+    position: relative;
+
+    .drag-input {
+      position: absolute;
+      width: 100%;
+      height: 240px;
+      opacity: 0;
+    }
+  }
+
+  table.mat-table {
+    width: 100%;
+  }
+
+  .scrollable-modal {
+    height: 350px;
+    overflow: auto;
+  }
+}

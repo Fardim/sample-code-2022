@@ -1,0 +1,66 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  width: 668px;
+
+  .breadcrum-toolbar {
+    padding: 8px 16px;
+
+    .mdo-constrained-right {
+      width: 100%;
+      align-items: center;
+
+      .breadcrum-head {
+        width: 100%;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px);
+    overflow: auto;
+
+    .mdo-justify {
+      margin: 0 16px;
+
+      .field-grid {
+        pros-map-mdo-field {
+          flex: 1;
+        }
+      }
+
+      .upload-col {
+        align-items: center;
+        position: relative;
+
+        .drag-input {
+          position: absolute;
+          width: 100%;
+          height: 240px;
+          opacity: 0;
+        }
+      }
+
+      .empty-state {
+        align-items: center;
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 66px;
+      }
+    }
+  }
+}

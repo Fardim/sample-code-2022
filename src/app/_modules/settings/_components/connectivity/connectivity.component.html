@@ -1,0 +1,432 @@
+<div class="root">
+
+    <div *ngIf="isLoading" class="f-col">        
+        <pros-toolbar-skeleton></pros-toolbar-skeleton>
+    </div>
+    <div *ngIf="!isLoading" class="f-col">
+
+   
+  <div class="f-row breadcrum-toolbar">
+    <lib-text-line type="leading">Connectivity</lib-text-line>
+    <span class="f-spacer"></span>
+    <lib-button type="minor" width="100px" (click)="openNewConnectionFlow()">New system</lib-button>
+  </div>
+
+  <div class="f-row-spacer-half"></div>
+
+  <lib-banner *ngIf="showTestConnectionMsg" [status]="isConnectionTestSuccess ? 'success' : 'error'">
+    <lib-text-line [innerHtml]="testConnectionMessage"></lib-text-line>
+    <span class="f-spacer"></span>
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="showTestConnectionMsg = false;"></lib-button>
+  </lib-banner>
+
+  <lib-banner *ngIf="showCommonErrorMsg" status="error">
+    <lib-text-line [innerHtml]="commonErrorMessage"></lib-text-line>
+    <span class="f-spacer"></span>
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="showCommonErrorMsg = false;"></lib-button>
+  </lib-banner>
+
+  <lib-chip-list class="mdo-chip-list">
+    <lib-search class="lib-search" placeholder="Search system" (valueChange)="searchConnectionSub.next($event)">
+    </lib-search>
+  </lib-chip-list>
+</div>
+  <div class="row-spacer"></div>
+
+  <div class="f-row system-container">
+    <div class="filter-list">
+      <div class="f-row filter-heading" *ngIf="!isLoading">
+        <lib-text-line type="leading" i18n="@@Systems">System</lib-text-line>
+      </div>
+      <div class="f-row-spacer-half"></div>
+      <mat-list role="list" class="mdo-list connection-list">
+        <div *ngIf='isLoading'>
+          <div class="f-row-spacer-half"></div>
+          <div class="f-row-spacer-half"></div>
+          <div class="f-row-spacer-half"></div>
+          <div class="f-row-spacer-half"></div>
+          <lib-skeleton-listmenu></lib-skeleton-listmenu>
+          <div class="f-row-spacer-mt-1"></div>
+          <lib-skeleton-listmenu></lib-skeleton-listmenu>
+        </div>
+
+        <mat-list-item role="listitem" class="list-item" *ngFor="let connection of connections; index as i"
+          (click)="getSelectedConnectionDetails(i)"
+          [class.selected]="connection.connectionId === selectedConnectionDetail.connId">
+          <lib-text-line type="base" i18n="@@notifications" [enableWrap]="true">{{connection.connectionName}}
+          </lib-text-line>
+        </mat-list-item>
+      </mat-list>
+    </div>
+
+    <lib-skeleton-vertical-table class="details-accordion" *ngIf="isLoading"></lib-skeleton-vertical-table>
+    <div class="details-accordion" *ngIf="connections.length > 0">
+      <div class="f-row">
+        <lib-text-line type="leading">{{selectedConnectionDetail.connName}}</lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button-group>
+          <lib-button icon="plus" iconFontType="light"  matTooltip="New interface"
+            (click)="openTableViewSettings('add-interface')"></lib-button>
+          <lib-button icon="ellipsis-h" [matMenuTriggerFor]="newConnect"></lib-button>
+        </lib-button-group>
+      </div>
+      <div class="f-row-spacer-half"></div>
+      <div class="f-col">
+        <mat-accordion>
+          <mat-expansion-panel class="mat-elevation-z0" [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+              <mat-panel-title>
+                <lib-text-line type="base" weight="strong">System details</lib-text-line>
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <table mat-table [dataSource]="dataSource" class="mat-elevation-z0 table-vertical">
+              <ng-container matColumnDef="header" sticky>
+                <td mat-cell *matCellDef="let element">
+                  {{element.header}}
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="cell" sticky>
+                <td mat-cell *matCellDef="let element">
+                  {{element.cell}}
+                </td>
+              </ng-container>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </mat-expansion-panel>
+      </mat-accordion>
+      <mat-accordion>
+          <mat-expansion-panel class="mat-elevation-z0" [expanded]="true">
+            <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+              <mat-panel-title>
+                <lib-text-line type="base" weight="strong">Interfaces</lib-text-line>
+
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <div *ngIf="!isInterfaceLoading && INTERFACES_DATA.length === 0 && DEFAULT_INTERFACE_DATA.length === 0" class="noticeMsg">
+              <lib-empty-state icon="table" iconSize="200" primaryText="Nothing to see here"
+                secondaryText="The connection has no interfaces yet. Would you like to create one?">
+                <lib-button type="minor" (click)="openTableViewSettings('add-interface')">New interface</lib-button>
+              </lib-empty-state>
+            </div>
+
+            <div class="f-row">
+              <lib-chip-list class="mdo-chip-list" *ngIf="DEFAULT_INTERFACE_DATA.length !== 0">
+                <lib-search class="lib-search" i18n-placeholder="@@search" placeholder="Search interface" 
+                  (valueChange)="searchInterfaceSub.next($event)"></lib-search>
+                <lib-chip label="Dataset:" type="info" i18n-label="@@search" [matMenuTriggerFor]="assignDataset" (valueChange)="searchInterfaceSub.next($event)">
+                    {{ (selectedDataset.length > 0 ? showSelectedDatasetDescription() : 'All') }}
+                </lib-chip>
+                <lib-chip label="Type:" type="info" [matMenuTriggerFor]="interfaceTypeListMenu">
+                  {{selectedInterfaceType.length > 0 ? selectedInterfaceTypeDescription.join(', ') : 'All'}}
+                </lib-chip>
+                <lib-chip label="Status:" i18n-label="@@status" type="info" [matMenuTriggerFor]="interfaceStatusListMenu">
+                    {{ (selectedInterfaceStatus.length > 0 ? selectedInterfaceStatusDescription.join(', ') : 'All' ) }}
+                </lib-chip>
+              </lib-chip-list>
+            </div>
+
+            <div *ngIf='isInterfaceLoading'>
+              <lib-skeleton-table></lib-skeleton-table>
+            </div>
+
+            <table mat-table *ngIf="INTERFACES_DATA.length !== 0" [dataSource]="interfaces" matSort
+              class="mat-elevation-z0 interface-list-table">
+              <!-- star Column -->
+              <ng-container matColumnDef="star">
+                <th mat-header-cell *matHeaderCellDef> </th>
+                <td mat-cell *matCellDef="let element; index as i">
+                  <!-- <lib-button *ngIf="element.interfaceType === 'DATA_PULL'" type="plain" icon="ellipsis-h" [matMenuTriggerFor]="interFaceDataUpload"  [matMenuTriggerData]="{interfaceDetails: element}"></lib-button>
+                            <lib-button *ngIf="element.interfaceType === 'DROPDOWN'" type="plain" icon="ellipsis-h" [matMenuTriggerFor]="interFaceDataUpload"  [matMenuTriggerData]="{interfaceDetails: element}"></lib-button> -->
+                  <lib-button *ngIf="element.interfaceType === 'SYNCCHECK'" type="plain" icon="ellipsis-h"
+                    [matMenuTriggerFor]="interFaceSyncCheck" [matMenuTriggerData]="{interfaceDetails: element}">
+                  </lib-button>
+                  <lib-button *ngIf="element.interfaceType === 'DATA_UPLOAD'" type="plain" icon="ellipsis-h"
+                    [matMenuTriggerFor]="interFaceDataUpload" [matMenuTriggerData]="{interfaceDetails: element}">
+                  </lib-button>
+                  <lib-button *ngIf="element.interfaceType === 'DATA_PULL'" type="plain" icon="ellipsis-h"
+                    [matMenuTriggerFor]="interFaceDataExtraction" [matMenuTriggerData]="{interfaceDetails: element}">
+                  </lib-button>
+                </td>
+              </ng-container>
+
+              <!-- Field ID Column -->
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Interface name </th>
+                <td mat-cell *matCellDef="let element; index as i">
+                  <lib-text-line type="base" textColor="link" enableWrap="true" (click)="editInterface(element,'view')" class="cursor">{{element.name}}</lib-text-line>
+                </td>
+              </ng-container>
+
+              <!-- Field description Column -->
+              <ng-container matColumnDef="dataset">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Dataset name</th>
+                <td mat-cell *matCellDef="let element"> {{element.datasetName}} </td>
+              </ng-container>
+
+              <!-- default-value Column -->
+              <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Type </th>
+                <td mat-cell *matCellDef="let element">{{showInterfaceType(element.type)}}</td>
+              </ng-container>
+
+              <!-- <ng-container matColumnDef="flows">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Flows </th>
+                <td mat-cell *matCellDef="let element">{{element.flows}}</td>
+              </ng-container> -->
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+                <td mat-cell *matCellDef="let element">
+                  <lib-label class="active-inactive-label" *ngIf="element.status === 'Active'; else Inactive" status="success">{{element.status}}
+                  </lib-label>
+                  <ng-template #Inactive>
+                    <lib-label class="active-inactive-label" status="error">{{element.status}}</lib-label>
+                  </ng-template>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedInterfaceColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedInterfaceColumns;"></tr>
+            </table>
+
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+    </div>
+
+    <mat-menu #interfaceTypeListMenu="matMenu" xPosition="after" class="filter-menudropdown">
+      <ng-template matMenuContent let-filteredDataset="filteredDataset">
+      <lib-filter-dropdown class="chip-filters">
+        <div class="dropdown-search-wrapper" *ngIf="!filteredDataset">
+          <lib-search #searchInput prosClickStopPropagation placeholder="Search" (valueChange)="searchModifyBySub.next($event)">
+          </lib-search>
+        </div>
+        <div class="dropdown-options-wrapper f-col">
+          <div class="dropdown-options-inner-container">
+            <div class="default-options">
+              <lib-filter-option>
+                <lib-checkbox label="All"
+                  [checked]="selectedInterfaceType?.length && selectedInterfaceType?.indexOf('ALL') >= 0"
+                  (valueChange)="setSelectedInterfaceType('all')"></lib-checkbox>
+              </lib-filter-option>
+              <lib-section></lib-section>
+            </div>
+            <div class="options">
+              <lib-filter-option prosClickStopPropagation *ngFor="let item of interfaceTypeList">
+                <lib-checkbox [label]="item.label" prosClickStopPropagation
+                  [checked]="selectedInterfaceType?.length && selectedInterfaceType?.indexOf(item.value) >= 0"
+                  (valueChange)="setSelectedInterfaceType(item)">
+                </lib-checkbox>
+              </lib-filter-option>
+            </div>
+          </div>
+          <div class="filter-button-wrapper">
+            <lib-button type="minor" (click)="afterFilterMenuClosed()">Apply</lib-button>
+          </div>
+        </div>
+      </lib-filter-dropdown>
+    </ng-template>
+    </mat-menu>
+    
+
+    <mat-menu #interfaceStatusListMenu="matMenu" xPosition="after" class="filter-menudropdown">
+      <lib-filter-dropdown class="chip-filters">
+        <div class="dropdown-options-wrapper f-col">
+          <div class="dropdown-options-inner-container">
+            <!-- <div class="default-options">
+              <lib-filter-option>
+                <lib-checkbox label="All"
+                  [checked]="selectedInterfaceStatus?.length === 0"
+                  (valueChange)="setSelectedInterfaceStatus(null)"></lib-checkbox>
+              </lib-filter-option>
+              <lib-section></lib-section>
+            </div> -->
+            <div class="options">
+              <lib-filter-option prosClickStopPropagation *ngFor="let item of interFaceStatusList">
+                <lib-checkbox [label]="item.label" prosClickStopPropagation
+                  [checked]="selectedInterfaceStatus?.length && selectedInterfaceStatus?.indexOf(item.value) >= 0 "
+                  (valueChange)="setSelectedInterfaceStatus(item)">
+                </lib-checkbox>
+              </lib-filter-option>
+            </div>
+          </div>
+          <div class="filter-button-wrapper">
+            <lib-button type="minor" (click)="afterFilterMenuClosed()">Apply</lib-button>
+          </div>
+        </div>
+      </lib-filter-dropdown>
+    </mat-menu>
+
+    <!--For Connection Options -->
+    <mat-menu #newConnect class="navigation-menu">
+      <button mat-menu-item (click)="testSelectedConnection()">
+        Test connection
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="export()">
+        Export
+      </button>
+      <button mat-menu-item (click)="publish()">
+        Publish
+      </button>
+      <button mat-menu-item [matMenuTriggerFor]="importMenu">
+        Import
+        <mat-menu #importMenu>
+          <button mat-menu-item (click)="fileInput.click()">
+            Upload file
+            <input #fileInput type="file" accept=".json" hidden="true" (change)="import($event.target.files)">
+          </button>
+          <button mat-menu-item (click)="ImportCKH()">
+            Import from Connekthub
+          </button>
+        </mat-menu>
+      </button>
+      <button mat-menu-item (click)="openEditConnectionSideSheet()">
+        Edit
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="openConfirmation('conn del',null)">
+        Delete
+      </button>
+    </mat-menu>
+
+    <!--For Interface Type Dropdown pull -->
+    <mat-menu #interFaceDropdownPull class="navigation-menu">
+      <button mat-menu-item (click)="openTableViewSettings('sync-freq')">
+        Sync frequency
+      </button>
+    </mat-menu>
+
+    <!--For Interface Type Sync check -->
+    <mat-menu #interFaceSyncCheck class="navigation-menu">
+      <ng-template matMenuContent let-interfaceDetails="interfaceDetails">
+        <!-- <button mat-menu-item [matMenuTriggerFor]="assignDataset" [matMenuTriggerData]="{filteredDataset: false}">
+          Assign dataset
+        </button> -->
+        <button mat-menu-item *ngIf="interfaceDetails.status === 'Inactive'"
+          (click)="openConfirmation('interface deActive',interfaceDetails)">
+          Activate
+        </button>
+        <button mat-menu-item *ngIf="interfaceDetails.status === 'Active'"
+          (click)="openConfirmation('interface deActive',interfaceDetails)">
+          Inactivate
+        </button>
+        <button mat-menu-item (click)="openTableViewSettings('sync-freq')">
+          Sync frequency
+        </button>
+      </ng-template>
+    </mat-menu>
+
+    <mat-menu #assignDataset="matMenu" xPosition="after" class="filter-menudropdown">
+      <ng-template matMenuContent let-filteredDataset="filteredDataset">
+        <lib-filter-dropdown class="chip-filters">
+          <div class="dropdown-search-wrapper" *ngIf="!filteredDataset">
+            <lib-search #searchInput prosClickStopPropagation placeholder="Search" (valueChange)="searchModifyBySub.next($event)">
+            </lib-search>
+          </div>
+          <div class="dropdown-options-wrapper f-col">
+            <!-- <mat-list class="default-options">
+              <mat-list-item prosClickStopPropagation class="f-row" *ngFor="let datasetId of selectedDataset">
+                 <lib-text-line type="base" [enableWrap]="true"> {{ getDatasetLabel(datasetId) }} </lib-text-line>
+                 <span class="f-spacer"></span>
+                 <span class="f-col-spacer-half"></span>
+                 <lib-button prosClickStopPropagation iconFontType="light" icon="times" (click)="setSelectedModifyby({moduleId: datasetId})">
+                 </lib-button>
+              </mat-list-item>
+            </mat-list> -->
+            <div class="dropdown-options-inner-container" prosInfiniteScroll bufferPercentage="20"
+              (scrollEnd)="modifybyScrollEnd()">
+              <div class="options">
+                <lib-filter-option prosClickStopPropagation *ngFor="let item of filteredOptionsObs | async">
+                  <lib-checkbox [label]="item.moduleName" prosClickStopPropagation
+                    [checked]="selectedDataset?.length && selectedDataset?.indexOf(+item.moduleId) >= 0"
+                    (valueChange)="setSelectedModifyby(item)">
+                  </lib-checkbox>
+                </lib-filter-option>
+              </div>
+            </div>
+            <div class="filter-button-wrapper" *ngIf="!filteredDataset">
+              <lib-button type="minor" (click)="afterFilterMenuClosed()">Apply</lib-button>
+            </div>
+          </div>
+        </lib-filter-dropdown>
+      </ng-template>
+    </mat-menu>
+
+    <!--For Interface Type Data Upload -->
+    <mat-menu #interFaceDataUpload class="navigation-menu">
+      <ng-template matMenuContent let-interfaceDetails="interfaceDetails">
+        <button mat-menu-item (click)="openInterfaceMapping(interfaceDetails)">
+          Map fields
+        </button>
+        <button mat-menu-item (click)="openPayloadTest(interfaceDetails)">
+          Payload test
+        </button>
+        <!-- <button mat-menu-item (click)="openTableViewSettings('add-daxe')">
+          Add DAXE
+        </button> -->
+        <button mat-menu-item (click)="openTableViewSettings('sync-freq')">
+          Sync frequency
+        </button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item (click)="editInterface(interfaceDetails,'edit')">
+          Edit
+        </button>
+        <button mat-menu-item (click)="duplicateInterface(interfaceDetails)">
+          Duplicate
+        </button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item *ngIf="interfaceDetails.status === 'Inactive'"
+          (click)="openConfirmation('interface deActive',interfaceDetails)">
+          Activate
+        </button>
+        <button mat-menu-item *ngIf="interfaceDetails.status === 'Active'"
+          (click)="openConfirmation('interface deActive',interfaceDetails)">
+          Inactivate
+        </button>
+        <button mat-menu-item (click)="openConfirmation('interface del',interfaceDetails)">
+          Delete
+        </button>
+      </ng-template>
+    </mat-menu>
+
+    <!--For Interface Type Data extraction -->
+    <mat-menu #interFaceDataExtraction class="navigation-menu">
+      <ng-template matMenuContent let-interfaceDetails="interfaceDetails">
+        <button mat-menu-item (click)="openInterfaceMapping(interfaceDetails)">
+          Map fields
+        </button>
+        <button mat-menu-item (click)="openTableViewSettings('sync-freq')">
+          Sync frequency
+        </button>
+        <!-- <button mat-menu-item (click)="openTableViewSettings('add-daxe')">
+          Add DAXE
+        </button> -->
+        <button mat-menu-item (click)="openDataScope(interfaceDetails)">
+          Data scope
+        </button>
+        <!-- <button mat-menu-item (click)="openTableViewSettings('edit-interface')">
+          Download
+        </button> -->
+        <button mat-menu-item (click)="editInterface(interfaceDetails,'edit')">
+          Edit
+        </button>
+        <mat-divider></mat-divider>
+        <button mat-menu-item *ngIf="interfaceDetails.status === 'Inactive'"
+          (click)="openConfirmation('interface deActive',interfaceDetails)">
+          Activate
+        </button>
+        <button mat-menu-item *ngIf="interfaceDetails.status === 'Active'"
+          (click)="openConfirmation('interface deActive',interfaceDetails)">
+          Inactivate
+        </button>
+        <button mat-menu-item (click)="openConfirmation('interface del',interfaceDetails)">
+          Delete
+        </button>
+      </ng-template>
+    </mat-menu>
+  </div>
+</div>

@@ -1,0 +1,54 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-text-line type="leading" i18n="@@profile">Organization</lib-text-line>
+    <div class="f-spacer"></div>
+    <lib-button type="minor" *ngIf="isShowNewTenantButton" (click)="newTenantButtonHandler()" i18n="@@new_tenant">New tenant</lib-button>
+  </div>
+  <div class="f-row-spacer-half"></div>
+  <lib-tab-group disableRipple="true" class="lib-tabs-content" (selectedIndexChange)="onTabChange($event)">
+    <lib-tab label="Company details" i18n-label="@@company_details">
+      <!-- Skeleton UI -->
+      <div class="f-row profile-skeleton" *ngIf="showSkeleton">
+        <div class="f-col w-40p">
+          <lib-skeleton type="avatar"></lib-skeleton>
+        </div>
+        <div class="f-col w-60p">
+          <lib-skeleton type="line"></lib-skeleton>
+          <lib-skeleton type="line"></lib-skeleton>
+          <lib-skeleton type="line"></lib-skeleton>
+          <lib-skeleton type="line"></lib-skeleton>
+          <lib-skeleton type="line"></lib-skeleton>
+          <lib-skeleton type="line"></lib-skeleton>
+          <lib-skeleton type="line"></lib-skeleton>
+          <div class="f-row">
+            <lib-skeleton type="button"></lib-skeleton>
+            <lib-skeleton type="button"></lib-skeleton>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!showSkeleton">
+        <lib-banner *ngIf="formErrMsg" [text]="formErrMsg" status="error"></lib-banner>
+        <div class="f-row">
+          <pros-company-details class="tabs-content"></pros-company-details>
+        </div>
+      </div>
+    </lib-tab>
+
+    <lib-tab label="Usage" i18n-label="@@usage">
+      <pros-usage></pros-usage>
+    </lib-tab>
+
+    <lib-tab label="Data management">
+      <pros-data-management></pros-data-management>
+    </lib-tab>
+
+    <lib-tab label="Manage tenants" i18n="@@manage_tenants">
+      <pros-tenant-list (openNewTenantForm)="newTenantButtonHandler()"></pros-tenant-list>
+    </lib-tab>
+
+    <lib-tab label="Licensing Information" i18n="@@licensing_information">
+      <pros-licensing-information></pros-licensing-information>
+    </lib-tab>
+
+  </lib-tab-group>
+</div>

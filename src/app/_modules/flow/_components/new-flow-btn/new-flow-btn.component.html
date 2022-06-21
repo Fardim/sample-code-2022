@@ -1,0 +1,23 @@
+<lib-button type="minor" (click)="manageFlows()">Manage flows</lib-button>
+<form ngNoForm [attr.target]="'_blank'" [action]="url" method="POST" style="display:'none';">
+    <div class="f-col">
+        <pros-form-input
+            [type]="'text'"
+            formControlName="username"
+            [label]="'Username'"
+            name="j_username"
+            [value]="userName" 
+        ></pros-form-input>
+        <div class="row-spacer"></div>
+        <pros-form-input
+            [type]="'password'"
+            formControlName="password"
+            [label]="'Password'"
+            name ="j_password"
+            [value]="password" 
+        ></pros-form-input>
+    </div>
+    <div class="f-col">
+        <button class="button" type="submit" #droolSignin>signIn</button>
+    </div>
+</form>

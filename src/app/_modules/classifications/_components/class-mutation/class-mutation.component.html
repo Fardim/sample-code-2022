@@ -1,0 +1,249 @@
+<div class="f-row breadcrum-toolbar">
+    <lib-button *ngIf="closable" type="plain" icon="times" iconFontType="light" [disabled]="loading"
+        (click)="closeDialog()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+        <div class="f-row breadcrum-head">
+            <lib-text-line type="leading" *ngIf="!classId">{{isNoun ? 'New noun' : 'New class'}}
+            </lib-text-line>
+            <lib-text-line type="leading" *ngIf="classId">{{isNoun ? 'Edit noun' : 'Edit class'}}
+            </lib-text-line>
+            <div class="f-spacer"></div>
+            <lib-button type="major" i18n="@@submit" [disabled]="loading" (click)="save()" width="80px">Submit
+            </lib-button>
+        </div>
+    </div>
+</div>
+
+<div class="f-col sidesheetcontent-listing">
+  <div #messageContainer class="f-col mdo-justify">
+    <lib-banner *ngIf="submitError.status" status="error" [text]="submitError.message"></lib-banner>
+  </div>
+    <form [formGroup]="classForm">
+        <div class="f-col mdo-justify">
+            <div class="f-col">
+                <lib-banner text="Banner" status="info" text="Characteristics can be added to this class later">
+                </lib-banner>
+            </div>
+
+            <div class="f-col">
+                <lib-input label="Class type" type="text" [disabled]="true" [formControl]="classForm.controls.classType"
+                    i18n="@@class_type">
+                </lib-input>
+            </div>
+
+            <div class="f-col">
+                <lib-input [label]="isNoun?'Noun short':'Class name'" type="text"
+                    placeholder="{{!isNoun?'Type name':''}}"
+                    [labelIconTooltip]="isNoun?'Allows user to define a noun short name that will be getting maintained in short description, when generated from description generator.':''"
+                    [labelIcon]="isNoun?'question-circle':''"  [isRequired]="true" i18n="@@class_name"
+                    [formControl]="classForm.controls.code"
+                    [hint]="(classForm.controls.code.touched && classForm.controls.code.errors && classForm.controls.code.errors.required) ? 'This is a required field' : ''"
+                    [hasError]="classForm.controls.code.touched &&classForm.controls.code.errors && classForm.controls.code.errors.required">
+                </lib-input>
+            </div>
+
+            <ng-template [ngIf]="isNoun">
+                <div class="f-col">
+                    <lib-input label="Noun long" type="text"
+                        labelIconTooltip="Allows user to define a noun long name that will be getting maintained in long description, when generated from description generator."
+                        labelIcon="question-circle"  [isRequired]="true"
+                        [hint]="(classForm.controls.codeLong.touched && classForm.controls.codeLong.errors && classForm.controls.codeLong.errors.required) ? 'This is a required field' : ''"
+                        [hasError]="classForm.controls.codeLong.touched &&classForm.controls.codeLong.errors && classForm.controls.codeLong.errors.required"
+                        i18n="@@noun_long" [formControl]="classForm.controls.codeLong">
+                    </lib-input>
+                </div>
+
+                <div class="f-col">
+                    <lib-input label="Modifier short" type="text"
+                      [isRequired]="isModRequired"
+                      labelIconTooltip="Allows user to define a modifier short name that will be getting maintained in short description, when generated from description generator."
+                      labelIcon="question-circle"
+                      [hint]="(classForm.controls.mod.touched && classForm.controls.mod.errors && classForm.controls.mod.errors.required) ? 'This is a required field' : ''"
+                      [hasError]="classForm.controls.mod.touched &&classForm.controls.mod.errors && classForm.controls.mod.errors.required"
+                      i18n="@@modifier_short" [formControl]="classForm.controls.mod"
+                      (valueChange)="onModValueChange($event)">
+                    </lib-input>
+                </div>
+
+                <div class="f-col">
+                    <lib-input label="Modifier long" [isRequired]="isModLongRequired" type="text"
+                        labelIconTooltip="Allows user to define a modifier long name that will be getting maintained in long description, when generated from description generator."
+                        labelIcon="question-circle"
+                        [hint]="(classForm.controls.modLong.touched && classForm.controls.modLong.errors && classForm.controls.modLong.errors.required) ? 'This is a required field' : ''"
+                        [hasError]="classForm.controls.modLong.touched &&classForm.controls.modLong.errors && classForm.controls.modLong.errors.required"
+                        i18n="@@modifier_long" [formControl]="classForm.controls.modLong"
+                        (valueChange)="onModLongValueChange($event)">
+                    </lib-input>
+                </div>
+              <div class="f-col numberInput">
+                    <lib-input label="Noun numeric code" type="number"
+                        labelIconTooltip="Allows user to define a numeric code associated with the noun that should be considered for generating the record number, based on defined number setting rule."
+                        labelIcon="question-circle"  i18n="@@noun_numeric_code" [formControl]="classForm.controls.numCod">
+                    </lib-input>
+                </div>
+
+                <div class="f-col numberInput">
+                    <lib-input label="Modifier numeric code" type="number"
+                        labelIconTooltip=" Allows user to define a numeric code associated with the modifier that should be considered for generating the record number, based on defined number setting rule."
+                        labelIcon="question-circle"  i18n="@@modifier_numeric_code" [formControl]="classForm.controls.numMod">
+                    </lib-input>
+                </div>
+            </ng-template>
+
+            <div class="f-col">
+              <lib-input label="Description" type="text" i18n="@@description" [isRequired]="true" [expanded]="true"
+                [disabled]="disabled"
+                  [labelIconTooltip]="isNoun ? 'Allows user to define a noun short name that will be getting maintained in short description, when generated from description generator.' : 'Allows user to maintain the description for a class in relation to its business use.'"
+                  labelIcon="question-circle"
+                  [formControl]="classForm.controls.description"
+                  placeholder="Type description"
+                  [hint]="(classForm.controls.description.touched && classForm.controls.description.errors && classForm.controls.description.errors.required) ? 'This is a required field' : ''"
+                  [hasError]="classForm.controls.description.touched &&classForm.controls.description.errors && classForm.controls.description.errors.required">
+              </lib-input>
+            </div>
+            <div class="f-col">
+                <!-- <lib-input label="Colloquial name" type="text" i18n="@@colloquial_name" labelIconFont="mdo-icons-light"
+                    labelIconTooltip="Allows user to maintain colloquial for the class. Colloquials allow the users to search a particular class while maintaining data with ease."
+                    labelIcon="question-circle" [formControl]="classForm.controls.colloquialName"></lib-input> -->
+
+              <div class="f-col mdo-field">
+                <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@colloquial_name">
+                  Colloquial name
+                  <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                    libTooltip="Allows user to maintain colloquial for the class. Colloquials allow the users to search a particular class while maintaining data with ease.">
+                    question-circle</mat-icon>
+                </lib-text-line>
+                <div class="mdo-field-input">
+                  <mat-chip-list #chipList></mat-chip-list>
+                  <lib-chip-list>
+                    <lib-chip [disabled]="disabled" *ngFor="let val of selectedColloquials;" [removable]="true" (removed)="removeColloquial(val)">
+                      {{val.calloquialName}}
+                    </lib-chip>
+                    <input matInput label="Colloquial name" type="text" i18n="@@colloquial_name"
+                      [disabled]="disabled"
+                      [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                      [matChipInputAddOnBlur]="true" (matChipInputTokenEnd)="addColloquial($event)" />
+                  </lib-chip-list>
+                </div>
+                <mat-label>
+                    <lib-text-line type="xsmall" textColor="secondary" i18n="@@type_and_hit_enter_to_add_multiple_values">Type and hit enter to add multiple values</lib-text-line>
+                </mat-label>
+                
+              </div>
+            </div>
+
+            <div *ngIf="isNoun" class="f-col  mdo-field">
+                <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@image">Image <mat-icon
+                        fontSet="mdo-icons-light" class="label-icon"
+                        libTooltip="Allows user to maintain images with respect to a noun that can be viewed by a user while generating description using description generator.">
+                        question-circle</mat-icon>
+                </lib-text-line>
+                <div class="mdo-field-input import-files">
+                    <input class="drag-input" accept="image/*" type="file"
+                    [disabled]="disabled"
+                        (change)="uploadAttachments($event.target.files)" multiple id="fileUpload" />
+                    <div class="f-col-spacer-half"></div>
+                    <div class="f-row cursor">
+                        <lib-text-line type="base" textColor="secondary" i18n="@@drag_files_here_or">Drag files here
+                            or&nbsp;</lib-text-line>
+                        <lib-text-line type="base" textColor="link" i18n="@@browse">browse
+                        </lib-text-line>
+                        <lib-text-line textColor="secondary" type="base" i18n="@@to_upload">&nbsp;to upload
+                        </lib-text-line>
+                    </div>
+                </div>
+                <div *ngIf="attachments.length" class="f-row display-images">
+                    <div class="f-col attachment-section" *ngFor="let attachment of attachments; let index = index">
+                        <div class="f-row attachment" [ngClass]="{ hasError: attachment.uploadError }">
+                            <img [src]="getAttachmentIcon(attachment.file?.name)" class="attachment-icon" />
+                            <span class="attachment-name"
+                                [libTooltip]="attachment.file?.name.length > 25 ? attachment.file?.name : ''">
+                                {{ truncateAttachmentName(attachment.file?.name) }}</span>
+                            <span class="f-spacer"></span>
+                            <lib-button *ngIf="!disabled" class="lib-button" (click)="removeAttachment(index)" icon="times" type="plain">
+                            </lib-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="f-col">
+                <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@valid_from">Valid from
+                    <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                        libTooltip="Allows user to define a valid from date for the class, thus controlling users from maintaining data for classes which have a future valid from date.">
+                        question-circle</mat-icon>
+                </lib-text-line>
+                <lib-date-picker [disabled]="disabled" class="lib-date-picker" range="false" [formControl]="classForm.controls.validFrom"
+                    enableTimeInput="false">
+                </lib-date-picker>
+            </div>
+
+            <div class="f-row mdo-field" *ngIf="parent">
+                <lib-slide-toggle [disabled]="disabled" class="toggle-col"  theme="primary" [formControl]="classForm.controls.inheritAttributes">
+                </lib-slide-toggle>
+                <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@inherit_characteristics">
+                    Inherit characteristics <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                        libTooltip="Allows user to control the display of inherited characteristics from parent class if required by the business.">
+                        question-circle</mat-icon>
+                </lib-text-line> 
+            </div>
+
+            <ng-template [ngIf]="isNoun">
+                <div class="f-row mdo-field">
+                    <lib-slide-toggle [disabled]="disabled" class="toggle-col"  theme="primary" [formControl]="classForm.controls.isNoun">
+                    </lib-slide-toggle>
+                    <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@description_generation">
+                        Enable for description generation <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                            libTooltip="Allows users to enable/disable the noun/modifier for generating description. The related noun modifiers will not be available for use while generating a description using description generator.">
+                            question-circle</mat-icon>
+                    </lib-text-line>
+                </div>
+
+                <div class="f-row mdo-field">
+                    <lib-slide-toggle class="toggle-col"  theme="primary" [formControl]="classForm.controls.isCodePartOfDesc">
+                    </lib-slide-toggle>
+                    <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@noun_short_description">
+                        Noun to be part of short description <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                            libTooltip="Allows users to control if defined noun should be part of short description, when generating description using description generator">
+                            question-circle</mat-icon>
+                    </lib-text-line>
+                </div>
+
+                <div class="f-row mdo-field">
+                    <lib-slide-toggle class="toggle-col"  theme="primary" [formControl]="classForm.controls.isModPartOfDesc">
+                    </lib-slide-toggle>
+                    <lib-text-line type="xsmall" weight="strong" class="field-label"
+                        i18n="@@modifier_short_description">Modifier to be part of short description <mat-icon
+                            fontSet="mdo-icons-light" class="label-icon"
+                            libTooltip=" Allows users to control if defined modifier should be part of short description, when generating description using description generator">
+                            question-circle</mat-icon>
+                    </lib-text-line>
+                </div>
+
+                <div class="f-col">
+                    <lib-input label="Reference type" type="text"
+                      [disabled]="disabled"
+                        labelIconTooltip="Allows users to maintain the reference type name." labelIcon="question-circle"
+                        i18n="@@reference_type" [formControl]="classForm.controls.referenceType">
+                    </lib-input>
+                </div>
+
+                <div class="f-col">
+                    <lib-input label="Reference code" type="text"
+                      [disabled]="disabled"
+                        labelIconTooltip="Allows users to maintain the reference identifier."
+                        labelIcon="question-circle" i18n="@@reference_code" [formControl]="classForm.controls.referenceCode">
+                    </lib-input>
+                </div>
+
+                <div class="f-col">
+                    <lib-input label="SAP class" placeholder="Type name" type="text"
+                      [disabled]="disabled"
+                      i18n="@@sap_class" [formControl]="classForm.controls.sapClass">
+                    </lib-input>
+                </div>
+            </ng-template>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,74 @@
+// Define color
+$mdo-light-blue: (
+  50: #e4ebf3,
+  500: #10aeef,
+  contrast: (
+    500: #fff
+  )
+);
+
+$mdo-light-grey: (
+  500: #e4ebf3,
+  contrast: (
+    500: #000
+  )
+);
+
+// Common attributes
+$box-shadow: 0 0 3px rgba(108, 124, 139, 0.5);
+$box-shadow-backdrop:0 0 3px rgb(108 124 139 / 50%);
+$inset-box-shadow: inset -7px -6px 2px -6px rgba(108, 124, 139, 0.3);
+
+// SVG Stroke Color
+$mdo-stroke-warning: #ffe8cc;
+$mdo-stroke-info:    #d0ebff;
+$mdo-stroke-offcanvas: #797979;
+$mdo-stroke-canvas: #fff;
+$mdo-stroke-accent: #e5e5e5;
+
+// App colors
+$color-app-offcanvas: #324358;
+$color-app-hover: #eff4f7;
+$color-accent: #e4ebf3;
+$color-app-border: #d9e3ef;
+$color-app-accent: #f8fbfd;
+$color-app-selected: #828f9f;
+$color-app-row: #fafafa;
+$color-app-canvas: #232f3e;
+$color-app-brand: #10aeef;
+
+// Text color
+$color-text-canvas: #fff;
+$color-text-primary: #272d37;
+$color-text-secondary: #646f79;
+$color-text-offcanvas: #b7bfce;
+$color-text-disabled: #cbcfd3;
+$color-text-link: #068adc;
+
+// Status color
+$color-status-error: #d81e22;
+$color-status-success: #0cb560;
+$color-status-warning: #f89b02;
+$color-status-info: #3e8dec;
+
+$color-status-error-accent: #fff5f5;
+$color-status-success-accent: #ebfcee;
+$color-status-warning-accent: #fff4e6;
+$color-status-info-accent: #e7f5ff;
+$color-status-button-accent: #265e74;
+
+// Light theme
+$mdo-light-primary: mat-palette($mdo-light-blue, 500, 50);
+$mdo-light-accent:  mat-palette($mdo-light-grey, 500,);
+$mdo-light-warn:    mat-palette($mat-red, 500);
+
+$mdo-light:   mat-light-theme($mdo-light-primary, $mdo-light-accent, $mdo-light-warn);
+
+// Include the default theme styles.
+@include angular-material-theme($mdo-light);
+@include pros-cmp-theme($mdo-light);
+@include pros-cmp-typography(mat-typography-config());
+
+$custom-typography: mat-typography-config($font-family: '"lato"');
+
+@include mat-core($custom-typography);

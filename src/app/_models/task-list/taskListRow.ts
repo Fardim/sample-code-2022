@@ -1,0 +1,40 @@
+// Interface for Task List Row
+export interface TaskListRow {
+    wfid: string;
+    uploadid: string;
+    status: string;
+    rejecttext: string;
+    rejectioncomment: string;
+    entrycheck: string;
+    fname: string;
+    imageurl: string;
+    claimable: string;
+    stepId: string;
+    claimed: string;
+    workflowPath: string;
+    rejectionType: string;
+    eventId: string;
+    senderRole: string;
+    forwardEnabled: string;
+    profilePicSNO: string;
+    massDumpDescription: string;
+    staticPriority: string;
+    dynamicPriority: string;
+    roleid: string;
+    guiActivate: string;
+    priorityEditable: string;
+    eventCode: string;
+    delegateStatus: string;
+    totalCount: string;
+    taskid: string;
+    objectid: string;
+    objecttype: string;
+    objectdesc: string;
+    duedate: Date;
+    datestarted: Date;
+    requestorName: string;
+    requestorDate: Date;
+    priorityType: string;
+    emailtext: string;
+    tags: Array<object>;
+}

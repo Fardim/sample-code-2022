@@ -1,0 +1,12 @@
+.root {
+  padding-left: 6px;
+
+  pros-class-detail,
+  pros-characteristics-detail {
+    height: calc(100vh - 206px);
+  }
+
+  .characteristics-card {
+    padding: 12px;
+  }
+}

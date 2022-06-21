@@ -1,0 +1,24 @@
+<mat-card class="root mat-elevation-z0">
+    <div class="f-row breadcrum-toolbar">
+        <div class="display-heading-large">
+            Session expired
+        </div>
+        <span class="f-spacer"></span>
+        <button mat-button (click)="close()">
+            <mat-icon>clear</mat-icon>
+        </button>
+    </div>
+
+    
+    <h3>
+        Your session has expired.
+    </h3>
+
+
+    <div class="row-spacer"></div>
+    <!-- navigation buttons -->
+    <div class="f-row">
+        <span class="f-spacer"></span>
+        <button mat-flat-button color="primary" (click)="close()">Ok</button>
+    </div>
+</mat-card>

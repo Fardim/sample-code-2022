@@ -1,0 +1,56 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button (click)="closeDialogComponent()" type="plain" iconFontType="light" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading" i18n="@@business_rule_library">Business rule library</lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-button type="major" (click)="saveSelection()" i18n="@@save" width="80px"> Save </lib-button>
+            </div>
+            <div class="f-row-spacer-half"></div>
+            <div class="f-row">
+                <lib-search (valueChange)="search($event)" i18n-placeholder="@@search_br"
+                    placeholder="Search business rules" class="lib-search"></lib-search>
+                <lib-chip type="info" [matMenuTriggerFor]="businessRuleType" label="Business rule type:"
+                    [removable]="selectedRuleType"
+                    (removed)="selectCurrentRuleType(null)"> {{ (selectedRuleType &&
+                    selectedRuleType.ruleDesc)? selectedRuleType.ruleDesc: 'All'}}</lib-chip>
+                <mat-menu #businessRuleType="matMenu" class="navigation-menu">
+                    <button mat-menu-item (click)="selectCurrentRuleType(null)"> All </button>
+                    <ng-container *ngFor="let type of businessRuleTypes">
+                        <button mat-menu-item *ngIf="type.isImplemented" [libTooltip]="type.ruleDesc"
+                            (click)="selectCurrentRuleType(type)">{{type.ruleDesc}}</button>
+                    </ng-container>
+                </mat-menu>
+            </div>
+        </div>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <!-- page loader -->
+            <div class="loading-spinner" *ngIf="loader">
+                <lib-spinner diameter="30"></lib-spinner>
+            </div>
+            <lib-empty-state i18n-primaryText="@@nothing_to_see_here" *ngIf="!loader && !filteredBusinessRulesList.length" primaryText="Nothing to see here" i18n-secondaryText="@@no_results_found" secondaryText="No results found" icon="table" iconSize="100">
+            </lib-empty-state>
+            <mat-list role="list" class="rule-list" *ngIf="!loader && filteredBusinessRulesList.length>0">
+                <mat-list-item role="listitem" *ngFor="let brItem of filteredBusinessRulesList; trackBy: trackByFn">
+                    <lib-text-line type="base" class="br-info" enableWrap="true">{{brItem.brInfo || 'UNTITLED'}}
+                    </lib-text-line>
+                    <span class="f-spacer"></span>
+                    <lib-button *ngIf="!isSelected(brItem); else doneButton"
+                        (click)="selectBusinessRule(brItem, constants.ADD)" type="minor" i18n="@@add"
+                        width="80px">Add</lib-button>
+                    <ng-template #doneButton>
+                        <lib-button width="80px" 
+                            (click)="selectBusinessRule(brItem, constants.REMOVE)"
+                            type="minor" icon="check">
+                        </lib-button>
+                    </ng-template>
+                </mat-list-item>
+            </mat-list>
+        </div>
+    </div>
+</div>

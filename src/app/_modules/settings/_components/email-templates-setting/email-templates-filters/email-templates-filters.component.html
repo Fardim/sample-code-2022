@@ -1,0 +1,101 @@
+<lib-chip-list>
+  <lib-search class="lib-search" placeholder="Search" (valueChange)="searchFieldSub.next($event)"></lib-search>
+  <mat-menu #modifiedUserListMenu="matMenu" xPosition="after" class="filter-menudropdown">
+    <lib-filter-dropdown class="chip-filters">
+      <div class="dropdown-search-wrapper">
+        <lib-search prosClickStopPropagation placeholder="Search" [formControl]="serachUserCtrl"></lib-search>
+      </div>
+      <div class="dropdown-options-wrapper f-col">
+        <div class="dropdown-options-inner-container">
+          <div class="default-options">
+            <lib-filter-option prosClickStopPropagation>
+              <lib-checkbox label="All" prosClickStopPropagation [checked]="selectedModifiedUsers.length == 0"
+                (valueChange)="setSelectedModifiedUser('')"></lib-checkbox>
+            </lib-filter-option>
+            <div class="separator">
+              <mat-divider></mat-divider>
+            </div>
+          </div>
+          <div class="options">
+            <lib-filter-option prosClickStopPropagation *ngFor="let user of userList">
+              <lib-checkbox prosClickStopPropagation [label]="user.userName"
+                [checked]="selectedModifiedUsers.indexOf(user.userName) >= 0"
+                (valueChange)="setSelectedModifiedUser(user.userName)"></lib-checkbox>
+            </lib-filter-option>
+          </div>
+        </div>
+        <div class="filter-button-wrapper">
+          <lib-button type="minor" i18n="@@apply" (click)="afterStatusAndRoleMenuClosed()">Apply</lib-button>
+        </div>
+      </div>
+    </lib-filter-dropdown>
+  </mat-menu>
+  <mat-menu #createdUserListMenu="matMenu" xPosition="after" class="filter-menudropdown">
+    <lib-filter-dropdown class="chip-filters">
+      <div class="dropdown-search-wrapper">
+        <lib-search prosClickStopPropagation placeholder="Search" [formControl]="serachUserCtrl"></lib-search>
+      </div>
+      <div class="dropdown-options-wrapper f-col">
+        <div class="dropdown-options-inner-container">
+          <div class="default-options">
+            <lib-filter-option prosClickStopPropagation>
+              <lib-checkbox label="All" prosClickStopPropagation [checked]="selectedCreateUsers.length == 0"
+                (valueChange)="setSelectedCreatedUser('')"></lib-checkbox>
+            </lib-filter-option>
+            <div class="separator">
+              <mat-divider></mat-divider>
+            </div>
+          </div>
+          <div class="options">
+            <lib-filter-option prosClickStopPropagation *ngFor="let user of userList">
+              <lib-checkbox prosClickStopPropagation [label]="user.userName"
+                [checked]="selectedCreateUsers.indexOf(user.userName) >= 0"
+                (valueChange)="setSelectedCreatedUser(user.userName)"></lib-checkbox>
+            </lib-filter-option>
+          </div>
+        </div>
+        <div class="filter-button-wrapper">
+          <lib-button type="minor" i18n="@@apply" (click)="afterStatusAndRoleMenuClosed()">Apply</lib-button>
+        </div>
+      </div>
+    </lib-filter-dropdown>
+  </mat-menu>
+  <mat-menu #templateTypeMenu="matMenu" xPosition="after" class="filter-menudropdown">
+    <lib-filter-dropdown class="chip-filters">
+      <div class="dropdown-options-wrapper f-col">
+        <div class="dropdown-options-inner-container">
+          <div class="default-options">
+            <lib-filter-option prosClickStopPropagation>
+              <lib-checkbox label="All" prosClickStopPropagation [checked]="selectedTemplateTypes.length == 0"
+                (valueChange)="setSelectedTemplateType(null)"></lib-checkbox>
+            </lib-filter-option>
+            <div class="separator">
+              <mat-divider></mat-divider>
+            </div>
+          </div>
+          <div class="options">
+            <lib-filter-option prosClickStopPropagation *ngFor="let item of templateTypeOptions">
+              <lib-checkbox [label]="item.key" prosClickStopPropagation [checked]="isTemplateTypeChecked(item)"
+                (valueChange)="setSelectedTemplateType(item)"></lib-checkbox>
+            </lib-filter-option>
+          </div>
+        </div>
+        <div class="filter-button-wrapper">
+          <lib-button type="minor" i18n="@@apply" (click)="afterStatusAndRoleMenuClosed()">Apply</lib-button>
+        </div>
+      </div>
+    </lib-filter-dropdown>
+  </mat-menu>
+  <lib-chip type="info" class="mdo-filter-matchip" disableRipple="true" label="Template type:"
+    [matMenuTriggerFor]="templateTypeMenu">
+    {{ (selectedTemplateTypes.length > 0 ? selectedTemplateTypeText : 'All') }}
+  </lib-chip>
+  <lib-chip type="info" class="mdo-filter-matchip" disableRipple="true" label="Modified by:"
+    [matMenuTriggerFor]="modifiedUserListMenu">
+    {{ (selectedModifiedUsers.length > 0 ? selectedModifiedUsers.join(',') : 'All') }}
+  </lib-chip>
+  <lib-chip type="info" class="mdo-filter-matchip" disableRipple="true" label="Created by:"
+    [matMenuTriggerFor]="createdUserListMenu">
+    {{ (selectedCreateUsers.length > 0 ? selectedCreateUsers.join(',') : 'All') }}
+  </lib-chip>
+</lib-chip-list>

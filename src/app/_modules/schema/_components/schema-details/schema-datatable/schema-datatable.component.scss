@@ -1,0 +1,196 @@
+.root {
+  padding: 0;
+  width: 100%;
+
+  mat-toolbar.header {
+    h3 {
+      margin: 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: pre-line;
+      word-break: break-word;
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 28px;
+      text-transform: capitalize;
+    }
+  }
+
+  > div {
+    padding: 16px;
+
+    mat-card {
+      padding: 0;
+
+      mat-tab-group.status-nav {
+        mat-chip-list {
+          margin-left: 8px;
+
+          mat-chip {
+            min-height: 22px;
+          }
+        }
+      }
+
+      .hierarchy-row,
+      .grid-row {
+        overflow-x: auto;
+
+        button {
+          margin-right: 16px;
+          flex-shrink: 0;
+        }
+
+        button:first-child {
+          margin-left: 16px;
+        }
+
+        padding-bottom: 16px;
+      }
+
+      .settings-row {
+        align-items: center;
+        margin: 16px;
+
+        mat-form-field {
+          height: 40px;
+        }
+      }
+
+      .table-row {
+        margin: 0 16px;
+        overflow: auto;
+
+        .mat-table {
+          width: 100%;
+
+          th.any-cell {
+            border-top-width: 1px;
+            border-top-style: solid;
+            left: 0 !important;
+          }
+
+          .any-cell {
+            border-right-width: 1px;
+            border-right-style: solid;
+            padding-left: 8px;
+            padding-right: 8px;
+            left: 0 !important;
+
+            mat-form-field {
+              height: 30px;
+            }
+          }
+
+          .any-cell:nth-last-child(2) {
+            border-right-width: 0;
+            border-right-style: solid;
+          }
+
+          .more-cell {
+            width: 40px;
+            min-width: 40px;
+            max-width: 40px;
+            border-left-width: 1px;
+            border-left-style: solid;
+          }
+
+          .score-cell {
+            width: 136px;
+            align-items: center;
+
+            mat-progress-bar {
+              border-radius: 10px;
+              height: 8px;
+              flex: 3;
+            }
+
+            .countscore {
+              flex: 1;
+              font-weight: 500;
+            }
+          }
+
+          .checkbox-cell {
+            width: 30px;
+            min-width: 30px;
+            max-width: 30px;
+            text-align: center;
+          }
+          // .objnr-cell {
+          //   flex: 0 0 150px;
+          // }
+          .status-cell {
+            width: 200px;
+            min-width: 200px;
+            max-width: 200px;
+            border-left-width: 1px;
+            border-left-style: solid;
+          }
+          // .data-cell {
+          //   flex: 0 0 200px;
+          // }
+          .errorCell {
+            border-bottom: 2px solid #e62a10;
+            color: #e62a10;
+          }
+
+          .correctedCell_New {
+            border-bottom: 2px solid #478cca;
+            color: #478cca;
+          }
+
+          .correctedCell_Old {
+            border-bottom: 2px solid #faac53;
+            color: #faac53;
+          }
+
+          .row_new_icon {
+            color: #478cca;
+          }
+
+          .row_old_icon {
+            color: #faac53;
+          }
+
+          .reviewed_icon {
+            color: #4caa00;
+          }
+
+          .unreviewed_icon {
+            color: #808080;
+          }
+
+          .submitted_icon {
+            color: #1976d2;
+          }
+
+          .errorChip {
+            background-color: #e62a10;
+            color: #fff;
+          }
+
+          .successChip {
+            background-color: #259b24;
+            color: #fff;
+          }
+
+          .skippedChip {
+            background-color: #a391c5;
+          }
+
+          .correctedChip {
+            background-color: #bdd827;
+          }
+
+          .correctedCellHeader {
+            min-width: 100px;
+          }
+        }
+      }
+    }
+  }
+}

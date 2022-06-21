@@ -1,0 +1,110 @@
+<div class="main message-list" #messageListContainer prosInfiniteScroll bufferPercentage="20"
+  (scrollToTop)="getAllMessages(true)">
+  <div *ngIf="isPreviousMessageLoading" class="loading-state">
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line-half"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line-half"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line-half"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line-half"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line-half"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line-half"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line-half"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line-half"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line-half"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line-half"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line-half"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line-half"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line-half"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+  </div>
+  <div class="chat-group" *ngFor="let message of formattedMessageList; let i = index">
+    <lib-section [text]="message.date" *ngIf="message.date !== 'New'" class="section-divider"></lib-section>
+    <lib-section *ngIf="message.date === 'New'" class="section-divider">
+      <lib-label class="banner" status="error">{{message.date}}</lib-label>
+    </lib-section>
+
+    <div class="message" *ngFor="let messageDetail of message.messageDetails; let i = index"
+      [ngClass]="{'show-textarea-editor': messageDetail.isEdit, 'message-deleted': messageDetail.deleted}"
+      id="{{messageDetail.messageUniqueId}}">
+      <div class="f-row align-items">
+        <div class="f-col">
+          <lib-avatar size="small" *ngIf="messageDetail.fromUserInfo.senderImage !== ''"
+            [srcPicture]="messageDetail.fromUserInfo.senderImage">
+          </lib-avatar>
+          <lib-avatar *ngIf="messageDetail.fromUserInfo.senderImage === ''"
+            [initials]="getInitials(messageDetail.fromUserInfo.senderName)"></lib-avatar>
+        </div>
+
+        <div class="f-col flex-grow">
+          <div class="f-row sender-details">
+            <div class="f-row">
+              <lib-text-line type="base" weight="strong" [enableWrap]="false" class="lib-text"
+                title="{{messageDetail?.fromUserInfo?.senderName | titlecase}}">
+                {{messageDetail?.fromUserInfo?.senderName | titlecase}}
+              </lib-text-line>
+              <lib-text-line type="xsmall" textColor="secondary" class="lib-text">{{messageDetail.time}}</lib-text-line>
+              <lib-text-line type="xsmall" class="lib-text" *ngIf="messageDetail.edited && !messageDetail.deleted">
+                Edited</lib-text-line>
+            </div>
+
+            <pros-message-actions class="message-icons" *ngIf="!messageDetail.isEdit && !messageDetail.deleted"
+              [messageDetail]="messageDetail" [userdetails]="userdetails" (reply)="replyToMessage(messageDetail)"
+              (edit)="editMessage(messageDetail)" (delete)="deleteMessage(messageDetail)"></pros-message-actions>
+          </div>
+
+          <pros-quoted-reply [messageDetail]="messageDetail"
+            *ngIf="messageDetail.replyForMsg && !messageDetail.deleted">
+          </pros-quoted-reply>
+
+          <lib-text-line class="message-text" *ngIf="!messageDetail.isEdit && !messageDetail.deleted"
+            textColor="secondary"
+            [ngClass]="{'hide-message-text': messageDetail.isShowViewMoreBtn && !messageDetail.isShowExtraText}"
+            [innerHTML]="getMessageText(messageDetail.messageText)"></lib-text-line>
+          <lib-text-line type="base" *ngIf="messageDetail.deleted">This message has been deleted.</lib-text-line>
+
+          <div class="f-row" *ngIf="messageDetail.isShowViewMoreBtn && !messageDetail.deleted && !messageDetail.isEdit">
+            <div class="view-more-button" (click)="messageDetail.isShowExtraText = !messageDetail.isShowExtraText">
+              <mat-icon fontSet="mdo-icons" class="view-more-icon">{{messageDetail.isShowExtraText ? 'chevron-up' :
+                'chevron-down'}}</mat-icon>
+              <lib-text-line textColor="link" textColor="secondary">{{messageDetail.isShowExtraText ? 'View less' :
+                'View more'}}</lib-text-line>
+            </div>
+          </div>
+
+          <!-- Attachment List -->
+          <div class="attachment-section f-row" *ngIf="messageDetail?.attachmentType === 'file'">
+            <pros-file-item *ngFor="let file of messageDetail?.attachement" [name]="file.attachmentName"
+              [serial]="file.sno" [downloadable]="true">
+            </pros-file-item>
+          </div>
+          <div class="attachment-object" *ngIf="messageDetail?.attachmentType === 'object'">
+            <lib-text-line type="base" enableWrap="true" [innerHTML]="attachmentText">
+            </lib-text-line>
+          </div>
+
+        </div>
+
+        <div class="message-edit" *ngIf="messageDetail.isEdit">
+          <pros-message-editor [textEditorId]="'textareaEditor' + messageDetail.messageUniqueId"
+            [innerToolbarId]=" 'toolbar' + messageDetail.messageUniqueId" [componentName]="'message-list'"
+            [messageDetail]="messageDetail" (cancelEditEmit)="cancelMessageEditing($event)"
+            (sendMessageEmit)="sendMessage($event)">
+          </pros-message-editor>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

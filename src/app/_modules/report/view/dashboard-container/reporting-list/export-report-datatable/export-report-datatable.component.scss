@@ -1,0 +1,51 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  width: 700px;
+
+  .breadcrum-toolbar {
+    padding: 8px 16px;
+    z-index: 2;
+
+    .mdo-constrained-right {
+      width: 100%;
+
+      .breadcrum-head {
+        align-items: center;
+        width: 100%;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px);
+    overflow: auto;
+
+    .cursor {
+      cursor: pointer;
+    }
+
+    .download-list {
+      flex: 1;
+      align-items: center;
+    }
+
+    .message-alert {
+      background: coral;
+      color: #fff;
+      border-radius: 4px;
+      padding: 8px 12px;
+    }
+  }
+}
+
+@media (min-width: 1200px) {
+  .mdo-constrained-right {
+    margin-right: 50px;
+  }
+
+  .mdo-justify {
+    margin: 0 66px;
+  }
+}

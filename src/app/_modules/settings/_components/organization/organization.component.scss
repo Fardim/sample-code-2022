@@ -1,0 +1,32 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  padding: 0 12px;
+  align-items: flex-start;
+
+  .breadcrum-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    padding-top: 8px;
+    min-height: 36px;
+  }
+
+  .lib-tabs-content {
+    width: 100%;
+  }
+
+  .tabs-content {
+    width: 62%;
+    margin: 0 auto;
+  }
+}
+
+.w-40p {
+  width: 40%;
+}
+
+.w-60p {
+  width: 60%;
+}

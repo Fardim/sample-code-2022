@@ -1,0 +1,182 @@
+<ng-container [ngSwitch]="fieldControlType">
+    <!-- Text, Password, Email -->
+    <!-- <lib-input
+        *ngSwitchCase="[FieldControlType.TEXT, FieldControlType.EMAIL, FieldControlType.PASSWORD].includes(fieldControlType) ? fieldControlType: !fieldControlType"
+            i18n-placeholder="@@type_filter_value" placeholder="Quick filter" [value]="filterValue"
+            (valueChange)="updateFilterValue($event)"></lib-input> -->
+    <div class="lib-input" *ngSwitchCase="[FieldControlType.TEXT, FieldControlType.EMAIL, FieldControlType.PASSWORD].includes(fieldControlType) ? fieldControlType: !fieldControlType">
+        <div class="f-col mdo-field">
+            <div class="mdo-field-input">
+                    <input
+                    autocomplete="off"
+                    placeholder="Quick filter"
+                    [value]="filterValue"
+                    (input)="updateFilterValue($event)"
+                    />
+            </div>
+        </div>
+    </div>
+
+    <!-- input type Text area -->
+    <lib-textarea *ngSwitchCase="FieldControlType.TEXT_AREA" placeholder="Quick filter"
+        i18n-placeholder="@@type_filter_value" [value]="filterValue" (valueChange)="updateFilterValue($event)">
+    </lib-textarea>
+
+    <!-- Input type number -->
+    <lib-range-slider *ngSwitchCase="FieldControlType.NUMBER" thumbLabel [value]="filterCriteria.startValue || 0"
+        [highValue]="filterCriteria.endValue || 1" (valueChange)="updateFilterValue($event)"></lib-range-slider>
+
+
+    <!-- Date -->
+    <ng-container *ngSwitchCase="FieldControlType.DATE">
+        <lib-date-range-picker [selectedDate]="filterValue" (valueChange)="updateFilterValue($event)">
+        </lib-date-range-picker>
+    </ng-container>
+
+    <!-- Date & Time -->
+    <ng-container *ngSwitchCase="FieldControlType.DATE_TIME">
+        <!-- [selectedDate]="filterValue" -->
+        <lib-date-time-range-picker [selectedDate]="filterValue" (valueChange)="updateFilterValue($event)">
+        </lib-date-time-range-picker>
+    </ng-container>
+
+    <!-- Time -->
+    <ng-container *ngSwitchCase="FieldControlType.TIME">
+        <lib-time-picker [hours]="filterValue.hours" [minutes]="filterValue.minutes"
+            (timeChange)="updateFilterValue($event)">
+        </lib-time-picker>
+    </ng-container>
+
+    <!-- Single select -->
+    <ng-container *ngSwitchCase="FieldControlType.SINGLE_SELECT">
+        <div class="mdo-field-input" [matMenuTriggerFor]="menu">
+            <lib-input [value]="filterValue"></lib-input>
+        </div>
+        <mat-menu #menu="matMenu">
+            <lib-filter-dropdown>
+                <div class="dropdown-search-wrapper" libClickStopPropagation>
+                    <div class="f-row">
+                        <lib-text-line type="base" weight="strong"> {{ fieldMetaData?.fieldDescri || fieldId }}
+                        </lib-text-line>
+                        <span class="f-spacer"></span>
+                        <lib-button iconFontType="solid" icon="sliders-h"></lib-button>
+                    </div>
+                    <div class="row-half-spacer"></div>
+                    <lib-search (valueChange)="dropSearchSub.next($event)"></lib-search>
+                </div>
+                <div class="dropdown-options-wrapper f-col">
+                    <div class="dropdown-options-inner-container" libClickStopPropagation prosInfiniteScroll
+                        bufferPercentage="20" (scrollEnd)="getDropdownOptions(true)">
+                        <div class="options">
+                            <lib-filter-option *ngFor="let op of dropdownOptions" (click)="selectDropOption(op.code)">
+                                {{ op.text }}
+                            </lib-filter-option>
+                        </div>
+                    </div>
+                    <div class="filter-button-wrapper f-col">
+                        <lib-chip-list libClickStopPropagation>
+                            <ng-container *ngFor="let option of filterValue; let i=index">
+                                <lib-chip [removable]="true" (removed)="removeDropOption(option)">{{ option }}
+                                </lib-chip>
+                            </ng-container>
+                        </lib-chip-list>
+                        <lib-button type="minor">Apply</lib-button>
+                    </div>
+                </div>
+            </lib-filter-dropdown>
+        </mat-menu>
+    </ng-container>
+
+    <!-- Multi select -->
+    <ng-container *ngSwitchCase="FieldControlType.MULTI_SELECT">
+        <div class="mdo-field-input" [matMenuTriggerFor]="menu">
+            <lib-input [value]="filterValue"></lib-input>
+        </div>
+        <mat-menu #menu="matMenu">
+            <lib-filter-dropdown>
+                <div class="dropdown-search-wrapper" libClickStopPropagation>
+                    <div class="f-row">
+                        <lib-text-line type="base" weight="strong"> {{ fieldMetaData?.fieldDescri || fieldId }}
+                        </lib-text-line>
+                        <span class="f-spacer"></span>
+                        <lib-button iconFontType="solid" icon="sliders-h"></lib-button>
+                    </div>
+                    <div class="row-half-spacer"></div>
+                    <lib-search (valueChange)="dropSearchSub.next($event)"></lib-search>
+                </div>
+                <div class="dropdown-options-wrapper f-col">
+                    <div class="dropdown-options-inner-container" libClickStopPropagation prosInfiniteScroll
+                        bufferPercentage="20" (scrollEnd)="getDropdownOptions(true)">
+                        <div class="options">
+                            <lib-filter-option *ngFor="let op of dropdownOptions" (click)="selectDropOption(op.code)">
+                                {{ op.text }}
+                            </lib-filter-option>
+                        </div>
+                    </div>
+                    <div class="filter-button-wrapper f-col">
+                        <lib-chip-list libClickStopPropagation>
+                            <ng-container *ngFor="let option of filterValue; let i=index">
+                                <lib-chip [removable]="true" (removed)="removeDropOption(option)">{{ option }}
+                                </lib-chip>
+                            </ng-container>
+                        </lib-chip-list>
+                        <lib-button type="minor">Apply</lib-button>
+                    </div>
+                </div>
+            </lib-filter-dropdown>
+        </mat-menu>
+    </ng-container>
+
+    <!-- Default input text -->
+    <lib-input *ngSwitchDefault i18n-placeholder="@@type_filter_value" placeholder="Quick filter"
+        [value]="filterValue" (valueChange)="updateFilterValue($event)"></lib-input>
+</ng-container>
+
+<ng-template>
+    <!-- Single select -->
+    <ng-container *ngSwitchCase="FieldControlType.SINGLE_SELECT">
+        <div class="f-col mdo-field">
+            <!-- input container -->
+            <div class="mdo-field-input">
+                {{ filterValue }}
+                <input matInput placeholder="Type to search" #singleSelectInput [matAutocomplete]="singleSelectAuto"
+                    (change)="filterDropdownOptions($event.target.value)" />
+                <!-- <mat-icon matSuffix fontSet="mdo-icons">chevron-down</mat-icon> -->
+
+                <!-- autocomplete -->
+                <mat-autocomplete class="mdo-autocomplete" #singleSelectAuto="matAutocomplete">
+                    <mat-option class="mdo-option" *ngFor="let option of filteredOptions | async" [value]="option"
+                        (click)="updateFilterValue(option);singleSelectInput.value=''">
+                        {{option}}
+                    </mat-option>
+                </mat-autocomplete>
+            </div>
+        </div>
+    </ng-container>
+
+    <!-- Multi select -->
+    <ng-container *ngSwitchCase="FieldControlType.MULTI_SELECT">
+        <div class="f-col mdo-field">
+            <!-- input container -->
+            <div class="mdo-field-input">
+                <!-- chip list -->
+                <lib-chip-list>
+                    <ng-container *ngFor="let option of filterValue; let i=index">
+                        <lib-chip [removable]="true" (removed)="removeDropOption(option)">{{ option }}</lib-chip>
+                    </ng-container>
+
+                    <input matInput placeholder="Type to search" #multiSelectInput [matAutocomplete]="multiSelectAuto"
+                        (change)="filterDropdownOptions($event.target.value)" />
+                </lib-chip-list>
+
+                <!-- autocomplete -->
+                <mat-autocomplete class="mdo-autocomplete" #multiSelectAuto="matAutocomplete">
+                    <mat-option class="mdo-option" *ngFor="let op of filteredOptions | async" [value]="op"
+                        (click)="selectDropOption(op);multiSelectInput.value=''">
+                        {{op}}
+                    </mat-option>
+                </mat-autocomplete>
+            </div>
+        </div>
+    </ng-container>
+</ng-template>

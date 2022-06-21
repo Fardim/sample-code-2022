@@ -1,0 +1,9 @@
+<div class="root">
+    <lib-chip-list>
+        <lib-chip *ngFor="let option of filterOptions" 
+            [selectable]="true" 
+            [selected]="selectedOption === option?.value"
+            (click)="selectOption(option.value)"
+            >{{option?.label}}</lib-chip>
+    </lib-chip-list>
+</div>

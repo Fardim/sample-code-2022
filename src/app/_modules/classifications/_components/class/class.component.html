@@ -1,0 +1,122 @@
+<div class="root">
+  <ng-container *ngIf="submitError.status; else dataContainer">
+      <!-- <pros-error-state></pros-error-state> -->
+  </ng-container>
+  <ng-template #dataContainer>
+    <lib-banner *ngIf="bannerMessage" [text]="bannerMessage" status="error"></lib-banner>
+
+    <div class="f-row" *ngIf="!showSkeleton">
+        <lib-text-line type="leading" enablewrap="true" class="heading-overflow">{{class?.description}}</lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-button [disabled]="class?.classType?.enableSync" type="plain" i18n="@@new_characteristics" (afterClick)="newCharacterictics()">New characteristics</lib-button>
+        <lib-button type="plain" icon="ellipsis-h" [matMenuTriggerFor]="menu"></lib-button>
+        <!--For Menu Options -->
+        <mat-menu #menu class="navigation-menu">
+          <button *ngIf="!class?.classType?.enableSync || class?.classType?.nountype" mat-menu-item i18n="@@edit" (click)="openEditClass()">
+            Edit
+        </button>
+            <button *ngIf="class?.classType?.enableSync" mat-menu-item i18n="@@sync_now">
+                Sync now
+            </button>
+            <button mat-menu-item i18n="@@add_language_and_colloquials" [matMenuTriggerFor]="languageMenu">
+                Add language and colloquials
+                <mat-menu #languageMenu class="navigation-menu">
+                  <button mat-menu-item (click)="addLanguagesManually()">
+                    Add manually
+                  </button>
+                  <button mat-menu-item>
+                    Upload a file
+                  </button>
+                </mat-menu>
+            </button>
+            <button mat-menu-item i18n="@@maintain_dependency">
+                Maintain dependency
+            </button>
+            <button *ngIf="!class?.classType?.enableSync && class?.isNoun" mat-menu-item i18n="@@map_class_and_char" (click)="openDialog()">
+                Map class and characteristics
+            </button>
+            <ng-container *ngIf="!class?.classType?.enableSync">
+              <mat-divider></mat-divider>
+              <button mat-menu-item i18n="@@delete" (click)="deleteClass()">
+                  Delete
+              </button>
+            </ng-container>
+        </mat-menu>
+    </div>
+    <ng-container *ngIf="showSkeleton">
+      <pros-toolbar-skeleton></pros-toolbar-skeleton>
+      <lib-skeleton-vertical-table></lib-skeleton-vertical-table>
+    </ng-container>
+
+    <lib-tab-group (selectedIndexChange)="tabIndex=$event" *ngIf="!showSkeleton && !submitError.status">
+        <lib-tab label="Class details">
+            <div class="f-col class-details">
+                <ng-container *ngIf="class">
+                    <pros-class-detail [class]="class"></pros-class-detail>
+                </ng-container>
+            </div>
+        </lib-tab>
+        <lib-tab label="Characteristics details">
+          <ng-container *ngIf="tabIndex === 1">
+            <div class="f-col only-inherited" *ngIf="!parentUuid; else characteristicsController">
+              <pros-characteristics-detail
+                [classId]="_classId"
+                [relatedDatasetId]="relatedDatasetId"
+                [emptyState]="{
+                  description: class?.classType?.enableSync
+                    ? 'No characteristics are available.'
+                    : 'You have not added any characteristics details to this class. Would you like to create one?'
+                }"
+                [showAction]="!class?.classType?.enableSync"
+                [showPaginator]="true"
+                ></pros-characteristics-detail>
+            </div>
+            <ng-template #characteristicsController>
+              <div class="f-col">
+                <mat-card class="mat-elevation-z0 characteristics-card" style="margin-bottom: 12px">
+                  <mat-card-title>
+                    <div class="f-row">
+                      <lib-text-line type="leading" i18n="@@assigned_characteristics">Assigned characteristics</lib-text-line>
+                      <span class="f-spacer"></span>
+                      <lib-button *ngIf="inheritedCharacteristicsCount" icon="external-link-alt" iconFontType="light" (click)="showCharsFullScreen(_classId, !class?.classType?.enableSync)">
+                      </lib-button>
+                    </div>
+                  </mat-card-title>
+                  <span class="f-spacer"></span>
+                  <mat-card-content>
+                    <pros-characteristics-detail
+                      [classId]="_classId"
+                      [relatedDatasetId]="relatedDatasetId"
+                      [emptyState]="{
+                        description: class?.classType?.enableSync
+                          ? 'No characteristics are available.'
+                          : 'You have not added any characteristics details to this class. Would you like to create one?'
+                      }"
+                      [showAction]="!class?.classType?.enableSync"
+                      (hasDataChanged)="acHasDataChanged($event)"></pros-characteristics-detail>
+                  </mat-card-content>
+                </mat-card>
+                <mat-card class="mat-elevation-z0 characteristics-card">
+                  <mat-card-title>
+                    <div class="f-row">
+                      <lib-text-line type="leading" i18n="@@inherited_characteristics">Inherited characteristics</lib-text-line>
+                      <span class="f-spacer"></span>
+                      <lib-button *ngIf="inheritedCharacteristicsCount" icon="external-link-alt" iconFontType="light" (click)="showCharsFullScreen(parentUuid, false)">
+                      </lib-button>
+                    </div>
+                  </mat-card-title>
+                  <span class="f-spacer"></span>
+                  <mat-card-content>
+                    <pros-characteristics-detail
+                      [classId]="parentUuid"
+                      [relatedDatasetId]="relatedDatasetId"
+                      (hasDataChanged)="icHasDataChanged($event)"></pros-characteristics-detail>
+                  </mat-card-content>
+                </mat-card>
+              </div>
+            </ng-template>
+           </ng-container>
+        </lib-tab>
+    </lib-tab-group>
+  </ng-template>
+</div>

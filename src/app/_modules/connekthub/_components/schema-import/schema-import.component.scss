@@ -1,0 +1,23 @@
+div.modal-wrapper {
+  height: 100%;
+
+  .modal-body {
+    &.import-body {
+      height: 350px;
+      overflow: auto;
+    }
+  }
+
+  table.mat-table {
+    width: 100%;
+
+    .mat-cell {
+      min-width: 170px;
+    }
+  }
+
+  .scrollable-modal {
+    height: 350px;
+    overflow: auto;
+  }
+}

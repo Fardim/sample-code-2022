@@ -1,0 +1,20 @@
+  <!-- single select example -->
+  <div class="f-col mdo-field">
+    <!-- input container -->
+    <div class="mdo-field-input">
+            <input matInput [placeholder]="placeholder"
+            #optionsInput
+            [formControl]="optionCtrl"
+            [matAutocomplete]="auto" (blur)="emitInputValue($event)"/>
+        <!-- autocomplete -->
+        <mat-autocomplete class="mdo-autocomplete"
+            #auto="matAutocomplete"
+            [displayWith]="formatValue"
+            (optionSelected)="emitSelectedValue($event.option.value)">
+            <mat-option class="mdo-option" *ngFor="let data of filteredOptions | async"
+                [value]="data">
+                {{data.fieldDescri}}
+            </mat-option>
+        </mat-autocomplete>
+    </div>
+</div>

@@ -1,0 +1,18 @@
+:host {
+  --pros-char-table-height: calc(100vh - 186px);
+
+  .root {
+    user-select: text;
+    overflow: hidden;
+    margin: 12px;
+
+    .breadcrum-toolbar {
+      padding: 12px 0;
+    }
+
+    .sidesheetcontent-listing {
+      padding: 8px 12px;
+      width: 900px;
+    }
+  }
+}

@@ -1,0 +1,76 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  width: 768px;
+
+  .breadcrum-toolbar {
+    padding: 8px 16px;
+    align-items: flex-start;
+
+    .mdo-constrained-right {
+      width: 100%;
+      margin-right: 0;
+
+      .breadcrum-head {
+        width: 100%;
+      }
+
+      .lib-search {
+        min-width: 213px;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 103px);
+    overflow: auto;
+
+    .mdo-justify {
+      margin: 0 16px;
+
+      .colunm-box {
+        align-items: center;
+        box-sizing: border-box;
+        min-height: 48px;
+
+        .col {
+          display: flex;
+          flex: 1 0 auto;
+          width: 1px;
+          align-items: center;
+          margin: 0 0 0 16px;
+          flex-wrap: wrap;
+
+          &.col-x4 {
+            flex: 4;
+          }
+
+          &.col-x8 {
+            flex: 8;
+          }
+
+          pros-noun-modifier-autocomplete {
+            flex: 1;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 66px;
+      }
+    }
+  }
+}

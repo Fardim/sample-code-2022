@@ -1,0 +1,29 @@
+<div class="root">
+    <lib-banner *ngIf="errorMsg" status="error" [text]="errorMsg"></lib-banner>
+
+    <input class="drag-input" type="file" id="uploader" #uploadClick style="display: none"
+        [multiple]="multiSelect"
+        (change)="fileChange($event.target.files)" prosClickStopPropagation />
+    <div class="f-col upload-col" (click)="uploadClick.click()" *ngIf="!dataSource?.length">      
+        <lib-text-line type="base" textColor="secondary">
+            Drag files here or <span class="input-link">browse</span> to upload
+        </lib-text-line>
+    </div>
+
+    <div class="attachment-listrow">
+        <ng-container *ngFor="let file of dataSource;let index = index">
+            <div class="f-col attachment-section">
+                <div class="f-row">
+                  <img [src]="getAttachmentIcon(file.name)" class="attachment-icon" />
+                  <lib-text-line type="base" [libTooltip]="file.name" matTooltipPosition="below" [matTooltipDisabled]="file.name.length < 25">
+                    {{ file.name | slice:0:25 }} <span *ngIf="file.name.length > 25">...</span>
+                  </lib-text-line>
+                  <lib-button class="lib-button" icon="times" type="plain"
+                    (afterClick)="removeSelectedFile(file)"></lib-button>
+                </div>
+            </div>
+        </ng-container>
+        <lib-button *ngIf="multiSelect && dataSource?.length" type="minor" icon="plus"
+            (afterClick)="uploadClick.click()"></lib-button>
+    </div>
+</div>

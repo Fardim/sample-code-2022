@@ -1,0 +1,30 @@
+.root {
+  display: flex;
+  flex-direction: column;
+
+  .lib-search {
+    width: 213px;
+  }
+
+  .container {
+    display: flex;
+    height: calc(100vh - 150px);
+    margin-top: 8px;
+    overflow: auto;
+  }
+}
+
+.mat-tree-node {
+  justify-content: space-between;
+
+  mat-icon.mat-icon {
+    height: 32px;
+    width: 32px;
+  }
+}
+
+.viewport-scroll {
+  height: calc(100vh - 100px);
+  margin-top: 12px;
+  width: 220px;
+}

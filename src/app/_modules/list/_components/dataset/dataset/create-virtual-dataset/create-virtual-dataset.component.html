@@ -1,0 +1,9 @@
+<ng-template [ngIf]="virtualDatasetDetails">
+  <ng-template [ngIf]="selectedDmlType || virtualDatasetDetails?.groupDetails?.length > 0" [ngIfElse]="virtualDatasetEditRef">
+    <pros-create-join [virtualDatasetDetails]="virtualDatasetDetails" [dmlType]="selectedDmlType"></pros-create-join>
+  </ng-template>
+
+  <ng-template #virtualDatasetEditRef>
+    <pros-virtual-dataset-edit [virtualDatasetDetails]="virtualDatasetDetails" (dmlTypeSelectionChange)="selectedDmlType = $event"></pros-virtual-dataset-edit>
+  </ng-template>
+</ng-template>

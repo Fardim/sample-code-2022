@@ -1,0 +1,84 @@
+.breadcrum-toolbar {
+  padding: 8px 12px;
+
+  .mdo-constrained-right {
+    align-items: center;
+    width: 100%;
+
+    .breadcrum-head {
+      width: 100%;
+    }
+  }
+}
+
+.sidesheetcontent-listing {
+  height: calc(100% - 52px);
+  overflow: auto;
+
+  .mdo-justify {
+    margin: 0 16px;
+
+    .field-label {
+      margin-bottom: 6px;
+      flex: 1;
+
+      .label-icon {
+        font-size: 12px;
+      }
+    }
+
+    .toggle-col {
+      margin-right: 12px;
+    }
+
+    .mat-error {
+      margin-top: 6px;
+    }
+
+    .display-images {
+      .attachment-section {
+        border-radius: 3px;
+        width: 150px;
+        margin: 6px 6px 0 0;
+      }
+
+      .attachment {
+        .attachment-icon {
+          width: 18px;
+          height: 18px;
+          margin-left: 6px;
+        }
+
+        .attachment-name {
+          margin-left: 6px;
+          width: 90px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+      }
+    }
+
+    .import-files {
+      .drag-input {
+        position: absolute;
+        width: 100%;
+        opacity: 0;
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  .breadcrum-toolbar {
+    .mdo-constrained-right {
+      margin-right: 50px;
+    }
+  }
+
+  .sidesheetcontent-listing {
+    .mdo-justify {
+      margin: 0 62px;
+    }
+  }
+}

@@ -1,0 +1,252 @@
+div.root {
+  user-select: text;
+  height: calc(100% - 44px - 68px);
+  overflow: hidden;
+
+  .comments {
+    margin-right: 15px;
+    margin-top: 15px;
+    height: 100%;
+  }
+
+  .schema-subgrid {
+    height: 100%;
+  }
+
+  .schema-actions {
+    align-items: center;
+    display: flex;
+    flex-grow: 0;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  .filter-container {
+    flex-wrap: wrap;
+    margin: 8px 0;
+    align-items: flex-start;
+
+    .lib-search {
+      width: 213px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+  }
+
+  .empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    width: 100%;
+    height: calc(100% - 44px);
+  }
+
+  .listing-container {
+    height: calc(100% - 44px - 16px - 60px);
+    overflow: hidden;
+
+    .listset-navigation {
+      transition: width ease-in-out 0.15s;
+      height: 100%;
+      width: 246px;
+      padding-right: 12px;
+      margin-right: 12px;
+      border-right-width: 1px;
+      border-right-style: solid;
+      position: relative;
+
+      .nav-tree {
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        mat-accordion.mat-accordion {
+          mat-expansion-panel {
+            .mat-expansion-panel-header {
+              padding: 0 0 0 8px;
+
+              mat-panel-title {
+                width: 100%;
+                margin-right: 0;
+
+                .expand-title {
+                  text-overflow: ellipsis;
+                  overflow: hidden;
+                  white-space: nowrap;
+                }
+              }
+            }
+
+            .undertree-expansion-panel {
+              padding-left: 42px;
+            }
+
+            mat-nav-list {
+              mat-list-item {
+                height: 48px;
+              }
+            }
+          }
+        }
+      }
+
+      .split-panel-mark {
+        border-radius: 50%;
+        position: absolute;
+        right: -10px;
+        top: 36px;
+        cursor: pointer;
+        z-index: 2;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+        line-height: 16px;
+
+        mat-icon.mat-icon {
+          width: 9px;
+          font-size: 8px;
+        }
+      }
+    }
+
+    .listset-grid {
+      width: calc(100% - 292px - 24px);
+      height: 100%;
+      overflow: hidden;
+
+      .admin-buttons {
+        position: sticky;
+        left: 0;
+      }
+
+      .datasource {
+        overflow-x: auto;
+        height: calc(100% - 16px);
+        display: inline-block;
+
+        table.mat-table {
+          border-collapse: separate;
+
+          .mat-row,
+          .mat-header-row {
+            border: none;
+          }
+
+          .edit-mode {
+            border-width: 1px;
+            border-style: solid;
+          }
+
+          .mat-header-cell,
+          .mat-cell {
+            min-width: 170px;
+            max-width: 170px;
+            border-bottom-width: 1px;
+
+            .collapse-icon {
+              padding: 4px;
+              border-radius: 50%;
+              cursor: pointer;
+              position: absolute;
+              text-align: center;
+              width: 12px;
+              height: 12px;
+              font-size: 10px;
+              line-height: 12px;
+              right: 6px;
+              bottom: -10px;
+            }
+
+            .mat-icon-header {
+              font-size: 12px;
+              width: 10px;
+            }
+          }
+
+          .mat-column-_row_actions {
+            border-right: none;
+            max-width: 314px;
+            min-width: 38px;
+
+            .action-iconbtns {
+              button.mat-flat-button {
+                padding: 0 6px;
+
+                .publish-icons {
+                  width: 14px;
+                  line-height: 14px;
+                  font-size: 14px;
+                }
+              }
+            }
+
+            .more-btn {
+              margin-right: 1px;
+            }
+          }
+
+          .mat-column-_select_columns,
+          .mat-column-_assigned_buckets {
+            min-width: 36px;
+            max-width: 36px;
+            border-right: none;
+          }
+
+          .mat-column-___header__collapsible {
+            min-width: 48px;
+            max-width: 48px;
+            padding: 0;
+            vertical-align: top;
+
+            .verticalsub-text {
+              text-orientation: mixed;
+              writing-mode: vertical-lr;
+              height: 100%;
+              border-right-width: 1px;
+              border-right-style: solid;
+              width: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: flex-start;
+              padding-top: 32px;
+            }
+          }
+
+          .mat-column-_score_weightage {
+            min-width: 120px;
+            border-right: none;
+
+            .progress-cell {
+              width: 120px;
+            }
+          }
+
+          .custom-actions {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 80px;
+          }
+        }
+      }
+    }
+  }
+
+  .hide-input {
+    display: none;
+  }
+}
+
+.lib-chip-dropdown {
+  padding: 8px;
+  height: 100%;
+
+  mat-nav-list.mat-nav-list {
+    padding-top: 0;
+    margin: 8px -8px;
+    overflow: auto;
+    height: calc(100% - 36px - 8px * 4 - 36px);
+    max-height: 139px;
+  }
+}

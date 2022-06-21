@@ -1,0 +1,48 @@
+<div class="root" #chatContainer [scrollTop]="chatContainer.scrollHeight">
+  <!-- <div class="f-row breadcrum-toolbar">
+    <lib-button iconFontType="light" icon="times" (afterClick)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@comments">Comments</lib-text-line>
+      </div>
+    </div>
+  </div> -->
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <div class="chat-box">
+       <div class="f-col message-list-wrapper">
+        <pros-message-list 
+          (channelIdEmit)="currentChannelIdReceived($event)"
+          (replyToMessageEmit)="replyToMessage($event)"
+          [showReplyMessage]="showReplyMessage">
+        </pros-message-list>
+       </div>
+
+        <div class="f-col editor-outer visible" [ngClass]="{'reply-message-editor': showReplyMessage}">
+
+          <div class="reply-message" *ngIf="showReplyMessage">
+            <div class="f-col reply-message-info">
+              <div class="f-row">
+                <lib-text-line type="small" weight="strong" class="lib-text">{{replyMessageInfo?.fromUserInfo?.senderName}}
+                </lib-text-line>
+                <lib-text-line type="xsmall" textColor="secondary" class="lib-text">{{replyMessageInfo?.time}}</lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button type="plain" (click)="closeReplyMessagePopup()" iconFontType="light" icon="times">
+                </lib-button>
+              </div>
+              <lib-text-line type="base" [innerHTML]="replyMessageInfo.messageText" enableWrap="true"></lib-text-line>
+            </div>
+            <div class="row-spacer"></div>
+          </div>
+
+          <pros-message-editor [textEditorId]="'textareaEditor'" [showReplyMessage]="showReplyMessage"
+            [innerToolbarId]="'toolbar'" [componentName]="'chat'" (replyMessageEmit)="replyMessage($event)"
+            (sendMessageEmit)="sendMessage($event)" scrollToBottomEmit="scrollToBottom($event)">
+          </pros-message-editor>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

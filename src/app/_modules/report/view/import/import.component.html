@@ -1,0 +1,72 @@
+<div class="modal-wrapper">
+    <div class="f-row modal-header">
+        <lib-text-line type="leading" i18n="@@import_report">Import report</lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="plain" icon="times" iconFontType="light" *ngIf="uploadLoader" (click)="close()"></lib-button>
+    </div>
+    <div class="modal-body import-body" [ngClass]="{'scrollable-modal' : uploadLoader && (isDuplicate || isMissingModule)}">
+        <lib-banner *ngIf="errorMsg" status="error" [text]="errorMsg"></lib-banner>
+        <lib-banner *ngIf="isDuplicate" status="info" [text]="warningMessage"></lib-banner>
+        <!-- Upload Section -->
+        <div class="f-col upload-col" *ngIf="!uploadLoader">
+            <lib-empty-state icon="table" iconSize="120" primaryText="Upload a file" i18n-primaryText="@@upload_file" secondaryText="Upload a .mdopage report file" i18n-secondaryText="@@upload_mdoreport">
+                <lib-button (click)="uploadInput.click()" type="minor" i18n="@@select_a_file"> Select a file </lib-button>
+            </lib-empty-state>
+            <input class="drag-input" type="file" id="uploader" #uploadInput (change)="fileChange($event.target.files)"
+                prosClickStopPropagation />
+        </div>
+        <!-- Upload Section -->
+        <!-- Table section -->
+        <table mat-table [dataSource]="dataSource" *ngIf="uploadLoader && !isDuplicate && !isMissingModule">
+            <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef><span i18n="@@description">Description</span></th>
+                <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+            </ng-container>
+            <ng-container matColumnDef="importedAt">
+                <th mat-header-cell *matHeaderCellDef><span i18n="@@import_date">Import date</span></th>
+                <td mat-cell *matCellDef="let element"> {{element.importedAt | date:'dd/MM/yyyy'}} </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+        <table mat-table [dataSource]="importData.logs" *ngIf="isDuplicate || isMissingModule">
+            <ng-container matColumnDef="message">
+                <th mat-header-cell *matHeaderCellDef><span i18n="@@warning">Warning</span></th>
+                <td mat-cell *matCellDef="let element"> {{element.message}} </td>
+            </ng-container>
+            <ng-container matColumnDef="category">
+                <th mat-header-cell *matHeaderCellDef><span i18n="@@category">Category</span></th>
+                <td mat-cell *matCellDef="let element">
+                    <ng-container [ngSwitch]="element.category">
+                        <span *ngSwitchCase="ReportCategory.DUPLICATE_REPORT" i18n="@@duplicate_report_name">
+                            Duplicate report name
+                        </span>
+                        <span *ngSwitchCase="ReportCategory.MISSING_MODULE" i18n="@@missing_module">
+                            Missing module
+                        </span>
+                        <span *ngSwitchCase="ReportCategory.MISSING_FIELDS" i18n="@@missing_module">
+                            Missing Fields
+                        </span>
+                        <span *ngSwitchDefault>
+                            {{element.category}}
+                        </span>
+                    </ng-container>
+                </td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumnsEror"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumnsEror;"></tr>
+        </table>
+        <!-- Table section -->
+    </div>
+    <div class="f-row modal-footer space-between">
+        <lib-button (click)="back()" *ngIf="uploadLoader" type="plain" i18n="@@back">Back</lib-button>
+        <span class="f-spacer"></span>
+        <lib-button-group>
+            <lib-button type="minor" (click)="addReport(true)" *ngIf="isDuplicate" i18n="replace_existing">Replace existing</lib-button>
+            <lib-button type="minor" (click)="addReport(false, true)" *ngIf="isDuplicate" i18n="duplicate_report">Duplicate report</lib-button>
+            <lib-button type="minor" (click)="addReport()" *ngIf="isMissingModule" i18n="add_report">Add report</lib-button>
+            <lib-button type="major" (click)="importReport()" *ngIf="uploadLoader && !isDuplicate && !isMissingModule" i18n="import">Import</lib-button>
+        </lib-button-group>
+          </div>
+</div>
+

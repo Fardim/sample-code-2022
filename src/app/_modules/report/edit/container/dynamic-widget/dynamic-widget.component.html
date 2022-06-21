@@ -1,0 +1,51 @@
+<mat-card id="{{ widget.widgetId }}" class="mat-elevation-z1 widget"
+   [ngStyle]="{'width.px': (widget.width * boxSize) , 'height.px': (widget.height * boxSize),'left.px': (widget.x * boxSize), 'top.px':(widget.y * boxSize)  }"
+   (click)="emitStyleEvent()" cdkDrag>
+   <div class="f-row">
+      <lib-text-line type="leading">{{ widget.widgetTitle ? widget.widgetTitle : 'Untitled' }}</lib-text-line>
+      <div class="f-spacer"></div>
+      <lib-button (click)="emitDeleteEvent()" *ngIf="showDelete" type="plain" icon="trash-alt"></lib-button>
+   </div>
+
+   <mat-card-content>
+      <ng-template [ngIf]="widget.widgetType && widget.widgetType === 'COUNT'">
+         <!-- <pros-svg-icon size="70" icon="COUNT_WIDGET" class="widget-lgsvg" color="widget"></pros-svg-icon> -->
+         <mat-icon fontSet="mdo-icons" class="widget-icon">hashtag</mat-icon>
+      </ng-template>
+
+      <ng-template [ngIf]="widget.widgetType && widget.widgetType === 'FILTER'">
+         <!-- <pros-svg-icon size="70" icon="FILTER_WIDGET" class="widget-lgsvg" color="widget"></pros-svg-icon> -->
+         <mat-icon fontSet="mdo-icons" class="widget-icon">filter</mat-icon>
+      </ng-template>
+
+      <ng-template [ngIf]="widget.widgetType && widget.widgetType === 'BAR_CHART'">
+         <!-- <pros-svg-icon size="70" icon="BAR_WIDGET" class="widget-lgsvg" color="widget"></pros-svg-icon> -->
+         <mat-icon fontSet="mdo-icons-solid" class="widget-icon">chart-pie</mat-icon>
+      </ng-template>
+
+      <ng-template [ngIf]="widget.widgetType && widget.widgetType === 'STACKED_BAR_CHART'">
+         <!-- <pros-svg-icon size="70" icon="STACKEDBAR_WIDGET" class="widget-lgsvg" color="widget"></pros-svg-icon> -->
+         <mat-icon fontSet="mdo-icons" class="widget-icon">analytics</mat-icon>
+      </ng-template>
+
+      <ng-template [ngIf]="widget.widgetType && widget.widgetType === 'TABLE_LIST'">
+         <!-- <pros-svg-icon size="70" icon="LIST_WIDGET" class="widget-lgsvg" color="widget"></pros-svg-icon> -->
+         <mat-icon fontSet="mdo-icons" class="widget-icon">table</mat-icon>
+      </ng-template>
+
+      <ng-template [ngIf]="widget.widgetType && widget.widgetType === 'IMAGE'">
+         <!-- <pros-svg-icon size="70" icon="IMAGE_WIDGET" class="widget-lgsvg" color="widget"></pros-svg-icon> -->
+         <mat-icon fontSet="mdo-icons" class="widget-icon">image</mat-icon>
+      </ng-template>
+
+      <ng-template [ngIf]="widget.widgetType && widget.widgetType === 'HTML'">
+         <!-- <pros-svg-icon size="70" icon="HTML_WIDGET" class="widget-lgsvg" color="widget"></pros-svg-icon> -->
+         <mat-icon fontSet="mdo-icons" class="widget-icon">arrows-alt-h</mat-icon>
+      </ng-template>
+
+      <ng-template [ngIf]="widget.widgetType && widget.widgetType === 'TIMESERIES'">
+         <!-- <pros-svg-icon size="70" icon="TIMESERIES" class="widget-lgsvg" color="widget"></pros-svg-icon> -->
+         <mat-icon fontSet="mdo-icons" class="widget-icon">clock</mat-icon>
+      </ng-template>
+   </mat-card-content>
+</mat-card>

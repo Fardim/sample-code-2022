@@ -1,0 +1,28 @@
+<ng-template [ngIf]="errorMessage">
+    <div class="f-col">
+        <span class="row-spacer"></span>
+        <lib-banner [text]="errorMessage" status="error"></lib-banner>
+    </div>    
+</ng-template>
+<div class="f-col state-container" *ngIf="!isFileUploading">
+    <ng-template [ngIf]="isInLoading" [ngIfElse]="normalState">
+        <lib-spinner type="minor"></lib-spinner>
+    </ng-template>
+
+    <ng-template #normalState>
+        <lib-text-line type="leading" class="spacer">Running data check...</lib-text-line>
+        <lib-text-line type="base" textColor="secondary" class="spacer">
+            Running business rule {{schemaProgress?.completedRules}} of {{schemaProgress?.totalRules}} - {{schemaProgress?.ruleDesc}}
+        </lib-text-line>
+        <lib-progress mode="determinate" [value]="schemaProgress?.percentage"></lib-progress>
+        <div class="f-col">
+            <span class="row-spacer"></span>
+            <lib-button type="minor" (afterClick)="cancleSchema()">Cancel</lib-button>
+        </div>
+    </ng-template>
+</div>
+
+<div class="f-col state-container" *ngIf="isFileUploading">
+    <lib-text-line type="leading" class="spacer">Uploading Data...</lib-text-line>
+    <lib-progress mode="determinate" [value]="dataUploadedPercent"></lib-progress>
+</div>

@@ -1,0 +1,85 @@
+<mat-card class="mat-elevation-z0 widget">
+  <div class="f-row">
+    <div #displayHeading [libTooltip]="widgetInf.getValue() ? widgetInf.getValue().desc : 'Timeseries widget'"
+      matTooltipPosition="right" [matTooltipDisabled]="false">
+      <lib-text-line type="leading" enableWrap="true">{{ widgetInf.getValue() ? widgetInf.getValue().desc : 'Timeseries
+        widget' }}
+      </lib-text-line>
+    </div>
+    <span class="f-spacer"></span>
+    <lib-button [matMenuTriggerFor]="menu" type="plain" icon="ellipsis-h"></lib-button>
+    <mat-menu #menu="matMenu" class="navigation-menu">
+      <button mat-menu-item (click)="downloadImage()">Image download (.png)</button>
+      <button mat-menu-item (click)="downloadCSV()">Data download (.csv)</button>
+      <button mat-menu-item [matMenuTriggerFor]="tcOptionMenu" i18n="@@viewAs">View as...</button>
+      <mat-menu #tcOptionMenu="matMenu" class="mat-elevation-z0 tooltip-fields-menu">
+        <lib-radio-group layout="vertical" [(value)]="displayCriteriaOption" [options]="displayCriteriaOptions"
+          (valueChange)="saveDisplayCriteria()" name="displayCriteria{{widgetId}}"></lib-radio-group>
+      </mat-menu>
+      <lib-filter-option>
+        <lib-slide-toggle labelPosition="before" class="lib-toggle" [checked]="isTableView" (toggleChange)="viewChange($event)"
+          label="Table view" theme="primary" prosClickStopPropagation></lib-slide-toggle>
+      </lib-filter-option>
+      <!-- <button mat-menu-item (click)="openColorPalette()">Color palette</button> -->
+    </mat-menu>
+  </div>
+  <div class="row-spacer"></div>
+  <mat-card-content *ngIf="chartType">
+      <ng-template [ngIf]="showFilterOption">
+        <div class="f-row datafilter">
+
+          <button *ngFor="let dateType of dateFilters" mat-stroked-button [color]="dateType.isActive ? 'primary' : '' "
+            (click)="updateForm('date',dateType)">{{ dateType.value === 'millisecond' ? 'Today' : dateType.value}}
+            <ng-template [ngIf]="dateType.value !== 'millisecond'">
+              {{ timeseriesData.timeSeries ? timeseriesData.timeSeries.seriesWith : ''}}s
+            </ng-template>
+          </button>
+          <div>
+            <!-- <mat-form-field appearance="outline">
+            <mat-date-range-input [rangePicker]="picker">
+              <input matStartDate placeholder="Start date" [formControl]="startDateCtrl">
+              <input matEndDate placeholder="End date" [formControl]="endDateCtrl">
+            </mat-date-range-input>
+            <div class="f-row input-actions">
+              <mat-divider [vertical]="true"></mat-divider>
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-date-range-picker #picker></mat-date-range-picker>
+            </div>
+          </mat-form-field> -->
+
+            <lib-date-range-picker label="Start date"
+              *ngIf="styleCtrlGrp && styleCtrlGrp.get('dateSelectionType').value === 'CUSTOM'"
+              formControlName="startDate">
+            </lib-date-range-picker>
+          </div>
+
+        </div>
+      </ng-template>
+      <ng-template [ngIf]="!isGroupByChart" [ngIfElse]="groupTimeSeries">
+        <ng-template [ngIf]="!isTableView">
+          <canvas [height]="widgetInfo.height * boxSize" [width]="widgetInfo.width * boxSize" baseChart
+            [datasets]="dataSet" class="inner-flexcol-12" [labels]="dataSetlabel" [options]="timeSeriesOption"
+            [plugins]="lineChartPlugins" [chartType]="chartType">
+          </canvas>
+        </ng-template>
+        <ng-template [ngIf]="isTableView">
+          <pros-table-view [height]="widgetInfo.height * boxSize" [width]="widgetInfo.width * boxSize"
+            [displayedColumnsId]="displayedColumnsId" [tableDataSource]="tableDataSource">
+          </pros-table-view>
+        </ng-template>
+      </ng-template>
+      <ng-template #groupTimeSeries>
+        <ng-template [ngIf]="!isTableView">
+          <canvas [height]="widgetInfo.height * boxSize" [width]="widgetInfo.width * boxSize" baseChart
+            [datasets]="dataSet" class="inner-flexcol-12" [labels]="dataSetlabel" [options]="timeSeriesOption"
+            [plugins]="lineChartPlugins" [chartType]="chartType">
+          </canvas>
+        </ng-template>
+        <ng-template [ngIf]="isTableView">
+          <pros-table-view [displayedColumnsId]="displayedColumnsId" [tableDataSource]="tableDataSource"
+            [height]="widgetInfo.height * boxSize" [width]="widgetInfo.width * boxSize">
+          </pros-table-view>
+        </ng-template>
+      </ng-template>
+  </mat-card-content>
+</mat-card>

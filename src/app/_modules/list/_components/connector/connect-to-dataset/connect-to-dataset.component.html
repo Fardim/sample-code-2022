@@ -1,0 +1,79 @@
+<mat-card class="root mat-elevation-z0">
+  <div class="modal-wrapper">
+    <div class="f-row modal-header">
+      <lib-text-line type="leading">New dataset/Connect to <span
+          *ngIf="showConnectorData">/{{selectedConnectorOption}}</span>
+      </lib-text-line>
+      <div class="f-row">
+        <lib-search *ngIf="!showConnectorData" i18n-placeholder="@@search_services" placeholder="Search connectors"
+          class="lib-search" [formControl]="searchConnectorCtrl"></lib-search>
+        <span class="f-col-spacer-half"></span>
+        <lib-button icon="times" iconFontType="light" (click)="cancelClick.emit(); onCancelClick()"></lib-button>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <div class="f-col dataset-list" *ngIf="!showConnectorData">
+        <!-- <lib-banner *ngIf="showErrorBanner" status="error" [text]="errorMessage"></lib-banner> -->
+        <div class="f-row dataset-palette">
+          <mat-card class="mat-elevation-z0 cursor" *ngFor="let connector of selectedConnector | async"
+            [ngClass]="{'is-active-card': connector.isSelectedCard}" [matMenuTriggerFor]="typesMenu">
+            <div class="f-row">
+              <lib-text-line type="base" weight="strong" textColor="primary" enableWrap="true"
+                i18n="connector.i18n_title">
+                {{connector.title}}
+              </lib-text-line>
+              &nbsp;
+              <mat-icon fontSet="mdo-icons-light" class="plain-icon" i18n-libTooltip="@@errormsg_tooltip"
+                [libTooltip]="connector.description">
+                question-circle</mat-icon>
+            </div>
+
+            <div class="f-row-spacer-half"></div>
+
+            <pros-svg-icon [viewBox]="connector.viewPort" [height]="connector.height" [icon]="connector.iconTitle"
+                class="f-row svg-block"></pros-svg-icon>
+                <div class="row-spacer"></div>
+                <lib-text-line type="small" textColor="secondary" enableWrap="true" i18n="connector.i18n_subtitle">
+                  {{connector.subtitle}}</lib-text-line>
+                <div class="row-spacer"></div>
+                <lib-text-line *ngIf="connector.title !== 'SAP CPI'" class="cursor" type="base" textColor="link"
+                i18n="@@select" (click)="onConnectorSelect(connector.title)">Select
+              </lib-text-line>
+              <lib-text-line *ngIf="connector.title === 'SAP CPI'" type="base" textColor="link"
+                [matMenuTriggerFor]="typesMenu" class="cursor"> Select <mat-icon fontSet="mdo-icons-solid"
+                  class="plain-icon">caret-down</mat-icon>
+              </lib-text-line>
+              <mat-menu #typesMenu="matMenu" class="navigation-menu">
+                <button mat-menu-item (click)="onConnectorSelect(connector.title)">New adaptor</button>
+                <button mat-menu-item icon="caret-down" *ngIf="pendingConnections.length"
+                  [matMenuTriggerFor]="pendingMenu">Pending connections</button>
+                <mat-menu #pendingMenu="matMenu" class="navigation-menu">
+                  <button *ngFor="let conn of pendingConn | async" (click)="pendingConnectionSelect(conn)"
+                    mat-menu-item>{{ conn.connectionName }}</button>
+                </mat-menu>
+              </mat-menu>
+          </mat-card>
+        </div>
+
+        <pros-salesforce-connection *ngIf="showConnectorData && showSalesforceConnection"
+        (cancelClick)="cancelClick.emit()" (backClick)="back()" (nextClick)="nextClick">
+      </pros-salesforce-connection>
+      </div>
+    </div>
+
+    <div class="f-row modal-footer space-between" *ngIf="!showConnectorData">
+      <lib-button type="plain" width="80px" (click)="cancelClick.emit();" i18n="@@cancel">Cancel</lib-button>
+      <span class="f-spacer"></span>
+      <div class="f-row">
+        <lib-button type="plain" width="80px" (click)="back()" i18n="@@back">Back</lib-button>
+        &nbsp;
+        <!-- <lib-button type="plain" (click)="backClick.emit();selectedConnectorOption = '';  connectorService.updateNextStep(-1)" i18n="@@back">Back</lib-button> -->
+        <lib-button type="major" width="80px" i18n="@@create">Next
+        </lib-button>
+        <!-- <lib-button type="major" i18n="@@create" (click)="connectorService.updateNextStep(1); onNextClick();">Next
+      </lib-button> -->
+      </div>
+    </div>
+  </div>
+</mat-card>

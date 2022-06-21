@@ -1,0 +1,241 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" iconFontType="light" icon="times" (click)="closeSidesheet()"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row">
+                <lib-text-line type="leading" weight="default" i18n="@@newCondition">New conditions</lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button width="80px" type="major" i18n="@@submit" (click)="onSubmit()">Submit</lib-button>
+            </div>
+        </div>
+    </div>
+
+    <div class="f-row-spacer-half"></div>
+
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-row mdo-justify">
+            <div class="f-col condition-filter-nav">
+                <div class="f-row">
+                    <lib-text-line type="base" class="text-line" i18n="@@condition">Conditions</lib-text-line>
+                    <span class="f-spacer"></span>
+                    <lib-button (click)="addNewCondition()" type="plain" icon="plus"></lib-button>
+                </div>
+                <div class="f-row-spacer-half"></div>
+                <mat-list class="condition-listing">
+                    <mat-list-item *ngFor="let condition of conditionCriteria;let i = index"
+                        [ngClass]="selectedCondition.conditionId === condition.conditionId ? 'selected': ''"
+                        (click)="onClickOnListItem(condition,i)" class="list-item">
+                        <lib-text-line type="base" class="text-line">{{condition.conditionName}}</lib-text-line>
+                        <span class="f-spacer"></span>
+                        <lib-button type="plain" icon="ellipsis-h" [matMenuTriggerFor]="actionMenu"></lib-button>
+                        <mat-menu #actionMenu="matMenu" class="navigation-menu">
+                            <button mat-menu-item (click)="removeSelectedCondition(selectedCondition)">Remove</button>
+                        </mat-menu>
+                    </mat-list-item>
+                </mat-list>
+            </div>
+            
+            <div class="f-col condition-value" *ngIf="conditionCriteria.length">
+                <lib-banner *ngIf="errorBanner.length" status="error" [text]="errorBanner"></lib-banner>
+                <div class="f-row">
+                    <lib-text-line type="leading">{{selectedCondition.conditionName}} </lib-text-line>
+                </div>
+                <div class="f-row-spacer-half"></div>
+
+                <div class="f-col" *ngFor="let field of selectedDescSettings; let indx = index;">
+                    <div *ngIf="field.pickList ==='52'">
+                        <div class="f-col colunm-box" class="mdo-field-input">
+                            <lib-text-line type="base" i18n="@@name" type="xsmall"  weight="strong" class="field-label">
+                                {{field.description}}
+                            <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                              libTooltip="Select the values for which the defined condition should run.">
+                              question-circle
+                            </mat-icon>
+
+                           
+                            <span class="mandatory"> *</span>
+                            </lib-text-line>
+                            <div class="row-space"></div>
+                            <lib-date-picker class="date-picker" placeholder="{{'Enter' +field.description}}"
+                                [formControl]="configurationConditionForm.get(!indx?'field1':'field2')" [selectedDate]="getSelectedDate(!indx?'field1':'field2')">
+                            </lib-date-picker>
+                        </div>
+                    </div>
+
+                    <div class="f-row mdo-field" *ngIf="field.pickList ==='2'">
+                        <lib-checkbox [label]="field.description" [formControl]="configurationConditionForm.get(!indx?'field1':'field2')"></lib-checkbox>
+                        &nbsp;
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                              libTooltip="Select the values for which the defined condition should run.">
+                              question-circle
+                            </mat-icon>
+                        <span class="mandatory">*</span>
+                    </div>
+                    <div class="mdo-field-input" *ngIf="field.pickList ==='0'">
+                        <lib-input labelIconTooltip="Select the values for which the defined condition should run." labelIcon="question-circle" [isRequired]="true" [label]="field.description"  labelIconFont="mdo-icons-light" [formControl]="configurationConditionForm.get(!indx?'field1':'field2')"></lib-input>
+                        
+                    </div>
+   
+                    <div *ngIf="field.pickList ==='4'">
+                        <div class="mdo-field-input">
+                            <lib-radio-group
+                            labelIconTooltip="Select the values for which the defined condition should run."
+                            labelIcon="question-circle"
+                                layout="horizontal"
+                                [label]="field.description"
+                                [formControl]="configurationConditionForm.get(!indx?'field1':'field2')"
+                                [options]="field.dropdown"
+                                labelKey="code"
+                                valueKey="code"
+                                required
+                            >
+                            </lib-radio-group>
+                        </div>
+                    </div>
+
+                    <div class="mdo-field" [class.mdo-form-error]="submitted && configurationConditionForm.get(!indx?'field1':'field2')" *ngIf="field.pickList ==='1'">
+                        <lib-text-line type="xsmall"  weight="strong" class="field-label">
+                            <span>{{ field.description }}</span>
+                            <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                              libTooltip="Select the values for which the defined condition should run.">
+                              question-circle
+                            </mat-icon>
+                            <span  class="mandatory"> *</span>
+                        </lib-text-line>
+                        <div class="mdo-field-input">
+                            <input matInput #optionsInput1 [matAutocomplete]="fieldSetting"
+                                [formControl]="configurationConditionForm.get(!indx?'field1':'field2')" />
+                            <mat-autocomplete  class="mdo-autocomplete" #fieldSetting="matAutocomplete" [displayWith]="displayWithDescField">
+                                
+                                <mat-option *ngFor="let option of field.dropdown" [value]="option.code">
+                                    {{option.text}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <div class="f-col">
+                    <lib-input label="Noun modifier separator" labelIconTooltip="Define the operator to separate Noun from Modifier" labelIcon="question-circle" labelIconFont="mdo-icons-light" [formControl]="configurationConditionForm.get('nounModSep')"></lib-input>
+                </div>
+
+                <div class="f-col">
+                    <lib-input label="Short descrption separator" labelIconTooltip="Define the operator to separate selected attributes" labelIcon="question-circle" labelIconFont="mdo-icons-light" [formControl]="configurationConditionForm.get('shortDescSep')"></lib-input>
+                </div>
+
+                <!-- <div class="f-col mdo-field">
+                    <lib-text-line type="xsmall" weight="strong" class="field-label">
+                        <span i18n="@@longDescription">Long description separator</span>
+                        <mat-icon fontSet="mdo-icons" iconFontType="solid"
+                            libTooltip="Define the operator to separate selected attributes">
+                            question-circle</mat-icon>
+                    </lib-text-line>
+                    <div class="mdo-field-input">
+                        <input matInput #optionsInput [matAutocomplete]="longDesc"
+                            [formControl]="configurationConditionForm.get('longDescSep')" />
+                        <mat-autocomplete class="mdo-autocomplete" #longDesc="matAutocomplete">
+                            <mat-option *ngFor="let opt of systemOptions" [value]="opt">
+                                {{ opt }}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </div>
+                </div> -->
+
+                <div class="f-col">
+                    <lib-input i18n="@@longDescription" label="Long description separator" labelIconTooltip="Define the operator to separate selected attributes" labelIcon="question-circle" labelIconFont="mdo-icons-light" [formControl]="configurationConditionForm.get('longDescSep')"></lib-input>
+                </div>
+
+                <div class="f-col">
+                    <lib-input i18n="@@attributeSep" label="Attribute separator" labelIconTooltip="Define the operator to separate attribute name and attribute value" labelIcon="question-circle" labelIconFont="mdo-icons-light" [formControl]="configurationConditionForm.get('attSep')"></lib-input>
+                </div>
+
+                <!-- <div class="f-col mdo-field">
+                    <lib-text-line type="xsmall" weight="strong" class="field-label">
+                        <span i18n="@@attributeSep">Attribute separator</span>
+                        <mat-icon fontSet="mdo-icons" iconFontType="solid"
+                            libTooltip="Define the operator to separate attribute name and attribute value">
+                            question-circle</mat-icon>
+                    </lib-text-line>
+                    <div class="mdo-field-input">
+                        <input matInput #optionsInput [matAutocomplete]="attributeSep"
+                            [formControl]="configurationConditionForm.get('attrSep')" />
+                        <mat-autocomplete class="mdo-autocomplete" #attributeSep="matAutocomplete">
+                            <mat-option *ngFor="let opt of systemOptions" [value]="opt">
+                                {{ opt }}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </div>
+                </div> -->
+
+                <div class="f-col mdo-field">
+                    <lib-text-line type="xsmall" weight="strong" class="field-label">
+                        <span i18n="@@attributeFormat">Attribute format for long description</span>
+                        <mat-icon fontSet="mdo-icons-light" iconFontType="solid"
+                            libTooltip="Based on the selection, either both 'Attribute name and value' will be part of the description or only the Attribute value will be part of the description">
+                            question-circle</mat-icon>
+                    </lib-text-line>
+                    <div class="mdo-field-input">
+                        <input matInput #optionsInput1 [matAutocomplete]="longDesc1"
+                               [formControl]="configurationConditionForm.get('attrFormatLongDesc')" />
+                        <mat-autocomplete class="mdo-autocomplete" #longDesc1="matAutocomplete" [displayWith]="displayWithAttr">
+                            <mat-option *ngFor="let option of attributeFormat1" [value]="option">
+                                {{option.value}}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </div>
+                </div>
+
+                <div class="f-row mdo-field">
+                    <lib-text-line type="xsmall" weight="strong" class="field-label field-partition">
+                        <span i18n="@@shortDescActive">Short description active</span>
+                        <mat-icon fontSet="mdo-icons-light" iconFontType="solid"
+                            libTooltip="Mark the field as active for auto generation of Short description.">
+                            question-circle</mat-icon>
+                    </lib-text-line>
+                    <lib-slide-toggle class="field-partition" theme="primary"
+                        [formControl]="configurationConditionForm.get('shortDescActive')">
+                    </lib-slide-toggle>
+                </div>
+
+                <div class="f-row mdo-field">
+                    <lib-text-line type="xsmall" weight="strong" class="field-label field-partition">
+                        <span i18n="@@longDescActive">Long description active</span>
+                        <mat-icon fontSet="mdo-icons-light" iconFontType="solid"
+                            libTooltip="Mark the field as active for auto generation of Long description.">
+                            question-circle</mat-icon>
+                    </lib-text-line>
+                    <lib-slide-toggle class="field-partition" theme="primary"
+                        [formControl]="configurationConditionForm.get('longDescActive')">
+                    </lib-slide-toggle>
+                </div>
+
+                <div class="f-row mdo-field">
+                    <lib-text-line type="xsmall" weight="strong" class="field-label field-partition">
+                        <span i18n="@@manualDescription">Allow users to maintain descriptions manually</span>
+                        <mat-icon fontSet="mdo-icons-light" iconFontType="solid"
+                            libTooltip="Mark the field as active to provide the option of adding description manually">
+                            question-circle</mat-icon>
+                    </lib-text-line>
+
+                    <lib-slide-toggle class="field-partition" theme="primary"
+                        [formControl]="configurationConditionForm.get('manuallyDesc')">
+                    </lib-slide-toggle>
+                </div>
+
+                <div class="f-row mdo-field">
+                    <lib-text-line type="xsmall" weight="strong" class="field-label field-partition">
+                        <span i18n="@@transferClassification">Transfer to classification</span>
+                        <mat-icon fontSet="mdo-icons-light" iconFontType="solid" libTooltip="Transfer to classification">
+                            question-circle</mat-icon>
+                    </lib-text-line>
+
+                    <lib-slide-toggle class="field-partition" theme="primary"
+                        [formControl]="configurationConditionForm.get('classificationActive')">
+                    </lib-slide-toggle>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,160 @@
+<div class="modal-wrapper root">
+    <div class="f-row modal-header">
+        <lib-text-line type="leading" [enableWrap]="true">Publishing to Connekthub...</lib-text-line>
+        <lib-button icon="times" iconFontType="light" (click)="close()"></lib-button>
+    </div>
+    <ng-container [ngSwitch]="screen">
+        <ng-container *ngSwitchCase="'AUTHORISE'">
+            <div class="f-col modal-body">
+                <lib-banner text="Banner" status="info"
+                    text="Publishing a dashboard to ConnektHub allows its subscribers to download the dashboard in their environments.">
+                </lib-banner>
+                <div class="row-spacer"></div>
+                <div class="row-spacer"></div>
+                <lib-text-line type="base">ConnektHub authrorization is required to publish systems and interfaces. Use
+                    your credentials to authorise.</lib-text-line>
+            </div>
+            <div class="f-row modal-footer">
+                <lib-button width="80px" (click)="close()">Cancel</lib-button>
+                <div class="f-spacer"></div>
+                <lib-button width="80px" type="major" (click)="authorise()">Authorise</lib-button>
+            </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'LOGIN'">
+            <div class="f-col modal-body">
+                <pros-connekthub-login (hasLogined)="searchPackages()"></pros-connekthub-login>
+            </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="'EXISTING_PACKAGE'">
+
+            <div class="f-col modal-body modal-w-d-body">
+                <lib-banner text="Banner" status="info"
+                    text="Selecting an existing package overrides the information in the selected package.">
+                </lib-banner>
+                <div class="f-row package-button">
+                    <lib-segment class="f-col" [optionsList]="packageOptions" labelKey="label" valueKey="value" [ngModel]="newPackage" (valueChange)="changeNewPackage($event)"></lib-segment>
+                </div>
+                <div class="row-spacer"></div>
+                <pros-connekthub-packages [packages]="packages" [selectOption]="true" rootClass="chk-export" [importType]="parentData.type"
+                    (emitGetPackage)="selectPackage($event)"></pros-connekthub-packages>
+            </div>
+            <div class="f-row modal-footer">
+                <lib-button (click)="close()">Cancel</lib-button>
+                <div class="f-spacer"></div>
+                <lib-button type="major" (click)="setFormValue(); newPackage = false;">Next</lib-button>
+            </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="'CONFIG'">
+            <div class="f-col modal-body modal-w-d-body" [formGroup]="form">
+                <lib-banner *ngIf="newPackage" text="Banner" status="info"
+                    text="Selecting new package will publish it as a new package"></lib-banner>
+                <lib-banner *ngIf="!newPackage" text="Banner" status="info"
+                    text="Selecting an existing package overrides the information in the selected package.">
+                </lib-banner>
+                <div class="f-row package-button">
+                    <lib-segment class="f-col" [optionsList]="packageOptions" labelKey="label" valueKey="value" [ngModel]="newPackage" (valueChange)="changeNewPackage($event)"></lib-segment>
+                </div>
+                <div class="f-col">
+                    <lib-input label="Name" [isRequired]="true" formControlName="name"></lib-input>
+                </div>
+
+                <div class="f-col">
+                    <lib-textarea label="Description" [isRequired]="true" formControlName="brief" placeholder=""></lib-textarea>
+                </div>
+
+                <div class="f-col">
+                    <lib-textarea label="What's new?" [isRequired]="true" formControlName="whatsNew" placeholder=""></lib-textarea>
+                </div>
+
+                <ng-container *ngTemplateOutlet="tagsControl"></ng-container>
+
+                <!-- FORM: imageUrls -->
+                <div class="f-col" formArrayName="imageUrls"
+                    *ngFor="let item of form.get('imageUrls').controls; let index = index">
+                    <lib-text-line type="xsmall" weight="strong" class="field-label">{{0 === index ? 'Reference image
+                        URL' : null}}</lib-text-line>
+                    <div class="f-row">
+                        <lib-input class="input-row" [formControl]="form.get('imageUrls').controls[index]"></lib-input>
+                        <ng-container *ngIf="(form.value.imageUrls.length - 1) === index; else minusTemplate">
+                            <lib-button class="action-row" iconFontType="light" icon="plus" (click)="addItem('imageUrls')"></lib-button>
+                        </ng-container>
+                        <ng-template #minusTemplate>
+                            <lib-button class="action-row" iconFontType="light" icon="minus" (click)="removeItem('imageUrls', index)">
+                            </lib-button>
+                        </ng-template>
+                    </div>
+                </div>
+
+                <!-- FORM: videoUrls -->
+                <div class="f-col" formArrayName="videoUrls"
+                    *ngFor="let item of form.get('videoUrls').controls; let index = index">
+                    <lib-text-line type="xsmall" weight="strong" class="field-label">{{0 === index ? 'Reference video
+                        URL' : null}}</lib-text-line>
+                    <div class="f-row">
+                        <lib-input class="input-row" [formControl]="form.get('videoUrls').controls[index]"></lib-input>
+                        <ng-container *ngIf="(form.value.videoUrls.length - 1) === index; else minusTemplate">
+                            <lib-button class="action-row" iconFontType="light" icon="plus" (click)="addItem('videoUrls')"></lib-button>
+                        </ng-container>
+                        <ng-template #minusTemplate>
+                            <lib-button class="action-row" iconFontType="light" icon="minus" (click)="removeItem('videoUrls', index)">
+                            </lib-button>
+                        </ng-template>
+                    </div>
+                </div>
+
+                <!-- FORM: docUrls -->
+                <div class="f-col" formArrayName="docUrls"
+                    *ngFor="let item of form.get('docUrls').controls; let index = index">
+                    <lib-text-line type="xsmall" weight="strong" class="field-label">{{0 === index ? 'Reference
+                        attachment URL' : null}}</lib-text-line>
+                    <div class="f-row">
+                        <lib-input class="input-row" [formControl]="form.get('docUrls').controls[index]"></lib-input>
+                        <ng-container *ngIf="(form.value.docUrls.length - 1) === index; else minusTemplate">
+                            <lib-button class="action-row" iconFontType="light" icon="plus" (click)="addItem('docUrls')"></lib-button>
+                        </ng-container>
+                        <ng-template #minusTemplate>
+                            <lib-button class="action-row" iconFontType="light" icon="minus" (click)="removeItem('docUrls', index)">
+                            </lib-button>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+            <div class="f-row modal-footer">
+                <lib-button (click)="close()">Cancel</lib-button>
+                <div class="f-spacer"></div>
+                <lib-button type="major" (click)="publish()">Publish</lib-button>
+            </div>
+        </ng-container>
+        <ng-container *ngSwitchCase="'UPLOAD_ERROR'">
+            <div class="f-row modal-body">
+                <lib-button [sizeLarge]="true" [rounded]="true" icon="exclamation" iconFontType="solid" type="major">
+                </lib-button>
+                <div class="col-spacer"></div>
+                <div class="f-col">
+                    <lib-text-line type="base">Oops! Something went wrong while publishing your dashboard.
+                    </lib-text-line>
+                    <lib-text-line type="base">Unable to export dashboard due to:</lib-text-line>
+                    <ul>
+                        <li>
+                            <lib-text-line type="base">{{errorMsg}}</lib-text-line>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="f-row modal-footer">
+                <lib-button (click)="close()">Cancel</lib-button>
+                <div class="f-spacer"></div>
+                <lib-button type="major" (click)="publish()">Retry</lib-button>
+            </div>
+        </ng-container>
+        <ng-container *ngSwitchDefault>
+            <lib-skeleton type="line"></lib-skeleton>
+        </ng-container>
+    </ng-container>
+</div>
+
+<ng-template #tagsControl>
+    <pros-chips-input label="Labels" [(ngModel)]="tags" (valueChange)="updateTags()"></pros-chips-input>
+</ng-template>

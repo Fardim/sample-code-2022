@@ -1,0 +1,69 @@
+<div class="root"  (scroll)="onScroll($event)">
+    <mat-table [dataSource]="dataSource.data" matSort>
+
+        <ng-container matColumnDef="check">
+            <mat-header-cell *matHeaderCellDef class="fixed-width-c1">
+                <lib-checkbox (change)="$event ? masterToggle() : null"
+                    [checked]="selection.hasValue() && isAllSelected()"
+                    [indeterminate]="selection.hasValue() && !isAllSelected()"></lib-checkbox>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="fixed-width-c1">
+                <lib-checkbox (click)="$event.stopPropagation()"
+                    (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+                </lib-checkbox>
+            </mat-cell>
+        </ng-container>
+    
+        <ng-container matColumnDef="settings">
+            <mat-header-cell *matHeaderCellDef class="fixed-width-c1">
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="fixed-width-c1">
+                <lib-button type="plain"  icon="ellipsis-h"></lib-button>
+            </mat-cell>
+        </ng-container>
+    
+        <ng-container matColumnDef="avatar">
+            <mat-header-cell *matHeaderCellDef class="fixed-width-c1">
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row" class="fixed-width-c1">
+                <lib-avatar>
+                    {{ userDetails.firstName ? userDetails.firstName.substring(0,1).toUpperCase() : ''  }}{{ userDetails.lastName ? userDetails.lastName.substring(0,1).toUpperCase() : ''  }}
+                </lib-avatar>
+            </mat-cell>
+        </ng-container>
+    
+        <ng-container matColumnDef="groupName">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <div class="f-row group-row">
+                    <div class="f-col">
+                        {{ row.groupDesc ? row.groupDesc : row.groupId }}
+                    </div>
+                    <div class="f-spacer"></div>
+                    <div class="f-col">
+                        {{ row.docCount || 0 }}
+                    </div>
+                </div>
+            </mat-cell>
+        </ng-container>
+    
+        <ng-container matColumnDef="common_actions_header">
+            <mat-header-cell *matHeaderCellDef [attr.colspan]="displayedFields.getValue().length">
+                <div class="f-row">
+                    <lib-button type="minor" icon="check"> Action </lib-button>
+                    <lib-button (click)="selection.clear()" type="minor" icon="times"></lib-button>
+                </div>
+            </mat-header-cell>
+        </ng-container>
+    
+        <!-- <mat-header-row *matHeaderRowDef="tableHeaderActBtn; sticky: true"></mat-header-row> -->
+        <mat-header-row *matHeaderRowDef="displayedFields | async; sticky: true"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedFields | async;" [ngClass]="{'active-row': activeGroupId == row.groupId, 'ignored': row.ignore, 'group-row': !row.ignore, 'has-docs': row.docCount > 0}" (click)="rowGroupClicked(row)"></mat-row>
+    </mat-table>
+    <div class="load-more-data" *ngIf="apiState === 'inp'">
+        <lib-text-line class="lib-text-line">
+            Loading ...
+        </lib-text-line>
+    </div>
+    <pros-null-state *ngIf="!dataSource.data.length" [button]="null"></pros-null-state>   
+</div>

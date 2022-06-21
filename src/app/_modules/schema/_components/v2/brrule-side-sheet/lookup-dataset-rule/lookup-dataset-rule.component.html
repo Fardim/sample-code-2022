@@ -1,0 +1,196 @@
+<div class="lookup-form">
+  <form [formGroup]="lookupForm">
+    <!-- lookup type single select dropdown -->
+    <div class="f-col" [class.has-error]="submitted && lookupForm.controls.lookupType.errors?.required">
+      <lib-text-line type="xsmall" class="field-label" weight="strong"
+        [textColor]="submitted && lookupForm.controls.lookupType.errors?.required ? 'error' : 'default'">Lookup
+        type<span class="mandatory">*</span></lib-text-line>
+      <!-- <div class="mdo-field-input single-dropdown" *ngIf="!editMode">
+        <input
+          matInput
+          formControlName="lookupType"
+          placeholder="Lookup type"
+          [matAutocomplete]="auto"
+          #inputEl
+          (click)="resetValues('lookup')"
+        />
+        <mat-icon matSuffix fontSet="mdo-icons" class="arrow">{{ getDropdownPos(auto) }}</mat-icon>
+        <mat-autocomplete
+          class="mdo-autocomplete"
+          #auto="matAutocomplete"
+          (optionSelected)="selectSingle('lookupType', $event, inputEl)"
+          [displayWith]="displayRuleFn.bind(this)"
+        >
+          <mat-option *ngFor="let opt of lookupTypesFiltered" [libTooltip]="opt.tooltipDesc" class="mdo-option" [value]="opt.ruleType">
+            {{ opt.ruleDesc }}
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+      <mat-error *ngIf="submitted && lookupForm.controls.lookupType.errors && lookupForm.controls.lookupType.errors.required">
+        <span>Please select lookup type</span>
+      </mat-error> -->
+      <ng-container>
+        <lib-input [value]="displayRuleFn(lookupForm.value.lookupType)" [disabled]="true"></lib-input>
+      </ng-container>
+    </div>
+
+    <!-- dataset single select dropdown -->
+    <div class="f-col mdo-field" *ngIf="isDatasetLookup"
+      [class.has-error]="submitted && lookupForm.controls.datasetCtrl.errors?.required">
+      <lib-text-line type="xsmall" class="field-label" weight="strong"
+        [textColor]="submitted && lookupForm.controls.datasetCtrl.errors?.required ? 'error' : 'default'">Dataset<span
+          class="mandatory">*</span></lib-text-line>
+      <div class="mdo-field-input single-dropdown" *ngIf="!editMode">
+        <input matInput formControlName="datasetCtrl" placeholder="Type the dataset name to add a lookup rule"
+          [matAutocomplete]="datasetAuto" #datasetInputEl
+          (click)="prevSelectedDataset = lookupForm.value.datasetCtrl" [disabled]="isDataFiltering" />
+        <mat-icon *ngIf="!isDataFiltering" matSuffix fontSet="mdo-icons" class="arrow">{{ getDropdownPos(datasetAuto) }}</mat-icon>
+        <mat-autocomplete class="mdo-autocomplete" #datasetAuto="matAutocomplete"
+          (optionSelected)="selectSingle('datasetCtrl', $event, datasetInputEl)" [displayWith]="displayDatasetFn">
+          <mat-option *ngFor="let opt of datasetListObs | async" class="mdo-option" [value]="opt">
+            {{ opt.moduleDesc }}
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+      <mat-error
+        *ngIf="submitted && lookupForm.controls.datasetCtrl.errors && lookupForm.controls.datasetCtrl.errors.required">
+        <lib-text-line type="xsmall" textColor="error">Please select dataset</lib-text-line>
+      </mat-error>
+      <ng-container *ngIf="editMode">
+        <lib-input [value]="displayDatasetFn(lookupForm.value.datasetCtrl)" [disabled]="true"></lib-input>
+      </ng-container>
+    </div>
+
+    <!-- target system single select dropdown -->
+    <div class="f-col mdo-field" *ngIf="isSAPTableLookup || isSAPFunctionCall"
+      [class.has-error]="submitted && lookupForm.controls.targetSystem.errors?.required">
+      <lib-text-line type="xsmall" class="field-label" weight="strong"
+        [textColor]="submitted && lookupForm.controls.targetSystem.errors?.required ? 'error' : 'default'">Target system<span class="mandatory">*</span></lib-text-line>
+      <div class="mdo-field-input single-dropdown" *ngIf="!editMode">
+        <input matInput formControlName="targetSystem" placeholder="Value" [matAutocomplete]="targetSystemAuto"
+          #targetSystemInputEl />
+        <mat-icon matSuffix fontSet="mdo-icons" class="arrow">{{ getDropdownPos(targetSystemAuto) }}</mat-icon>
+        <mat-autocomplete class="mdo-autocomplete" #targetSystemAuto="matAutocomplete"
+          (optionSelected)="selectSingle('targetSystem', $event, targetSystemInputEl)"
+          [displayWith]="displayTrgtSystemFn">
+          <mat-option *ngFor="let opt of targetSystemsObs | async" class="mdo-option" [value]="opt">
+            {{ opt.name }}
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+      <mat-error
+        *ngIf="submitted && lookupForm.controls.targetSystem.errors && lookupForm.controls.targetSystem.errors.required">
+        <lib-text-line type="xsmall" textColor="error">Please select target system</lib-text-line>
+      </mat-error>
+      <ng-container *ngIf="editMode">
+        <lib-input [value]="displayTrgtSystemFn(lookupForm.value.targetSystem)" [disabled]="true"></lib-input>
+      </ng-container>
+    </div>
+
+    <!-- lookup table auto select dropdown -->
+    <div class="f-col mdo-field" *ngIf="isSAPTableLookup"
+      [class.has-error]="submitted && lookupForm.controls.lookupTable.errors?.required">
+      <lib-text-line type="xsmall" class="field-label" weight="strong"
+        [textColor]="submitted && lookupForm.controls.lookupTable.errors?.required ? 'error' : 'default'">Lookup table<span class="mandatory">*</span></lib-text-line>
+      <div class="mdo-field-input" *ngIf="!editMode">
+        <input matInput formControlName="lookupTable" placeholder="Type the table name to add a lookup rule"
+          [matAutocomplete]="lookupTableAuto" #lookupTableInputEl />
+        <mat-autocomplete class="mdo-autocomplete" #lookupTableAuto="matAutocomplete"
+          (optionSelected)="selectSingle('lookupTable', $event, lookupTableInputEl)">
+          <mat-option *ngFor="let opt of lookupTablesObs | async" class="mdo-option" [value]="opt">
+            {{ opt }}
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+      <mat-error
+        *ngIf="submitted && lookupForm.controls.lookupTable.errors && lookupForm.controls.lookupTable.errors.required">
+        <lib-text-line type="xsmall" textColor="error">Please select lookup table</lib-text-line>
+      </mat-error>
+      <ng-container *ngIf="editMode">
+        <lib-input [value]="lookupForm.value.lookupTable" [disabled]="true"></lib-input>
+      </ng-container>
+    </div>
+
+    <ng-container *ngIf="isSAPFunctionCall">
+      <pros-check-code-control [formGroup]="getBlocksGrp('checkCodeGroup')" [submitted]="submitted"
+        [disabled]="editMode"></pros-check-code-control>
+    </ng-container>
+
+    <ng-container *ngIf="isSAPTableLookup">
+      <div class="f-col mdo-field">
+        <lib-text-line type="xsmall" class="field-label" weight="strong">When<span class="mandatory">*</span>
+        </lib-text-line>
+        <pros-blocks-hierarchy [operatorsList]="SAPWhenOperatorsList" [blocksGrp]="getBlocksGrp('SAPWhenBlock')"
+          [sourceList]="SAPWhenSourceFieldsList" [targetListMetaData]="SAPTargetMetaData"
+          (updateFldList)="updateFldList($event, 'SAPWhen')" [blocksList]="whenBlocksList" [showRegex]="true"
+          [initialSrcList]="lookupTableMetaDataFields" [moduleId]="moduleId" [isNewModule]="!moduleId" [submitted]="submitted" [blockNotMandatory]="true">
+        </pros-blocks-hierarchy>
+      </div>
+      <div class="f-col mdo-field">
+        <lib-text-line type="xsmall" class="field-label" weight="strong">Then<span class="mandatory">*</span>
+        </lib-text-line>
+        <pros-blocks-hierarchy [operatorsList]="operatorsList" [blocksGrp]="getBlocksGrp('SAPThenBlock')"
+          [sourceList]="SAPThenSourceFieldsList" [targetListMetaData]="SAPTargetMetaData"
+          (updateFldList)="updateFldList($event, 'SAPThen')" [blocksList]="thenBlocksList" [showRegex]="true"
+          [initialSrcList]="SAPInitialSourceFieldsList" [moduleId]="moduleId" [isNewModule]="!moduleId" [showResultCount]="true"
+          [submitted]="submitted"></pros-blocks-hierarchy>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="isDatasetLookup">
+      <div class="f-col mdo-field">
+        <lib-text-line type="xsmall" class="field-label" weight="strong">
+          <span>When</span>
+          <mat-icon fontSet="mdo-icons-light" [libTooltip]="datasetWhenCondTooltip">
+            question-circle</mat-icon><span class="mandatory">*</span>
+        </lib-text-line>
+        <pros-blocks-hierarchy [operatorsList]="operatorsList" [blocksGrp]="getBlocksGrp('dataSetWhenBlock')"
+          [sourceList]="datasetWhenSourceFieldsList" [targetListMetaData]="datasetTargetMetaData"
+          (updateFldList)="updateFldList($event, 'datasetWhen')" [blocksList]="whenBlocksList" [showRegex]="true"
+          [parentMetadata]="parentMetadata" [moduleId]="moduleId" [initialSrcList]="datasetInitialSourceFieldsList" [submitted]="submitted" [blockNotMandatory]="true">
+        </pros-blocks-hierarchy>
+      </div>
+      <div *ngIf="!isDataFiltering" class="f-col mdo-field">
+        <lib-text-line type="xsmall" class="field-label" weight="strong">
+          <span>Then</span>
+          <mat-icon fontSet="mdo-icons-light" [libTooltip]="datasetThenCondTooltip">
+            question-circle</mat-icon><span class="mandatory">*</span>
+        </lib-text-line>
+        <pros-blocks-hierarchy [operatorsList]="operatorsList" [blocksGrp]="getBlocksGrp('dataSetThenBlock')"
+          [sourceList]="datasetThenSourceFieldsList" [targetListMetaData]="datasetTargetMetaData"
+          (updateFldList)="updateFldList($event, 'datasetThen')" [blocksList]="thenBlocksList" [showRegex]="true"
+          [parentMetadata]="parentMetadata" [moduleId]="moduleId" [initialSrcList]="datasetInitialSourceFieldsList"
+          [showResultCount]="isResultCountAdd" [submitted]="submitted"></pros-blocks-hierarchy>
+      </div>
+    </ng-container>
+
+    <!-- error display field single select dropdown -->
+    <div *ngIf="false" class="f-col mdo-field" [class.has-error]="submitted && !selectedFields.length">
+      <lib-text-line type="xsmall" class="field-label" weight="strong"
+        [textColor]="submitted && !selectedFields.length ? 'error' : 'default'">Error display field<span
+          class="mandatory">*</span></lib-text-line>
+      <mat-form-field appearance="outline">
+        <mat-chip-list class="f-row field-chip-list" #chipList>
+          <ng-container *ngIf="selectedFields.length">
+            <lib-chip *ngFor="let field of selectedFields; let i = index" [removable]="true"
+              (removed)="remove(field, i)" class="lib-chip">{{
+              field.fieldDescri
+              }}</lib-chip>
+          </ng-container>
+          <input matInput #fieldsInput class="mat-input" [matAutocomplete]="errorDisplayFldAuto"
+            formControlName="errorDisplayFld" [matChipInputFor]="chipList"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes" />
+        </mat-chip-list>
+        <mat-autocomplete #errorDisplayFldAuto="matAutocomplete" [displayWith]="displayFn.bind(this)"
+          (optionSelected)="selectErrorFields($event, fieldsInput)">
+          <mat-option *ngFor="let fieldItem of errorFieldsListObs | async" [value]="fieldItem.fieldId">
+            {{ fieldItem.fieldDescri }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+      <mat-error *ngIf="submitted && !selectedFields.length">
+        <lib-text-line type="xsmall" textColor="error">Please select the fields</lib-text-line>
+      </mat-error>
+    </div>
+  </form>
+</div>

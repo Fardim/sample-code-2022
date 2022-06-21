@@ -1,0 +1,159 @@
+.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  align-items: flex-start;
+  width: 900px;
+
+  .breadcrum-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 8px 12px;
+    min-height: 36px;
+    align-items: baseline;
+
+    .mdo-constrained-right {
+      align-items: flex-start;
+      width: 100%;
+      margin-right: 0;
+      overflow: hidden;
+
+      .breadcrum-head {
+        width: 100%;
+      }
+    }
+  }
+
+  .mat-expansion-panel {
+    border-radius: 7px;
+    margin-bottom: 16px;
+
+    .mat-expansion-panel-header {
+      padding: 5px 15px;
+
+      .mat-expansion-panel-header-title {
+        .avatar {
+          padding-top: 10px;
+        }
+
+        .access-diagram-btn {
+          padding: 10px;
+        }
+      }
+
+      .display-heading {
+        padding: 5px 0 5px 10px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 102px);
+    overflow: hidden;
+
+    .mdo-justify {
+      align-items: flex-start;
+      height: 100%;
+
+      .container {
+        padding-left: 54px;
+        margin: 24px 0;
+        max-height: 600px;
+        overflow-y: scroll;
+
+        .timeline {
+          position: relative;
+          margin: 0 0 0 0;
+
+          &::before {
+            content: '';
+            position: absolute;
+            left: -34px;
+            top: 0;
+            height: 100%;
+          }
+
+          .timeline-container {
+            position: relative;
+            margin-bottom: 2.5rem;
+
+            .timeline-icon {
+              position: absolute;
+              left: -52px;
+              width: 36px;
+              height: 36px;
+              border-radius: 50%;
+              text-align: center;
+              font-size: 1rem;
+            }
+
+            .timeline-body {
+              align-items: flex-start;
+
+              .date-time {
+                margin-right: 26px;
+                font-weight: 900;
+                padding-top: 9px;
+              }
+
+              .log-details {
+                border-radius: 3px;
+                margin: 0 8px;
+                padding: 16px;
+                width: 100%;
+
+                .table-view {
+                  align-items: flex-start;
+                  margin-bottom: 12px;
+
+                  .avatar {
+                    margin-right: 24px;
+                  }
+
+                  .col {
+                    flex: 1 1;
+                  }
+                }
+              }
+
+              .comment-section {
+                margin-bottom: 12px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .empty-block {
+    justify-content: center;
+    height: 100%;
+  }
+
+  .scroll-container {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 56px;
+      }
+    }
+  }
+}

@@ -1,0 +1,79 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  width: 1024px;
+
+  .breadcrum-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 8px 12px;
+    min-height: 36px;
+
+    .mdo-constrained-right {
+      align-items: flex-start;
+      width: 100%;
+      margin-right: 0;
+      overflow: hidden;
+
+      .breadcrum-head {
+        width: 100%;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px);
+    overflow: hidden;
+
+    .mdo-justify {
+      align-items: flex-start;
+      height: 100%;
+
+      .listset-navigation {
+        width: 220px;
+        height: 100%;
+        padding-right: 12px;
+        margin-right: 12px;
+        border-right-width: 1px;
+        border-right-style: solid;
+
+        .lib-input-rename {
+          height: 36px;
+          display: block;
+        }
+
+        .ruleslist {
+          .rule-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-grow: 0;
+          }
+        }
+      }
+    }
+  }
+
+  .tabs-result {
+    width: calc(100% - 220px - 24px);
+    overflow: auto;
+    height: 100%;
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 56px;
+      }
+    }
+  }
+}

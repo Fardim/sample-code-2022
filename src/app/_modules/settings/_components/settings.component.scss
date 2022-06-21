@@ -1,0 +1,32 @@
+.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  align-items: flex-start;
+
+  .setting-tabs {
+    width: 220px;
+    height: 100%;
+    overflow: auto;
+    padding: 0 12px;
+
+    .breadcrum-toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding-top: 8px;
+      min-height: 36px;
+    }
+  }
+
+  .list-item {
+    cursor: pointer;
+  }
+
+  .tabs-result {
+    width: calc(100% - 220px - 24px);
+    align-items: center;
+    overflow: auto;
+    height: 100%;
+  }
+}

@@ -1,0 +1,27 @@
+<!-- single select -->
+<div class="f-col mdo-field" [ngClass]="{'has-error': hasError}">
+    <mat-label class="mdo-field-label" *ngIf="label">{{label}}</mat-label>
+    <!-- input container -->
+    <div class="mdo-field-input">
+        <input matInput #optionsInput
+            autocomplete="off"
+            (click)="registerOnTouched($event)"
+            (blur)="registerOnBlur()"
+            (focus)="registerOnTouched($event)"
+            [placeholder]="placeholder"
+            [formControl]="control"
+            [matAutocomplete]="auto" />
+        <!-- autocomplete -->
+        <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" [displayWith]="formatValue.bind(this)"
+            (optionSelected)="emitSelectedValue($event.option.value)">
+            <mat-option class="mdo-option mat-result-option" *ngFor="let data of filteredOptions | async" [value]="data">
+                {{data[labelKey]}}
+            </mat-option>
+            <mat-option class="no-result mdo-option" disabled>
+                Result Not Found
+            </mat-option>
+        </mat-autocomplete>
+    </div>
+    <mat-hint class="mdo-field-hint" *ngIf="hint && !hasError">{{hint}}</mat-hint>
+    <mat-error class="mdo-field-hint" *ngIf="error && hasError">{{error}}</mat-error>
+</div>

@@ -1,0 +1,43 @@
+.root {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  align-content: flex-start;
+  margin: -24px;
+
+  mat-toolbar {
+    mat-toolbar-row {
+      font-weight: 400;
+    }
+  }
+
+  mat-divider {
+    width: 100%;
+  }
+
+  .rule-process {
+    margin: 0 auto;
+    width: 100%;
+
+    .businessrule-nav {
+      width: 275px;
+      margin: 0 auto;
+
+      .mat-stroked-button {
+        font-weight: 400;
+        height: 52px;
+        margin-top: -1px;
+      }
+
+      .mat-stroked-button:first-of-type {
+        margin-top: 0;
+      }
+    }
+
+    .rule-fields {
+      height: 470px;
+      overflow: auto;
+    }
+  }
+}

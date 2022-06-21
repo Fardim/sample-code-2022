@@ -1,0 +1,55 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@package">Package</lib-text-line>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <div class="f-row">
+        <lib-chip-list class="filters-list">
+          <lib-search class="lib-search" i18n="@@search" placeholder="Search"
+          (valueChange)="searchPackage.next($event)"></lib-search>
+          <lib-chip label="Dataset:" i18n="@@dataset" type="info">
+            All
+          </lib-chip>
+          <lib-chip label="Tag:" i18n="@@tag" type="info">
+            All
+          </lib-chip>
+        </lib-chip-list>
+      </div>
+      <div class="f-row-spacer-half"></div>
+      <div class="package-block" *ngFor="let package of packageList">
+        <mat-card class="mat-elevation-z0">
+          <div class="f-row package-toolbar-heading">
+            <div>
+              <lib-text-line type="leading">{{package?.packageName}}</lib-text-line>
+            </div>
+              <lib-button type="minor" i18n="@@select" (click)="editPackage(package?.packageId)">Select</lib-button>
+          </div>
+          <div class="row-spacer"></div>
+          <lib-text-line type="base" enableWrap="true">{{package?.packageDesc}}</lib-text-line>
+          <div class="row-spacer"></div>
+          <div class="f-row">
+            <div class="f-row" *ngFor="let img of package?.images">
+              <img src="{{img}}" class="image" alt="">
+              <div class="f-col-spacer-half"></div>
+            </div>
+          </div>
+          <div class="row-spacer"></div>
+          <div class="f-row">
+            <div class="f-row" *ngFor="let tag of package?.tags">
+              <lib-label text="{{tag}}" appearance="solid"></lib-label>
+              <div class="f-col-spacer-half"></div>
+            </div>
+          </div>
+        </mat-card>    
+      </div>
+    </div>
+  </div>
+</div>

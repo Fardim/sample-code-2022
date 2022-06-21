@@ -1,0 +1,53 @@
+.filter-container {
+  flex-wrap: wrap;
+  margin: 8px 0;
+  align-items: flex-start;
+
+  .lib-search {
+    width: 213px;
+    margin-right: 3px;
+  }
+
+  .mdo-filter-matchip {
+    margin: 0 3px;
+  }
+}
+
+.flow-listing {
+  height: calc(100% - 96px);
+  overflow: auto;
+
+  table.mat-table {
+    border-collapse: separate;
+
+    .mat-row,
+    .mat-header-row {
+      border: none;
+    }
+
+    .mat-header-cell,
+    .mat-cell {
+      min-width: 160px;
+      max-width: 160px;
+      border-bottom-width: 1px;
+      border-right: none;
+    }
+
+    .mat-column-_row_actions {
+      border-right: none;
+      max-width: 314px;
+      min-width: 38px;
+    }
+
+    .mat-column-_row_sel {
+      min-width: 36px;
+      max-width: 36px;
+      border-right: none;
+    }
+  }
+}
+
+.empty-block {
+  justify-content: center;
+  height: 90%;
+}

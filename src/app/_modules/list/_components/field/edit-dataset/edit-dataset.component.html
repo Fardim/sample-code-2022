@@ -1,0 +1,48 @@
+<div class="root">
+  <ng-container>
+    <div class="f-row breadcrum-toolbar">
+      <lib-text-line type="leading" i18n="@@field_properties">Edit dataset</lib-text-line>
+    </div>
+    <div class="f-col sidesheetcontent-listing">
+      <form [formGroup]="datasetformGroup" *ngIf="datasetformGroup">
+        <div class="f-col mdo-justify">
+          <div class="f-col">
+            <lib-input matInput formControlName="objectName" i18n-label="@@name" label="Name" [id]="'edit_dataset_first_field'"
+              (afterBlur)="updateDatasetValue()" 
+              [hasError]="datasetformGroup.controls.objectName?.errors &&
+                (datasetformGroup.controls.objectName?.errors?.required || datasetformGroup.controls.objectName?.errors?.maxLength)">
+            </lib-input>
+          </div>
+
+          <div class="f-col">
+            <lib-textarea matInput formControlName="objectDesc" i18n-label="@@description" label="Description"
+              (afterBlur)="updateDatasetValue()" [hasError]="datasetformGroup.controls.objectName?.errors && datasetformGroup.controls.objectName?.errors?.maxLength">
+            </lib-textarea>
+          </div>
+
+        <div class="f-col mdo-field">
+            <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@parent_dataset">Parent dataset(s)
+            </lib-text-line>
+            <div class="mdo-field-input">
+              <lib-chip-list>
+                <ng-container *ngFor="let opt of selectedParentDatasetOptions; let i=index">
+                  <ng-container *ngIf="i<=limit-1">
+                    <lib-chip [removable]="true" (removed)="removeParentDatasetOptions(opt)">{{opt.description}}</lib-chip>
+                  </ng-container>
+                </ng-container>
+                <lib-chip *ngIf="hasLimit(true)">+{{selectedParentDatasetOptions.length - limit}}</lib-chip>
+                <input matInput placeholder="Type to search" id="parentOptionInput" formControlName="objectParentDataset" 
+                  [matAutocomplete]="parentDatsetAuto"/>
+              </lib-chip-list>
+              <mat-autocomplete class="mdo-autocomplete" #parentDatsetAuto="matAutocomplete" (optionSelected)="selectedParentDataset($event)">
+                <mat-option class="mdo-option" name="parentDataset" *ngFor="let opt of parentDatasetOptions" [value]="opt.moduleId">
+                  {{opt.moduleDescriptionRequestDTO?.description}}
+                </mat-option>
+              </mat-autocomplete>
+            </div>
+          </div> 
+        </div>
+      </form>
+    </div>
+  </ng-container>
+</div>

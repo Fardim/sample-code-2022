@@ -1,0 +1,58 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" icon="times" iconfonttype="light" (click)="close()"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+          <div class="f-row breadcrum-head">
+            <lib-text-line type="leading">Interface Name</lib-text-line>
+            <div class="f-spacer"></div>
+            <lib-button-group>
+            <lib-button type="minor" (click)="openConfirmation('interface save')">Save</lib-button>
+            <lib-button type="minor" icon="ellipsis-h" [matMenuTriggerFor]="reset"></lib-button>
+            </lib-button-group>
+          </div>
+        </div>       
+    </div>
+
+    <div class="header-msg">
+        <lib-banner text="Saving the edits will made reset XSL to system generated and any customization maintained will be reverted." status="info"></lib-banner>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing">
+        
+        <lib-tab-group>
+            <lib-tab label="Request" i18n-label="@@request">
+
+                <lib-textarea
+                    value="XML VERSION 1 = 1.0..."
+                    [hasError]="false"
+                    [isReadOnly]="false"
+                    [isRequired]="false"
+                    label="XLS Data"
+                    [rows]="15"></lib-textarea>
+
+            </lib-tab>
+            
+            <lib-tab label="Response" i18n-label="@@response">
+
+                <lib-textarea
+                value="XML VERSION 1 = 1.0..."
+                [hasError]="false"
+                [isReadOnly]="false"
+                [isRequired]="false"
+                label="XLS Data"
+                [rows]="15"></lib-textarea>
+
+            </lib-tab>
+
+        </lib-tab-group>
+
+    </div>
+
+    <mat-menu #reset>
+        <button mat-menu-item>
+            Reset
+        </button>
+    </mat-menu>
+
+</div>

@@ -1,0 +1,7 @@
+<!-- <div class="root f-row" [class.onfocus]="hasFocus">
+    <mat-icon fontSet="mdo-icons">search</mat-icon>
+    <input class="mat-input" [type]="type" [placeholder]="placeholder"  (focus)="hasFocus = true" (blur)="hasFocus = false">
+    <mat-icon class="mdo-clickable" *ngIf="control && control.value"(click)="clearSearch()" fontSet="mdo-icons">close</mat-icon>
+</div> -->
+
+<lib-search [placeholder]="placeholder" [formControl]="control"></lib-search>

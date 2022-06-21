@@ -1,0 +1,225 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" iconFontType="light" icon="times" (click)="close()"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row">
+                <lib-text-line type="leading" weight="default">Filters</lib-text-line>
+                <span class="f-spacer"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="f-row-spacer-half"></div>
+
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-row mdo-justify">
+            <div class="f-col table-filter-nav">
+                <lib-search placeholder="Search" [formControl]="searchFormControl">
+                </lib-search>
+                <div class="f-row-spacer-half"></div>
+                <mat-list>
+                    <mat-list-item *ngFor="let widget of finalFormatedWidgetListObs | async;let i=index"
+                        [ngClass]="selectedWidget?.widgetId == widget?.widgetId ? 'selected': ''"
+                        (click)="onClickOnListItem(widget)" class="list-item">
+                        <div class="f-row widget-name">
+                            <lib-text-line type="base" class="text-line">{{ widget.name  ? widget.name : 'Unknown'}}
+                            </lib-text-line>
+                            <div class="f-col-spacer"></div>
+                            <ng-template [ngIf]="widget?.selectedValues?.length">
+                                <lib-button type="plain" (click)="clearSelectedFilter(widget)" iconFontType="light"
+                                    icon="times">
+                                </lib-button>
+                            </ng-template>
+                        </div>
+                        <div class="text-line" *ngIf="widget?.selectedValues?.length">
+                            <ng-template
+                                [ngIf]="getWidgetDataType(widget.widgetId) === 'text' || getWidgetDataType(widget.widgetId) === 'textarea' || getWidgetDataType(widget.widgetId) === 'checkbox' || getWidgetDataType(widget.widgetId) === false">
+                                <lib-text-line type="base" textColor="secondary" [libTooltip]="widget.selectedValues[0]"
+                                    matTooltipPosition="right">{{widget.selectedValues[0]}}
+                                </lib-text-line>
+                            </ng-template>
+                            <ng-template
+                                [ngIf]="getWidgetDataType(widget.widgetId) === 'dropdown' || getWidgetDataType(widget.widgetId) === 'radio' || getWidgetDataType(widget.widgetId) === 'multiselectDropdown'">
+                                <lib-text-line type="base" textColor="secondary"
+                                    [libTooltip]="widget.selectedValues[0].TEXT" matTooltipPosition="right">
+                                    {{widget.selectedValues[0].TEXT}}
+                                    <span *ngIf="widget.selectedValues.length > 1"> +
+                                        {{widget.selectedValues.length-1}}</span>
+                                </lib-text-line>
+                            </ng-template>
+                            <ng-template [ngIf]="getWidgetDataType(widget.widgetId) === 'number'">
+                                <lib-text-line type="base" textColor="secondary"
+                                    libTooltip="{{widget.selectedValues[0].start  + '-' + widget.selectedValues[0].end}}"
+                                    matTooltipPosition="right">
+                                    {{widget.selectedValues[0].start}} -
+                                    {{widget.selectedValues[0].end}}</lib-text-line>
+                            </ng-template>
+                            <ng-template
+                                [ngIf]="getWidgetDataType(widget.widgetId) === 'date' || getWidgetDataType(widget.widgetId) === 'dateTime'">
+                                <lib-text-line type="base" textColor="secondary"
+                                    libTooltip="{{getSelectedDateValue(widget)}}" matTooltipPosition="right">
+                                    {{getSelectedDateValue(widget)}}</lib-text-line>
+                            </ng-template>
+
+                            <ng-template [ngIf]="getWidgetDataType(widget.widgetId) === 'time'">
+                                <lib-text-line type="base" textColor="secondary"
+                                    libTooltip="{{widget.selectedValues[0].start.hours  + 'hrs :' + widget.selectedValues[0].start.minutes + 'minutes - ' + widget.selectedValues[0].end.hours + 'hrs :' + widget.selectedValues[0].end.minutes + 'minutes' }}"
+                                    matTooltipPosition="right">
+                                    {{widget.selectedValues[0].start.hours}} hrs :
+                                    {{widget.selectedValues[0].start.minutes}} minutes -
+                                    {{widget.selectedValues[0].end.hours}} hrs :
+                                    {{widget.selectedValues[0].end.minutes}} minutes</lib-text-line>
+                            </ng-template>
+                        </div>
+                        <div class="text-line" *ngIf="hierarchyFilterApplied[widget.widgetId]?.length">
+                            <ng-template [ngIf]="getWidgetDataType(widget.widgetId) === 'hierarchy'">
+                                <lib-text-line type="base" textColor="secondary"
+                                    [libTooltip]="hierarchyFilterApplied[widget.widgetId][0].TEXT" matTooltipPosition="right">
+                                    {{hierarchyFilterApplied[widget.widgetId][0].TEXT}}
+                                    <span *ngIf="hierarchyFilterApplied[widget.widgetId].length > 1"> +
+                                       {{hierarchyFilterApplied[widget.widgetId].length-1}}</span>
+                                </lib-text-line>
+                            </ng-template>
+                        </div>
+                    </mat-list-item>
+                </mat-list>
+                <lib-section></lib-section>
+            </div>
+
+            <mat-divider vertical class="mat-divider"></mat-divider>
+            <ng-template [ngIf]="selectedWidget">
+                <div class="f-col table-value">
+                    <div class="f-row">
+                        <lib-text-line type="base" weight="strong">{{selectedWidget.name}}
+                        </lib-text-line>
+                        <div class="f-spacer"></div>
+                        <lib-button-group>
+                            <lib-button type="major" i18n="@@apply" (click)="applyFilter()">Apply</lib-button>
+                        </lib-button-group>
+                    </div>
+
+                    <div class="f-row-spacer-half"></div>
+                    <div class="f-col"
+                        *ngIf="getWidgetDataType(selectedWidget.widgetId) === 'dropdown' || getWidgetDataType(selectedWidget.widgetId) === 'multiselectDropdown' || getWidgetDataType(selectedWidget.widgetId) === 'radio' || getWidgetDataType(selectedWidget.widgetId) === 'hierarchy'">
+                        <lib-text-line type="small" weight="strong" class="field-label">View as...</lib-text-line>
+                        <lib-segment [optionsList]="outputFormatList" (valueChange)="changeDisplayCriteria($event)"
+                            [ngModel]="selectedWidget.displayCriteria">
+                        </lib-segment>
+                        <div class="f-row-spacer-half"></div>
+                    </div>
+                    <lib-section></lib-section>
+                    <div class="f-row-spacer-half"></div>
+                    <div class="f-row selectedchips"
+                        *ngIf="getWidgetDataType(selectedWidget.widgetId) === 'multiselectDropdown'">
+                        <div *ngFor="let selected of getSelectedValue(selectedWidget.widgetId);let i = index">
+                            <lib-chip [selectable]="true" [removable]="true" class="lib-chip"
+                                (removed)="removedSelectedFilter(selected.CODE,i)">
+                                {{selected.TEXT }}</lib-chip>
+                        </div>
+                        <div class="f-row-spacer-half"></div>
+                    </div>
+                    <div class="f-row selectedchips"
+                        *ngIf="getWidgetDataType(selectedWidget.widgetId) === 'hierarchy'">
+                        <div *ngFor="let selected of hierarchyFilterApplied[selectedWidget.widgetId];let i = index">
+                            <lib-chip [selectable]="true" [removable]="true" class="lib-chip"
+                                (removed)="removedSelectedFilter(selected.CODE,i)">
+                                {{selected.TEXT }}</lib-chip>
+                        </div>
+                    </div>
+                    <!--multi select dropdown-->
+                    <ng-container *ngIf="getWidgetDataType(selectedWidget.widgetId) === 'multiselectDropdown'">
+                        <pros-form-multiselect [widgetId]="selectedWidget.widgetId" isFilterWidget="true"
+                            (valueChange)="onChange($event.value)" [displayCriteria]="selectedWidget.displayCriteria"
+                            [widgetInfo]="getWidgetData(selectedWidget.widgetId)" [filterCriteria]="filterCriteria"
+                            [value]="getSelectedValue(selectedWidget.widgetId)" isFilterSiderSheet="true"
+                            [isEnableGlobalFilter]="getWidgetData(selectedWidget.widgetId)?.isEnableGlobalFilter">
+                        </pros-form-multiselect>
+                    </ng-container>
+
+                    <!--for checkbox -->
+                    <ng-template [ngIf]="getWidgetDataType(selectedWidget.widgetId) === 'checkbox'">
+                        <pros-form-checkbox [value]='getSelectedValue(selectedWidget.widgetId)'
+                            (valueChange)="onInputValueChange($event.value)" [widgetId]="selectedWidget.widgetId"
+                            [label]="getWidgetData(selectedWidget.widgetId)?.fieldCtrl?.fieldDescri" isTableFilter="false">
+                        </pros-form-checkbox>
+                    </ng-template>
+                    <!--Single select drop down-->
+                    <ng-container *ngIf="getWidgetDataType(selectedWidget.widgetId)==='dropdown'">
+                        <pros-form-single-select [placeholder]="'Please search here'" isFilterWidget="true"
+                            [fieldId]="selectedWidget.widgetId" [displayCriteria]="selectedWidget.displayCriteria"
+                            (valueChange)="onChange($event.value)" [widgetInfo]="getWidgetData(selectedWidget.widgetId)"
+                            [filterCriteria]="filterCriteria" isFilterSiderSheet="true"
+                            [value]="getSelectedValue(selectedWidget.widgetId)"
+                            [isEnableGlobalFilter]="getWidgetData(selectedWidget.widgetId)?.isEnableGlobalFilter">
+                        </pros-form-single-select>
+                    </ng-container>
+                    <!-- radio button group -->
+                    <ng-template [ngIf]="getWidgetDataType(selectedWidget.widgetId) === 'radio'">
+                        <pros-form-radio-button-group isFilterWidget="true" [widgetId]="selectedWidget.widgetId"
+                            [displayCriteria]="selectedWidget.displayCriteria" (valueChange)="onChange($event.value)"
+                            [widgetInfo]="getWidgetData(selectedWidget.widgetId)" [filterCriteria]="filterCriteria"
+                            isFilterSiderSheet="true" [value]="getSelectedValue(selectedWidget.widgetId)"
+                            [isEnableGlobalFilter]="getWidgetData(selectedWidget.widgetId)?.isEnableGlobalFilter">
+                        </pros-form-radio-button-group>
+                    </ng-template>
+
+                    <!-- For text area -->
+                    <ng-template
+                        [ngIf]="getWidgetDataType(selectedWidget.widgetId) === 'textarea' || getWidgetDataType(selectedWidget.widgetId) === 'text'">
+                        <pros-form-textarea (valueChange)="onInputValueChange($event.value)" isTableFilter="false"
+                            [value]="getSelectedValue(selectedWidget.widgetId)" [widgetId]="selectedWidget.widgetId">
+                        </pros-form-textarea>
+                    </ng-template>
+
+                    <!--for slider range picker-->
+                    <ng-template [ngIf]="getWidgetDataType(selectedWidget.widgetId) === 'number'">
+                        <pros-form-range-slider placeholder="X-XX" (valueChange)="rangeTypeValueChange($event)"
+                            [preSelectedValue]="getPreSelectedRangeValue(selectedWidget.widgetId)"
+                            [placeholder]="'Enter '+selectedWidget.name" [widgetId]="selectedWidget.widgetId">
+                        </pros-form-range-slider>
+                    </ng-template>
+
+                    <!-- For date type -->
+                    <ng-template [ngIf]="getWidgetDataType(selectedWidget.widgetId) === 'date'">
+                        <pros-form-date (valueChange)="rangeTypeValueChange($event)"
+                            [widgetId]="selectedWidget.widgetId"
+                            [selectedDate]="getSelectedValue(selectedWidget.widgetId)" [filterControlType]="picker_date"
+                            [placeholder]="'Enter '+selectedWidget.name">
+                        </pros-form-date>
+                    </ng-template>
+
+                    <!-- For date time picker -->
+                    <ng-template [ngIf]="getWidgetDataType(selectedWidget.widgetId) === 'dateTime'">
+                        <div class="f-col" prosClickStopPropagation>
+                            <pros-form-date-time (valueChange)="rangeTypeValueChange($event)"
+                                [widgetId]="selectedWidget.widgetId"
+                                [selectedDate]="getSelectedValue(selectedWidget.widgetId)"
+                                [filterControlType]="picker_date" [placeholder]="'Enter '+selectedWidget.name">
+                            </pros-form-date-time>
+                        </div>
+                    </ng-template>
+
+                    <!-- For time picker -->
+                    <ng-template [ngIf]="getWidgetDataType(selectedWidget.widgetId) === 'time'">
+                        <div class="f-col" prosClickStopPropagation>
+                            <lib-time-range-picker [enableTimeInput]="true" [emitDateOnSave]="true"
+                                (valueChange)="rangeTypeValueChange($event)"
+                                [selected]="getSelectedValue(selectedWidget.widgetId)"
+                                [placeholder]="'Enter '+selectedWidget.name">
+                            </lib-time-range-picker>
+                        </div>
+                    </ng-template>
+                    <!-- Hierarchy filter component-->
+                    <ng-template [ngIf]="getWidgetDataType(selectedWidget.widgetId) === 'hierarchy'">
+                        <pros-hierarchy-filter-v2 (valueChange)="onChange($event)"
+                            [value]="getSelectedValue(selectedWidget.widgetId)" 
+                            isFilterSiderSheet="true" [widgetId]="selectedWidget.widgetId"
+                            [displayCriteria]="selectedWidget.displayCriteria">
+                        </pros-hierarchy-filter-v2>
+                    </ng-template>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>

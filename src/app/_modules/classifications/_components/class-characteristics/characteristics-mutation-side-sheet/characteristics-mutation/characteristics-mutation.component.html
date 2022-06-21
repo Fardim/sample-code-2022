@@ -1,0 +1,465 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-row mdo-constrained-right">
+      <lib-text-line type="leading" i18n="@@new_characteristics">New characteristics for {{classDesc}}</lib-text-line>
+      <div class="f-spacer"></div>
+      <lib-button-group>
+        <lib-button type="major" i18n="@@new_row" (afterClick)="newChars()">New row</lib-button>
+        <lib-button type="major" i18n="@@submit" width="80px" (afterClick)="onCharacteristicsSave()">Submit</lib-button>
+      </lib-button-group>
+    </div>
+  </div>
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+        <div class="f-col characteristics-form">
+            <div class="characteristics-mutation">
+              <div class="message-container" #messageContainer>
+                <lib-banner *ngIf="submitError.status" status="error" [text]="submitError.message"></lib-banner>
+              </div>
+                  <form [formGroup]="form">
+                    <div formArrayName="frmArray" class="form-array">
+                      <table mat-table #table [dataSource]="dataSource" class="mat-elevation-z0 char-table">
+
+                      <ng-container matColumnDef="selected" sticky>
+                        <th mat-header-cell *matHeaderCellDef>
+                          <lib-checkbox-option [menuOptions]="CheckboxOptions" (valueChange)="masterToggle($event)"
+                            [checked]="isHeaderChecked" [indeterminate]="isIndeterminate">
+                          </lib-checkbox-option>
+                        </th>
+                        <td mat-cell *matCellDef="let element; let i = index">
+                          <div class="f-row">
+                            <lib-checkbox (valueChange)="toggle(element)" [checked]="element.controls.selected.value">
+                            </lib-checkbox>
+                            <div class="f-col-spacer-half"></div>
+                            <lib-button-group>
+                              <lib-button type="minor" icon="ellipsis-h" [matMenuTriggerFor]="newCharacteristic"></lib-button>
+                              <lib-button type="minor" iconFontType="light" icon="expand-alt" (click)="openDialog(element)">
+                              </lib-button>
+                            </lib-button-group>
+
+                            <mat-menu #newCharacteristic class="navigation-menu">
+                              <button mat-menu-item i18n="@@add_language" (click)="onNewLanguage(element)">
+                                  Add language
+                              </button>
+                              <button mat-menu-item i18n="@@duplicate" (click)="onDuplicateRow(element)">
+                                  Duplicate
+                              </button>
+                              <mat-divider></mat-divider>
+                              <button mat-menu-item i18n="@@delete" (click)="onDeleteRow(i)">
+                                  Delete
+                              </button>
+                            </mat-menu>
+                          </div>
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="charCode">
+                          <th mat-header-cell *matHeaderCellDef i18n="@@name">
+                            Name
+                            <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to maintain a unique name for the characteristic. Characteristic name once maintained cannot be changed.">
+                              question-circle
+                            </mat-icon>
+                            <span class="mandatory">*</span>
+                          </th>
+                          <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                            <lib-input class="lib-input input-upper-case" placeholder="Type name" i18n-placeholder="@@type_name" formControlName="charCode"
+                              inputPreventKey [keyList]="['Space']"
+                              [hasError]="element.controls.charCode.touched && element.controls.charCode.errors && element.controls.charCode.errors.required">
+                            </lib-input>
+                          </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="language">
+                        <th mat-header-cell *matHeaderCellDef i18n="@@language">Language</th>
+                        <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                          <mat-form-field appearance="outline">
+                            <input matInput placeholder="Value" [matAutocomplete]="moduleAutoCmpLanguage" [value]="getSelectedLanguage(element.controls.language.value)" />
+                            <lib-button icon="chevron-down" matSuffix></lib-button>
+                            <mat-autocomplete class="mdo-autocomplete" #moduleAutoCmpLanguage="matAutocomplete" (optionSelected)="onLanguageChange(element, $event.option.value)" [displayWith]="displayLanguageFn.bind(this)">
+                              <mat-option class="mdo-option" *ngFor="let obj of allLanguages" [value]="obj.id">
+                                {{obj.name}}
+                              </mat-option>
+                            </mat-autocomplete>
+                          </mat-form-field>
+                        </td>
+                      </ng-container>
+
+                      <ng-container matColumnDef="charDesc">
+                        <th mat-header-cell *matHeaderCellDef i18n="@@description">
+                          Description
+                          <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to maintain the characteristic description.">
+                            question-circle
+                          </mat-icon>
+                          <span class="mandatory">*</span>
+                        </th>
+                        <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                          <lib-input type="text" [expanded]="true"
+                            formControlName="charDesc"
+                            placeholder="Type description"
+                            (valueChange)="onDescChange(element, $event)"
+                            [hasError]="element.controls.charDesc.touched && element.controls.charDesc.errors && element.controls.charDesc.errors.required">
+                          </lib-input>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="numCode">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@characteristic_numeric_code">
+                        Characteristic numeric code
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows user to define a numeric code associated with the characteristic that should be considered for generating the record number, based on defined number setting rule.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <lib-input class="lib-input" formControlName="numCode">
+                        </lib-input>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="fieldType">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@characteristic_type">
+                        Characteristic type
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to maintain the type of characteristic from a list of available options.">
+                          question-circle
+                        </mat-icon>
+                        <span class="mandatory">*</span>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <mat-form-field appearance="outline">
+                          <input matInput placeholder="Characteristic Type" formControlName="fieldType" [matAutocomplete]="moduleAutoCmpField" />
+                          <lib-button icon="chevron-down" matSuffix></lib-button>
+                          <mat-autocomplete class="mdo-autocomplete" #moduleAutoCmpField="matAutocomplete" (optionSelected)="onFieldTypeChange(element, $event)">
+                            <mat-option class="mdo-option" *ngFor="let obj of fieldTypeList" [value]="obj.name">
+                              {{obj.name}}
+                            </mat-option>
+                          </mat-autocomplete>
+                        </mat-form-field>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="dataType">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@data_type">
+                        Data type
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to maintain the applicable data type for the characteristic.">
+                          question-circle
+                        </mat-icon>
+                        <span class="mandatory">*</span>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <mat-form-field appearance="outline">
+                          <input matInput placeholder="Data Type" formControlName="dataType" [matAutocomplete]="moduleAutoCmpData" />
+                          <lib-button icon="chevron-down" matSuffix></lib-button>
+                          <mat-autocomplete class="mdo-autocomplete" #moduleAutoCmpData="matAutocomplete" (optionSelected)="onDataTypeChange(element, $event)">
+                            <mat-option class="mdo-option" *ngIf="!element.controls.typeList.value?.length" disabled i18n="@@no_data_type_found">
+                              No data type found
+                            </mat-option>
+                            <mat-option class="mdo-option" *ngFor="let obj of element.controls.typeList.value" [value]="obj.name">
+                              {{obj.name}}
+                            </mat-option>
+                          </mat-autocomplete>
+                        </mat-form-field>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="length">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@length">
+                        Length
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to specify the maximum length characteristic value can take.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <mat-form-field appearance="outline">
+                          <input matInput type="number" formControlName="length" />
+                        </mat-form-field>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="decimal">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@decimal_places">
+                        Decimal places
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to specify the decimal value precision if applicable for the characteristic.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <mat-form-field appearance="outline">
+                          <input matInput type="number" formControlName="decimal" min="0" max="9" />
+                        </mat-form-field>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="currency">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@currency">
+                        Currency
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to specify the unit to be defaulted for Currency type characteristics.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <mat-form-field appearance="outline">
+                          <input matInput formControlName="currency" />
+                        </mat-form-field>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="prefix">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@characteristic_prefix_for_short_description">
+                        Characteristic prefix for short description
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to maintain a prefix that needs to be part of the generated short description, if data is maintained for the respective characteristic.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <mat-form-field appearance="outline">
+                          <input matInput formControlName="prefix" />
+                        </mat-form-field>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="longPrefix">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@characteristic_prefix_for_long_description">
+                        Characteristic prefix for long description
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to maintain a prefix that needs to be part of the generated long description, if data is maintained for the respective characteristic.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <mat-form-field appearance="outline">
+                          <input matInput formControlName="longPrefix" />
+                        </mat-form-field>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="suffix">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@characteristic_suffix_for_short_description">
+                        Characteristic suffix for short description
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to maintain a suffix that needs to be part of the generated short description, if data is maintained for the respective characteristic.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <mat-form-field appearance="outline">
+                          <input matInput formControlName="suffix" />
+                        </mat-form-field>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="longSuffix">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@characteristic_suffix_for_long_description">
+                        Characteristic suffix for long description
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to maintain a suffix that needs to be part of the generated long description, if data is maintained for the respective characteristic.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <mat-form-field appearance="outline">
+                          <input matInput formControlName="longSuffix" />
+                        </mat-form-field>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="isAllowMultipleValue">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@allows_maintaining_multiple_values">
+                        Allows maintaining multiple values
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to maintain more than one values for the characteristic.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <lib-slide-toggle class="toggle-col" theme="primary" formControlName="isAllowMultipleValue"></lib-slide-toggle>
+                      </td>
+                    </ng-container>
+
+
+                    <ng-container matColumnDef="isManatory">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@required_characteristic">
+                        Required characteristic
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to define a characteristic as a required characteristic for the class.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <lib-slide-toggle class="toggle-col" theme="primary" formControlName="isManatory"></lib-slide-toggle>
+                      </td>
+                    </ng-container>
+                    <ng-container matColumnDef="isAllowValueRange">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@allows_maintaining_value_range">
+                        Allows maintaining value range
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to maintain range of values for the characteristic.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <lib-slide-toggle class="toggle-col" theme="primary" formControlName="isAllowValueRange"></lib-slide-toggle>
+                      </td>
+                    </ng-container>
+                    <ng-container matColumnDef="isAllowUpperCase">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@allow_maintaining_data_in_upper_case_only">
+                        Allow maintaining data in upper case only
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to restrict maintaining values in upper case only for a characteristic. Users can disable the property to maintain data in lower case.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <lib-slide-toggle class="toggle-col" theme="primary" formControlName="isAllowUpperCase"></lib-slide-toggle>
+                      </td>
+                    </ng-container>
+                    <ng-container matColumnDef="isAllowNegative">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@allow_maintaining_negative_values">
+                        Allow maintaining negative values
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to maintain negative values for the characteristic.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <lib-slide-toggle class="toggle-col" theme="primary" formControlName="isAllowNegative"></lib-slide-toggle>
+                      </td>
+                    </ng-container>
+                    <ng-container matColumnDef="isAllowNewValue">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@allow_maintaining_new_values">
+                        Allow maintaining new values
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to add new values for a Dropdown type characteristic.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <lib-slide-toggle class="toggle-col" theme="primary" formControlName="isAllowNewValue"></lib-slide-toggle>
+                      </td>
+                    </ng-container>
+                    <ng-container matColumnDef="enableDuplicateCheck">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@enable_for_duplicate_check">
+                        Enable for duplicate check
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the system to perform a duplicate check on combination of attributes defined for the class and enabled for this property, when a duplicate type rule is maintained to identify duplicates on classification attributes.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <lib-slide-toggle class="toggle-col" theme="primary" formControlName="enableDuplicateCheck"></lib-slide-toggle>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="dimensionType">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@dimension">
+                        Dimension
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to maintain the dimension which is applicable for the characteristic, for maintaining data in related units.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <mat-form-field appearance="outline">
+                          <input matInput formControlName="dimensionType"
+                            [matAutocomplete]="moduleAutoCmpDimension"
+                            [value]="getSelectedDimensionName(element)"
+                          />
+                          <lib-button *ngIf="element.controls.dimensionType.value" icon="times" matSuffix prosClickStopPropagation (click)="clearSelectedDimension(element)"></lib-button>
+                          <lib-button icon="chevron-down" matSuffix></lib-button>
+                          <mat-autocomplete class="mdo-autocomplete" #moduleAutoCmpDimension="matAutocomplete"
+                              [displayWith]="displayDimensionFn.bind(this)"
+                              (optionSelected)="onDimensionTypeChange(element, $event)">
+                              <mat-option class="mdo-option" *ngFor="let obj of dimensionTypeList" [value]="obj.uuid">
+                                  {{obj.description}}
+                              </mat-option>
+                          </mat-autocomplete>
+                        </mat-form-field>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="defaultUoM">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@default_unit_of_measure">
+                        Default Unit of measure
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to define a default unit of measure for the characteristic, belonging to the maintained dimension.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <mat-form-field appearance="outline">
+                          <input matInput formControlName="defaultUoM" [required]="isRequiredField(element, 'defaultUoM')"
+                          [matAutocomplete]="moduleAutoCmpDefaultMeasure" />
+                          <lib-button icon="chevron-down" matSuffix></lib-button>
+                          <mat-autocomplete class="mdo-autocomplete" #moduleAutoCmpDefaultMeasure="matAutocomplete">
+                            <mat-option *ngIf="!element.controls.uoMs.value?.length" disabled i18n="@@no_options_to_show">
+                              No options to show
+                            </mat-option>
+                              <mat-option class="mdo-option" *ngFor="let obj of element.controls.uoMs.value"
+                                  [value]="obj.uomValue">
+                                  {{obj.uomValue}}
+                              </mat-option>
+                          </mat-autocomplete>
+                        </mat-form-field>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="status">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@status">
+                        Status
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <lib-slide-toggle class="toggle-col" theme="primary" formControlName="status"></lib-slide-toggle>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="validFrom">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@valid_from">
+                        Valid from
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <lib-date-picker class="date-picker" formControlName="validFrom" [selectedDate]="getSelectedDateValue(element, 'validFrom')"
+                          (valueChange)="onDateChanged(element, 'validFrom', $event)">
+                        </lib-date-picker>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="validTo">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@valid_to">
+                        Valid to
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <lib-date-picker class="date-picker" formControlName="validTo" [selectedDate]="getSelectedDateValue(element, 'validTo')"
+                          (valueChange)="onDateChanged(element, 'validTo', $event)">
+                        </lib-date-picker>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="helpText">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@help_text">
+                        Help text
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to maintain a Help text for the characteristic, which is then available on the transaction screen in the Description generator, or in the Classification component.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <pros-rich-text-editor
+                          [tabFieldId]="'helpText' + i"
+                          [control]="helpText"
+                          (valueChange)="setFieldHelpTextValue(element, $event)"
+                        ></pros-rich-text-editor>
+                      </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="sapChars">
+                      <th mat-header-cell *matHeaderCellDef i18n="@@sap_characteristics">
+                        SAP characteristics
+                        <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Allows the user to maintain the equivalent characteristic from target system, for the linked SAP class.">
+                          question-circle
+                        </mat-icon>
+                      </th>
+                      <td mat-cell *matCellDef="let element; let i = index" formGroupName="{{ i }}">
+                        <mat-form-field appearance="outline">
+                          <input matInput formControlName="sapChars" />
+                        </mat-form-field>
+                      </td>
+                    </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="columns; sticky: true"></tr>
+                  <tr mat-row *matRowDef="let row; columns: columns;">
+                </tr>
+              </table>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    </div>
+</div>

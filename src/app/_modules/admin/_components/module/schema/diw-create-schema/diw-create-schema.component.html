@@ -1,0 +1,124 @@
+<div class="root">
+    <mat-card class="mat-elevation-z0 container-show create-scehma">
+        <div class="f-row create-field">
+            <mat-form-field appearance="legacy">
+                <mat-label>Enter schema name</mat-label>
+                <input matInput placeholder="Placeholder">
+            </mat-form-field>
+            <div class="right-actions">
+                <lib-button matSuffix type="major">Save draft</lib-button>
+                <lib-button matSuffix>Cancel</lib-button>
+                <lib-button matSuffix type="major">Save Schema</lib-button>
+            </div>
+        </div>
+
+
+        <div class="f-row">
+            <span class="headline-caps">Business Rules</span>
+            <span class="f-spacer"></span>
+            <a mat-button color="primary">Create new group</a>
+            <span class="f-col-spacer-half"></span>
+            <mat-divider [vertical]="true"></mat-divider>
+            <span class="f-col-spacer-half"></span>
+            <a mat-button color="primary" (click)="createbusinessrule()">Add a new business rule</a>
+        </div>
+        <mat-card class="mat-elevation-z0 f-col null-stage" style="display: none;">
+            <h2 class="mat-h2">You have no business rules.</h2>
+            <p>Please enter your new schema name and create at least one business rule</p>
+        </mat-card>
+
+        <div class="b-rule-listing" style="display: none;">
+            <div class="f-row">
+                <h4 class="mat-h4">My new rule group</h4>
+                <span class="f-spacer"></span>
+                <a mat-button color="primary">Edit group</a>
+            </div>
+
+            <mat-card class="mat-elevation-z0 f-row rule-tile-horizotal">
+                <strong>Regex rule</strong>
+                <p class="tile-paragraph">My rule description</p>
+                <span class="f-spacer"></span>
+                <button mat-icon-button>
+                    <mat-icon>import_export</mat-icon>
+                </button>
+                <span class="f-col-spacer-half"></span>
+                <button mat-icon-button>
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+            </mat-card>
+
+            <mat-card class="mat-elevation-z0 f-row rule-tile-horizotal">
+                <strong>Rule 2</strong>
+                <p class="tile-paragraph">import qualified Data.Text as T. To use an extended and very rich family of
+                    functions for working with Unafe Haske…</p>
+                <span class="f-spacer"></span>
+                <button mat-icon-button>
+                    <mat-icon>import_export</mat-icon>
+                </button>
+                <span class="f-col-spacer-half"></span>
+                <button mat-icon-button>
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+            </mat-card>
+
+            <mat-card class="mat-elevation-z0 f-row rule-tile-horizotal">
+                <strong>Rule 3</strong>
+                <p class="tile-paragraph">Data.Text.Conversions. Description. This module provides a set of typeclasses
+                    for safely converting between textual data. The built-in String type, as well as strict</p>
+                <span class="f-spacer"></span>
+                <button mat-icon-button>
+                    <mat-icon>import_export</mat-icon>
+                </button>
+                <span class="f-col-spacer-half"></span>
+                <button mat-icon-button>
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+            </mat-card>
+        </div>
+
+
+        <!-- RULES CONTAINER -->
+        <ng-template ngFor let-data [ngForOf]="brListOb | async">
+            <mat-card class="mat-elevation-z0 f-row rule-tile-horizotal">
+                <strong> {{ data.brType }}</strong>
+                <p class="tile-paragraph">{{ data.brInfo }}</p>
+                <span class="f-spacer"></span>
+                <button mat-icon-button>
+                    <mat-icon>import_export</mat-icon>
+                </button>
+                <span class="f-col-spacer-half"></span>
+                <button mat-icon-button>
+                    <mat-icon>more_vert</mat-icon>
+                </button>
+            </mat-card>
+        </ng-template>
+
+
+        <!-- <mat-card class="mat-elevation-z0 f-row rule-tile-horizotal">
+            <strong>Regex rule</strong>
+            <p class="tile-paragraph">My rule description</p>
+            <span class="f-spacer"></span>
+            <button mat-icon-button>
+                <mat-icon>import_export</mat-icon>
+            </button>
+            <span class="f-col-spacer-half"></span>
+            <button mat-icon-button>
+                <mat-icon>more_vert</mat-icon>
+            </button>
+        </mat-card>
+
+        <mat-card class="mat-elevation-z0 f-row rule-tile-horizotal">
+            <strong>Rule 2</strong>
+            <p class="tile-paragraph">import qualified Data.Text as T. To use an extended and very rich family of functions for working with Unafe Haske…</p>
+            <span class="f-spacer"></span>
+            <button mat-icon-button>
+                <mat-icon>import_export</mat-icon>
+            </button>
+            <span class="f-col-spacer-half"></span>
+            <button mat-icon-button>
+                <mat-icon>more_vert</mat-icon>
+            </button>
+        </mat-card> -->
+
+    </mat-card>
+</div>

@@ -1,0 +1,29 @@
+<div class="f-row">
+  <lib-checkbox
+  [formControl]="copyField"
+  *ngIf="process === 'copy'"
+  class="copy-box"
+  ></lib-checkbox>
+
+  <div class="f-col w-100">
+    <lib-input *ngIf="!isFieldReadOnly || !control.disabled"
+      placeholder="URL"
+      autocomplete="off"
+      label="URL"
+      [label]="fieldObj?.fieldCtrl?.description"
+      labelIcon="question-circle"
+      labelIconFont="mdo-icons"
+      [formControl]="control"
+      [hasError]="control.invalid && !control.pristine"
+      [hint]="getHint"
+      [disabled]="isFieldReadOnly || control.disabled"
+      [isRequired]="isRequired"
+      (afterBlur)="afterBlur($event)"
+      suffixIcon="external-link-alt"
+      (afterSuffixBtnClick)="openURlinNewTab(control.value)"
+    > 
+  </lib-input>
+<a *ngIf="isFieldReadOnly || control.disabled" [href]="control.value" target="_blank"> <lib-text-line textColor="link">{{control.value}}</lib-text-line></a>
+  
+  </div>
+</div>

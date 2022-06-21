@@ -1,0 +1,73 @@
+<div class="mapping-inner-container">
+    <div class="source-container">
+        <div class="f-row header-wrapper">
+            <lib-text-line textColor="primary" type="base" weight="strong">{{tableName}}</lib-text-line>
+            <div class="f-spacer"></div>
+        </div>
+        <div class="f-row-spacer-half"></div>
+        <div class="f-row search-wrapper">
+            <lib-search class="lib-search" [formControl]="sourceControl" placeholder="Search source fields"></lib-search>
+        </div>
+        <div class="f-row-spacer-half"></div>
+        <div class="cdk-wrapper-container">
+            <cdk-virtual-scroll-viewport itemSize="64" class="collapsible">
+                <div class="f-row-spacer-half"></div>
+                <ng-container *ngIf="mappingLoader; else sourceLoaded">
+                    <div class="f-row loader-element" *ngFor="let a of [].constructor(10)">
+                        <lib-skeleton class="line" type="line"></lib-skeleton>
+                    </div>
+                </ng-container>
+                <ng-template #sourceLoaded>
+                    <ng-container *ngFor="let opt of filteredSourceFields | async; trackBy: trackByFn;">
+                        <lib-filter-option class="dynamic-input">
+                            <lib-checkbox
+                                label="{{opt.externalFieldDesc}}"
+                                [value]="opt.externalFieldDesc"
+                                [checked]="isSelected(opt.externalFieldId)"
+                                (valueChange)="selectSource(opt, $event)">
+                            </lib-checkbox>
+                        </lib-filter-option>
+                    </ng-container>
+                </ng-template>
+            </cdk-virtual-scroll-viewport>
+        </div>
+    </div>
+    <!-- Spacer between grids, do not remove -->
+    <div></div>
+    <!-- target container -->
+    <div class="target-container">
+        <!-- To be used when the target div is out of view -->
+        <div class="hidden-top-reference" id="top-reference"></div>
+        <div class="hidden-bottom-reference" id="bottom-reference"></div>
+
+        <div class="f-row header-wrapper">
+            <lib-text-line textColor="primary" type="base" weight="strong" i18n="@@newDatasetFields">New Dataset Fields</lib-text-line>
+            <div class="f-spacer"></div>
+        </div>
+        <div class="f-row-spacer-half"></div>
+        <div class="f-row search-wrapper">
+            <lib-search class="lib-search" [formControl]="targetControl" placeholder="Search target fields"></lib-search>
+        </div>
+        <div class="f-row-spacer-half"></div>
+        <cdk-virtual-scroll-viewport itemSize="64" class="collapsible">
+            <ng-container *ngIf="mappingLoader; else targetLoaded">
+                <div class="f-row-spacer-half"></div>
+                <div class="f-row loader-element" *ngFor="let a of [].constructor(10)">
+                    <lib-skeleton class="line" type="line"></lib-skeleton>
+                </div>
+            </ng-container>
+            <ng-template #targetLoaded>
+                <ng-container *ngFor="let opt of filteredTargetFields | async; trackBy: trackByFn;">
+                    <lib-filter-option class="dynamic-input">
+                        <ng-container *ngIf="isSelected(opt.externalFieldId)">
+                            <lib-input class="input-area" [placeholder]="opt.externalFieldDesc" (valueChange)="updateMapping($event,opt)"></lib-input>
+                        </ng-container>
+                        <ng-container *ngIf="!isSelected(opt.externalFieldId)">
+                            <lib-text-line>{{ opt.externalFieldDesc }}</lib-text-line>
+                        </ng-container>
+                    </lib-filter-option>
+                </ng-container>
+            </ng-template>
+        </cdk-virtual-scroll-viewport>
+    </div>
+</div>

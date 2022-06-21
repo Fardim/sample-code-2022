@@ -1,0 +1,11 @@
+<div class="expandable-text-block">
+  <lib-text-line type="base" [enableWrap]="true" [innerHTML]="getMessageText(text)"> </lib-text-line>
+
+  <div class="f-row" *ngIf="showViewMoreBtn(text)">
+    <div class="f-spacer"></div>
+    <div class="view-more-button f-row" (click)="showHiddenText=!showHiddenText">
+      <mat-icon fontSet="mdo-icons" class="view-more-icon">{{ showHiddenText ? 'chevron-up' : 'chevron-down' }}</mat-icon>
+      <lib-text-line textColor="link" textColor="secondary">{{ showHiddenText ? 'View less' : 'View more' }}</lib-text-line>
+    </div>
+  </div>
+</div>

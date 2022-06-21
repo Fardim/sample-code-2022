@@ -1,0 +1,42 @@
+<div class="root">
+    <mat-expansion-panel togglePosition="before" class="mat-elevation-z0 segment-panel" [hideToggle]="true" [expanded]="true" (click)="selectCurrentField(segment)">
+        <mat-expansion-panel-header class="segment-name">
+            <mat-panel-title>
+                <div class="f-row title-container">
+                    <lib-text-line class="title" [title]="segment?.segmentName" textColor="primary" [enableWrap]="false">
+                        <div [innerHTML]="segment?.segmentName | highlight: control?.value">
+                            {{segment?.segmentName}}
+                        </div>
+                    </lib-text-line>
+                    <div class="f-spacer" *ngIf="removable"></div>
+                    <lib-button iconFontType="light" *ngIf="removable" icon="times" (afterClick)="removeCurrentField(segment)"></lib-button>
+                </div>
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <!-- When there's nexted Segment structure -->
+        <ng-container *ngFor="let field of segment?.segmentMappings">
+            <div class="f-row child-panel">
+              <div class="f-col-spacer-half"></div>
+             <pros-segment-data
+              [segment]="field"
+              [control]="control"
+              [removable]="removable"
+              (fieldSelected)="emitSelectedField($event)"
+              (fieldRemoved)="removeCurrentField($event)"
+             ></pros-segment-data>
+            </div>
+        </ng-container>
+
+        <!-- Target fields list -->
+        <ng-container *ngFor="let targetField of segment?.mdoMappings;">
+            <pros-segment-field
+            [searchTerm]="control?.value"
+            [targetField]="targetField"
+            [removable]="removable"
+            (click)="selectCurrentField(targetField)"
+            (removed)="removeCurrentField(targetField)"
+            ></pros-segment-field>
+        </ng-container>
+    </mat-expansion-panel>
+</div>

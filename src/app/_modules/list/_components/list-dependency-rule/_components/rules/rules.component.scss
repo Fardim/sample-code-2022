@@ -1,0 +1,63 @@
+div.root {
+  height: 100%;
+  overflow: hidden;
+  user-select: text;
+
+  .depends-data-container {
+    height: calc(100% - 36px - 8px - 52px);
+    overflow: auto;
+
+    .mat-expansion-panel {
+      margin-bottom: 8px;
+
+      .mat-expansion-panel-header {
+        padding: 0 8px;
+        border-radius: 3px;
+
+        &.cdk-mouse-focused {
+          background: transparent;
+        }
+      }
+    }
+
+    .field-label {
+      margin-bottom: 6px;
+    }
+
+    .lib-search {
+      width: 213px;
+    }
+
+    .load-empty {
+      align-items: center;
+      justify-content: center;
+    }
+
+    .teams {
+      height: 100%;
+      overflow: auto;
+
+      table.mat-table {
+        width: 100%;
+        overflow: auto;
+        border-collapse: separate;
+
+        td.mat-cell {
+          border-right: none;
+          min-width: 160px;
+
+          .lib-chip {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+
+  .pagination {
+    position: fixed;
+    bottom: 8px;
+    width: 100%;
+    z-index: 1;
+  }
+}

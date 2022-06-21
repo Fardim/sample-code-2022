@@ -1,0 +1,75 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <div class="f-row mdo-constrained-right">
+      <lib-text-line type="leading" i18n="@@structure_level_config">Structure level config</lib-text-line>
+    </div>
+  </div>
+  <div class="f-col sidesheetcontent-listing">
+    <form [formGroup]="structureLevelConfigformGroup" *ngIf="structureLevelConfigformGroup">
+      <div class="f-col mdo-justify">
+        <div class="f-col mdo-field">
+          <lib-checkbox label="Header structure" i18n-label="@@header_structure" formControlName="headerStructure"> </lib-checkbox>
+        </div>
+
+        <div class="f-col">
+          <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@structure_type">Structure type
+          </lib-text-line>
+          <lib-radio-group
+            layout="vertical"
+            formControlName="structureType"
+            [options]="structureTypeList"
+            labelKey="label"
+            valueKey="value"
+          >
+          </lib-radio-group>
+        </div>
+
+        <div class="f-col mdo-field">
+          <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@superior_structure">Superior structure<span class="mandatory">*</span></lib-text-line>
+          <div class="mdo-field-input">
+            <input matInput placeholder="Select data type" #optionsInput [matAutocomplete]="superiorStructureAuto" />
+            <mat-autocomplete class="mdo-autocomplete" #superiorStructureAuto="matAutocomplete">
+              <mat-option class="mdo-option" *ngFor="let data of superiorStructureOptions" [value]="data">
+                {{ data }}
+              </mat-option>
+            </mat-autocomplete>
+          </div>
+        </div>
+
+        <div class="f-col mdo-field">
+          <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@superior_grid">Superior grid<span class="mandatory">*</span></lib-text-line>
+          <div class="mdo-field-input">
+            <input matInput placeholder="Select data type" #optionsInput [matAutocomplete]="superiorGridAuto" />
+            <mat-autocomplete class="mdo-autocomplete" #superiorGridAuto="matAutocomplete">
+              <mat-option class="mdo-option" *ngFor="let data of superiorGridOptions" [value]="data">
+                {{ data }}
+              </mat-option>
+            </mat-autocomplete>
+          </div>
+        </div>
+
+        <div class="f-col mdo-field">
+          <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@industry">Joining Key<span class="mandatory">*</span>
+          </lib-text-line>
+          <div class="mdo-field-input">
+            <lib-chip-list>
+              <ng-container *ngFor="let opt of selectedJoiningKeys; let i=index">
+                <ng-container *ngIf="i<=limit-1">
+                  <lib-chip [removable]="true" (removed)="remove(opt)">{{opt}}</lib-chip>
+                </ng-container>
+              </ng-container>
+              <lib-chip *ngIf="hasLimit(false)">+{{selectedJoiningKeys.length - limit}}</lib-chip>
+              <input matInput placeholder="Type to search" id="optionInput" [formControl]="joiningKeyOptionCtrl" [matAutocomplete]="joiningKeyAuto" />
+            </lib-chip-list>
+            <mat-autocomplete class="mdo-autocomplete" #joiningKeyAuto="matAutocomplete" prosClickStopPropagation>
+              <mat-option class="mdo-option" *ngFor="let opt of joiningKeyOptions" [value]="opt" prosClickStopPropagation>
+                <lib-checkbox [label]="opt" [checked]="selectedJoiningKeys.indexOf(opt) >= 0"
+                    (valueChange)="checkedItem(opt)" prosClickStopPropagation></lib-checkbox>
+              </mat-option>
+            </mat-autocomplete>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

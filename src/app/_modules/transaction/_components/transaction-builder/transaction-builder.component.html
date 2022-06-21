@@ -1,0 +1,160 @@
+<mat-drawer-container autosize hasBackdrop="false">
+  <mat-drawer #drawer mode="side" position="end" id="property-panel">
+    <pros-transaction-errors *ngIf="isErrorExists" [dataControl]="dataControl" [moduleId]="moduleId"
+      (close)="closeErrorSideSheet()" [allErrorsLogs]="allErrorsLogs"></pros-transaction-errors>
+  </mat-drawer>
+
+  <mat-drawer-content class="sidesheet-outer-drawer">
+    <div class="root">
+      <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+        <div class="f-col-spacer-half"></div>
+        <div class="f-col mdo-constrained-right">
+          <div class="f-row breadcrum-head">
+            <lib-text-line type="leading" enableWrap="true">
+              {{ process === 'copy' ? 'Copy from' : (objectType && objectType.objectdesc ? objectType.objectdesc : 'Untitled' + ' - ' +  (flow && flow?.flowDesc) ? flow.flowDesc : 'Untitled form') }}
+            </lib-text-line>
+            <span class="f-spacer"></span>
+            <ng-container
+              *ngIf="process === 'copy'"
+            >
+              <lib-slide-toggle
+                labelPosition="before"
+                label="Copy with related datasets"
+                theme="primary"
+                [disableRipple]="false"
+                [formControl]="copyWithRelatedDatasets"
+                (toggleChange)="copyWithRelatedDatasetsToggle($event)"
+              ></lib-slide-toggle>
+              <span class="f-col-spacer-half"></span>
+              <mat-icon
+                fontSet="mdo-icons-light"
+                class="plain-icon"
+                libTooltip="This will allow users to copy records from related datasets."
+              >question-circle</mat-icon>
+              <span class="f-col-spacer-half"></span>
+            </ng-container >
+            <lib-button-group *ngIf="process !== 'copy'">
+              <lib-button *ngIf="process !== 'view'" i18n="@@save" width="80px" type="major" (click)="save()" [spinner]="saving" [disable]="saving"> 
+                {{ process === 'approve' ? 'Approve' : 'Save' }}
+              </lib-button>
+              <ng-template [ngIf]="process === 'approve'">
+                <lib-button i18n="@@reject" width="80px" type="major" (click)="reject()">
+                  Send for correction
+                </lib-button>
+              </ng-template>
+              <lib-button *ngIf="process === 'create'" type="major" (click)="openCopyRecordSS()">Copy from...</lib-button>
+              <lib-button
+                type="major"
+                libTooltip="Chat"
+                iconFontType="light"
+                icon="comment-alt"
+                (afterClick)="toggleChatWindow()"
+              >
+              </lib-button>
+              <lib-button type="major" libTooltip="Coming soon" iconFontType="light" icon="share-alt"></lib-button>
+              <lib-button type="major" libTooltip="Coming soon" icon="ellipsis-h"></lib-button>
+            </lib-button-group>
+
+            <lib-button-group *ngIf="process === 'copy'">
+              <lib-button  width="80px" type="major" (click)="copyRecord()">
+              Copy
+              </lib-button>
+            </lib-button-group>
+          </div>
+        </div>
+      </div>
+
+      <mat-drawer-container class="sidenav-drawer-container">
+        <mat-drawer mode="side" position="start" #chatPanel class="chat-panel">
+          <div class="transaction-chat-container" *ngIf="!!isChatEnabled">
+            <pros-chat class="transaction-chat" [moduleId]="moduleId" [crId]="crId" [recordId]="recordId"></pros-chat>
+          </div>
+        </mat-drawer>
+
+        <mat-drawer-content class="f-col mdo-justify" autosize hasBackdrop="false">
+          <div class="f-col sidesheetcontent-listing">
+            <div class="f-col mdo-justify">
+              <div class="f-col error-banner" *ngIf="errorMsg">
+                <lib-banner status="error" [text]="errorMsg"></lib-banner>
+              </div>
+
+              <div class="f-col error-banner" *ngIf="hasDuplicateRecords">
+                <lib-banner status="error">
+                  We have found records which are possible duplicates based on your input -
+                  &nbsp;<span class="info-link" (click)="openDuplicateRecordsList()"> View records </span>
+                </lib-banner>
+              </div>
+
+              <ng-template [ngIf]="process === 'copy'">
+
+                <lib-text-line type="xsmall" weight="strong" class="field-label">Record Number</lib-text-line>
+
+                <div class="f-col mdo-field w-100">
+                  <div class="mdo-field-input multi-select f-row">
+                    <input matInput placeholder="Select Any One..." #recordListOption
+                      [disabled]="transactionOutlet === 'sb'" [matAutocomplete]="optionsAutoComp"
+                      #autocompleteTrigger="matAutocompleteTrigger" />
+                    <mat-autocomplete class="mdo-autocomplete" #optionsAutoComp="matAutocomplete"
+                      (optionSelected)="copyRecordSelected($event)" [displayWith]="formatValue.bind(this)">
+                      <mat-option class="mdo-option" *ngFor="let data of recordOptionList | async" [value]="data">{{
+                        data.id }}
+                      </mat-option>
+                    </mat-autocomplete>
+                  </div>
+                </div>
+              </ng-template>
+
+              <ng-container *ngIf="(process !== 'copy') || (process === 'copy' && recordId !== 'undefined')">
+                <div class="f-row dataset-tabs-headers"
+                  [ngStyle]="{'display': (relatedDatasets.length > 0 && (process !== 'copy' || (process === 'copy' && copyWithRelatedDatasets.value))) ? 'flex': 'none'}"
+                  #datasetsTabsHeaders>
+                  <lib-tab-group #matTabgroup disableRipple="true" [selectedIndex]="currentTabIndex">
+                    <!-- Parent dataset -->
+                    <lib-tab label="">
+                      <div label>
+                        <lib-text-line [enableWrap]="false"
+                          libTooltip="{{ objectType && objectType.objectdesc ? objectType.objectdesc : 'Untitled' }}">
+                          {{ objectType && objectType.objectdesc ? objectType.objectdesc : 'Untitled' }}
+                        </lib-text-line>
+                      </div>
+                    </lib-tab>
+
+                    <ng-template ngFor let-dataset [ngForOf]="relatedDatasets">
+                      <lib-tab label="">
+                        <div label class="dataset-label">
+                          <lib-text-line [enableWrap]="false"
+                            libTooltip="{{ dataset.childDescription || dataset.childDatasetId }}">
+                            <div class="section">
+                              {{ dataset.childDescription || dataset.childDatasetId }}
+                              {{ dataset.count }}
+                            </div>
+                          </lib-text-line>
+                        </div>
+                      </lib-tab>
+                    </ng-template>
+                  </lib-tab-group>
+                </div>
+                <div class="dataset-tab-content"
+                  [ngStyle]="{ height: 'calc(100% - ' + (relatedDatasets?.length ? '60' : '0') + 'px)' }">
+                  <ng-template [ngIf]="isLoading" [ngIfElse]="showTab">
+                    <lib-skeleton type="line"></lib-skeleton>
+                    <lib-skeleton type="line"></lib-skeleton>
+                    <lib-skeleton type="line"></lib-skeleton>
+                  </ng-template>
+                  <ng-template #showTab>
+                    <pros-transaction-dataset-tab [moduleId]="activeDatasetId" [layoutId]="activeLayoutId"
+                      [isChildDataset]="currentTabIndex !== 0" [recordId]="recordId" [process]="process" [crId]="crId"
+                      [dataEventId]="dataEventId" [dataControl]="dataControl" [relatedDatasets]="relatedDatasets" [flowId]="flowId"
+                      [stepId]="stepId" [sidebarToggleState]="!isChatEnabled" (characteristicChange)="onCharacteristicChange($event)">
+                    </pros-transaction-dataset-tab>
+                  </ng-template>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </mat-drawer-content>
+      </mat-drawer-container>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>

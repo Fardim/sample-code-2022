@@ -1,0 +1,16 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading">{{selectedUser ? selectedUser : 'Profile'}}</lib-text-line>
+      </div>
+    </div>
+  </div>
+  <div class="f-col sidesheetcontent-listing">
+    <div class="mdo-justify">
+      <pros-profile></pros-profile>
+    </div>
+  </div>
+</div>

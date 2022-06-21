@@ -1,0 +1,19 @@
+div.root {
+  height: 100%;
+
+  .breadcrum-toolbar {
+    align-items: center;
+    padding-top: 16px;
+
+    .display-heading-large {
+      font-size: 1.2rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  }
+
+  .filter-fields {
+    height: calc(100% - 52px - 16px * 2 - 36px);
+  }
+}

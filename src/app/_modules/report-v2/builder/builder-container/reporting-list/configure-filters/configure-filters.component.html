@@ -1,0 +1,241 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" iconFontType="light" icon="times" (click)="close()"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row">
+                <lib-text-line type="leading" weight="default" i18n="@@tableFilters">Table filters</lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button type="plain" icon="ellipsis-h"></lib-button>
+            </div>
+        </div>
+    </div>
+
+    <div class="f-row-spacer-half"></div>
+
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-row mdo-justify">
+            <div class="f-col table-filter-nav">
+                <mat-list>
+                    <mat-list-item *ngFor="let filter of filterCriteria;let i = index"
+                        [ngClass]="selectedFilter.fieldId === filter.fieldId ? 'selected': ''"
+                        (click)="onClickOnListItem(filter,i)" class="list-item">
+                        <lib-text-line type="base" class="text-line">{{ columnDescs[filter.fieldId] }}</lib-text-line>
+                        <div class="text-line" *ngIf="filter.conditionFieldValue || filter.conditionFieldStartValue || filter.conditionFieldEndValue">
+                            <ng-template
+                                [ngIf]=" getFormFieldType(filter.fieldId) === 'text' || getFormFieldType(filter.fieldId) === 'textarea' || getFormFieldType(filter.fieldId) === 'checkbox' || getFormFieldType(filter.fieldId) === false">
+                                <lib-text-line type="base" textColor="secondary">{{filter.conditionFieldValue}}
+                                </lib-text-line>
+                            </ng-template>         
+                            <ng-template [ngIf]="getFormFieldType(filter.fieldId) === 'number'">
+                                <lib-text-line type="base" textColor="secondary" *ngIf="!filter.conditionFieldStartValue">0 - {{filter.conditionFieldEndValue}}</lib-text-line>
+                                <lib-text-line type="base" textColor="secondary" *ngIf="filter.conditionFieldStartValue">{{filter.conditionFieldStartValue}} - {{filter.conditionFieldEndValue}}</lib-text-line>
+                            </ng-template>
+                            <ng-template [ngIf]="getFormFieldType(filter.fieldId) === 'time'">
+                                <lib-text-line type="base" textColor="secondary">
+                                    {{filter.conditionFieldStartValue.hours}}:{{filter.conditionFieldStartValue.minutes}}
+                                    -
+                                    {{filter.conditionFieldEndValue.hours}}:{{filter.conditionFieldEndValue.minutes}}
+                                </lib-text-line>
+                            </ng-template>
+                            <ng-template
+                                [ngIf]="(getFormFieldType(filter.fieldId) === 'date' || getFormFieldType(filter.fieldId) === 'dateTime')">
+                                <lib-text-line type="base" textColor="secondary">
+                                    {{getDateTypeValue(filter.conditionFieldStartValue)|dateFormatPipe:dateFormat}}
+                                    -
+                                    {{getDateTypeValue(filter.conditionFieldEndValue)|dateFormatPipe:dateFormat}}
+                                </lib-text-line>
+                            </ng-template>
+                            <ng-template
+                                [ngIf]="getFormFieldType(filter.fieldId) === 'dropdown'|| getFormFieldType(filter.fieldId) === 'radio'">
+                                <div class="subline-row">
+                                    <lib-text-line type="base" textColor="secondary"> {{ filter.conditionFieldValueText }}  </lib-text-line>
+                                </div>
+                            </ng-template>
+                            <ng-template
+                                [ngIf]="getFormFieldType(filter.fieldId) === 'multiselectDropdown'">
+                                <div class="subline-row" *ngIf="filterApplied[filter.fieldId].length">
+                                    <lib-text-line type="base" textColor="secondary"> {{filterApplied[filter.fieldId][0].TEXT}}  <span *ngIf="filter.conditionFieldValue.length > 1"> , +{{filter.conditionFieldValue.length-1}}</span> </lib-text-line>
+                                </div>
+                            </ng-template>
+                            <ng-template
+                                [ngIf]="getFormFieldType(filter.fieldId) === 'hierarchy'">
+                                <div class="subline-row" *ngIf="hierarchyFilterApplied[filter.fieldId].length">
+                                    <lib-text-line type="base" textColor="secondary"> {{hierarchyFilterApplied[filter.fieldId][0].TEXT}}  <span *ngIf="hierarchyFilterApplied[filter.fieldId].length > 1"> , +{{hierarchyFilterApplied[filter.fieldId].length-1}}</span> </lib-text-line>
+                                </div>
+                            </ng-template>
+                        </div>
+                    </mat-list-item>
+                </mat-list>
+
+                <lib-section></lib-section>
+            </div>
+
+            <mat-divider vertical class="mat-divider"></mat-divider>
+
+            <div class="f-col table-value" *ngIf="filterCriteria && filterCriteria.length">
+                <div class="f-row">
+                    <lib-text-line type="base" weight="strong">{{columnDescs[selectedFilter.fieldId]}}
+                    </lib-text-line>
+                    <div class="f-spacer"></div>
+                    <lib-button-group>
+                        <lib-button type="major" i18n="@@apply" (click)="applyFilter()">Apply</lib-button>
+                    </lib-button-group>
+                </div>
+
+                <div class="f-row-spacer-half"></div>
+
+                <div class="f-col"
+                    *ngIf="getFormFieldType(selectedFilter.fieldId) === 'dropdown' || getFormFieldType(selectedFilter.fieldId) === 'multiselectDropdown' || getFormFieldType(selectedFilter.fieldId) === 'radio' || getFormFieldType(selectedFilter.fieldId) === 'hierarchy' ">
+                    <lib-text-line type="small" weight="strong" class="field-label">Output Format</lib-text-line>
+                    <lib-segment [optionsList]="outputFormatList" (valueChange)="changeOutputFormat($event)"
+                        [ngModel]="selectedFieldMetaData.displayCriteria">
+                    </lib-segment>
+                    <div class="f-row-spacer-half"></div>
+                </div>
+
+                <div class="f-col" *ngIf="getFormFieldType(selectedFilter.fieldId) !== 'date' && getFormFieldType(selectedFilter.fieldId) !== 'dateTime' && getFormFieldType(selectedFilter.fieldId) !== 'time' && getFormFieldType(selectedFilter.fieldId) !== 'number'">
+                    <lib-text-line type="small" weight="strong" class="field-label">Rule</lib-text-line>
+                    <lib-segment [optionsList]="rulesList" (valueChange)="changeCondition($event)"
+                        [ngModel]="selectedFilter.conditionOperator ? selectedFilter.conditionOperator : 'EQUAL'">
+                    </lib-segment>
+                    <div class="f-row-spacer-half"></div>
+                </div>
+
+
+
+                <lib-section></lib-section>
+
+                <div class="f-row-spacer-half"></div>
+
+                <div class="f-row selectedchips"
+                    *ngIf="getFormFieldType(selectedFilter.fieldId) === 'multiselectDropdown' || getFormFieldType(selectedFilter.fieldId) === 'radio' || getFormFieldType(selectedFilter.fieldId) === 'dropdown'">
+                    <div *ngFor="let selected of filterApplied[this.selectedFilter.fieldId];let i = index">
+                        <lib-chip [selectable]="true" [removable]="true" class="lib-chip"
+                            (removed)="removedSelectedFilter(selected.CODE,i)">
+                            {{
+                            selected.TEXT }}</lib-chip>
+                    </div>
+                    <div class="f-row-spacer-half"></div>
+                </div>
+
+                <div class="f-row selectedchips"
+                    *ngIf="getFormFieldType(selectedFilter.fieldId) === 'hierarchy'">
+                    <div *ngFor="let selected of hierarchyFilterApplied[this.selectedFilter.fieldId];let i = index">
+                        <lib-chip [selectable]="true" [removable]="true" class="lib-chip"
+                            (removed)="removedSelectedHierarchyFilter(selected,i)">
+                            {{ selected.TEXT }}
+                        </lib-chip>
+                        <!-- <lib-chip *ngIf="hierarchyFilterApplied[this.selectedFilter.fieldId].length > 2 && i=='2'" class="lib-chip">
+                          +{{hierarchyFilterApplied[this.selectedFilter.fieldId].length-2}}
+                        </lib-chip> -->
+                    </div>
+                </div>
+
+                <!--multi select dropdown-->
+                <ng-container *ngIf="getFormFieldType(selectedFilter.fieldId) === 'multiselectDropdown'">
+                    <pros-form-multiselect [placeholder]="'Enter ' +columnDescs[selectedFilter.fieldId]"
+                        [displayCriteria]="selectedFieldMetaData.displayCriteria" (valueChange)="onChange($event.value)"
+                        [formFieldInfo]="getSelectedFieldMetaData(selectedFilter.fieldId)" isTableFilter="false"
+                        [control]="configurationFilterForm.get(selectedFilter.fieldId)"
+                        [value]="filterApplied[selectedFilter.fieldId]">
+                    </pros-form-multiselect>
+                </ng-container>
+
+                <!--for checkbox -->
+                <ng-template [ngIf]="getFormFieldType(selectedFilter.fieldId) === 'checkbox'">
+                    <pros-form-checkbox [control]="configurationFilterForm.get(selectedFilter.fieldId)"
+                        [placeholder]="'Enter '+columnDescs[selectedFilter.fieldId]"
+                        (valueChange)="onInputValueChange($event.value)" [formFieldId]="selectedFilter.fieldI"
+                        [label]="columnDescs[selectedFilter.fieldId]" isTableFilter="false">
+                    </pros-form-checkbox>
+                </ng-template>
+                <!--Single select drop down-->
+                <ng-container *ngIf="getFormFieldType(selectedFilter.fieldId)==='dropdown'">
+                    <pros-form-single-select [placeholder]="'Enter ' + columnDescs[selectedFilter.fieldId]"
+                        [displayCriteria]="selectedFieldMetaData.displayCriteria" (valueChange)="onChange($event.value)"
+                        [formFieldInfo]="getSelectedFieldMetaData(selectedFilter.fieldId)"
+                        [control]="configurationFilterForm.get(selectedFilter.fieldId)" [isTableFilter]="false">
+                    </pros-form-single-select>
+                </ng-container>
+                <!-- radio button group -->
+                <ng-template [ngIf]="getFormFieldType(selectedFilter.fieldId) === 'radio'">
+                    <pros-form-radio-button-group [placeholder]="'Enter '+columnDescs[selectedFilter.fieldId]"
+                        [displayCriteria]="selectedFieldMetaData.displayCriteria" (valueChange)="onChange($event.value)"
+                        [formFieldInfo]="getSelectedFieldMetaData(selectedFilter.fieldId)"
+                        [control]="configurationFilterForm.get(selectedFilter.fieldId)"
+                        isTableFilter="false">
+                    </pros-form-radio-button-group>
+                </ng-template>
+
+                <!--input type -->
+                <ng-template
+                    [ngIf]="getFormFieldType(selectedFilter.fieldId) === 'text' || getFormFieldType(selectedFilter.fieldId) === false">
+                        <lib-input [placeholder]="'Enter '+columnDescs[selectedFilter.fieldId]"
+                            (change)="onInputValueChange($event.target.value)"
+                            [formControl]="configurationFilterForm.get(selectedFilter.fieldId)">
+                        </lib-input>
+                </ng-template>
+
+                <!-- For text area -->
+                <ng-template [ngIf]="getFormFieldType(selectedFilter.fieldId) === 'textarea'">
+                    <pros-form-textarea [control]="configurationFilterForm.get(selectedFilter.fieldId)"
+                        [placeholder]="'Enter '+columnDescs[selectedFilter.fieldId]"
+                        (valueChange)="onInputValueChange($event.value)" [formFieldId]="selectedFilter.fieldId"
+                        isTableFilter="false"></pros-form-textarea>
+                </ng-template>
+
+                <!--for slider range picker-->
+                <ng-template [ngIf]="getFormFieldType(selectedFilter.fieldId) === 'number'">
+                    <pros-form-range-slider placeholder="X-XX" (valueChange)="rangeTypeValueChange($event)"
+                        [formFieldId]="selectedFilter.fieldId"
+                        [control]="configurationFilterForm.get(selectedFilter.fieldId)"
+                        [preSelectedValue]="getPreSelectedRangeValue(selectedFilter.fieldId)">
+                    </pros-form-range-slider>
+                </ng-template>
+
+                <!-- For date type -->
+                <ng-template [ngIf]="getFormFieldType(selectedFilter.fieldId) === 'date'">
+                    <div class="f-col" prosClickStopPropagation>
+                        <lib-date-range-picker [formControl]="configurationFilterForm.get(selectedFilter.fieldId)"
+                            (valueChange)="rangeTypeValueChange($event)" [emitDateOnSave]="true"
+                            [placeholder]="'Enter '+columnDescs[selectedFilter.fieldId]"
+                            [selectedDate]="getSelectedDateValue()">
+                        </lib-date-range-picker>
+                    </div>
+                </ng-template>
+
+                <!-- For date time picker -->
+                <ng-template [ngIf]="getFormFieldType(selectedFilter.fieldId) === 'dateTime'">
+                    <div class="f-col" prosClickStopPropagation>
+                        <lib-date-time-range-picker [formControl]="configurationFilterForm.get(selectedFilter.fieldId)"
+                            (valueChange)="rangeTypeValueChange($event)" [emitDateOnSave]="true"
+                            [placeholder]="'Enter '+columnDescs[selectedFilter.fieldId]"
+                            [selectedDate]="getSelectedDateValue()">
+                        </lib-date-time-range-picker>
+                    </div>
+                </ng-template>
+
+                <!-- For time picker -->
+                <ng-template [ngIf]="getFormFieldType(selectedFilter.fieldId) === 'time'">
+                    <div class="f-col" prosClickStopPropagation>
+                        <lib-time-range-picker [enableTimeInput]="true" [formControlName]="selectedFilter.fieldId"
+                            [emitDateOnSave]="true" (valueChange)="rangeTypeValueChange($event)"
+                            [selected]="getSelectedTimeValue()"
+                            [placeholder]="'Enter '+columnDescs[selectedFilter.fieldId]">
+                        </lib-time-range-picker>
+                    </div>
+                </ng-template>
+                
+                <!-- For hierarchy -->
+                <ng-template [ngIf]="getFormFieldType(selectedFilter.fieldId) === 'hierarchy'">
+                    <pros-hierarchy-filter-v2 [control]="configurationFilterForm.get(selectedFilter.fieldId)" 
+                        [placeholder]="'Enter '+columnDescs[selectedFilter.fieldId]"  isTableFilter="false"
+                        (valueChange)="onChange($event.value)" [displayCriteria]="selectedFieldMetaData.displayCriteria"
+                        [value]="filterApplied[selectedFilter.fieldId]" [fieldId]="selectedFilter.fieldId">
+                    </pros-hierarchy-filter-v2>
+                </ng-template>
+            </div>
+        </div>
+    </div>
+</div>

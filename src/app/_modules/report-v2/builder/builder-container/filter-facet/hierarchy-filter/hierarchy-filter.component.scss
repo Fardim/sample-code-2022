@@ -1,0 +1,76 @@
+.multicheck {
+  .menu-spacing {
+    padding: 12px;
+  }
+
+  .multiselect-checkbox {
+    max-height: 250px;
+    overflow-y: auto;
+    padding: 10px;
+
+    .nestedData {
+      padding: 5px 0;
+      width: 100%;
+
+      .button-flex {
+        display: flex;
+
+        .checkbox-flex {
+          flex-grow: 2;
+        }
+
+        .mat-menu-item {
+          width: 20px;
+          height: 35px;
+        }
+      }
+    }
+  }
+}
+
+.sideSheet-checkbox {
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 10px;
+
+  .sideSheet-nested {
+    padding: 5px 0;
+    width: 50%;
+
+    .sideSheet-button-flex {
+      display: flex;
+
+      .sideSheet-checkbox-flex {
+        flex-grow: 2;
+      }
+
+      .sideSheet-button-fl {
+        width: 20px;
+        height: 35px;
+      }
+    }
+  }
+
+  .nestedDataWidth {
+    padding: 5px 0;
+    width: 100%;
+
+    .sideSheet-button-flex {
+      display: flex;
+
+      .sideSheet-checkbox-flex {
+        flex-grow: 2;
+      }
+
+      .sideSheet-button-fl {
+        width: 20px;
+        height: 35px;
+      }
+    }
+  }
+}
+
+.multiselect-input {
+  display: flex;
+  margin-top: 10px;
+}

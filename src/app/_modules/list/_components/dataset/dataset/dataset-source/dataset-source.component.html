@@ -1,0 +1,90 @@
+<mat-card class="root mat-elevation-z0">
+  <div class="modal-wrapper">
+    <div class="f-row modal-header">
+      <lib-text-line type="leading" *ngIf="selectedDatasetId === 0" i18n="@@new_dataset">New dataset
+      </lib-text-line>
+      <lib-text-line type="leading" *ngIf="selectedDatasetId !== 0" i18n="@@update_dataset">Update dataset
+      </lib-text-line>
+      <lib-button type="plain" icon="times" iconFontType="light"
+        (click)="onCancelClick({toRefreshApis: false, moduleId: null})"></lib-button>
+    </div>
+
+    <div class="modal-body">
+      <div class="f-col dataset-list" *ngIf="true">
+        <div class="f-row dataset-palette">
+          <mat-card class="f-col mat-elevation-z0 cursor" (click)="openConnectors();">
+            <lib-text-line type="base" weight="strong" textColor="primary" enableWrap="true" i18n="@@connect_to">
+              Bring over
+            </lib-text-line>
+            <div class="f-row-spacer-half"></div>
+            <pros-svg-icon size="90" height="80" [viewBox]="'0 0 326 218'" icon="BRING_OVER">
+            </pros-svg-icon>
+            <div class="row-spacer"></div>
+            <lib-text-line type="small" textColor="secondary" enableWrap="true" i18n="@@connect_to_details">Bring your
+              data across from another system</lib-text-line>
+            <div class="row-spacer"></div>
+            <lib-text-line class="cursor" type="base" textColor="link" i18n="@@select" (click)="openConnectors();">
+              Select
+            </lib-text-line>
+          </mat-card>
+
+          <mat-card class="f-col mat-elevation-z0 cursor" [matMenuTriggerFor]="importDatasetOption">
+            <lib-text-line type="base" weight="strong" textColor="primary" enableWrap="true" i18n="@@load_from_file">
+              Load
+              from file
+            </lib-text-line>
+            <div class="f-row-spacer-half"></div>
+            <pros-svg-icon size="80" height="80" [viewBox]="'0 0 305 224'" icon="LOAD_FILE">
+            </pros-svg-icon>
+            <div class="row-spacer"></div>
+            <lib-text-line type="small" textColor="secondary" enableWrap="true" i18n="@@load_from_file_details">Create
+              a dataset by uploading a file with data</lib-text-line>
+            <div class="row-spacer"></div>
+            <lib-text-line class="cursor" type="base" textColor="link" i18n="@@select"
+              [matMenuTriggerFor]="importDatasetOption">
+              Select <mat-icon fontSet="mdo-icons-solid" class="plain-icon">caret-down</mat-icon>
+            </lib-text-line>
+            <mat-menu #importDatasetOption="matMenu" class="navigation-menu">
+              <button mat-menu-item (click)="uploadAFile();">
+                Import data file
+              </button>
+              <input type="file" #file_attach style="display: none;" />
+              <button mat-menu-item (click)="importFrmCKH()">
+                Import dataset
+              </button>
+            </mat-menu>
+          </mat-card>
+
+          <mat-card class="f-col mat-elevation-z0 cursor" [matMenuTriggerFor]="typesMenu">
+            <div class="f-row">
+              <lib-text-line type="base" weight="strong" textColor="primary" enableWrap="true" i18n="@@create_manually">
+                Create manually </lib-text-line> &nbsp;
+              <mat-icon fontSet="mdo-icons-light" class="plain-icon">question-circle</mat-icon>
+            </div>
+            <div class="f-row-spacer-half"></div>
+            <pros-svg-icon size="60" height="80" [viewBox]="'0 0 220 233'" icon="CREATE">
+            </pros-svg-icon>
+            <div class="row-spacer"></div>
+            <lib-text-line type="small" textColor="secondary" enableWrap="true" i18n="@@create_manually_details">Create
+              a dataset by defining its content manually</lib-text-line>
+            <div class="row-spacer"></div>
+            <lib-text-line type="base" textColor="link" [matMenuTriggerFor]="typesMenu" class="cursor"> Select
+              <mat-icon fontSet="mdo-icons-solid" class="plain-icon">caret-down</mat-icon>
+            </lib-text-line>
+            <mat-menu #typesMenu="matMenu" class="navigation-menu">
+              <button mat-menu-item (click)="openManualForm(type.value);" formTypes *ngFor="let type of datasetTypes">
+                {{ type?.key }}
+              </button>
+            </mat-menu>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+
+    <div class="f-row modal-footer space-between">
+      <lib-button type="plain" width="80px" (click)="onCancelClick({toRefreshApis: false, moduleId: null})"
+        i18n="@@cancel">Cancel
+      </lib-button>
+    </div>
+  </div>
+</mat-card>

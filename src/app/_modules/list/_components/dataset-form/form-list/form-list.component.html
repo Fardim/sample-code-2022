@@ -1,0 +1,256 @@
+<cdk-virtual-scroll-viewport [ngStyle]="{'height': '100%'}" itemSize="50" prosInfiniteScroll bufferPercentage="20">
+  <div class="root">
+    <div class="f-row-spacer-half"></div>
+    <div class="f-row" *ngIf="!showSkeleton; else showToolbarLoader">
+      <lib-text-line type="leading">Forms</lib-text-line>
+      <div class="f-spacer"></div>
+      <lib-button-group>
+        <lib-button type="minor" iconFontType="solid" icon="caret-down" [matMenuTriggerFor]="newFormtypeMenu">New form
+        </lib-button>
+        <lib-button type="minor" [matMenuTriggerFor]="moreactionfile" icon="ellipsis-h"></lib-button>
+      </lib-button-group>
+      <mat-menu #newFormtypeMenu="matMenu" class="navigation-menu">
+        <button mat-menu-item (click)="formTypeSelected(type)" formTypes *ngFor="let type of formTypes">
+          {{ type?.name }}
+        </button>
+      </mat-menu>
+      <mat-menu #moreactionfile="matMenu" class="navigation-menu">
+        <button mat-menu-item i18n="@@export_to_csv">Export to CSV</button>
+        <button mat-menu-item i18n="@@import_from_csv">Import from CSV</button>
+      </mat-menu>
+    </div>
+
+    <ng-template #showToolbarLoader>
+      <pros-toolbar-skeleton></pros-toolbar-skeleton>
+    </ng-template>
+
+    <div class="f-row-spacer-half"></div>
+
+    <pros-form-nullstate [moduleId]="moduleId" *ngIf="!formListHasData && !dataLoaders.loadTable"></pros-form-nullstate>
+    <div class="f-row" *ngIf="formListHasData">
+      <lib-chip-list class="filters-list">
+        <lib-search class="lib-search" i18n-placeholder="@@search" placeholder="Search forms"
+        (valueChange)="searchFieldSub.next($event)">
+      </lib-search>
+        <lib-chip label="Type:" i18n-label="@@type" [matMenuTriggerFor]="typesMenu" type="info"
+          [removable]="selectedTypes.length != 0" (removed)="selectedTypes=[]; getTableData()">
+          {{ selectedTypes.length > 0 ? selectedTypes.join(', ') : 'All' }}
+        </lib-chip>
+        <lib-chip label="Modified by:" i18n-label="@@role" [matMenuTriggerFor]="modifiedbyMenu" type="info"
+          [removable]="selectedModifyby.length != 0" (removed)="selectedModifyby=[];getTableData()">
+          {{ selectedModifyby.length > 0 ? selectedModifyby.join(', ') : 'All' }}
+        </lib-chip>
+        <lib-chip label="Created by:" i18n-label="@@role" [matMenuTriggerFor]="createdbyMenu" type="info"
+          [removable]="selectedCreatedby.length != 0" (removed)="selectedCreatedby=[];getTableData()">
+          {{ selectedCreatedby.length > 0 ? selectedCreatedby.join(', ') : 'All' }}
+        </lib-chip>
+        <lib-chip label="Modified on:" i18n-label="@@role" type="info" [removable]="dateModified!==0"
+          (removed)="dateModified=0;getTableData()">
+          <span *ngIf="dateModified">{{dateModified | date: MM:dd:YYYY }}</span>
+          <mat-icon fontSet="mdo-icons-light" [matMenuTriggerFor]="modifyDateMenu">calendar</mat-icon>
+        </lib-chip>
+        <lib-chip label="Created on:" i18n-label="@@role" type="info" [removable]="dateCreated!==0"
+          (removed)="dateCreated=0;getTableData()">
+          <span *ngIf="dateCreated">{{dateCreated | date: MM:dd:YYYY }}</span>
+          <mat-icon fontSet="mdo-icons-light" [matMenuTriggerFor]="createDateMenu">calendar</mat-icon>
+        </lib-chip>
+
+        <mat-menu #createDateMenu="matMenu" class="date-picker-menu navigation-menu">
+          <div class="f-col">
+            <lib-date-picker [ngClass]="{'no-date':dateCreated===0,'date-now':dateCreated!==0}" range="false"
+            enableTimeInput="false" hideInput="true" (valueChange)="createdateChanged($event)"></lib-date-picker>
+          </div>
+      </mat-menu>
+
+        <mat-menu #modifyDateMenu="matMenu" class="date-picker-menu navigation-menu">
+          <div class="f-col">
+            <lib-date-picker [ngClass]="{'no-date':dateModified===0,'date-now':dateModified!==0}" range="false"
+            enableTimeInput="false" hideInput="true" (valueChange)="modifydateChanged($event)"></lib-date-picker>
+          </div>
+      </mat-menu>
+
+        <mat-menu #typesMenu="matMenu" class="filter-menudropdown">
+          <lib-filter-dropdown class="chip-filters">
+            <div class="dropdown-options-wrapper f-col">
+              <div class="dropdown-options-inner-container">
+                <div class="default-options">
+                  <lib-filter-option prosClickStopPropagation>
+                    <lib-checkbox label="All" [checked]="selectedTypes.length == 0"
+                      (valueChange)="setSelectedFormType(null)"></lib-checkbox>
+                  </lib-filter-option>
+                  <lib-section></lib-section>
+                </div>
+                <div class="options">
+                  <lib-filter-option prosClickStopPropagation *ngFor="let type of formTypes">
+                    <lib-checkbox [label]="type?.name" prosClickStopPropagation
+                      [checked]="selectedTypes.indexOf(type.name) >= 0" (valueChange)="setSelectedFormType(type)">
+                    </lib-checkbox>
+                  </lib-filter-option>
+                </div>
+              </div>
+              <div class="filter-button-wrapper">
+                <lib-button type="minor" (click)="afterFilterMenuClosed()">Apply</lib-button>
+              </div>
+            </div>
+          </lib-filter-dropdown>
+        </mat-menu>
+
+        <mat-menu #modifiedbyMenu="matMenu" xPosition="after" class="filter-menudropdown">
+          <lib-filter-dropdown class="chip-filters">
+            <div class="dropdown-search-wrapper">
+              <lib-search #searchInput prosClickStopPropagation (valueChange)="searchModifyBySub.next($event)">
+              </lib-search>
+            </div>
+            <div class="dropdown-options-wrapper f-col">
+              <div class="dropdown-options-inner-container" prosInfiniteScroll bufferPercentage="20"
+                (scrollEnd)="modifybyScrollEnd()">
+                <div class="default-options">
+                  <lib-filter-option>
+                    <lib-checkbox label="All" (valueChange)="setSelectedModifyby(null)"></lib-checkbox>
+                  </lib-filter-option>
+                  <lib-section></lib-section>
+                </div>
+                <div class="options">
+                  <lib-filter-option prosClickStopPropagation *ngFor="let item of filteredmodifybyUsers">
+                    <lib-checkbox [label]="item.fname && item.lname ? item.fname + ' ' + item.lname : item.userName"
+                      prosClickStopPropagation [checked]="selectedModifyby.indexOf(item.userName) >= 0"
+                      (valueChange)="setSelectedModifyby(item)">
+                    </lib-checkbox>
+                  </lib-filter-option>
+                </div>
+              </div>
+              <div class="filter-button-wrapper">
+                <lib-button type="minor" (click)="afterFilterMenuClosed()">Apply</lib-button>
+              </div>
+            </div>
+          </lib-filter-dropdown>
+        </mat-menu>
+
+        <mat-menu #createdbyMenu="matMenu" xPosition="after" class="filter-menudropdown">
+          <lib-filter-dropdown class="chip-filters">
+            <div class="dropdown-search-wrapper">
+              <lib-search #searchCreatedInput prosClickStopPropagation (valueChange)="searchCreatedBySub.next($event)">
+              </lib-search>
+            </div>
+            <div class="dropdown-options-wrapper f-col">
+              <div class="dropdown-options-inner-container" prosInfiniteScroll bufferPercentage="20"
+                (scrollEnd)="createdbyScrollEnd()">
+                <div class="default-options">
+                  <lib-filter-option>
+                    <lib-checkbox label="All" i18n-label="@@all" (valueChange)="setSelectedCreatedby(null)">
+                    </lib-checkbox>
+                  </lib-filter-option>
+                  <lib-section></lib-section>
+                </div>
+                <div class="options">
+                  <lib-filter-option prosClickStopPropagation *ngFor="let item of filteredcreatedbyUsers">
+                    <lib-checkbox [label]="item.fname && item.lname ? item.fname + ' ' + item.lname : item.userName"
+                      prosClickStopPropagation [checked]="selectedCreatedby.indexOf(item.userName) >= 0"
+                      (valueChange)="setSelectedCreatedby(item)"></lib-checkbox>
+                  </lib-filter-option>
+                </div>
+              </div>
+              <div class="filter-button-wrapper">
+                <lib-button type="minor" (click)="afterFilterMenuClosed()">Apply</lib-button>
+              </div>
+            </div>
+          </lib-filter-dropdown>
+        </mat-menu>
+      </lib-chip-list>
+    </div>
+
+    <div class="f-row-spacer-half"></div>
+
+    <div class="f-col table-loader" *ngIf="dataLoaders.loadTable">
+      <lib-skeleton-table></lib-skeleton-table>
+    </div>
+    <div class="teams" [ngStyle]="{ display: showTableView ? 'none' : '' }">
+      <table #table [ngStyle]="{ display: showTableView ? 'none' : '' }" mat-table [dataSource]="dataSource"
+        class="mat-elevation-z0">
+        <!-- dynamic columns -->
+        <ng-template ngFor let-dynCol [ngForOf]="displayedColumns">
+          <ng-container [matColumnDef]="dynCol">
+            <th class="action-column" mat-header-cell *matHeaderCellDef>
+              <ng-container *ngIf="dynCol !=='action' ">
+              {{ getLabel(dynCol) }}
+            </ng-container>
+            </th>
+
+            <td mat-cell *matCellDef="let element" [ngClass]="{ 'action-cell': dynCol == 'action'}">
+              <div class="f-row" *ngIf="dynCol == 'labels'; else descriptionTemplate">
+                <lib-chip-list *ngIf="element[dynCol]">
+                  <ng-container *ngFor="let label of element[dynCol].split(',')">
+                    <lib-label text="{{ label }}" appearance="solid"></lib-label>
+                  </ng-container>
+                </lib-chip-list>
+              </div>
+
+              <ng-template #descriptionTemplate>
+                <div *ngIf="dynCol == 'description'; else dateTemplate" class="f-row">
+                  <lib-text-line (click)="gotoEditPage(element)" class="link-text" textColor="link" type="base">
+                    {{ element[dynCol] ? element[dynCol] : '' }}
+                  </lib-text-line>
+                </div>
+              </ng-template>
+
+              <ng-template #dateTemplate>
+                <lib-text-line type="base" enableWrap="true" *ngIf="dynCol == 'dateModified'; else typeTemplate">
+                  {{ element[dynCol] | date }}
+                </lib-text-line>
+              </ng-template>
+              <ng-template #typeTemplate>
+                <lib-text-line type="base" enableWrap="true" *ngIf="dynCol == 'type'; else actionCellTemplate">
+                  {{ getTypeName(element[dynCol]) }}
+                </lib-text-line>
+              </ng-template>
+              <ng-template #actionCellTemplate>
+                <div  *ngIf="dynCol == 'action'; else defaultCellTemplate" class="f-row">
+                  <lib-button type="plain" icon="ellipsis-h" (click)="$event.stopPropagation()"
+                    [matMenuTriggerFor]="actionMenu">
+                  </lib-button>
+                  <mat-menu #actionMenu="matMenu" class="navigation-menu">
+                    <button mat-menu-item i18n="@@edit" (click)="gotoEditPage(element)">Edit</button>
+                    <button mat-menu-item i18n="@@duplicate" (click)="duplicate(element)">Duplicate</button>
+                    <button mat-menu-item i18n="@@duplicate" (click)="openSideSheet(element)">Defaults and restrictions</button>
+                    <button mat-menu-item i18n="@@where_used">Where used</button>
+                    <lib-section></lib-section>
+                    <button mat-menu-item i18n="@@delete" (click)="delete(element.layoutId)">Delete</button>
+                  </mat-menu>
+                </div>
+              </ng-template>
+              <ng-template #defaultCellTemplate>
+                <lib-text-line type="base" enableWrap="true">
+                  {{ element[dynCol] ? element[dynCol] : '' }}
+                </lib-text-line>
+              </ng-template>
+            </td>
+          </ng-container>
+        </ng-template>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      </table>
+    </div>
+
+    <ng-container *ngIf="!showTableView">
+      <div class="f-row-spacer-half"></div>
+
+      <div class="f-row">
+        <lib-pagination [currentPageIndex]="recordsPageIndex" [totalCount]="totalCount" [pageSize]="recordsPageSize"
+          (pageChangeEvent)="onPageChange($event)">
+        </lib-pagination>
+        <lib-text-line type="base" enableWrap="true">
+          {{ displayedRecordsRange }}
+        </lib-text-line>
+      </div>
+    </ng-container>
+
+    <div class="f-col filtered-empty-state" *ngIf="!dataLoaders.hasFilteredData && !dataLoaders.loadTable && formListHasData">
+      <lib-empty-state
+      icon="search"
+      primaryText="Nothing to see here"
+      secondaryText="Your search did not return any results, try modifying your search">
+    </lib-empty-state>
+    </div>
+  </div>
+</cdk-virtual-scroll-viewport>

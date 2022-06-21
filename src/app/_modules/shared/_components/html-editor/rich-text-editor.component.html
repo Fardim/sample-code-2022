@@ -1,0 +1,9 @@
+<div class="f-col ql-container" #editorContainer [ngClass]="{ 'hide-toolbar': hideToolbar }">
+    <div [id]="tabFieldId" (click)="clickEditor($event,tabFieldId)"></div>
+    <ng-template [ngIf]="hideToolbar && !isReadOnly">
+        <div class="f-row editor-option">
+            <lib-button mat-icon-button matSuffix icon="pencil" iconFontType="light" (afterClick)="toggleToolbar()">
+            </lib-button>
+        </div>
+    </ng-template>
+</div>

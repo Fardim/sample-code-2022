@@ -1,0 +1,115 @@
+<div class="f-col sidesheetcontent-listing">
+
+    <form [formGroup]="classTypeForm">
+    
+        <div class="f-row breadcrum-toolbar">
+            <lib-button *ngIf="closable" type="plain" icon="times" iconFontType="light" (click)="closeDialog()"></lib-button>
+            <div class="col-spacer"></div>
+            <div class="f-col mdo-constrained-right">
+                <div class="f-row breadcrum-head">
+                    <lib-text-line type="leading" i18n="@@new_class_type">Translate Content</lib-text-line>
+                    <div class="f-spacer"></div>
+                    <lib-button width="80px" type="major" i18n="@@submit" (click)="save()">Translate</lib-button>
+                </div>
+            </div>
+        </div>
+
+
+        <div #messageContainer class="f-col mdo-justify">
+            <lib-banner *ngIf="submitError.status" status="error" [text]="submitError.message"></lib-banner>
+        </div>
+
+        <div class="f-col mdo-justify">
+            <div class="f-row-spacer-half"></div>
+            <div class="f-col">
+                <lib-text-line type="small" weight="strong">Current Language</lib-text-line>
+                <lib-input type="text" formControlName="currentLanguage" i18n="@@name"
+                    placeholder="English"
+                    [hint]="(classTypeForm.controls.currentLanguage.touched && classTypeForm.controls.currentLanguage.errors && classTypeForm.controls.currentLanguage.errors.required) ? 'This is a required field' : ''"
+                    [hasError]="classTypeForm.controls.currentLanguage.touched && classTypeForm.controls.currentLanguage.errors && classTypeForm.controls.currentLanguage.errors.required">
+                </lib-input>
+            </div>     
+
+            <div class="f-col">
+                <pros-dataset-search class="dataset-search"
+                    label="Class Types"
+                    tooltip="Showing class with description generator active"
+                    [isRequired]="true"
+                    formControlName="classTypes"
+                    i18n-label="@@class_types"
+                    labelKey="moduleName" valueKey="moduleId"
+                    [error]="(classTypeForm.controls.classTypes.touched && classTypeForm.controls.classTypes.errors && classTypeForm.controls.classTypes.errors.required) ? 'This is a required field' : ''"
+                    [hasError]="classTypeForm.controls.classTypes.touched && classTypeForm.controls.classTypes.errors && classTypeForm.controls.classTypes.errors.required"
+                    [availableOptions]="classTypesList"
+                    [multiCheck]="true"
+                    labelKey="label"
+                    valueKey="value"
+                    (selectionChange)="setClassTypes($event)">
+                </pros-dataset-search>
+              </div>
+                  
+
+        </div>
+
+        <div class="f-col mdo-justify">
+            <div class="f-row-spacer-half"></div>
+
+            <div class="f-col">
+                <pros-dataset-search class="dataset-search"
+                    [isRequired]="true"
+                    formControlName="languages"
+                    i18n-label="@@languages"
+                    label="Languages"
+                    labelKey="moduleName" valueKey="moduleId"
+                    [error]="(classTypeForm.controls.languages.touched && classTypeForm.controls.languages.errors && classTypeForm.controls.languages.errors.required) ? 'This is a required field' : ''"
+                    [hasError]="classTypeForm.controls.languages.touched && classTypeForm.controls.languages.errors && classTypeForm.controls.languages.errors.required"
+                    [availableOptions]="languagesList"
+                    [multiCheck]="true"
+                    labelKey="label"
+                    valueKey="value"
+                    (selectionChange)="setLangague($event)">
+                </pros-dataset-search>
+              </div>
+                  
+
+        </div>
+
+
+
+    </form>
+    
+    
+    <div class="f-col mdo-justify" *ngIf="translated">
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line weight="strong">Translating to</lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-text-line weight="strong">Status</lib-text-line>
+            </div>
+        </div>
+
+        <mat-divider _ngcontent-jnb-c652="" role="separator" class="mat-divider mat-divider-horizontal ng-tns-c201-38" aria-orientation="horizontal"></mat-divider>
+
+        <div class="f-col mdo-constrained-right h-40 pt-10">
+            <div class="f-row breadcrum-head">
+                <lib-text-line weight="strong">Spaish</lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-label text="TRANSLATED"  appearance="solid" status="success"></lib-label>
+            </div>
+        </div>
+
+        <div class="f-spacer"></div>
+        <mat-divider _ngcontent-jnb-c652="" role="separator" class="mat-divider mat-divider-horizontal ng-tns-c201-38" aria-orientation="horizontal"></mat-divider>
+
+        <div class="f-col mdo-constrained-right h-40 pt-10">
+            <div class="f-row breadcrum-head">
+                <lib-text-line weight="strong">Korean</lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-label text="INPROGRESS" appearance="solid" status="info"></lib-label>
+            </div>
+        </div>
+    </div>
+</div>
+
+

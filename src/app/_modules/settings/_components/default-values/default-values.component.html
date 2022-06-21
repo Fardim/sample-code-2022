@@ -1,0 +1,104 @@
+<div class="f-row root">
+    <div class="f-col filter-list">
+        <div class="f-row breadcrum-toolbar">
+            <lib-text-line type="leading">My default</lib-text-line>
+        </div>
+        <div class="f-row-spacer-half"></div>
+        <lib-search placeholder="Search module"></lib-search>
+        <div class="f-row-spacer-half"></div>
+        <mat-list role="list" class="mdo-list">
+            <mat-list-item role="listitem">
+                <lib-text-line type="base">Customer</lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-text-line type="base" textColor="secondary">4</lib-text-line>
+            </mat-list-item>
+
+            <mat-list-item role="listitem">
+                <lib-text-line type="base">PO text</lib-text-line>
+            </mat-list-item>
+
+            <mat-list-item role="listitem">
+                <lib-text-line type="base">Vender</lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-text-line type="base" textColor="secondary">2</lib-text-line>
+            </mat-list-item>
+        </mat-list>
+    </div>
+    <div class="f-col filter-values">
+        <div class="f-row breadcrum-toolbar">
+            <lib-text-line type="leading">Customer</lib-text-line>
+        </div>
+        <div class="f-row-spacer-half"></div>
+        <div class="lib-tabgroup">
+            <lib-tab-group disableRipple="true">
+                <lib-tab label="Field">
+                    <ng-template>
+                        <lib-empty-state primaryText="Nothing to see here" icon="table" iconSize="100"
+                            secondaryText="You don't have any fields added. Would you like to add one?">
+                        </lib-empty-state>
+                    </ng-template>
+
+                    <div class="default-table">
+                        <table mat-table [dataSource]="dataSource" class="mat-elevation-z0">
+                            <!-- Field ID Column -->
+                            <ng-container matColumnDef="field_id">
+                                <th mat-header-cell *matHeaderCellDef> Field id </th>
+                                <td mat-cell *matCellDef="let element"> {{element.field_id}} </td>
+                            </ng-container>
+
+                            <!-- Field description Column -->
+                            <ng-container matColumnDef="field_description">
+                                <th mat-header-cell *matHeaderCellDef> Field description </th>
+                                <td mat-cell *matCellDef="let element"> {{element.field_description}} </td>
+                            </ng-container>
+
+
+                            <!-- default-value Column -->
+                            <ng-container matColumnDef="default_value">
+                                <th mat-header-cell *matHeaderCellDef> Default value </th>
+                                <td mat-cell *matCellDef="let element">
+                                    <lib-input class="lib-input"></lib-input>
+                                </td>
+                            </ng-container>
+
+                            <!-- default-value Column -->
+                            <ng-container matColumnDef="condition">
+                                <th mat-header-cell *matHeaderCellDef> Default value </th>
+                                <td mat-cell *matCellDef="let element">
+                                    <lib-button type="plain" icon="link" iconFontType="light"></lib-button>
+                                </td>
+                            </ng-container>
+
+
+                            <!-- star Column -->
+                            <ng-container matColumnDef="star">
+                                <th mat-header-cell *matHeaderCellDef> </th>
+                                <td mat-cell *matCellDef="let element">
+                                    <lib-button type="plain" icon="trash-alt" iconFontType="light"></lib-button>
+                                </td>
+                            </ng-container>
+
+                            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        </table>
+                    </div>
+                    <div class="f-row-spacer-half"></div>
+                    <div class="f-row">
+                        <lib-pagination [totalCount]="200" [currentPageIndex]="1" [pageSize]="10"></lib-pagination>
+                        <div class="col-spacer"></div>
+                        <lib-text-line textColor="secondary">1-50 of 2456</lib-text-line>
+                    </div>
+                </lib-tab>
+
+                <lib-tab label="Form layout">
+                    <lib-empty-state class="f-row empty-state" primaryText="Nothing to see here" icon="order"
+                        iconSize="100" secondaryText="Notifications are not currently allowed">
+                        <lib-button type="minor">Allow
+                            form layout
+                        </lib-button>
+                    </lib-empty-state>
+                </lib-tab>
+            </lib-tab-group>
+        </div>
+    </div>
+</div>

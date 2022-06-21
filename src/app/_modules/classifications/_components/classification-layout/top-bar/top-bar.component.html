@@ -1,0 +1,29 @@
+<div class="f-row breadcrum-toolbar">
+  <lib-text-line type="leading">Classification</lib-text-line>
+  <span class="f-spacer"></span>
+  <lib-button-group>
+    <lib-button class="lib-button" type="minor" i18n="@@map_dimension" (click)="redirectToMapDimension()">Map dimension and UoM</lib-button>
+    <lib-button class="lib-button" type="minor" mat-button [matMenuTriggerFor]="menu" iconFontType="solid" icon="caret-down">
+      <mat-icon mat-list-icon fontSet="mdo-icons-light">plus</mat-icon>
+    </lib-button>
+  </lib-button-group>
+  <mat-menu #menu="matMenu" class="navigation-menu">
+    <button mat-menu-item *ngFor="let item of options" [value]="item?.value" (click)="openDialog(item?.value, '')">
+      <div *ngIf="item?.label !== 'New class'">{{ item?.label }}</div>
+      <div *ngIf="item?.label === 'New class'" class="submenu" mat-menu-item [matMenuTriggerFor]="classTypeMenu">
+        {{ item?.label }}
+        <mat-menu #classTypeMenu>
+          <div class="row-spacer"></div>
+          <lib-search class="lib-search" placeholder="Search classification" prosClickStopPropagation
+            (valueChange)="searchSub.next($event)"></lib-search>
+          <cdk-virtual-scroll-viewport itemSize="10" #virtualScroll (scroll)="onScroll($event)"
+            class="viewport-scroll" prosInfiniteScroll>
+            <button mat-menu-item *ngFor="let obj of data" (click)="openDialog(item?.value, obj)">
+              {{ obj.className }}
+            </button>
+          </cdk-virtual-scroll-viewport>
+        </mat-menu>
+      </div>
+    </button>
+  </mat-menu>
+</div>

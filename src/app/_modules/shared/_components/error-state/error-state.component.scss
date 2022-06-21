@@ -1,0 +1,16 @@
+.state-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  width: 100%;
+  height: calc(100% - 44px);
+
+  .messages {
+    display: flex;
+  }
+
+  .cursor {
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,37 @@
+<ng-container [ngSwitch]="mode">
+  <div class="f-col mdo-field" *ngSwitchCase="'AUTOCOMPLETE_SEARCHBAR'">
+    <div class="mdo-field-input">
+      <input #locationSearch [placeholder]="placeholder" type="text" />
+      <mat-icon fontSet="mdo-icons-light" class="field-icon">search</mat-icon>
+    </div>
+  </div>
+  <div class="root geo-location-map" *ngSwitchCase="'MAP_MODAL'">
+    <div class="f-row breadcrum-toolbar" *ngIf="showModalHeader">
+      <lib-button type="plain" iconFontType="light" (click)="close(false)" icon="times"></lib-button>
+      <div class="col-spacer"></div>
+      <div class="f-col mdo-constrained-right">
+        <div class="f-row breadcrum-head">
+          <lib-text-line type="leading" i18n="@@save_filter_as">{{ modalTitle }}</lib-text-line>
+          <span class="f-spacer"></span>
+          <lib-button type="major" (click)="close(true)" i18n="@@save">Save</lib-button>
+        </div>
+      </div>
+    </div>
+    <div class="row-spacer"></div>
+    <div class="f-col sidesheetcontent-listing">
+      <div class="f-col mdo-justify">
+        <div class="f-col mdo-field">
+          <div class="mdo-field-input map-auto-complete">
+            <mat-icon fontSet="mdo-icons-light">search</mat-icon>
+            <input class="location-search" #locationSearch type="text" placeholder="Search location" />
+          </div>
+        </div>
+        <div class="f-col mdo-field" [hidden]="!showLocationMap">
+          <lib-text-line type="small" weight="strong" class="field-label">Geo location</lib-text-line>
+          <div class="f-row-spacer-half"></div>
+          <div id="map" #map class="geo-location-map"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

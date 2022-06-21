@@ -1,0 +1,39 @@
+<div class="root">
+  <ng-container>
+    <div class="f-row breadcrum-toolbar">
+      <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+      <lib-text-line type="leading" i18n="@@section_properties">Section properties</lib-text-line>
+    </div>
+
+    <div class="sidesheetcontent-listing">
+      <div class="f-col mdo-justify">
+        <form [formGroup]="sectionformGroup" *ngIf="sectionformGroup">
+          <div class="f-col">
+            <div class="f-col">
+              <lib-input matInput [formControl]="sectionformGroup.controls['tabText']" i18n-label="@@name" label="Name" [id]="'section_property_first_field'"
+              (valueChange)='onChangeNameValue($event)'
+                [hasError]="sectionformGroup.controls.tabText?.errors &&
+                (sectionformGroup.controls.tabText?.errors?.required || sectionformGroup.controls.tabText?.errors?.maxLength)"
+                >
+              </lib-input>
+            </div>
+            <div class="f-col mdo-field">
+              <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@section_state">Section state</lib-text-line>
+              <div class="mdo-field-input">
+                <input matInput placeholder="Section State" #optionsInput
+                  [matAutocomplete]="sectionStateAuto" formControlName='sectionState' />
+                <mat-autocomplete class="mdo-autocomplete" #sectionStateAuto="matAutocomplete"
+                  (optionSelected)="onChangeSetionState($event)">
+                  <mat-option class="mdo-option" *ngFor="let data of sectionStateList" [value]="data">{{ data }}</mat-option>
+                </mat-autocomplete>
+              </div>
+            </div>
+            <!-- <div class="f-col">
+              <lib-button iconPosition='before' icon="sliders-h" iconFontType="light" class="criteria" type="plain" (click)="openDisplayCriteriaSheet()"><span>Display criteria</span></lib-button>
+            </div> -->
+          </div>
+        </form>
+      </div>
+    </div>
+  </ng-container>
+</div>

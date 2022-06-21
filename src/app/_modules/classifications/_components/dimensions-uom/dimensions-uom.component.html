@@ -1,0 +1,94 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button *ngIf="closable" [disabled]="saving" type="plain" icon="times" iconFontType="light"
+      (afterClick)="closeDialog()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@dimensions_and_uom_mapping">Dimensions and UoM Mapping</lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-button-group>
+          <lib-button type="major" [disabled]="saving" width="80px" i18n="@@submit" (afterClick)="save()">Save
+          </lib-button>
+          <lib-button type="major" width="80px" i18n="@@sync_now" (click)="sync()">Sync now</lib-button>
+        </lib-button-group>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="mdo-justify">
+      <div *ngIf="loading" class="f-col">
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line"></lib-skeleton>
+      </div>
+
+      <div *ngIf="!loading && !dimensionsList?.length" class="f-row empty-block">
+        <lib-empty-state primaryText="Nothing to see here"
+          secondaryText="You don't have any dimensions yet. Would you like to create one?" icon="layout" iconSize="200">
+          <lib-button (afterClick)="addDimension()" type="minor" i18n="@@new_dimension">New dimension</lib-button>
+        </lib-empty-state>
+      </div>
+
+      <div *ngIf="!loading && dimensionsList?.length" class="f-row container">
+        <div class="nav-container">
+          <div class="f-row">
+            <lib-text-line type="leading" i18n="@@dimensions_uom">Dimensions</lib-text-line>
+            <span class="f-spacer"></span>
+            <lib-button type="plain" iconFontType="light" icon="plus" (click)="addDimension()"></lib-button>
+          </div>
+
+          <div class="f-row-spacer-half"></div>
+          <mat-list role="list" class="mdo-list">
+            <mat-list-item role="listitem" class="list-item" *ngFor="let dimension of dimensionsList; let i = index"
+              [class.selected]="dimension === selectedDimension" (click)="setSelectedDimension(dimension)">
+              <div class="f-row list-items">
+                <lib-text-line *ngIf="!isInputVisible" type="base" enableWrap="true">{{ dimension.description }}
+                </lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button type="plain" icon="ellipsis-h" [matMenuTriggerFor]="options"></lib-button>
+                <mat-menu #options class="navigation-menu">
+                  <button mat-menu-item i18n="@@edit" (click)="edit(dimension)">
+                    Edit
+                  </button>
+                  <lib-section></lib-section>
+                  <button mat-menu-item i18n="@@delete" (click)="delete(i)">
+                    Delete
+                  </button>
+                </mat-menu>
+              </div>
+            </mat-list-item>
+          </mat-list>
+        </div>
+        <div class="f-col language-container">
+          <div class="f-col" *ngIf="selectedDimension">
+            <div class="f-row col-heading">
+              <lib-text-line type="leading">{{ selectedDimension.description }}</lib-text-line>
+            </div>
+            <div class="f-row-spacer-half"></div>
+            <div class="f-col mdo-field">
+              <lib-text-line type="base" weight="strong" i18n="@@uom">UoM</lib-text-line>
+              <div class="mdo-field-input">
+                <mat-chip-list #chipList></mat-chip-list>
+                <lib-chip-list>
+                  <lib-chip *ngFor="let val of uomList; let i=index" [removable]="true" (removed)="remove(i)">{{val}}
+                  </lib-chip>
+                  <input matInput label="UoM" type="text" i18n="@@uom" [matChipInputFor]="chipList"
+                    [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
+                    (matChipInputTokenEnd)="addDimUoM($event)" />
+                </lib-chip-list>
+              </div>
+              <mat-label>
+                <lib-text-line type="small" textColor="secondary">Type and hit enter to add multiple values</lib-text-line></mat-label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+</div>

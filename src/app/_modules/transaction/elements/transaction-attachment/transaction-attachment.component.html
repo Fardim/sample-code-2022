@@ -1,0 +1,43 @@
+<div class="f-row">
+    <lib-checkbox
+    [formControl]="copyField"
+    *ngIf="process === 'copy'"
+    class="copy-box"
+    ></lib-checkbox>
+
+  <div class="root f-col mdo-field">
+      <lib-banner *ngIf="errorMsg" status="error" [text]="errorMsg"></lib-banner>
+      <lib-text-line type="xsmall" class="field-label" weight="strong">{{fieldObj?.fieldCtrl?.description}}<span class="mandatory">{{isRequired ? '*' : ''}}</span></lib-text-line>
+      <ng-container *ngIf="isFileLoadingInProgress">
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line-half"></lib-skeleton>
+      </ng-container>
+      <ng-container *ngIf="!isFileLoadingInProgress">
+        <input class="drag-input" type="file" id="uploader" #uploadClick style="display: none"
+            [multiple]="multiSelect"
+            (change)="fileChange($event.target.files)" prosClickStopPropagation />
+        <div class="f-col upload-col" (click)="!isFieldReadOnly ? uploadClick.click(): 0;" *ngIf="!dataSource?.length">
+            <lib-text-line type="base" textColor="secondary">
+                Drag files here or <span class="input-link">browse</span> to upload
+            </lib-text-line>
+        </div>
+
+      <div class="attachment-listrow">
+          <ng-container *ngFor="let file of dataSource;let index = index">
+              <div class="f-col attachment-section">
+                  <div class="f-row">
+                    <img [src]="getAttachmentIcon(file.name)" class="attachment-icon" />
+                    <lib-text-line (click)="downloadFile(file?.docid, file?.name)" type="base" [libTooltip]="file.name" matTooltipPosition="below" [matTooltipDisabled]="file.name.length < 25">
+                      {{ file.name | slice:0:25 }} <span *ngIf="file.name.length > 25">...</span>
+                    </lib-text-line>
+                    <lib-button class="lib-button" *ngIf="!isFieldReadOnly" icon="times" iconFontType="light" type="plain"
+                      (afterClick)="removeSelectedFile(file)"></lib-button>
+                  </div>
+              </div>
+          </ng-container>
+          <lib-button *ngIf="multiSelect && dataSource?.length && !isFieldReadOnly" type="plain" iconFontType="light" icon="plus"
+              (afterClick)="uploadClick.click()"></lib-button>
+      </div>
+    </ng-container>
+</div>
+

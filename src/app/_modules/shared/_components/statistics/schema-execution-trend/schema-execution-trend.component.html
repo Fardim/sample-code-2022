@@ -1,0 +1,13 @@
+<div class="root">
+    <ng-container *ngIf="!hideLabel">
+        <div class="f-row">
+            <lib-text-line type="leading" i18n="@@schema_execution_trends">Schema execution trends</lib-text-line>
+        </div>
+        <div class="row-spacer"></div>
+    </ng-container>
+    <div class="f-col excution-chart">
+        <canvas baseChart [datasets]="dataSet" [labels]="dataSetLabels" 
+            [options]="chartOptions">
+        </canvas>
+    </div>
+</div>

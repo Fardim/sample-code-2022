@@ -1,0 +1,69 @@
+<div class="root">
+    <div class="f-row-spacer-half"></div>
+  <div class="fld-val-blk f-row" [formGroup]="fieldValuesGrp">
+    <!-- Field 1 -->
+    <div class="f-col mdo-field" [class.half]="selectedFields.length === 2">
+      <div class="mdo-field-input" [class.invalid]="submitted && !isFieldValid('field1Val')">
+        {{ Selected1 }}
+        <input matInput placeholder="Type to search" #optionsInput1 formControlName="field1Val" [matAutocomplete]="auto1" />
+        <mat-autocomplete
+          class="mdo-autocomplete"
+          #auto1="matAutocomplete"
+          (optionSelected)="selectSingle($event, 'f1')"
+          [displayWith]="displayFn.bind(this)"
+        >
+          <mat-option class="mdo-option" *ngFor="let opt of filteredField1Values | async" [value]="opt">
+            {{ opt.text }}
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+      <!-- hint -->
+      <!-- <mat-hint class="mdo-field-hint">This is an example hint</mat-hint> -->
+    </div>
+
+    <!-- Field 2 -->
+    <div class="f-col mdo-field" [class.half]="selectedFields.length === 2">
+      <div class="mdo-field-input" [class.invalid]="submitted && !isFieldValid('field2Val')">
+        {{ Selected2 }}
+        <input matInput placeholder="Type to search" #optionsInput2 formControlName="field2Val" [matAutocomplete]="auto2" />
+        <mat-autocomplete
+          class="mdo-autocomplete"
+          #auto2="matAutocomplete"
+          (optionSelected)="selectSingle($event, 'f2')"
+          [displayWith]="displayFn.bind(this)"
+        >
+          <mat-option class="mdo-option" *ngFor="let opt of filteredField2Values | async" [value]="opt">
+            {{ opt.text }}
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+      <!-- hint -->
+      <!-- <mat-hint class="mdo-field-hint">This is an example hint</mat-hint> -->
+    </div>
+
+    <!-- Field 3 -->
+    <div class="f-col mdo-field" *ngIf="selectedFields.length > 2">
+      <div class="mdo-field-input" [class.invalid]="submitted && !fieldValuesGrp.get('field3Val').value">
+        {{ Selected3 }}
+        <input matInput placeholder="Type to search" #optionsInput3 formControlName="field3Val" [matAutocomplete]="auto3" />
+        <mat-autocomplete
+          class="mdo-autocomplete"
+          #auto3="matAutocomplete"
+          (optionSelected)="selectSingle($event, 'f3')"
+          [displayWith]="displayFn.bind(this)"
+        >
+          <mat-option class="mdo-option" *ngFor="let opt of filteredField3Values | async" [value]="opt">
+            {{ opt.text }}
+          </mat-option>
+        </mat-autocomplete>
+      </div>
+      <!-- hint -->
+      <!-- <mat-hint class="mdo-field-hint">This is an example hint</mat-hint> -->
+    </div>
+
+    <!-- Delete Link -->
+    <div class="f-row mdo-field">
+      <lib-button (click)="deleteBlock()" type="plain" icon="trash-alt" prosClickStopPropagation></lib-button>
+    </div>
+  </div>
+</div>

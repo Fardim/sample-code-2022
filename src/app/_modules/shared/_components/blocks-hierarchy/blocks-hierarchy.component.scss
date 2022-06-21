@@ -1,0 +1,36 @@
+.hierarchy-blocks {
+  margin-bottom: 16px;
+  position: relative;
+  overflow: auto;
+  padding: 0 0 0 16px;
+
+  &::before {
+    display: block;
+    content: '';
+    height: 100%;
+    width: 1px;
+    position: absolute;
+    top: 0;
+    left: 60px;
+  }
+
+  .child-padding {
+    padding-left: 88px;
+    width: 648px;
+    position: relative;
+
+    &::before {
+      display: block;
+      content: '';
+      height: 100%;
+      width: 1px;
+      position: absolute;
+      top: -16px;
+      left: 130px;
+    }
+  }
+
+  .add-col {
+    margin-left: 26px;
+  }
+}

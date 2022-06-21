@@ -1,0 +1,11 @@
+div.root {
+  height: calc(100% - 80px);
+  justify-content: center;
+  text-align: center;
+
+  .dataset-button {
+    position: absolute;
+    bottom: 16px;
+    width: 100%;
+  }
+}

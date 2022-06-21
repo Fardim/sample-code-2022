@@ -1,0 +1,30 @@
+.root {
+  margin-bottom: 8px;
+
+  .extension-blocks {
+    padding: 8px;
+    border-radius: 3px;
+
+    .dropdown-section {
+      display: flex;
+      justify-content: space-between;
+
+      .mat-form-field {
+        width: 100%;
+      }
+
+      .attr-select {
+        .mat-option {
+          .mat-icon {
+            margin-right: 0;
+            vertical-align: text-bottom;
+          }
+        }
+      }
+
+      .uom-select {
+        width: 35%;
+      }
+    }
+  }
+}

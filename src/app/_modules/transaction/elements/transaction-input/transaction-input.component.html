@@ -1,0 +1,25 @@
+<div class="f-row">
+  <lib-checkbox
+    [formControl]="copyField"
+    *ngIf="process === 'copy'"
+    class="copy-box"
+    ></lib-checkbox>
+
+  <lib-input
+    class="w-100"
+    value=""
+    autocomplete="off"
+    [label]="fieldObj?.fieldCtrl?.description"
+    labelIcon="question-circle"
+    labelIconFont="mdo-icons"
+    [hint]="getHint"
+    [formControl]="control"
+    [hasError]="control.invalid && !control.pristine"
+    [disabled]="isFieldReadOnly"
+    [isRequired]="isRequired"
+    (afterBlur)="afterBlur()"
+    prosCorrectedValue
+    [displayValue]="oldValue"
+    useWith="withOutSuffix"
+  ></lib-input>
+</div>

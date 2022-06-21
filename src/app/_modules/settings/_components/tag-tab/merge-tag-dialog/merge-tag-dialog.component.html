@@ -1,0 +1,27 @@
+<div class="modal-wrapper">
+  <div class="f-row modal-header">
+    <lib-text-line type="leading" [enableWrap]="true" i18n="@@merge_tags">Merge tags</lib-text-line>
+    <lib-button icon="times" iconFontType="light" (click)="closeDialog(false)"></lib-button>
+  </div>
+  <div class="f-col modal-body">
+    <lib-banner [status]="banner.status" [text]="banner.merge_tags_banner"></lib-banner>
+    <div class="f-col">
+      <lib-input [formControl]="consolidatedTagName" type="text" placeholder="Consolidated tag name"
+        i18n-label="@@consolidated_tag_name" i18n-placeholder="@@consolidated_tag_name" label="Consolidated tag name"
+        [hint]="(consolidatedTagName.errors && consolidatedTagName.errors.required) ? 'This is a required field' : ''"
+        [hasError]="consolidatedTagName.errors && consolidatedTagName.errors.required"></lib-input>
+    </div>
+    <div class="f-row tag-wrapping">
+      <ng-container *ngFor="let tag of tags">
+        <lib-label text="{{ tag?.description }}" class="tag"></lib-label>
+        <div class="col-spacer"></div>
+      </ng-container>
+    </div>
+  </div>
+  <div class="f-row modal-footer">
+    <lib-button (click)="closeDialog(false)" i18n="@@cancel">Cancel</lib-button>
+    <div class="f-spacer"></div>
+    <lib-button type="major" (click)="mergeTags()" [disabled]="!consolidatedTagName || tags.length <= 0" i18n="@@merge">
+      Merge</lib-button>
+  </div>
+</div>

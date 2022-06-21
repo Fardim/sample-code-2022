@@ -1,0 +1,95 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button (click)="close()" icon="times" iconFontType="light" type="plain"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@new_configuration">{{ currentConfigDetails?.configurationTitle }}
+          configuration</lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="major" i18n="@@submit" width="80px" (afterClick)="submitConfiguration()">Submit</lib-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <lib-banner class="f-col" status="error" *ngIf="currentConfigDetails.showBanner">
+        <lib-text-line>
+          {{ currentConfigDetails.message || 'Please enter require field ' }}
+        </lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-button type="plain" icon="times" iconFontType="light" (click)="currentConfigDetails.showBanner = false">
+        </lib-button>
+      </lib-banner>
+
+      <form [formGroup]="samlConfigFormGroup">
+        <div class="f-col">
+          <lib-input formControlName="idpXmlUrl" [hasError]="
+              samlConfigFormGroup.controls.idpXmlUrl.touched &&
+              samlConfigFormGroup.controls.idpXmlUrl.errors &&
+              samlConfigFormGroup.controls.idpXmlUrl.errors.required
+            " label="IDP metadata url" [hint]="
+              samlConfigFormGroup.controls.idpXmlUrl.touched &&
+              samlConfigFormGroup.controls.idpXmlUrl.errors &&
+              samlConfigFormGroup.controls.idpXmlUrl.errors.required
+                ? 'This is a required field'
+                : ''
+            " (click)="showErrorBanner()" labelIconTooltip="The URL where MDO will send a SAML request to start the login sequence.
+            You can send login requests to the specified URL." labelIcon="question-circle"></lib-input>
+        </div>
+
+        <lib-section class="lib-section" [text]="'Or'"></lib-section>
+
+        <div class="f-col mdo-field">
+          <lib-text-line type="xsmall" weight="strong" class="field-label">IDP server token signing certificate
+          </lib-text-line>
+          <div class="mdo-field-input">
+            <textarea matInput formControlName="idpXml" placeholder="IDP metadata xml" [rows]="3" cdkTextareaAutosize
+              #autosize="cdkTextareaAutosize" (click)="showErrorBanner()">
+            </textarea>
+          </div>
+        </div>
+
+        <div class="f-col" formArrayName="rolesMappings">
+          <lib-text-line type="xsmall" weight="strong">Role mapping</lib-text-line>
+          <div class="f-row colunm-box" *ngFor="let role of rolesMappingsArray.controls; let i = index">
+            <div class="col col-x4">
+              <lib-input placeholder="Active directory role id" class="mdo-field"
+                [formControl]="rolesMappingsArray.controls[i].get('ADRole')"></lib-input>
+            </div>
+            <div class="col">
+              <mat-icon fontSet="mdo-icons-light">long-arrow-right</mat-icon>
+            </div>
+            <div class="col col-x4">
+              <div class="f-col mdo-field">
+                <div class="mdo-field-input">
+                  <input matInput placeholder="MDO roles" [matAutocomplete]="options" #roleInput
+                    [formControl]="rolesMappingsArray.controls[i].get('mdoRole')">
+                  <mat-icon matSuffix fontSet="mdo-icons" class="autocomplete-icon" prosClickStopPropagation
+                    (click)="roleInput.focus();">chevron-down</mat-icon>
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <lib-button type="plain" icon="trash-alt" iconFontType="light" (afterClick)="removeRow(i)"></lib-button>
+            </div>
+          </div>
+
+          <!-- auto complete for options -->
+          <mat-autocomplete [displayWith]="displayFn" class="mdo-autocomplete" #options="matAutocomplete">
+            <mat-option class="mdo-option" *ngFor="let role of roles$ | async" [value]="role">
+              {{ role.description || role.uuid }}
+            </mat-option>
+          </mat-autocomplete>
+
+          <div class="f-col">
+            <span class="f-row-spacer-half"></span>
+            <lib-text-line i18n="@@add_another" class="cursor" type="xsmall" textColor="link" (click)="addRow()">Add
+              another</lib-text-line>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

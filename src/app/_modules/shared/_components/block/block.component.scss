@@ -1,0 +1,96 @@
+.single-block {
+  .defined-row {
+    box-sizing: border-box;
+    border-width: 1px;
+    border-style: solid;
+    align-items: center;
+    height: 54px;
+    margin: 0 0 16px 0;
+    border-radius: 3px;
+
+    div.col {
+      display: block;
+      flex: 1;
+      min-width: 0;
+      position: relative;
+      padding: 0 8px;
+
+      &:first-of-type,
+      &:last-of-type {
+        min-width: auto;
+        flex: 0 0 auto;
+        padding: 0;
+      }
+
+      &.range-col {
+        flex: 2;
+      }
+
+      &.select-col {
+        width: 54px;
+        padding: 0 16px;
+        height: 54px;
+        align-items: center;
+        display: flex;
+        z-index: 1;
+        justify-content: center;
+        text-align: center;
+      }
+
+      .udr-change {
+        position: absolute;
+        left: -18px;
+      }
+    }
+  }
+
+  .single-dropdown {
+    input {
+      padding-right: 30px;
+    }
+
+    .arrow {
+      position: absolute;
+      top: 8px;
+      right: 5px;
+      font-size: 13px;
+    }
+  }
+
+  div.col.f-col.mdo-field {
+    margin-bottom: 0;
+  }
+
+  .value-ctrl {
+    height: 36px;
+  }
+
+  pros-udr-value-control {
+    display: flex;
+    flex: 1;
+  }
+}
+
+.field-badge {
+  height: 22px;
+  width: 22px;
+  z-index: 1;
+  top: -8px;
+  right: 11px;
+  position: absolute;
+  cursor: pointer;
+}
+
+.field-badge-dropdown {
+  padding: 12px 12px 0;
+}
+
+.range-col {
+  div {
+    display: flex;
+
+    .val-input {
+      margin-right: 8px;
+    }
+  }
+}

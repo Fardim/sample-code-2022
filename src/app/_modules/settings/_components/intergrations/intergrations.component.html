@@ -1,0 +1,40 @@
+<div class="root">
+    <div class="f-row-spacer-half"></div>
+    <div class="f-row">
+        <lib-text-line type="leading">Intergrations</lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-button type="minor">New intergration</lib-button>
+    </div>
+    <div class="row-spacer"></div>
+    <div class="f-row">
+        <mat-card class="mat-elevation-z0">
+            <img src="../../assets/images/X.png" width="135px" height="135px" />
+            <lib-section></lib-section>
+            <div class="f-row">
+                <lib-text-line type="base">Material excel</lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-button type="plain" icon="ellipsis-h" [matMenuTriggerFor]="intergration"></lib-button>
+                <mat-menu #intergration="matMenu" class="navigation-menu">
+                    <button mat-menu-item>Download excel connect template</button>
+                    <button mat-menu-item>Download excel connect Installer</button>
+                    <button mat-menu-item>Download excel connect template help</button>
+                </mat-menu>
+            </div>
+        </mat-card>
+        <div class="col-spacer"></div>
+        <mat-card class="mat-elevation-z0">
+            <img src="../../assets/images/T.png" width="135px" height="135px" />
+            <lib-section></lib-section>
+            <div class="f-row">
+                <lib-text-line type="base">Material excel</lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-button type="plain" icon="ellipsis-h" [matMenuTriggerFor]="intergration"></lib-button>
+                <mat-menu #intergration="matMenu" class="navigation-menu">
+                    <button mat-menu-item>Download excel connect template</button>
+                    <button mat-menu-item>Download excel connect Installer</button>
+                    <button mat-menu-item>Download excel connect template help</button>
+                </mat-menu>
+            </div>
+        </mat-card>
+    </div>
+</div>

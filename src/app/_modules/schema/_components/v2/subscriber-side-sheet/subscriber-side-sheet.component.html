@@ -1,0 +1,56 @@
+<ng-template [ngIf]="!showInviteTemplate" [ngIfElse]="inviteTemplate">
+    <div class="root">
+        <div class="f-row breadcrum-toolbar">
+            <lib-button type="plain" iconFontType="light" (click)="close()" icon="times"></lib-button>
+            <div class="col-spacer"></div>
+            <div class="f-col mdo-constrained-right">
+                <div class="f-row breadcrum-head">
+                    <lib-text-line type="leading" i18n="@@add_subscribers">Add collaborators</lib-text-line>
+                    <div class="f-spacer"></div>
+                    <!-- <lib-button (click)="openSubscriberInviteDialog()" iconPosition="before" icon="user-plus"> Invite people to your team </lib-button> -->
+                    <lib-button type="major" i18n="@@save" (click)="save()" width="80px">Save</lib-button>
+                </div>
+                <div class="f-row-spacer-half"></div>
+                <div class="f-row">
+                    <lib-search class="lib-search" (valueChange)="collabSearchSub.next($event)"
+                        i18n-placeholder="@@search_subscribers" placeholder="Search user"></lib-search>
+                    <!-- <mat-chip-list>
+                        <mat-chip class="mdo-filter-matchip">
+                            <label>Role:</label> <span class="info">{{(selectedRoleType)? selectedRoleType: 'All'}}</span>
+                        </mat-chip>
+                    </mat-chip-list> -->
+                </div>
+            </div>
+        </div>
+
+        <div class="f-col sidesheetcontent-listing">
+            <cdk-virtual-scroll-viewport itemSize="20" (scroll)="onScroll($event)" class="viewport-scroll">
+                <div class="f-col mdo-justify">
+                    <mat-list role="list" class="rule-list" *cdkVirtualFor="let subscriber of subscribers">
+                        <mat-list-item role="listitem">
+                            <div class="f-row">
+                                <lib-avatar [initials]="shortName(subscriber.fName, subscriber.lName) | uppercase">
+                                </lib-avatar>
+                                <span class="f-col-spacer-half"></span>
+                                <lib-text-line type="base">{{subscriber.fullName}}</lib-text-line>
+                            </div>
+                            <span class="f-spacer"></span>
+                            <ng-template [ngIf]="subscriber.isAdd===false" [ngIfElse]="checkButton">
+                                <lib-button width="80px" (click)="addSubscriber(subscriber)" type="minor"
+                                    i18n="@@add"> Add </lib-button>
+                            </ng-template>
+                            <ng-template #checkButton>
+                                <lib-button width="80px" (click)="uncheckSubscriber(subscriber)" type="minor"
+                                    icon="check"></lib-button>
+                            </ng-template>
+                        </mat-list-item>
+                    </mat-list>
+                </div>
+            </cdk-virtual-scroll-viewport>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #inviteTemplate>
+    <pros-subscriber-invite-sidesheet></pros-subscriber-invite-sidesheet>
+</ng-template>

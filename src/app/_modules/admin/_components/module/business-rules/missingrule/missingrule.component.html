@@ -1,0 +1,38 @@
+<div class="rulesfields">
+    <div class="f-col" [formGroup]="fillDataForm">
+        <mat-form-field appearance="outline">
+            <mat-label>Description</mat-label>
+            <input matInput autocomplete="off" formControlName="description">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Select Fields</mat-label>
+            <mat-chip-list #chipList aria-label="Module selection">
+                <mat-chip *ngFor="let module of groupDetailss" [selectable]="'true'" [removable]="'true'"
+                    (removed)="remove(module)">
+                    {{module.descr}}
+                    <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip>
+                <input matInput formControlName="selectFields" [matAutocomplete]="autoGroup"
+                    [matChipInputFor]="chipList" [matChipInputAddOnBlur]="'true'" (matChipInputTokenEnd)="add($event)" (click)="openPanel()"  
+                    #trigger="matAutocompleteTrigger" (keydown.enter)="$event.target.blur(); trigger.closePanel()">
+            </mat-chip-list>
+
+            <mat-autocomplete #autoGroup="matAutocomplete">
+                <div *ngFor="let group of moduleListData | async">
+                    <div *ngIf="group.length === 1" class="optionLeftSpace">
+                        <mat-option *ngFor="let name of group.names" [value]="name" (click)="onSelect(name)">
+                            {{name.fieldDescri}}
+                        </mat-option>
+                    </div>
+                    <mat-optgroup *ngIf="group.length > 1" [label]="group.letter">
+                        <mat-option *ngFor="let name of group.names" [value]="name" (click)="onSelect(name)">
+                            {{name.fieldDescri}}
+                        </mat-option>
+                    </mat-optgroup>
+                </div>
+            </mat-autocomplete>
+        </mat-form-field>
+    </div>
+</div>
+<div class="row-spacer"></div>

@@ -1,0 +1,53 @@
+<lib-button icon="plus" [rounded]="true" type="major" [matMenuTriggerFor]="datasearch"></lib-button>
+<div>
+  <mat-menu #datasearch="matMenu" (closed)="searchInput.clearSearch()">
+    <div class="dropdown-search-wrapper">
+      <lib-search #searchInput placeholder="Search" prosClickStopPropagation (valueChange)="searchSub.next($event)">
+      </lib-search>
+    </div>
+    <div class="dataset-list" style="max-height: 350px;">
+      <!-- BEGIN: JOINS / TRANSLATIONS -->
+      <mat-nav-list disableRipple class="dnd-task-search-list">
+        <mat-list-item *ngFor="let item of filteredItems | async;">
+          <div class="task-search-list-drag-el" (click)="selectTransJoin(item)">
+            <lib-text-line type="base">{{ item.desc }}</lib-text-line>
+          </div>
+        </mat-list-item>
+      </mat-nav-list>
+      <!-- END: JOINS / TRANSLATIONS -->
+      <mat-expansion-panel height="400px" *ngFor="let moduleState of filteredModulesState | async;"
+        [id]="moduleState.module.moduleId" hideToggle="false" togglePosition="before" class="mat-elevation-z0"
+        [expanded]="false">
+        <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px" prosExpansionPanelToggleHandler
+          prosClickStopPropagation (click)="openMenu(moduleState)">
+          <mat-panel-title>
+            <!-- <mat-icon>{{ 'keyboard_arrow_right'}}</mat-icon> -->
+            <lib-text-line type="base" class="expand-title" prosExpansionPanelToggleHandler>{{
+              moduleState.module.moduleDesc }}
+            </lib-text-line>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <ng-container *ngIf="moduleState.moduleItems">
+          <mat-nav-list disableRipple class="dnd-task-search-list">
+            <mat-list-item>
+              <div class="task-search-list-drag-el"
+                (click)="selectHeaders(moduleState.module, moduleState.moduleItems.headers)">
+                <lib-text-line type="base">Header</lib-text-line>
+              </div>
+            </mat-list-item>
+            <mat-list-item *ngFor="let hierarchy of moduleState.moduleItems.hierarchy">
+              <div class="task-search-list-drag-el" (click)="selectHierarchy(moduleState.module, hierarchy)">
+                <lib-text-line type="base">{{hierarchy.heirarchyText}}</lib-text-line>
+              </div>
+            </mat-list-item>
+            <mat-list-item *ngFor="let grid of moduleState.moduleItems.grids">
+              <div class="task-search-list-drag-el" (click)="selectGrid(moduleState.module, grid)">
+                <lib-text-line type="base">{{grid.fieldDescri}}</lib-text-line>
+              </div>
+            </mat-list-item>
+          </mat-nav-list>
+        </ng-container>
+      </mat-expansion-panel>
+    </div>
+  </mat-menu>
+</div>

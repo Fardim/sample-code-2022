@@ -1,0 +1,52 @@
+<div class="root">
+  <pros-toolbar-skeleton *ngIf="showSkeleton"></pros-toolbar-skeleton>
+  <pros-top-bar  *ngIf="!showSkeleton"></pros-top-bar>
+  <div class="f-row classification-container" [ngClass]="{ flexStart: classTypeId || classId}">
+    <pros-nav-bar [loader]="showSkeleton" [selectedDataSet]="selectedDataSet?.moduleId || ''" (selectedNode)="selectedNode($event)"></pros-nav-bar>
+    <div  class="f-col container">
+      <div class="f-row">
+        <lib-chip-list  *ngIf="!showSkeleton">
+          <lib-chip type="info" class="mdo-filter-matchip" disableRipple="true" label="Dataset:">
+            <div class="f-row">
+              <div [matMenuTriggerFor]="datasetDrop">{{ selectedDataSet?.moduleDesc }}</div>
+              <lib-button *ngIf="selectedDataSet?.moduleId" stopPropagation type="plain" icon="times" iconFontType="light" (click)="onDatasetSelect({ moduleId: '', moduleDesc: 'All' })"></lib-button>
+            </div>
+          </lib-chip>
+        </lib-chip-list>
+        <mat-menu #datasetDrop="matMenu" xPosition="after" class="classification-layout filter-menudropdown">
+          <lib-filter-dropdown class="chip-filters">
+            <div class="dropdown-search-wrapper">
+              <lib-search prosClickStopPropagation placeholder="Search..."  (valueChange)="searchSub.next($event)"></lib-search>
+           </div>
+           <div class="dropdown-options-wrapper f-col">
+            <div class="dropdown-options-inner-container">
+              <cdk-virtual-scroll-viewport itemSize="10" (scroll)="onScroll($event)" class="viewport-scroll">
+                <button mat-menu-item [(value)]="selectedDataSet" (click)="onDatasetSelect({ moduleId: '', moduleDesc: 'All' })" i18n="@@all">
+                  All
+                </button>
+                <button mat-menu-item *ngFor="let item of moduleList" [(value)]="selectedDataSet"
+                  [innerHTML]="item?.moduleDesc | highlight: searchString" (click)="onDatasetSelect(item)">
+                  {{item?.moduleDesc}}
+                </button>
+              </cdk-virtual-scroll-viewport>
+            </div>
+            </div>
+          </lib-filter-dropdown>
+        </mat-menu>
+      </div>
+      <div class="f-row-spacer-half"></div>
+      <div class="f-col class-data" >
+        <lib-skeleton-vertical-table *ngIf="showSkeleton"></lib-skeleton-vertical-table>
+        <ng-template [ngIf]="!classTypeId && !classId && !showSkeleton">
+          <pros-empty-view></pros-empty-view>
+        </ng-template>
+        <ng-template [ngIf]="classTypeId && !showSkeleton">
+          <pros-class-type-detail [classTypeId]="classTypeId"></pros-class-type-detail>
+        </ng-template>
+        <ng-template [ngIf]="classId && !showSkeleton">
+          <pros-class [classId]="classId"></pros-class>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

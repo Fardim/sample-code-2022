@@ -1,0 +1,16 @@
+.lib-input {
+  .mdo-field {
+    margin-bottom: 0;
+
+    .mdo-field-input {
+      border: none;
+      background: transparent;
+      min-height: 55px;
+
+      input {
+        background: transparent;
+        padding: 0;
+      }
+    }
+  }
+}

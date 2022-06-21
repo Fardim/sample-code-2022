@@ -1,0 +1,431 @@
+<div class="f-col root" *ngIf="dataExist && !isLoaderAvailable">
+    <div class="f-row breadcrum-toolbar">
+        <ng-template [ngIf]="isFromSideSheet === 'true'">
+            <lib-button icon="times" iconFontType="light" (click)="close()" class="s-close"></lib-button>
+        </ng-template>
+        <ng-template [ngIf]="!isReport">
+            <lib-text-line type="leading" enableWrap="true">
+                {{ objectType && objectType.objectInfo ? objectType.objectInfo: 'Untitled' }} - {{ currentView.viewName
+                ||
+                'Default view' }}
+            </lib-text-line>
+            <lib-button type="plain" iconFontType="solid" [matMenuTriggerFor]="menu" icon="caret-down"></lib-button>
+            <mat-menu #menu="matMenu" class="navigation-menu">
+                <div class="menu-customdropdown" prosInfiniteScroll bufferPercentage="20"
+                    (scrollEnd)="getViewsList(true)">
+                    <button mat-menu-item *ngFor="let userView of userViews"
+                        (click)="getViewDetails(userView.viewId,true)">
+                        {{ userView.viewName }}
+                    </button>
+                    <lib-section text="System views" class="lib-section" *ngIf="systemViews && systemViews.length">
+                    </lib-section>
+                    <button mat-menu-item (click)="getViewDetails(systemView.viewId,true)"  *ngFor="let systemView of systemViews">
+                        {{ systemView.viewName }}
+                    </button>
+                    <lib-section *ngIf="userViews.length || systemViews.length" class="lib-section"></lib-section>
+                </div>
+                <button mat-menu-item (click)="openTableViewSettings()" i18n="@@new_view">New view</button>
+            </mat-menu>
+        </ng-template>
+        <span class="f-col-spacer-half"></span>
+        <span class="f-spacer"></span>
+        <lib-button *ngIf="isFromSideSheet === 'true'" type="major" width="80px" i18n="@@save" (click)="saveData();">Save</lib-button>
+        <ng-template [ngIf]="isFromSideSheet !== 'true' && !isReport">
+            <div class="f-row" image="assets\images\learning.svg" (click)="startHelp()">
+                <img width="38px" src="assets/images/learning.svg" aria-hidden="true">
+            </div>
+            <span class="f-col-spacer-half"></span>
+            <span class="col-spacer"></span>
+            <lib-button-group>
+                <lib-button type="minor" width="100px" [matMenuTriggerData]="{triggerFrom: 'create'}"
+                    [matMenuTriggerFor]="flowNavigationList" (menuOpened)="getFlowListOptions('1')" iconFontType="solid"
+                    icon="caret-down">New record
+                </lib-button>
+                <lib-button type="minor" (click)="openDataListObjectSetting()">
+                    Forms and rules
+                </lib-button>
+                <lib-button type="minor" icon="pencil-alt" iconFontType="light" ico matTooltip="Edit dataset"
+                    (click)="openFieldEditPopup()">
+                </lib-button>
+                <lib-button type="minor" [matMenuTriggerFor]="navigation" icon="ellipsis-h">
+                </lib-button>
+                <mat-menu #navigation="matMenu" class="navigation-menu">
+                    <button mat-menu-item (click)="openFieldReadOnlyPopup()"> Dataset view
+                    </button>
+                    <button mat-menu-item (click)="openTableViewSettings(true)" i18n="@@configure_view"> Configure view
+                    </button>
+                    <button mat-menu-item (click)="exportDatasetConfirmation()" i18n="@@export_dataset">
+                        Export dataset
+                    </button>
+                    <button mat-menu-item (click)="publichDatatset()" i18n="@@publish_dataset">
+                        Publish dataset
+                    </button>
+                    <button mat-menu-item (click)="_exportExcelAddIn()" i18n="@@export_excel_addin">
+                        Export in excel
+                    </button>
+                    <lib-section></lib-section>
+                    <button mat-menu-item (click)="deleteView(currentView.viewId)" i18n="@@delete_view"
+                        [disabled]="currentView.viewId === 'default'" *ngIf="!currentView.isSystemView"> Delete view
+                    </button>
+                </mat-menu>
+            </lib-button-group>
+        </ng-template>
+    </div>
+
+    <lib-banner *ngIf="bannerErrorText" [text]="bannerErrorText" status="error"></lib-banner>
+    <lib-banner *ngIf="bannerSuccessText" [text]="bannerSuccessText" status="success"></lib-banner>
+
+    <div class="f-col" [ngClass]="{
+            'sidesheetcontent-listing' : isFromSideSheet === 'true',
+            'list-container': isFromSideSheet !== 'true',
+            'hide-table': (!showSkeleton && !dataSource?.docLength() && !filtersList?.filterCriteria?.length) }">
+        <div class="f-row filters-list" *ngIf="!showSkeleton && !!totalCount">
+            <div class="f-col">
+                <lib-search i18n-placeholder="@@search" placeholder="Search" class="lib-search"
+                    [formControl]="globalSearchControl" matAutocompleteOrigin #origin="matAutocompleteOrigin"
+                    [suffixIcon]="searchHistory && searchHistory.length ? 'history' : ''"
+                    (afterFocus)="onGlobaleSearchFocus()" prosClickStopPropagation></lib-search>
+                <input matInput [matAutocomplete]="auto" [matAutocompleteConnectedTo]="origin"
+                    #historyEntriesTrigger="matAutocompleteTrigger" hidden />
+                <mat-autocomplete #auto="matAutocomplete">
+                    <div class="history-entries" *ngFor="let entry of searchHistory">
+                        <mat-option (click)="applyHistoryEntry(entry.searchString)">
+                            {{ entry.searchString }}
+                        </mat-option>
+                        <lib-section></lib-section>
+                    </div>
+                </mat-autocomplete>
+            </div>
+            <lib-chip-list>
+                <ng-template ngFor let-filter [ngForOf]="filtersList.filterCriteria" let-i="index">
+                    <lib-chip *ngIf="i<=limit-1" [label]="getFieldDesc(filter?.fieldId)" type="info"
+                        (click)="selectedFilterChip(filter)" [matMenuTriggerFor]="filterChipMenu"
+                        [matMenuTriggerData]="{filterData: filter}" [removable]="true"
+                        (removed)="removeAppliedFilter(i)">
+                        {{showFilterValue(filter)}}
+                    </lib-chip>
+                </ng-template>
+                <lib-chip class="mdo-filter-matchip list-table filter-pill"
+                    [libBadge]="(filtersList?.filterCriteria?.length > limit) ? filtersList?.filterCriteria?.length -limit  : ''"
+                    (click)="openFiltersSideSheet()">
+                    <mat-icon fontSet="mdo-icons-light">filter</mat-icon>
+                </lib-chip>
+                <lib-chip *ngIf="savedFilters.length>0" [matMenuTriggerFor]="savedFiltersMenu">
+                    <mat-icon fontSet="mdo-icons-light">layer-group</mat-icon>
+                </lib-chip>
+                <mat-menu #savedFiltersMenu="matMenu" class="navigation-menu">
+                    <div class="saved-filters-menu" prosInfiniteScroll bufferPercentage="20" (scrollEnd)="scroll(true)">
+                        <button mat-menu-item (click)="resetSavedFilter()" i18n="@@reset"> Reset </button>
+                        <button mat-menu-item *ngFor="let filter of savedFilters"
+                            (click)="onChangeSelectedSavedFilter(filter)">
+                            {{filter?.description}} </button>
+                    </div>
+                </mat-menu>
+                <lib-chip class="mdo-filter-matchip filter-pill"
+                    *ngIf="filtersList && (filtersList.filterId || filtersList.filterCriteria.length)"
+                    [matMenuTriggerFor]="filterMenu">
+                    <mat-icon fontSet="mdo-icons">ellipsis-h</mat-icon>
+                </lib-chip>
+
+                <mat-menu #filterMenu="matMenu" class="navigation-menu">
+                    <button mat-menu-item (click)="saveFilterCriterias()" i18n="@@save_as"> Save as... </button>
+                    <button mat-menu-item (click)="resetAllFilters()" i18n="@@reset"> Reset </button>
+                    <ng-container *ngIf="selectedSavedFilters && selectedSavedFilters.filterCriteria?.length>0">
+                        <lib-section text="Saved Filters"></lib-section>
+                        <button mat-menu-item (click)="saveFilterCriterias()" i18n="@@update"> Update </button>
+                        <button mat-menu-item (click)="deleteFilter()" i18n="@@delete"> Delete </button>
+                    </ng-container>
+
+                </mat-menu>
+
+                <mat-menu #filterChipMenu="matMenu" class="navigation-menu {{isDateFilter? 'date-mat-menu': ''}}">
+                    <div class="f-col filters-menu">
+                        <ng-template matMenuContent let-filterData="filterData">
+                            <div class="f-row" libClickStopPropagation>
+                                <lib-text-line>
+                                    {{getFieldDesc(filterData?.fieldId)}}
+                                </lib-text-line>
+                            </div>
+                            <pros-list-filter-field-elements libClickStopPropagation *ngIf="filterData"
+                                [showRuleToggled]="false" [moduleId]="moduleId" [filterList]="filtersList"
+                                [selectedCurrentFilter]="filterData" [moduleFieldsMetatdata]="metadataFldLst"
+                                (valueChanged)="updateFilterValue($event)"></pros-list-filter-field-elements>
+                        </ng-template>
+                        <lib-button type="major" (click)="applyFilterChanged()"> Apply</lib-button>
+                    </div>
+                </mat-menu>
+            </lib-chip-list>
+        </div>
+
+        <div class="row-spacer"></div>
+
+        <ng-template [ngIf]="showGlobalFilter && !showSkeleton">
+            <pros-global-search [moduleId]="moduleId" [fieldsMetadata]="metadataFldLst"
+                [searchString]="globalSearchControl.value" (upsertFilterCriteria)="upsertFilterCriteria($event)">
+            </pros-global-search>
+        </ng-template>
+
+        <div class="f-col table-loader" *ngIf="showSkeleton">
+            <lib-skeleton-table></lib-skeleton-table>
+        </div>
+
+        <div class="data-listing" [ngClass]="{'s-data-listing' : isFromSideSheet === 'true'}">
+            <table #table [class.hide-table]="showSkeleton" mat-table [dataSource]="dataSource" matSort
+                class="mat-elevation-z0" [ngStyle]="{'min-width.px': tableWidth}">
+                <ng-container matColumnDef="_select" sticky>
+                    <th mat-header-cell *matHeaderCellDef class="fixed-width-c1">
+                        <lib-checkbox (valueChange)="masterToggle()" [checked]="selection.hasValue() && isAllSelected()"
+                            [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()">
+                        </lib-checkbox>
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="fixed-width-c1"
+                        [ngClass]="{'mdo-row-warning': rowHasWarning(element), 'mdo-row-error': rowHasError(element)}">
+                        <lib-checkbox (valueChange)="selection.toggle(element)" [checked]="isCheckboxSelected(element)"
+                            [aria-label]="checkboxLabel(element)"></lib-checkbox>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="_settings" sticky>
+                    <th mat-header-cell *matHeaderCellDef class="fixed-width-c1">
+                        <lib-button icon="cog" iconFontType="light" (click)="openTableViewSettings(true)"></lib-button>
+                    </th>
+                    <td mat-cell *matCellDef="let element" class="fixed-width-c1 more-icon">
+                        <lib-button icon="ellipsis-h" [matMenuTriggerFor]="moreAction"></lib-button>
+                        <mat-menu #moreAction="matMenu" class="navigation-menu">
+                            <button mat-menu-item
+                                [matMenuTriggerData]="{triggerFrom: 'change', docId: element['OBJECTNUMBER']?.fieldData}"
+                                [matMenuTriggerFor]="flowNavigationList"
+                                (menuOpened)="getFlowListOptions('2')">Edit</button>
+                            <button mat-menu-item
+                              [matMenuTriggerData]="{triggerFrom: 'copy', docId: element['OBJECTNUMBER']?.fieldData}"
+                              [matMenuTriggerFor]="flowNavigationList"
+                              (menuOpened)="getFlowListOptions('2')">Copy</button>
+                            <button mat-menu-item
+                                [matMenuTriggerData]="{triggerFrom: 'view', docId: element['OBJECTNUMBER']?.fieldData}"
+                                [matMenuTriggerFor]="flowNavigationList" (menuOpened)="getFlowListOptions('3')"> Summary
+                            </button>
+                            <button mat-menu-item (click)="viewProcessLog(element['OBJECTNUMBER']?.fieldData)"> View
+                                process log
+                            </button>
+                            <lib-section></lib-section>
+                            <button mat-menu-item (click)="deleteRecord([element['OBJECTNUMBER']?.fieldData])"> Delete
+                            </button>
+                        </mat-menu>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="OBJECTNUMBER" sticky>
+                    <th [attr.colspan]="hasSelectedValue && spanValue ? 1 : 0 " mat-header-cell *matHeaderCellDef
+                        class="responsive-width-c2">
+                        <lib-text-line type="base" textColor="default" weight="strong" *ngIf="!selection.hasValue()">
+                            {{objectType.objectInfo ? objectType.objectInfo: 'Object'}} Number
+                           </lib-text-line>
+                        <div class="f-row" *ngIf="!showSkeleton && selection.hasValue() && isFromSideSheet !== 'true'">
+                            <!-- hello -->
+                            <lib-button-group *ngIf="selection.hasValue()">
+                                <lib-button type="minor" (click)="bulkDeletionRecords()" i18n="@@delete">Delete
+                                </lib-button>
+                            </lib-button-group>
+                            <span class="f-col-spacer-half"></span>
+                            <lib-text-line type="base" textColor="secondary" *ngIf="selection.hasValue()">
+                                {{ selectedPages?.includes('all') ? totalCount : selection.selected?.length }} of
+                                {{totalCount}} records selected.
+                            </lib-text-line>
+                        </div>
+                    </th>
+                    <!-- <th [attr.colspan]="hasSelectedValue && spanValue ? spanValue : 0 " mat-header-cell *matHeaderCellDef class="fixed-width-c2">
+                        Object Number
+                    </th> -->
+                    <td mat-cell *matCellDef="let element" class="fixed-width-c2">
+                        <lib-text-line [textColor]="'link'">
+                            {{ element.OBJECTNUMBER.fieldData}}
+                        </lib-text-line>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="_select_filter" sticky>
+                    <th mat-header-cell *matHeaderCellDef class="fixed-width-c1">
+                    </th>
+                </ng-container>
+
+                <ng-container matColumnDef="_settings_filter" sticky>
+                    <th mat-header-cell *matHeaderCellDef class="fixed-width-c1">
+                    </th>
+                </ng-container>
+
+                <ng-container matColumnDef="OBJECTNUMBER_filter" sticky>
+                    <th mat-header-cell *matHeaderCellDef class="fixed-width-c2">
+                        <!-- <pros-inline-table-column-filter
+                                    fieldId="OBJECTNUMBER"
+                                    (applyFilter)="applyInlineFilter($event)">
+                                </pros-inline-table-column-filter> -->
+                    </th>
+                </ng-container>
+
+                <ng-template ngFor let-dynCol let-index="index" [ngForOf]="(displayedColumns | async)">
+                    <ng-template [ngIf]="isStaticCol(dynCol)" [ngIfElse]="dynamic">
+                        <!-- skip all static columns -->
+                    </ng-template>
+                    <ng-template #dynamic>
+                        <ng-container [matColumnDef]="dynCol">
+                            <th [style.borderRight]="hasSelectedValue && spanValue ? 'none' : '' " mat-header-cell
+                                *matHeaderCellDef [disabled]="resizableColumn.isColResizing"
+                                [ngStyle]="{'width.px': getColumnWidth(dynCol)}"
+                                [ngClass]="{'large-cell-header': isLargeHeader(dynCol)}" prosResizableColumn
+                                #resizableColumn="prosResizableColumn" [index]="index"
+                                (widthChanged)="onResizeEnd($event)" [id]="dynCol" (resizing)="onColumnsResize($event)">
+                                <div [style.display]="hasSelectedValue && spanValue ? 'none' : '' ">
+                                    <div *ngIf="isSortable(dynCol); else notSortable" class="f-row sort-container"
+                                        (click)="sortDirChanged(dynCol)">
+                                        <lib-text-line type="base" weight="strong" enableWrap="true">{{
+                                            getFieldDesc(dynCol)
+                                            }}
+                                        </lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <mat-icon fontSet="mdo-icons-light"> {{ getColumnActiveSortIcon(dynCol) }}
+                                        </mat-icon>
+                                    </div>
+                                    <ng-template #notSortable>
+                                        {{ getFieldDesc(dynCol) }}
+                                    </ng-template>
+                                </div>
+                            </th>
+                            <td mat-cell *matCellDef="let element"
+                                [ngClass]="{'large-cell-content': isLargeCell(element, dynCol)}"
+                                [ngStyle]="{'width.px': getColumnWidth(dynCol)}">
+
+                                <ng-container [ngSwitch]="getFieldType(dynCol)">
+                                    <!-- Date fields -->
+                                    <ng-container *ngSwitchCase="'DATEPICKER'">
+                                        {{ (element[dynCol] ? element[dynCol].fieldData || '' : '') | prosDatePipe:
+                                        this.dateFormat }}
+                                    </ng-container>
+                                    <!-- HTML-EDITOR fields -->
+                                    <ng-container *ngSwitchCase="'HTML-EDITOR'">
+                                        {{ formatHtmlCell(element[dynCol] ? element[dynCol].fieldData || '' : '') }}
+                                    </ng-container>
+                                    <!-- URL fields -->
+                                    <ng-container *ngSwitchCase="'URL'">
+                                        <a [href]="element[dynCol].fieldData" target="_blank"> <lib-text-line textColor="link">{{element[dynCol].fieldData}}</lib-text-line></a>
+                                    </ng-container>
+                                    <!-- Default -->
+                                    <ng-container *ngSwitchDefault>
+                                        {{ element[dynCol] ? element[dynCol].fieldData || '' : ''}}
+                                    </ng-container>
+                                </ng-container>
+
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="{{dynCol}}_filter">
+                            <th mat-header-cell *matHeaderCellDef [ngStyle]="{'width.px': getColumnWidth(dynCol)}">
+                                <div class="filter-container">
+                                    <pros-inline-table-column-filter [fieldId]="dynCol"
+                                        [appliedFilters]="filtersList.filterCriteria"
+                                        (applyFilter)="applyInlineFilter($event)">
+                                    </pros-inline-table-column-filter>
+                                </div>
+                            </th>
+                        </ng-container>
+                    </ng-template>
+                </ng-template>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns | async; sticky: true"></tr>
+                <tr mat-header-row *matHeaderRowDef="inlineFilterColumns | async; sticky: true"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns | async;"></tr>
+            </table>
+            <div class="f-row empty-state"
+                *ngIf="!totalCount && !dataSourceHasData && !showSkeleton && filtersList?.filterCriteria?.length">
+                <lib-empty-state primaryText="Nothing to see here"
+                    secondaryText="You search did not return any results, try modifying your search?" icon="search"
+                    iconSize="200">
+                </lib-empty-state>
+            </div>
+        </div>
+        <ng-container *ngIf="dataSource?.docLength() || filtersList?.filterCriteria?.length">
+            <div class="f-row list-pagination">
+                <lib-pagination [currentPageIndex]="recordsPageIndex" [totalCount]="totalCount"
+                    [pageSize]="recordsPageSize" (pageChangeEvent)="onPageChange($event)">
+                </lib-pagination>
+                <span class="f-col-spacer-half"></span>
+                <lib-text-line type="base">{{ displayedRecordsRangeValue }}</lib-text-line>
+            </div>
+
+            <div class="f-row-spacer-half"></div>
+
+            <ng-template>
+                <!-- Configure loading -->
+                <div class="f-col loading-result">
+                    <pros-null-state [button]="{text: 'Configure'}" [iconWidth]="200"
+                        [iconPath]="'./assets/images/empty-table.svg'" [subtext]="'View is not configured'"
+                        [message]="'Please configure your view by selecting columns to display'"></pros-null-state>
+                </div>
+            </ng-template>
+        </ng-container>
+    </div>
+    <ng-template [ngIf]="!showSkeleton && !dataSource?.docLength() && !filtersList?.filterCriteria?.length && !isReport">
+        <div class="f-row empty-state">
+             <lib-empty-state primaryText="Nothing to see here"
+                secondaryText="You don't have any records. Would you like to create one?" icon="table" iconSize="200"> 
+                <lib-button type="minor" width="100px" [matMenuTriggerData]="{triggerFrom: 'create'}"
+                    [matMenuTriggerFor]="flowNavigationList" (menuOpened)="getFlowListOptions('1')" iconFontType="solid"
+                    icon="caret-down">New record 
+                </lib-button>
+            </lib-empty-state> 
+        </div>
+    </ng-template>
+    <ng-template [ngIf]="!showSkeleton && !dataSource?.docLength() && !filtersList?.filterCriteria?.length && isReport">
+        <div class="f-row empty-state">
+            <lib-empty-state primaryText="Nothing to see here"
+             icon="table" iconSize="200"> 
+            <lib-text-line type="base">You don’t have any records.</lib-text-line>
+        </lib-empty-state> 
+
+        </div>
+    </ng-template>
+    <mat-menu #flowNavigationList="matMenu" xPosition="after" class="navigation-menu">
+        <ng-template matMenuContent let-triggerFrom="triggerFrom" let-docId="docId">
+            <ng-template [ngIf]="triggerFrom === 'create'">
+                <div class="search-container">
+                    <lib-search placeholder="Search" prosClickStopPropagation [formControl]="flowSearchControl">
+                    </lib-search>
+                </div>
+            </ng-template>
+            <div class="flow-list-section" *ngIf="flowList | async as flowL">
+                <lib-section text="Flows"></lib-section>
+                <ng-container *ngFor="let flowDet of flowL.flows">
+                    <button mat-menu-item [focus]="false" [ngClass]="{'no-data-text': flowDet.isNoFlows}"
+                        (click)="openTransaction(flowDet.flowId, flowDet.forms[0]?.formId, triggerFrom, docId, flowDet.isNoFlows, flowDet.stepId)">
+                        {{flowDet.flowDesc || flowDet.flowId}}
+                    </button>
+                </ng-container>
+
+                <lib-section text="Forms"></lib-section>
+                <ng-container *ngFor="let form of flowL.forms">
+                    <button mat-menu-item [focus]="false" [ngClass]="{'no-data-text': form.isNoFlows}"
+                        (click)="openTransaction('', form?.formId, triggerFrom, docId, form.isNoFlows, '')">
+                        {{form.formDesc || form.formId}}
+                    </button>
+                </ng-container>
+            </div>
+        </ng-template>
+    </mat-menu>
+</div>
+
+<ng-template [ngIf]="!dataExist && !isLoaderAvailable">
+    <div class="f-row empty-state">
+        <lib-empty-state primaryText="Nothing to see here"
+            secondaryText="You don't have any record in this dataset. Would you like to create one?" icon="table"
+            iconSize="200">
+            <lib-button type="minor" (afterClick)="openDatasetPopup()">New dataset</lib-button>
+        </lib-empty-state>
+    </div>
+</ng-template>
+
+<ng-template [ngIf]="isLoaderAvailable">
+    <div class="f-col root">
+        <pros-toolbar-skeleton></pros-toolbar-skeleton>
+        <div class="f-col table-loader">
+            <lib-skeleton-table></lib-skeleton-table>
+        </div>
+    </div>
+</ng-template>

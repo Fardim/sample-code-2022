@@ -1,0 +1,44 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  width: 360px;
+
+  .breadcrum-toolbar {
+    padding: 8px 12px;
+    min-height: 36px;
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px);
+    overflow: auto;
+
+    .mdo-justify {
+      margin: 0 12px;
+
+      .field-label {
+        margin-bottom: 6px;
+
+        mat-icon.mat-icon {
+          font-size: 10px;
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    width: 360px;
+
+    .breadcrum-toolbar {
+      padding: 8px 24px;
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 24px;
+      }
+    }
+  }
+}

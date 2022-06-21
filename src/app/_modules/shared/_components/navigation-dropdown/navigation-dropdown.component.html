@@ -1,0 +1,71 @@
+<!-- <button i18n="@@check_data" mat-menu-item [matMenuTriggerFor]="check" prosClickStopPropagation [disableRipple]="true">
+    Check data
+</button> -->
+
+<!-- module-menu -->
+<div class="search-container">
+    <lib-search placeholder="Search modules" prosClickStopPropagation
+(valueChange)="searchModule($event)"></lib-search>
+</div>
+<div class="menu-customdropdown">
+    <ng-container *ngFor="let module of filteredModulesList;let i=index; trackBy:moduleTrackBy">
+        <button mat-menu-item [focus]="false" [matMenuTriggerFor]="schemaMenu"
+            id="menuId_{{module.moduleId}}"
+            (mouseenter)="selected(module.moduleId);schemaList(module.moduleId);"
+            [disableRipple]="true">
+            {{ module.moduleDesc || 'UNTITLED'}}
+        </button>
+    </ng-container>
+</div>
+<mat-divider></mat-divider>
+<button mat-menu-item (click)="emitSelection()" [disableRipple]="true">
+    <mat-icon fontSet="mdo-icons-light" class="mat-menu-icon">plus</mat-icon> <span i18n="@@new_module">New module</span>...
+</button>
+
+<!-- IMPORT SCHEMA -->
+<button i18n="@@import_schema" mat-menu-item [matMenuTriggerFor]="importMenu" id="import-schema" [disableRipple]="true">
+    Import schema
+</button>
+
+<!-- schema-menu -->
+<mat-menu #schemaMenu="matMenu" class="navigation-menu">
+    <div class="search-container">
+        <lib-search placeholder="Search schemas" prosClickStopPropagation #searchInput
+        (valueChange)="searchSchema($event)"></lib-search>
+    </div>
+    <div class="menu-customdropdown">
+        <ng-container *ngFor="let schema of filteredSchemaList;let i=index; trackBy:schemaTrackBy">
+            <button mat-menu-item
+                [focus]="false"
+                (click)="selectschema(schema)"
+                [disableRipple]="true">
+                {{ schema.schemaDescription || 'UNTITLED'}}
+            </button>
+        </ng-container>
+    </div>
+
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="selectschema()" [disableRipple]="true">
+        <mat-icon fontSet="mdo-icons-light" class="mat-menu-icon">plus</mat-icon> <span i18n="@@new_schema">New schema</span>...
+    </button>
+
+    <!-- IMPORT SCHEMA -->
+    <button i18n="@@import_schema" mat-menu-item [matMenuTriggerFor]="importMenu" id="import-schema" [disableRipple]="true">
+        Import schema
+    </button>
+</mat-menu>
+
+<mat-menu #importMenu="matMenu" class="navigation-menu" xPosition="before">
+    <div class="menu-customdropdown upload-col">
+        <button mat-menu-item [disableRipple]="true" (click)="openExplorer()">
+            Upload schema
+        </button>
+
+        <input class="drag-input" type="file" id="uploader" #uploadInput (change)="fileChange($event)"
+            prosClickStopPropagation />
+    
+        <button mat-menu-item [disableRipple]="true" (click)="importSchema('Connekthub')">
+            Import from connekthub
+        </button>
+    </div>
+</mat-menu>

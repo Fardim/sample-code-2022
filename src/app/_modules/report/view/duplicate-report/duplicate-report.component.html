@@ -1,0 +1,25 @@
+<div class="modal-wrapper">
+    <div class="f-row modal-header">
+        <lib-text-line type="leading" i18n="@@duplicateReport">Duplicate report</lib-text-line>
+    </div>
+    <div class="modal-body">
+        <lib-banner *ngIf="errorMsg" status="error" [text]="errorMsg"></lib-banner>
+        <lib-banner *ngIf="reportNameCtrl.errors?.required" status="error" text="Please enter a report name">
+        </lib-banner>
+        <lib-banner *ngIf="reportNameCtrl.errors?.maxlength" status="error"
+            text="Report name can't be more than 100 in length"></lib-banner>
+        <lib-input label="Report" i18n-label="@@report" [formControl]="reportNameCtrl" [maxLength]="maxReportNameLength"
+        [hasError]="reportNameCtrl.invalid"></lib-input>
+    </div>
+
+    <div class="f-row modal-footer space-between">
+        <lib-button (click)="onCancel()" type="minor" i18n="@@cancel">Cancel</lib-button>
+        <span class="f-spacer"></span>
+        <lib-button type="major" (afterClick)="onConfirm($event)" [disabled]="reportNameCtrl.invalid">
+            <span *ngIf="errorMsg; else NonError" i18n="@@retry">Retry</span>
+            <ng-template #NonError>
+                <span i18n="@@confirm">Confirm</span>
+            </ng-template>
+        </lib-button>
+    </div>
+</div>

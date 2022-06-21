@@ -1,0 +1,54 @@
+mat-card.root {
+  height: 100%;
+  user-select: text;
+  padding: 0;
+
+  .breadcrum-toolbar {
+    align-items: center;
+    margin-bottom: 24px;
+    padding-top: 8px;
+    min-height: 40px;
+  }
+
+  .nav-tree {
+    max-height: 450px;
+    overflow: auto;
+
+    mat-accordion.mat-accordion {
+      mat-expansion-panel {
+        .mat-expansion-panel-header {
+          padding: 0 0 0 8px;
+
+          mat-panel-title {
+            align-items: center;
+
+            .expand-title {
+              margin-left: 8px;
+            }
+          }
+        }
+
+        .undertree-expansion-panel {
+          padding-left: 42px;
+        }
+
+        mat-nav-list {
+          mat-list-item {
+            font-size: 0.9rem;
+            height: 48px;
+          }
+        }
+      }
+    }
+
+    .default-badge {
+      margin: 0 8px;
+      min-width: 24px;
+      text-align: right;
+    }
+  }
+
+  .actions-row {
+    margin-bottom: 12px;
+  }
+}

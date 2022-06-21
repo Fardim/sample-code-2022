@@ -1,0 +1,21 @@
+.root {
+  padding-left: 6px;
+
+  .data-row {
+    .class-cell {
+      min-height: 48px;
+      align-items: center;
+      display: flex;
+      width: 50%;
+      padding: 0 6px;
+
+      .lib-chips {
+        margin: 3px 6px 3px 0;
+      }
+    }
+  }
+}
+
+.hide-input {
+  display: none;
+}

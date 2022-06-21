@@ -1,0 +1,226 @@
+<div class="root">
+  <ng-template [ngIf]="loading" [ngIfElse]="showTab">
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+  </ng-template>
+  <ng-template #showTab>
+    <div class="f-col" *ngIf="tabDetails">
+      <div class="f-col" *ngFor="let field of tabFieldList">
+        <div class="f-col" *ngIf="field.fieldType === 'TEXT'">
+          <pros-transaction-static-text [staticTextBody]="field.description"> </pros-transaction-static-text>
+        </div>
+
+        <div class="f-col" *ngIf="field.fieldType === 'IMAGE'">
+          <pros-transaction-image
+            [fieldObj]="field"
+          ></pros-transaction-image>
+        </div>
+
+        <div class="f-col" *ngIf="!isFieldHidden(field)  && getFieldType(field.fieldCtrl) === 'TEXT' && patchDataMap">
+          <pros-transaction-input
+            [moduleId]="moduleId"
+            [control]="fGroup.controls[field.fieldId]"
+            [controlName]="field.fieldId"
+            [tabDetails]="tabDetails"
+            [fieldObj]="field"
+            [layoutId]="layoutId"
+            [recordId]="recordId"
+            [process]="process"
+            [dataControl]="dataControl"
+            [generateDescriptionValue]="generateDescriptionValue"
+            [patchRuleData]="patchDataMap[field.fieldId]"
+          ></pros-transaction-input>
+          <ng-template [ngIf]="isShowDescription(field)">
+            <pros-transaction-generate-description [tabDetails]="tabDetails" [layoutId]="layoutId" [moduleId]="moduleId" [fieldObj]="field" [process]="process" [flowId]="flowId" [stepId]="stepId" (evtParentDesciptionValueUpdate)="generateDescriptionValue = $event"></pros-transaction-generate-description>
+          </ng-template>
+        </div>
+
+        <div class="f-col" *ngIf="!isFieldHidden(field)  && getFieldType(field.fieldCtrl) === 'CHECKBOX'">
+          <pros-transaction-checkbox
+            [moduleId]="moduleId"
+            [control]="fGroup.controls[field.fieldId]"
+            [controlName]="field.fieldId"
+            [tabDetails]="tabDetails"
+            [fieldObj]="field"
+            [layoutId]="layoutId"
+            [recordId]="recordId"
+            [process]="process"
+            [dataControl]="dataControl"
+          ></pros-transaction-checkbox>
+        </div>
+
+        <div class="f-col" *ngIf="!isFieldHidden(field)  && getFieldType(field.fieldCtrl) === 'TEXTAREA'">
+          <pros-transaction-textarea
+            [moduleId]="moduleId"
+            [control]="fGroup.controls[field.fieldId]"
+            [controlName]="field.fieldId"
+            [tabDetails]="tabDetails"
+            [fieldObj]="field"
+            [layoutId]="layoutId"
+            [recordId]="recordId"
+            [process]="process"
+            [dataControl]="dataControl"
+          ></pros-transaction-textarea>
+        </div>
+
+        <div class="f-col" *ngIf="!isFieldHidden(field)  && getFieldType(field.fieldCtrl) === 'DATEPICKER'">
+          <pros-transaction-date-picker
+            [moduleId]="moduleId"
+            [control]="fGroup.controls[field.fieldId]"
+            [controlName]="field.fieldId"
+            [tabDetails]="tabDetails"
+            [fieldObj]="field"
+            [layoutId]="layoutId"
+            [recordId]="recordId"
+            [process]="process"
+            [dataControl]="dataControl"
+          ></pros-transaction-date-picker>
+        </div>
+
+        <div class="f-col" *ngIf="!isFieldHidden(field)  && getFieldType(field.fieldCtrl) === 'DROPDOWN' && patchDataMap">
+          <pros-transaction-dropdown
+            [control]="fGroup.controls[field.fieldId]"
+            [controlName]="field.fieldId"
+            [tabDetails]="tabDetails"
+            [fieldObj]="field"
+            [layoutId]="layoutId"
+            [moduleId]="moduleId"
+            [recordId]="recordId"
+            [process]="process"
+            [dataControl]="dataControl"
+            [patchRuleData]="patchDataMap[field.fieldId]"
+          >
+          </pros-transaction-dropdown>
+        </div>
+
+        <div class="f-col" *ngIf="!isFieldHidden(field)  && getFieldType(field.fieldCtrl) === 'RADIO'">
+          <pros-transaction-radio-group
+            [control]="fGroup.controls[field.fieldId]"
+            [controlName]="field.fieldId"
+            [tabDetails]="tabDetails"
+            [fieldObj]="field"
+            [layoutId]="layoutId"
+            [moduleId]="moduleId"
+            [recordId]="recordId"
+            [process]="process"
+            [dataControl]="dataControl"
+          ></pros-transaction-radio-group>
+        </div>
+
+        <div class="f-col" *ngIf="!isFieldHidden(field)  && getFieldType(field.fieldCtrl) === 'TIMEPICKER'">
+          <pros-transaction-time-picker
+            [moduleId]="moduleId"
+            [control]="fGroup.controls[field.fieldId]"
+            [controlName]="field.fieldId"
+            [tabDetails]="tabDetails"
+            [fieldObj]="field"
+            [layoutId]="layoutId"
+            [recordId]="recordId"
+            [process]="process"
+            [dataControl]="dataControl"
+          ></pros-transaction-time-picker>
+        </div>
+
+        <div class="f-col" *ngIf="!isFieldHidden(field)  && getFieldType(field.fieldCtrl) === 'URL'">
+          <pros-transaction-url
+            [moduleId]="moduleId"
+            [control]="fGroup.controls[field.fieldId]"
+            [controlName]="field.fieldId"
+            [tabDetails]="tabDetails"
+            [fieldObj]="field"
+            [layoutId]="layoutId"
+            [recordId]="recordId"
+            [process]="process"
+            [dataControl]="dataControl"
+          ></pros-transaction-url>
+        </div>
+
+        <div class="f-col" *ngIf="!isFieldHidden(field)  && getFieldType(field.fieldCtrl) === 'ATTACHMENT'">
+          <pros-transaction-attachment
+            [moduleId]="moduleId"
+            [control]="fGroup.controls[field.fieldId]"
+            [controlName]="field.fieldId"
+            [tabDetails]="tabDetails"
+            [fieldObj]="field"
+            [layoutId]="layoutId"
+            [recordId]="recordId"
+            [process]="process"
+            [dataControl]="dataControl"
+          ></pros-transaction-attachment>
+        </div>
+
+        <div class="f-col" *ngIf="!isFieldHidden(field)  && getFieldType(field.fieldCtrl) === 'TOGGLE'">
+          <pros-transaction-toggle
+            [moduleId]="moduleId"
+            [control]="fGroup.controls[field.fieldId]"
+            [controlName]="field.fieldId"
+            [tabDetails]="tabDetails"
+            [fieldObj]="field"
+            [layoutId]="layoutId"
+            [recordId]="recordId"
+            [process]="process"
+            [dataControl]="dataControl"
+          ></pros-transaction-toggle>
+        </div>
+
+        <div class="f-col" *ngIf="!isFieldHidden(field)  && getFieldType(field.fieldCtrl) === 'GRID'">
+          <pros-transaction-grid
+            [moduleId]="moduleId"
+            [tabDetails]="tabDetails"
+            [fieldObj]="field"
+            [layoutId]="layoutId"
+            [recordId]="recordId"
+            [process]="process"
+            [dataControl]="dataControl"
+            [flowId]="flowId"
+            [stepId]="stepId"
+          ></pros-transaction-grid>
+        </div>
+
+        <div class="f-col" *ngIf="!isFieldHidden(field)  && getFieldType(field.fieldCtrl) === 'DATA-REF'">
+          <pros-transaction-dataref
+            [control]="fGroup.controls[field.fieldId]"
+            [controlName]="field.fieldId"
+            [moduleId]="moduleId"
+            [tabDetails]="tabDetails"
+            [fieldObj]="field"
+            [layoutId]="layoutId"
+            [recordId]="recordId"
+            [process]="process"
+            [dataControl]="dataControl"
+            [allowSingleSelect]="true"
+          ></pros-transaction-dataref>
+        </div>
+
+        <div class="f-col" *ngIf="!isFieldHidden(field)  && getFieldType(field.fieldCtrl) === 'HTML-EDITOR'">
+          <pros-transaction-html-editor
+            [moduleId]="moduleId"
+            [control]="fGroup.controls[field.fieldId]"
+            [controlName]="field.fieldId"
+            [tabDetails]="tabDetails"
+            [fieldObj]="field"
+            [layoutId]="layoutId"
+            [recordId]="recordId"
+            [process]="process"
+            [dataControl]="dataControl"
+          ></pros-transaction-html-editor>
+        </div>
+
+        <div class="f-col" *ngIf="!isFieldHidden(field.fieldId) && getFieldType(field.fieldCtrl) === 'DATETIME'">
+          <pros-transaction-date-time-picker
+            [moduleId]="moduleId"
+            [control]="fGroup.controls[field.fieldId]"
+            [controlName]="field.fieldId"
+            [tabDetails]="tabDetails"
+            [fieldObj]="field"
+            [layoutId]="layoutId"
+            [recordId]="recordId"
+            [process]="process"
+            [dataControl]="dataControl"
+          ></pros-transaction-date-time-picker>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>

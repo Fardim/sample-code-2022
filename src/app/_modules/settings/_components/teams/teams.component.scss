@@ -1,0 +1,30 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  padding: 0 16px;
+
+  .colunm-box {
+    padding: 6px 0;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+
+    .col {
+      display: flex;
+      flex: 1 0 auto;
+      width: 1px;
+      align-items: center;
+
+      &.col-x4 {
+        flex: 4;
+      }
+
+      .lib-avatar {
+        margin: 0 4px;
+      }
+
+      &.end-items {
+        justify-content: flex-end;
+      }
+    }
+  }
+}

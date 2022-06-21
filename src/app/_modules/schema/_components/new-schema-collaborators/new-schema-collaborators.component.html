@@ -1,0 +1,61 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" (click)="closeDialogComponent()" iconFontType="light" icon="times"></lib-button>
+
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading" i18n="@@add_subscribers">Add collaborators</lib-text-line>
+
+                <span class="f-col-spacer-half"></span>
+                <div class="f-spacer"></div>
+                <lib-button-group>
+                    <!-- <lib-button (click)="openSubscriberInviteDialog()" iconPosition="before" type="major" icon="user-plus" i18n="@@invite_people_to_team"> Invite people to your team </lib-button> -->
+                    <lib-button type="major" i18n="@@save" (click)="saveSelection()" width="80px">Save</lib-button>
+                </lib-button-group>
+            </div>
+            <div class="f-row-spacer-half"></div>
+            <div class="f-row">
+                <!-- <pros-search-input (value)="getCollaborators($event, 0)" placeholder="Search subscribers"></pros-search-input> -->
+                <lib-search (valueChange)="getCollaborators($event, 0)" i18n-placeholder="@@search_subscribers"
+                    placeholder="Search user" class="lib-search"></lib-search>
+                <span class="col-spacer"></span>
+                <!-- <mat-chip-list>
+                    <mat-chip class="mdo-filter-matchip">
+                        <label>Role:</label> <span class="info">{{(selectedRoleType)? selectedRoleType: 'All'}}</span>
+                    </mat-chip>
+                </mat-chip-list> -->
+            </div>
+        </div>
+    </div>
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <mat-list role="list" class="rule-list">
+                <mat-list-item role="listitem" *ngFor="let subscriber of filteredSubscribers">
+                    <lib-avatar [initials]="shortName(subscriber.fName, subscriber.lName) | uppercase">
+                    </lib-avatar>
+                    <span class="f-col-spacer-half"></span>
+                    <lib-text-line type="base" enableWrap="true">{{subscriber.fullName}}</lib-text-line>
+                    <span class="f-spacer"></span>
+                    <!-- <button mat-flat-button color="accent" (click)="addOrDeleteCollaborator(subscriber)">
+                        <ng-container *ngIf="subscriber.selected;else addBtn">
+                            <mat-icon fontSet="mdo-icons">
+                                check-mark
+                            </mat-icon>
+                        </ng-container>
+                        <ng-template #addBtn>
+                            Add
+                        </ng-template>
+                    </button>  -->
+                    <lib-button (click)="addOrDeleteCollaborator(subscriber)" *ngIf="subscriber.selected;else addBtn"
+                        type="minor" icon="check" width="80px"></lib-button>
+                    <ng-template #addBtn>
+                        <lib-button i118n="@@add" (click)="addOrDeleteCollaborator(subscriber)" type="minor"
+                            width="80px"> Add
+                        </lib-button>
+                    </ng-template>
+                </mat-list-item>
+            </mat-list>
+        </div>
+    </div>
+</div>

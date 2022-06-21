@@ -1,0 +1,15 @@
+<mat-card class="detail-dialog mat-elevation-z0">
+  <div class="modal-wrapper">
+    <div class="f-row modal-header">
+      <lib-text-line type="leading">{{ title }}</lib-text-line>
+      <lib-button icon="times" iconFontType="light" i18n="@@cancel" (click)="onCancelClick()"></lib-button>
+    </div>
+    <div class="modal-body">
+      <pros-characteristics-detail
+      [classId]="classId"
+      [relatedDatasetId]="relatedDatasetId"
+      [showAction]="showActions"
+      [showPaginator]="true"></pros-characteristics-detail>
+    </div>
+  </div>
+</mat-card>

@@ -1,0 +1,69 @@
+.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  align-items: flex-start;
+
+  .breadcrum-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 8px 12px;
+    min-height: 36px;
+    align-items: baseline;
+
+    .mdo-constrained-right {
+      align-items: flex-start;
+      width: 100%;
+      margin-right: 0;
+      overflow: hidden;
+
+      .breadcrum-head {
+        width: 100%;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: 100%;
+    overflow: hidden;
+
+    .mdo-justify {
+      align-items: flex-start;
+      height: 100%;
+
+      .error-banner {
+        width: 100%;
+      }
+
+      .dataset-tabs-headers {
+        width: 100%;
+        align-items: start;
+      }
+
+      .dataset-tab-content {
+        width: 100%;
+      }
+    }
+  }
+}
+
+.sidesheet-outer-drawer {
+  height: 100%;
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 56px;
+      }
+    }
+  }
+}

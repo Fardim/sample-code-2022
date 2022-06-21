@@ -1,0 +1,15 @@
+
+<mat-table #table [dataSource]="dataSource" matSort>
+
+  <ng-container matColumnDef="{{items.value}}" *ngFor="let items of columnData">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> {{items.value}} </mat-header-cell>
+      <mat-cell *matCellDef="let element" class="taskid-link"  [ngStyle]="{'width':items.width}">
+          <span class="mat-text">{{element[items.value]}}</span>
+      </mat-cell>
+  </ng-container>
+
+  <mat-header-row *matHeaderRowDef="getDisplayColumns;sticky:true"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: getDisplayColumns;"></mat-row>
+
+
+</mat-table>

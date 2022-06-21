@@ -1,0 +1,251 @@
+<div class="f-row empty-block" *ngIf="dataSource.length === 0 && !filterHasValue; else showContent">
+    <lib-empty-state primaryText="Nothing to see here"
+            secondaryText="You haven’t performed any data checks so far. Would you like to perform one now?" icon="table">
+        <pros-check-data-btn></pros-check-data-btn>
+    </lib-empty-state>
+</div>
+
+<ng-template #showContent>
+    <div class="root" *ngIf="!showLoader">
+        <lib-chip-list #filterContainer class="f-row filter-container">
+            <lib-search class="lib-search" placeholder="Search" [formControl]="search">
+            </lib-search>
+    
+            <lib-chip class="mdo-filter-matchip" disableRipple="true" [selectable]="true" [selected]="isSelected('NEW')"
+                (click)="updateFilterCriteria('NEW',!isSelected('NEW'))">
+                New
+            </lib-chip>
+    
+            <lib-chip class="mdo-filter-matchip" disableRipple="true" [selectable]="true" [selected]="isSelected('RUNNING')"
+                (click)="updateFilterCriteria('RUNNING',!isSelected('RUNNING'))">
+                Running
+            </lib-chip>
+    
+            <!-- Start Chip for dataset dropdown-->
+            <lib-chip type="info" class="mdo-filter-matchip" disableRipple="true" label="Dataset:"
+                [matMenuTriggerFor]="datasetDrop" [removable]="appliedDatasetList.length>0"
+                (removed)="appliedDatasetList = []; apply('DATASETS',true);">
+                {{ brDatasetDesc }}
+            </lib-chip>
+            <mat-menu #datasetDrop="matMenu">
+                <div class="f-col lib-chip-dropdown">
+                    <lib-search prosClickStopPropagation placeholder="Search..." [formControl]="serachDataset"></lib-search>
+                    <mat-nav-list prosClickStopPropagation>
+                        <mat-list-item *ngFor="let ckbox of filterableDatasetOb | async;">
+                            <lib-checkbox (valueChange)="addFilterFromDataset(ckbox, $event)"
+                                [checked]="isDatasetAppliedChecked(ckbox)"
+                                [label]="ckbox.moduleDesc ? ckbox.moduleDesc : ckbox.moduleId">
+                            </lib-checkbox>
+                        </mat-list-item>
+                    </mat-nav-list>
+                    <lib-button type="minor" i18n="@@apply" class="f-col" (click)="apply('DATASETS')">Apply </lib-button>
+                </div>
+            </mat-menu>
+            <!-- End Chip for business rule dropdown-->
+    
+            <!-- Start for business rule type filter .. -->
+            <lib-chip type="info" [matMenuTriggerFor]="businessRuleType" label="Business rule type:"
+                [removable]="appliedBrList.length>0" (removed)="appliedBrList = []; apply('BRTYPE',true);">
+                {{ brRuleFilterDesc }}
+            </lib-chip>
+            <mat-menu #businessRuleType="matMenu" class="navigation-menu">
+                <div class="f-col lib-chip-dropdown">
+                    <lib-search prosClickStopPropagation placeholder="Search..." [formControl]="searchBrs"></lib-search>
+                    <mat-nav-list prosClickStopPropagation>
+                        <mat-list-item *ngFor="let ckbox of filterableRulesOb | async">
+                            <lib-checkbox (valueChange)="addFilterFromBrRule(ckbox, $event)" [libTooltip]="ckbox.ruleDesc"
+                                [checked]="isBrAppliedChecked(ckbox)" [label]="ckbox.ruleDesc ? ckbox.ruleDesc : ''">
+                            </lib-checkbox>
+                        </mat-list-item>
+                    </mat-nav-list>
+                    <lib-button type="minor" i18n="@@apply" class="f-col" (click)="apply('BRTYPE')">Apply
+                    </lib-button>
+                </div>
+            </mat-menu>
+        </lib-chip-list>
+
+    <div class="schema-details-table f-col datasource" #tableContainer>
+        <table mat-table [dataSource]="dataSource" #table matSort [class.no-data]="dataSource.length === 0">
+            <ng-container matColumnDef="_row_sel" sticky>
+                <th mat-header-cell *matHeaderCellDef>
+                    <lib-checkbox (valueChange)="masterToggle()"
+                        [checked]="selection.hasValue() && isAllSelected()"
+                        [indeterminate]="selection.hasValue() && !isAllSelected()">
+                    </lib-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let row">
+                    <lib-checkbox
+                        (click)="$event.stopPropagation()"
+                        (valueChange)="selection.toggle(row)"
+                        [checked]="selection.isSelected(row)">
+                    </lib-checkbox>
+                </td>
+            </ng-container>
+
+            <ng-container matColumnDef="_row_actions" sticky>
+                <th mat-header-cell *matHeaderCellDef>
+                    <!-- <lib-button type="plain" rounded="true" iconFontType="light" icon="cog"></lib-button> -->
+                </th>
+                <td mat-cell *matCellDef="let element">
+                    <lib-button-group>
+                        <lib-button type="minor" icon="ellipsis-h" [matMenuTriggerFor]="moreActions">
+                        </lib-button>
+                        <mat-menu #moreActions="matMenu" class="navigation-menu">
+                            <button mat-menu-item *ngIf="element.running" (click)="cancelSchema(element.schemaId)">Cancel</button>
+                            <!-- <button mat-menu-item i18n="@@export_schema" (click)="exportSchema(element.schemaId)">
+                                Export schema
+                            </button> -->
+                            <lib-section></lib-section>
+                            <button mat-menu-item i18n="@@delete"
+                                (click)="deleteSchema(element.schemaId)">Delete</button>
+                        </mat-menu>
+    
+                            <ng-template [ngIf]="!element.running" [ngIfElse]="inRunningMode">
+                                <lib-button type="minor" (click)="openChckData(element)">
+                                    <mat-icon fontSet="mdo-icons-light">play</mat-icon>
+                                </lib-button>
+                            </ng-template>
+                            <ng-template #inRunningMode>
+                                <lib-button type="minor">
+                                    <lib-spinner size="14" class="lib-spinner"></lib-spinner>
+                                </lib-button>
+                            </ng-template>
+    
+                            <lib-button type="minor" [disabled]="element.running" (click)="openSchemaTab(element.schemaId, 'statics', element)">
+                                <mat-icon fontSet="mdo-icons-light">chart-bar</mat-icon>
+                            </lib-button>
+                            <!-- <lib-button type="minor">
+                                <mat-icon fontSet="mdo-icons">server</mat-icon>
+                            </lib-button> -->
+                            <lib-button type="minor" iconFontType="light" [disabled]="element.running" (click)="openSchemaTab(element.schemaId, 'details', element)">
+                                <mat-icon fontSet="mdo-icons-light">table</mat-icon>
+                            </lib-button>
+                        </lib-button-group>
+                    </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="schema" sticky>
+                    <th mat-header-cell *matHeaderCellDef>
+                        <div mat-sort-header>Schema</div>
+                    </th>
+    
+                    <td mat-cell *matCellDef="let element">
+                        <lib-text-line type="base" textColor="link" class="cursor" (click)="openSchemaTab(element.schemaId, 'details', element)">
+                            {{ element.schemaDescription }}
+                        </lib-text-line>
+                    </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="dataset">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <div mat-sort-header> Dataset</div>
+                    </th>
+                    <td mat-cell *matCellDef="let element">
+                        {{ element.moduleDesc }}
+                    </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="business_rules">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <div mat-sort-header> Business rule </div>
+                    </th>
+                    <td mat-cell *matCellDef="let element;">
+                        <lib-chip-list class="label-spacer">
+                            <lib-label class="label-chips" [text]="getRuleDesc(r)" *ngFor="let r of getUniqueRuleNames(element?.brs) | slice:0:2">                                
+                            </lib-label>
+                            <ng-template [ngIf]="getUniqueRuleNames(element?.brs).length>2">
+                                <lib-label class="label-chips"
+                                text="+{{ getUniqueRuleNames(element?.brs).length -2 }}"
+                                [matMenuTriggerFor]="rules">
+                                </lib-label>
+                                <mat-menu #rules="matMenu">
+                                    <div class="f-col lib-chip-dropdown">
+                                        <lib-chip-list class="mdo-chip-list">
+                                            <lib-label class="label-chips"
+                                            [text]="getRuleDesc(r)"
+                                                *ngFor="let r of getUniqueRuleNames(element?.brs) | slice:2:getUniqueRuleNames(element?.brs).length">
+                                            </lib-label>
+                                        </lib-chip-list>
+                                    </div>
+                                </mat-menu>
+                            </ng-template>
+                        </lib-chip-list>
+                    </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="result">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <div mat-sort-header> Result</div>
+                    </th>
+                    <td mat-cell *matCellDef="let element; let rIndex = index;">
+                        <ng-template [ngIf]="!element.running" [ngIfElse]="runningTxt">
+                            <div class="mdo-progress-segment mdo-margin-bottom-medium">
+                                <div [ngStyle]="{'width.%':getStats('errorCnt', rIndex)}" class="error-cnt-status"></div>
+                                <div [ngStyle]="{'width.%':getStats('successCnt', rIndex)}" class="success-cnt-status"></div>
+                                <div [ngStyle]="{'width.%':getStats('correctedCnt', rIndex)}" class="correction-status"></div>
+                                <div [ngStyle]="{'width.%':getStats('skippedCnt', rIndex)}" class="skipped-status"></div>
+                                <div [ngStyle]="{'width.%':getStats('outdatedCnt', rIndex)}" class="expired-status"></div>
+                            </div>
+                        </ng-template>
+                        <ng-template #runningTxt>
+                            <lib-text-line type="base">
+                                Running
+                            </lib-text-line>
+                        </ng-template>
+    
+                    </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="started">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <div mat-sort-header> Started </div>
+                    </th>
+                    <td mat-cell *matCellDef="let element; let rIndex = index;">
+                        {{ element.exeStrtDate ? (element.exeStrtDate | date:'MMM d, y, h:mm:ss a'): 'N/A' }}
+                    </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="finished">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <div mat-sort-header> Finished </div>
+                    </th>
+                    <td mat-cell *matCellDef="let element; let rIndex = index;">
+                        {{ element.exeEndDate ? (element.exeEndDate | date:'MMM d, y, h:mm:ss a'): 'N/A' }}
+                    </td>
+                </ng-container>
+    
+                <ng-container matColumnDef="exe_by">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <div mat-sort-header> Executed by </div>
+                    </th>
+                    <td mat-cell *matCellDef="let element; let rIndex = index;">
+                        {{ element.createdBy }}
+                    </td>
+                </ng-container>
+    
+                <tr mat-header-row *matHeaderRowDef="displayedFields; sticky: true"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedFields;"></tr>
+            </table>
+
+            <ng-container *ngIf="dataLoaders.loadTable">
+                <lib-skeleton-table class="table-skeleton"></lib-skeleton-table>
+            </ng-container>
+        </div>
+        <div class="f-row footer">
+            <lib-pagination
+            [currentPageIndex]="paginationCtrl.currentPage"
+            [pageSize]="paginationCtrl.pageSize"
+            [totalCount]="paginationCtrl.totalCnt"
+            (pageChangeEvent)="goTo($event)">
+        </lib-pagination>
+        <lib-text-line type="base" enableWrap="true">
+        </lib-text-line>
+        </div>
+    </div>
+    <ng-container *ngIf="showLoader">
+        <div class="f-col root">
+            <pros-toolbar-skeleton></pros-toolbar-skeleton>
+            <lib-skeleton-table></lib-skeleton-table>
+        </div>
+    </ng-container>
+</ng-template>

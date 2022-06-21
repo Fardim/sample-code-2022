@@ -1,0 +1,88 @@
+<mat-expansion-panel #panel="matExpansionPanel" [expanded]="true" togglePosition="before" class="mat-elevation-z0">
+  <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+    <lib-text-line weight="strong">Recipients</lib-text-line>
+  </mat-expansion-panel-header>
+
+  <form [formGroup]="recipientsFormGroup" class="recipients">
+    <div formArrayName="emailRecipients">
+      <div *ngFor="let item of emailRecipientsCtrl.controls; let i = index">
+        <ng-container [formGroupName]="i">
+          <div class="f-row defined-row">
+            <div class="col col-x8">
+              <div class="f-col mdo-field">
+                <div class="mdo-field-input">
+                  <input
+                    matInput
+                    #keyFieldInputEl
+                    #emailRecipientsTrigger="matAutocompleteTrigger"
+                    [matAutocomplete]="emailRecipientsAuto"
+                    formControlName="type"
+                    placeholder="Type"
+                    autocomplete="off"
+                  />
+                  <mat-autocomplete
+                    class="mdo-autocomplete"
+                    #emailRecipientsAuto="matAutocomplete"
+                    [displayWith]="displayEmailRecipients.bind(this)"
+                    (optionSelected)="emailRecipientsSelected($event, i)"
+                  >
+                    <mat-option *ngFor="let type of emailRecipientsTypes" [value]="type">
+                      {{ type.label }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </div>
+              </div>
+            </div>
+
+            <div class="col col-x8 send-to-input">
+              <div class="f-col mdo-field ">
+                <div class="mdo-field-input">
+                  <input matInput #sendToInputEl #fldValueAutoTrigger="matAutocompleteTrigger" [matAutocomplete]="fldValue"
+                    formControlName="sendTo"
+                    (keyup)="fieldDropvalueSearchSub.next({s: sendToInputEl.value, type:'sendTo', index: i})"
+                    (click)="initDropValueList('source',i)" />
+                  <mat-autocomplete class="mdo-autocomplete" #fldValue="matAutocomplete"
+                    (optionSelected)="isDropdownInitializing=true;sourceFieldValueSelected($event,i)">
+                    <ng-template [ngIf]="!isDropdownInitializing">
+                      <ng-template [ngIf]="(fieldDropValuesSub | async)?.length !== 0" [ngIfElse]="noKeyFieldsValue">
+                        <mat-option *ngFor="let dropValue of fieldDropValuesSub | async" [value]="dropValue">
+                          {{ dropValue }}
+                        </mat-option>
+                      </ng-template>
+                      <ng-template #noKeyFieldsValue>
+                        <mat-option disabled>No data found</mat-option>
+                      </ng-template>
+                    </ng-template>
+                  </mat-autocomplete>
+                </div>
+              </div>
+            </div>
+
+            <div class="col col-x2 end-items">
+              <div class="f-row end-items">
+                <lib-button
+                  type="plain"
+                  icon="trash-alt"
+                  iconFontType="light"
+                  (afterClick)="removeEmailRecipients(i)"
+                ></lib-button>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="f-col mdo-field">
+      <lib-text-line textColor="link" (click)="addEmailRecipients()">+ Add another</lib-text-line>
+    </div>
+
+    <div class="f-col mdo-field" *ngIf="getEmailsList">
+      <lib-text-line type="xsmall">Emails: {{ getEmailsList }}</lib-text-line>
+    </div>
+
+    <!-- <div class="f-col mdo-field">
+      <pros-chips-input label="cc" formControlName="cc"></pros-chips-input>
+    </div> -->
+  </form>
+</mat-expansion-panel>

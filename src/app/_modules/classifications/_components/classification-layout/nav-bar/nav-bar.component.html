@@ -1,0 +1,52 @@
+<div *ngIf="!loader" class="root">
+  <lib-search class="lib-search" placeholder="Search classification" prosClickStopPropagation (valueChange)="searchSub.next($event)"></lib-search>
+  <cdk-virtual-scroll-viewport itemSize="10" (scroll)="onScroll($event)" class="viewport-scroll" #scrollableTree>
+    <mat-tree #treeSelector [dataSource]="dataSource" [treeControl]="treeControl">
+      <!-- Leaf node -->
+      <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding matTreeNodePaddingIndent="24" [ngClass]="{active: node.uuid===_selectedNode?.uuid}" (click)="onNodeSelect(node)" isExpanded="node.uuid===_selectedNode?.uuid">
+        <div class="f-row">
+          <button mat-icon-button disabled></button>
+            <span class="text-overflow" [innerHTML]="node.name | highlight: searchString">
+                {{node.name}}
+            </span>
+        </div>
+        <lib-button-group *ngIf="!node.enableSync">
+          <lib-button type="plain" icon="ellipsis-h" [matMenuTriggerFor]="moreActions">
+          </lib-button>
+          <mat-menu #moreActions="matMenu" class="navigation-menu">
+            <button mat-menu-item i18n="@@new_class" (click)="openDialog(node)">New class</button>
+            <!-- <button *ngIf="!node.level" i18n="@@edit" mat-menu-item (click)="openDialog(node)">Edit</button>
+            <button mat-menu-item i18n="@@delete" (click)="onNodeSelect(node,'DELETE')">Delete</button> -->
+          </mat-menu>
+        </lib-button-group>
+      </mat-tree-node>
+
+      <!-- expandable node -->
+      <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding matTreeNodePaddingIndent="24" [ngClass]="{active: node.uuid===_selectedNode?.uuid}" (click)="onNodeSelect(node)">
+        <div class="f-row" isExpanded="treeControl.isExpanded(node)">
+          <button mat-icon-button [attr.aria-label]="'Toggle ' + node.item" (click)="loadChildren(node)"
+            matTreeNodeToggle>
+            <mat-icon class="mat-icon-rtl-mirror">
+              {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+            </mat-icon>
+          </button>
+          <span class="text-overflow" [innerHTML]="node.name | highlight: searchString">
+            {{node.name}}
+          </span>
+        </div>
+        <lib-button-group *ngIf="!node.enableSync">
+          <lib-button type="plain" icon="ellipsis-h" [matMenuTriggerFor]="moreActions">
+          </lib-button>
+          <mat-menu #moreActions="matMenu" class="navigation-menu">
+            <button mat-menu-item i18n="@@new_class" (click)="openDialog(node)">New class</button>
+            <!-- <button mat-menu-item *ngIf="!node.level" i18n="@@edit" (click)="openDialog(node)">Edit</button>
+            <button mat-menu-item i18n="@@delete" (click)="onNodeSelect(node,'DELETE')">Delete</button> -->
+          </mat-menu>
+        </lib-button-group>
+      </mat-tree-node>
+    </mat-tree>
+  </cdk-virtual-scroll-viewport>
+</div>
+<div *ngIf="loader" class="f-col">
+  <lib-skeleton-navtree style="width: 220px;" ></lib-skeleton-navtree>
+</div>

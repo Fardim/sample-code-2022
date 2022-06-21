@@ -1,0 +1,36 @@
+mat-card.root {
+  user-select: text;
+  height: 100%;
+  overflow: auto;
+  width: 900px;
+  padding: 0 16px;
+
+  .breadcrum-toolbar {
+    align-items: center;
+    padding-top: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+
+    .mdo-constrained-right {
+      align-items: center;
+      width: 100%;
+    }
+  }
+
+  .mdo-justify {
+    pros-summary-tabs {
+      width: 100%;
+    }
+  }
+}
+
+@media (min-width: 1200px) {
+  .mdo-justify {
+    margin: 0 38px;
+  }
+
+  .mdo-constrained-right {
+    margin-right: 54px;
+  }
+}

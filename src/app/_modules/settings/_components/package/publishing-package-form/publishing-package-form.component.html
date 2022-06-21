@@ -1,0 +1,42 @@
+<div class="root">
+  <div class="f-row">
+    <lib-text-line type="leading" mat-dialog-title i18n="@publish_to_connekthub">Publish to connekthub</lib-text-line>
+    <div class="f-spacer"></div>
+    <mat-icon fontSet="mdo-icons-light" mat-dialog-close>times</mat-icon>
+  </div>
+  <mat-dialog-content class="mat-typography">
+    <lib-input [isRequired]="true" i18n="@@name" label="Name"></lib-input>
+    <lib-textarea i18n="@@description" label="Description" [rows]="3" [cols]="10">
+    </lib-textarea>
+
+    <lib-input i18n="@@tags" label="Tags"></lib-input>
+
+    <lib-textarea i18n="@@what's_new" label="What's new?" [rows]="3" [cols]="10">
+    </lib-textarea>
+
+    <lib-input i18n="@@documentation_link`" label="Documentation link"></lib-input>
+
+    <div class="f-row">
+      <lib-input i18n="reference_image_url" class="w-95" label="Reference image URL"></lib-input>
+      <div class="f-spacer"></div>
+      <mat-icon fontSet="mdo-icons-light">plus</mat-icon>
+    </div>
+
+    <div class="f-row">
+      <lib-input i18n="reference_video_url" class="w-95" label="Reference video URL"></lib-input>
+      <div class="f-spacer"></div>
+      <mat-icon fontSet="mdo-icons-light">plus</mat-icon>
+    </div>
+
+    <div class="f-row">
+      <lib-input i18n="reference_attacment_url" class="w-95" label="Reference attacment URL"></lib-input>
+      <div class="f-spacer"></div>
+      <mat-icon fontSet="mdo-icons-light">plus</mat-icon>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions class="f-row">
+    <button mat-button mat-dialog-close>Cancel</button>
+    <div class="f-spacer"></div>
+    <lib-button type="major" i18n="@publish">Publish</lib-button>
+  </mat-dialog-actions>
+</div>

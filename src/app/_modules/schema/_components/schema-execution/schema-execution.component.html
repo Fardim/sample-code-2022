@@ -1,0 +1,61 @@
+<div class="root">
+
+    <div class="breadcrumb-wrapper">
+      <pros-breadcrumb [crumbs]="breadcrumb"></pros-breadcrumb>
+    </div>
+
+    <div class="flex-col-12">
+        <mat-card class="bxshadow-variant-0 mat-background-0">
+          <mat-card-content class="flex-container-grow">
+            <div class="grid-flexcol-3">
+              <h3 class="H3">{{breadcrumb.heading}}</h3>
+              <mat-list class="variant-listcount">
+                  <mat-list-item>
+                    <h4 mat-line>{{schemaDetail.totalCount}}</h4>
+                    <p mat-line> Total</p>
+                  </mat-list-item>
+                  <mat-list-item>
+                    <h4 mat-line>{{schemaDetail.errorCount}}</h4>
+                    <p mat-line> Error</p>
+                  </mat-list-item>
+                  <mat-list-item>
+                    <h4 mat-line>{{schemaDetail.successCount}}</h4>
+                    <p mat-line> Success</p>
+                  </mat-list-item>
+                  <mat-list-item>
+                    <button mat-flat-button color="primary">Execute</button>
+                  </mat-list-item>
+              </mat-list>
+          </div>
+          <div class="grid-flexcol-9">
+            <mat-card class="bxshadow-variant-1">
+              <mat-card-content>
+                <div class="flex-row-container">
+                  
+                  <!-- START FOR RUN TYPE-->
+                  <label>Select execution type</label>
+                  <mat-radio-group
+                    aria-labelledby="Select execution type"
+                    [(ngModel)]="selectedRunType">
+                    <mat-radio-button>
+                      All
+                    </mat-radio-button>
+                    <!-- <mat-radio-button  [value]="conditional">
+                      Conditional
+                    </mat-radio-button>
+                    <mat-radio-button  [value]="runwithvariant">
+                      Run with variant
+                    </mat-radio-button> -->
+                  </mat-radio-group>
+                   <!-- END FOR RUN TYPE-->
+                  </div>
+                <button mat-flat-button color="primary" (click)="openDialog()">Run</button>
+
+              </mat-card-content>
+            </mat-card>
+          </div>
+          </mat-card-content>
+        </mat-card>
+    </div>
+
+</div>

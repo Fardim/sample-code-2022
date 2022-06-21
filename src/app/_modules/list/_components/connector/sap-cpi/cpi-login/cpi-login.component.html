@@ -1,0 +1,76 @@
+<mat-card class="root mat-elevation-z0">
+  <div class="modal-wrapper">
+    <div class="f-row modal-header">
+      <lib-text-line type="leading">New dataset/Bring over/SAP CPI</lib-text-line>
+      <lib-button icon="times" iconFontType="light" (click)="onCancelClick()"></lib-button>
+    </div>
+
+    <div class="modal-body">
+      <div class="f-col manually-dataset">
+        <form [formGroup]="loginForm" class="f-col dataset-form">
+          <div class="f-col">
+            <lib-banner status="error" *ngIf="showErrorBanner" [text]="loginFormErrMsg"></lib-banner>
+          </div>
+
+          <div class="f-col">
+            <lib-input label="Name" [isRequired]="true" i18n-label="@@name" formControlName="systemName" type="text"
+              placeholder="Name for this connection..."
+              [hint]="(loginForm.controls.systemName.touched && loginForm.controls.systemName.errors && loginForm.controls.systemName.errors.required) ? 'This is a required field' : ''"
+              [hasError]="loginForm.controls.systemName.touched && loginForm.controls.systemName.errors && loginForm.controls.systemName.errors.required">
+            </lib-input>
+          </div>
+
+          <div class="f-col">
+            <lib-textarea label="System description" [isRequired]="true" i18n-label="@@systemDesc" type="text"
+              formControlName="systemDesc" placeholder="This is the pre-populated system description for the adaptor"
+              [hint]="(loginForm.controls.systemDesc.touched && loginForm.controls.systemDesc.errors && loginForm.controls.systemDesc.errors.required) ? 'This is a required field' : ''"
+              [hasError]="loginForm.controls.systemDesc.touched && loginForm.controls.systemDesc.errors && loginForm.controls.systemDesc.errors.required">
+            </lib-textarea>
+          </div>
+
+          <div class="f-col mdo-field" [class.has-error]="loginForm.controls.systemUrl.touched && loginForm.controls?.systemUrl.invalid">
+            <lib-text-line type="xsmall" weight="strong" class="field-label" i18n-label="@@systemURL">System URL
+            </lib-text-line>
+            <div class="mdo-field-input">
+              <input matInput placeholder="URL of the system you wish to connect..." formControlName="systemUrl" type="text" />
+            </div>
+            <mat-error *ngIf="loginForm.controls.systemUrl.touched">
+              <mat-error *ngIf="loginForm.controls.systemUrl.errors?.required">
+                <lib-text-line type="small"> This is required</lib-text-line>
+              </mat-error>
+              <mat-error *ngIf="loginForm.controls.systemUrl.errors?.pattern">
+                <lib-text-line type="small">Invalid URL</lib-text-line>
+              </mat-error>
+            </mat-error>
+          </div>
+
+          <div class="f-col">
+            <lib-input label="Username" [isRequired]="true" i18n-label="@@username" type="text"
+              formControlName="username"
+              [hint]="(loginForm.controls.username.touched && loginForm.controls.username.errors && loginForm.controls.username.errors.required) ? 'This is a required field' : ''"
+              [hasError]="loginForm.controls.username.touched && loginForm.controls.username.errors && loginForm.controls.username.errors.required">
+            </lib-input>
+          </div>
+
+          <div class="f-col">
+            <lib-input label="Password" [isRequired]="true" type="password" i18n-label="@@password"
+              formControlName="userPassword"
+              [hint]="(loginForm.controls.userPassword.touched && loginForm.controls.userPassword.errors && loginForm.controls.userPassword.errors.required) ? 'This is a required field' : ''"
+              [hasError]="loginForm.controls.userPassword.touched && loginForm.controls.userPassword.errors && loginForm.controls.userPassword.errors.required">
+            </lib-input>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="f-row modal-footer space-between">
+      <lib-button type="plain" width="80px" (click)="onCancelClick()" i18n="@@cancel">Cancel</lib-button>
+      <span class="f-spacer"></span>
+      <div class="f-row">
+        <lib-button type="plain" width="80px" i18n="@@back" (click)="back()">Back</lib-button>
+        &nbsp;
+        <lib-button type="major" width="80px" i18n="@@next" (click)="next()">Next</lib-button>
+      </div>
+    </div>
+  </div>
+</mat-card>

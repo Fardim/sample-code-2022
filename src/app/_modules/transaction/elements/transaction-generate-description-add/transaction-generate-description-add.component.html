@@ -1,0 +1,40 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading" enableWrap="true">
+                    New value
+                </lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button i18n="@@save" width="80px" type="major" class="save-btn" (click)="save()">Save</lib-button>
+            </div>
+        </div>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing">
+        <div class="mdo-justify">
+            <form [formGroup]="frmGroup">
+                <div class="f-col">
+                    <lib-input label="Short value" autocomplete="off" formControlName="short"></lib-input>
+                </div>
+                <div class="f-col">
+                    <lib-input label="Long value" autocomplete="off" formControlName="long"></lib-input>
+                </div>
+                <div class="f-col">
+                    <lib-input label="Numeric value" autocomplete="off" type="number" formControlName="numeric"></lib-input>
+                </div>
+                <div class="f-col">
+                    <lib-text-line type="xsmall" weight="strong" class="field-label">Language</lib-text-line>
+                    <mat-form-field appearance="outline">
+                        <input matInput formControlName="lang" readonly=true />
+                        <lib-button icon="chevron-down" matSuffix prosClickStopPropagation>
+                        </lib-button>
+                    </mat-form-field>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+</div>

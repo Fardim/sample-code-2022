@@ -1,0 +1,106 @@
+<div class="f-col" *ngIf="showSkeleton">
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+    <lib-skeleton type="line"></lib-skeleton>
+</div>
+
+<!-- <ng-container *ngIf="submitError.status">
+    <pros-error-state></pros-error-state>
+</ng-container> -->
+
+<ng-container *ngIf="!showSkeleton && !hasData">
+    <lib-empty-state icon="table" [iconSize]="100" primaryText="Nothing to see here"
+        secondaryText="No characteristics are available.">
+        <!-- <lib-button (afterClick)="newCharacteristics()" type="minor" i18n="@@new_characteristics">New characteristics</lib-button> -->
+    </lib-empty-state>
+    <!-- <pros-class-characteristics-empty-view></pros-class-characteristics-empty-view> -->
+</ng-container>
+
+<div [ngClass]="{'char-table': true, 'has-selection': selection.hasValue(), 'has-no-selection': !selection.hasValue()}"
+    *ngIf="!submitError.status && hasData">
+    <table mat-table [ngStyle]="{ 'display': showSkeleton ? 'none' : '' }" [dataSource]="dataSource"
+        class="mat-elevation-z0">
+
+        <!-- Checkbox Column -->
+        <ng-container matColumnDef="select" *ngIf="showAction">
+            <th mat-header-cell *matHeaderCellDef>
+                <lib-checkbox-option [menuOptions]="CheckboxOptions" (valueChange)="masterToggle($event)"
+                    [checked]="selection.hasValue()" [indeterminate]="selection.hasValue() && !isAllSelected()">
+                </lib-checkbox-option>
+            </th>
+            <td mat-cell *matCellDef="let element">
+                <lib-checkbox (valueChange)="toggle(element)" [checked]="isChecked(element)">
+                </lib-checkbox>
+            </td>
+        </ng-container>
+
+        <!-- Action Column -->
+        <ng-container matColumnDef="action" *ngIf="showAction">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let element">
+                <lib-button type="plain" icon="ellipsis-h" [matMenuTriggerFor]="actions">
+                </lib-button>
+                <mat-menu #actions="matMenu" class="navigation-menu">
+                    <button mat-menu-item i18n="@@edit" (click)="edit(element)">Edit</button>
+                    <button mat-menu-item i18n="@@duplicate" (click)="duplicate(element)">Duplicate</button>
+                    <button mat-menu-item i18n="@@reorder" (click)="reorder()">Reorder</button>
+                    <button mat-menu-item i18n="@@manage_languages" (click)="openLanguageSheet(element)">Manage Languages</button>
+                    <mat-divider></mat-divider>
+                    <button mat-menu-item i18n="@@delete" (click)="deleteCharacteristic(element.uuid)">Delete</button>
+                </mat-menu>
+            </td>
+        </ng-container>
+
+        <ng-container *ngFor="let column of columns">
+            <ng-container [matColumnDef]="column" *ngIf="(column !== 'select' && column !== 'action')">
+                <th mat-header-cell *matHeaderCellDef> {{ getLabel(column) }} </th>
+                <td mat-cell *matCellDef="let element">
+                    <ng-container
+                        *ngIf="!['language', 'fieldType', 'dimensionType', 'validFrom', 'validTo'].includes(column)">
+                        {{ element[column] }}
+                    </ng-container>
+                    <ng-container *ngIf="column === 'dimensionType'">
+                        {{ getDimensionName(element[column]) }}
+                    </ng-container>
+
+                    <ng-container *ngIf="(column === 'fieldType')">
+                        <div (click)="openSideSheet(element, element[column])"
+                            [ngClass]="{link: (element[column]).includes('DROPDOWN')}">{{ element[column] }}</div>
+                    </ng-container>
+
+                    <ng-container *ngIf="(column === 'language')">
+                        <lib-chip-list>
+                            <ng-container *ngFor="let opt of element.labels; let i=index">
+                                <ng-container *ngIf="i<=limit-1">
+                                    <lib-chip class="lib-chips">{{getLanguage(opt?.language)}}</lib-chip>
+                                </ng-container>
+                            </ng-container>
+                            <lib-chip *ngIf="hasLimit(element.labels)" class="lib-chips">+{{element.labels.length -
+                                limit}}
+                            </lib-chip>
+                        </lib-chip-list>
+                    </ng-container>
+                    <ng-container *ngIf="['validFrom', 'validTo'].includes(column)">
+                        {{ formatDate(element[column]) }}
+                    </ng-container>
+                </td>
+            </ng-container>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns;">
+        </tr>
+    </table>
+</div>
+
+<div *ngIf="hasData && !showSkeleton">
+    <div class="f-row-spacer-half"></div>
+    <div class="f-row">
+        <lib-pagination [currentPageIndex]="page" [totalCount]="totalCount" [pageSize]="size"
+            (pageChangeEvent)="onPageChange($event)">
+        </lib-pagination>
+        <lib-text-line type="base">{{ displayedRecordsRange }}</lib-text-line>
+    </div>
+</div>

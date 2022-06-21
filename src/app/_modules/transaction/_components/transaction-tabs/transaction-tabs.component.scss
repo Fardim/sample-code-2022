@@ -1,0 +1,30 @@
+div.root {
+  .transaction-tab-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .scroll-height {
+    max-height: 320px;
+    overflow: auto;
+  }
+
+  .section-container {
+    padding-right: 12px;
+    margin-top: 12px;
+
+    .mat-expansion-panel {
+      margin-bottom: 8px;
+
+      .mat-expansion-panel-header {
+        padding: 0 8px;
+        border-radius: 3px;
+
+        &.cdk-mouse-focused {
+          background: transparent;
+        }
+      }
+    }
+  }
+}

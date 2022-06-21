@@ -1,0 +1,31 @@
+<div class="root child-fields">
+    <ng-container *ngFor="let field of structureFieldList;let i = index">
+      <mat-accordion *ngIf="field?.childfields?.length; else noHierarchy">
+        <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" [expanded]="true">
+          <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px"  class="grid-level-down">
+            <mat-panel-title class="f-row">
+              <lib-text-line type="base" enableWrap="true">{{(field.description || ('Untitled')) }}</lib-text-line>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <pros-hierarchy-field-list [structureDetails]="structureDetails" [structureFieldList]="field.childfields" (fieldSelected)="structureFieldSelected($event)">
+          </pros-hierarchy-field-list>
+        </mat-expansion-panel>
+      </mat-accordion>
+
+      <ng-template #noHierarchy>
+        <mat-list [disableRipple]="true" class="mdo-list level-down">
+          <mat-list-item class="mat-list-item header-data-item" (click)="onFieldClick(field)" [class.selected]="field.fieldId === selectedFieldId">
+            <div class="f-row">
+              <lib-text-line type="leading" textColor="secondary">
+                <mat-icon fontSet="mdo-icons-light"> {{ getFieldIcon(field) }} </mat-icon>
+              </lib-text-line>
+              <span class="f-col-spacer-half"></span>
+              <lib-text-line type="base" enableWrap="true">{{(field?.description || field?.fieldDesc || 'Untitled') }}</lib-text-line>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </ng-template>
+
+    </ng-container>
+</div>

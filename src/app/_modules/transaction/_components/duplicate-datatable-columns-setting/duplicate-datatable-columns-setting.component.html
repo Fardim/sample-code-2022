@@ -1,0 +1,83 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button iconFontType="light" icon="times" (afterClick)="close()"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-col breadcrum-head">
+                <div class="f-row">
+                    <lib-text-line type="leading" i18n="@@configure_view">Configure view</lib-text-line>
+                    <span class="f-col-spacer-half"></span>
+                    <span class="f-spacer"></span>
+                    <lib-button type="major" width="80px" (afterClick)="save()" i18n="@@save">
+                        Save </lib-button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row-spacer"></div>
+    <div class="f-col sidesheetcontent-listing" prosInfiniteScroll bufferPercentage="20"
+        (scrollEnd)="getModuleFldMetadata(true)">
+        <div class="f-col mdo-justify">
+            <div class="f-col">
+                <lib-tab-group disableRipple="true"
+                    [selectedIndex]="selectedTabIndex"
+                    (selectedIndexChange)="selectedTabChange($event)">
+                  <lib-tab label="">
+                    <div label>
+                      <lib-text-line [enableWrap]="false"> Dataset fields </lib-text-line>
+                    </div>
+                  </lib-tab>
+                  <lib-tab label="">
+                    <div label>
+                      <lib-text-line [enableWrap]="false"> System fields </lib-text-line>
+                    </div>
+                  </lib-tab>
+                </lib-tab-group>
+                <div class="row-spacer"></div>
+                <lib-search i18n-placeholder="@@search" #searchInput placeholder="Search columns"
+                    (valueChange)="searchFieldSub.next($event);"></lib-search>
+
+                <div class="check-list">
+                    <div class="f-row colunm-box">
+                        <div class="col"></div>
+                        <div class="col col-x4">
+                            <lib-text-line type="base" weight="strong" i18n="@@Column">Column</lib-text-line>
+                        </div>
+                        <span class="f-spacer"></span>
+                        <div class="col">
+                            <lib-text-line type="base" weight="strong" i18n="@@Visible">Visible</lib-text-line>
+                        </div>
+                        <span class="f-col-spacer-half"></span>
+                    </div>
+                    <div cdkDropList [cdkDropListData]="suggestedFieldsMetadata" (cdkDropListDropped)="drop($event)"
+                        class="fields-container">
+                        <ng-container *ngFor="let fld of suggestedFieldsMetadata">
+                            <div *ngIf="showField(fld)" cdkDrag [cdkDragData]="fld.fieldId" class="colunm-list">
+                                <div class="f-row colunm-box">
+                                    <div class="col">
+                                        <lib-button cdkDragHandle type="plain" iconFontType="light" icon="grip-lines">
+                                        </lib-button>
+                                    </div>
+    
+                                    <div class="col col-x4">
+                                        <lib-text-line type="base" enablewrap="true">{{ fld.fieldDescri ? fld.fieldDescri :
+                                            (fld.fieldDescri
+                                            ?
+                                            fld.fieldDescri : 'Untitled') }} </lib-text-line>
+                                    </div>
+    
+                                    <div class="f-spacer"></div>
+    
+                                    <div class="col">
+                                        <lib-checkbox [checked]="isChecked(fld)" (valueChange)="selectionChange(fld)">
+                                        </lib-checkbox>
+                                    </div>
+                                </div>
+                            </div>
+                        </ng-container>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

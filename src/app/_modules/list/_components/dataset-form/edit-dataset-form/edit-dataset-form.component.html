@@ -1,0 +1,372 @@
+<mat-drawer-container class="sidenav-container" autosize hasBackdrop="false">
+  <mat-drawer #drawer mode="side" position="end" id="property-panel">
+    <!-- Section property panel -->
+    <pros-section-property *ngIf="activePropertyPanel === 'section'" [sectionProperty]="sectionProperty" [moduleId]="moduleId"
+      [tabIndex]="tabIndex" (updateSectionProperty)="updateSectionProperty($event)"
+      (closed)="editDataSet()"></pros-section-property>
+
+    <!-- Grid Field Form property panel -->
+    <pros-form-grid-field-property-panel *ngIf="activePropertyPanel === 'grid_field'" [fieldProperty]="gridFieldProperty" [moduleId]="moduleId"
+    [tabIndex]="tabIndex" (updateFieldProperty)="updateFieldProperty($event)" (closed)="editDataSet()"></pros-form-grid-field-property-panel>
+
+    <div class="properties-container f-col">
+      <!-- Form property panel -->
+      <pros-dataset-form-properties class="panel" [ngClass]="{'hidden-panel': (activePropertyPanel === 'section' || activePropertyPanel === 'grid_field')}"></pros-dataset-form-properties>
+    </div>
+
+  </mat-drawer>
+  <mat-drawer-content>
+    <div class="root">
+      <div class="f-row breadcrumb-toolbar">
+        <lib-button type="plain" (click)="closeSidesheet()" iconFontType="light" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col dataset-filters">
+          <div class="f-row">
+            <lib-text-line type="leading" enableWrap="true">{{ updateDatasetFormModel?.form?.description || 'New form' }}
+            </lib-text-line>
+            <div class="f-spacer"></div>
+            <lib-search class="lib-search" i18n-placeholder="@@search" placeholder="Search"
+              (valueChange)="searchFieldSub.next($event)">
+            </lib-search>
+            <lib-button i18n="@@discard" type="plain" (click)="close()"> Discard </lib-button>
+            &nbsp;
+            <lib-button i18n="@@save" type="major" width="80px" (afterClick)="save()" [disabled]="saving"> Save
+            </lib-button>
+          </div>
+          <div class="f-row-spacer-half"></div>
+          <!-- <div class="f-row">
+            <lib-search class="lib-search" i18n-placeholder="@@search" placeholder="Search"
+              (valueChange)="searchFieldSub.next($event)">
+            </lib-search>
+            <lib-chip-list>
+              <lib-chip label="Changes" i18n-label="@@changes" type="info" [selectable]="true" [selected]="currentFilter == 'Changes'" (click)="currentFilterSub.next('Changes')"></lib-chip>
+              <lib-chip label="Errors" i18n-label="@@errors" type="info" [selectable]="true" [selected]="currentFilter == 'Errors'" (click)="currentFilterSub.next('Errors')"></lib-chip>
+              <lib-chip label="Deleted" i18n-label="@@deleted" type="info" [selectable]="true" [selected]="currentFilter == 'Deleted'" (click)="currentFilterSub.next('Deleted')"></lib-chip>
+            </lib-chip-list>
+          </div> -->
+        </div>
+      </div>
+      <div class="row-spacer"></div>
+      <div class="f-col" *ngIf="hasFieldError">
+        <lib-banner status="error" [text]="'Please fix the errors below before saving your changes'"></lib-banner>
+      </div>
+
+      <div class="f-row listing-container" #listingContainer>
+        <div class="f-col listset-navigation" bufferPercentage="20">
+          <ng-template [ngIf]="!searchTerm">
+            <lib-section text="Form components" i18n-text="@@form_components" class="lib-section"></lib-section>
+            <mat-list [disableRipple]="true" id="form_components" cdkDropList cdkDropListSortingDisabled
+              [cdkDropListConnectedTo]="'tabs_list'" class="mdo-list">
+              <mat-list-item cdkDrag dkDragBoundary=".listing-container" class="header-data-item">
+                <lib-text-line type="base" i18n="@@section"> Section </lib-text-line>
+              </mat-list-item>
+            </mat-list>
+            <mat-list [disableRipple]="true" id="form_tab_components" cdkDropList cdkDropListSortingDisabled
+              [cdkDropListConnectedTo]="getTargetDropIds('form_tab_components')" class="mdo-list">
+              <mat-list-item cdkDrag cdkDragData="IMAGE" dkDragBoundary=".listing-container">
+                <lib-text-line type="base" i18n="@@image"> Image </lib-text-line>
+              </mat-list-item>
+              <mat-list-item cdkDrag cdkDragData="TEXT" dkDragBoundary=".listing-container">
+                <lib-text-line type="base" i18n="@@static_text"> Static text </lib-text-line>
+              </mat-list-item>
+            </mat-list>
+          </ng-template>
+          <lib-section text="Class type" class="lib-section" *ngIf="dataSource.data.length>0"></lib-section>
+          <ng-container *ngIf="!classData?.length">
+            <lib-empty-state 
+            icon="order"
+            [iconSize]="100"
+            primaryText="Nothing to see here"
+            secondaryText="Please add a class type to see class type list">
+            </lib-empty-state>
+          </ng-container>
+          <mat-list [disableRipple]="true" id="source_panel_hierarchy" cdkDropList
+           cdkDropListSortingDisabled
+           [cdkDropListData]="dataSource.data"
+          [cdkDropListConnectedTo]="getTargetDropIds('source_panel_hierarchy')" class="mdo-list">
+            <mat-tree #treeSelector [dataSource]="dataSource" [treeControl]="treeControl">
+              <!-- Leaf node -->
+              <mat-tree-node *matTreeNodeDef="let node" cdkDrag [cdkDragData]="node"
+              cdkDragHandle cdkDragBoundary=".listing-container"
+              (cdkDragEnded)="enableAllTargetFormTabs($event)" matTreeNodePadding [ngClass]="{active: node.uuid===_selectedNode?.uuid}" (click)="onNodeSelect(node)" isExpanded="node.uuid===_selectedNode?.uuid">
+              <ng-container *ngIf="node?.level === 0">
+                <!-- matTooltip="Assigning class type to form will allow maintaining data for any class related to the Class type" -->
+                <div class="f-row">
+                  <lib-text-line type="base" enableWrap="true"
+                    [innerHTML]="node.name | highlight: searchTerm">
+                  </lib-text-line>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="node?.level !== 0">
+                <!-- matTooltip="Assigning a particular class to the form will allow maintaining characteristics for the assigned class as fields" -->
+                <div class="f-row" >
+                  <lib-text-line type="base" enableWrap="true"  enableWrap="true" class="text-overflow"
+                    [innerHTML]="node.name | highlight: searchTerm">
+                  </lib-text-line>
+                </div>
+                </ng-container>
+              </mat-tree-node>
+
+              <!-- expandable node -->
+              <mat-tree-node  cdkDrag [cdkDragData]="node"
+              cdkDragHandle cdkDragBoundary=".listing-container"
+              (cdkDragEnded)="enableAllTargetFormTabs($event)" *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding [ngClass]="{active: node.uuid===_selectedNode?.uuid}" (click)="onNodeSelect(node)">
+              <!-- matTooltip="Assigning class type to form will allow maintaining data for any class related to the Class type"   -->
+              <div class="f-row" isExpanded="treeControl.isExpanded(node)">
+                  <button mat-icon-button [attr.aria-label]="'Toggle ' + node.item"
+                    matTreeNodeToggle>
+                    <mat-icon class="mat-icon-rtl-mirror">
+                      {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                    </mat-icon>
+                  </button>
+                  <lib-text-line type="base" enableWrap="true" class="text-overflow"
+                    [innerHTML]="node.name | highlight: searchTerm">
+                  </lib-text-line>
+                </div>
+
+              </mat-tree-node>
+            </mat-tree>
+          </mat-list>
+          <mat-accordion *ngIf="searchTerm && assignedFieldsTabs.length > 0" multi>
+            <lib-section text="Used form fields" class="lib-section"></lib-section>
+            <mat-expansion-panel *ngFor="let tab of assignedFieldsTabs; let tabIndex = index" togglePosition="before"
+              class="mat-elevation-z0" [expanded]="searchTerm && tab?.fields?.length < 10"
+              hideToggle="{{ tab.fields && tab.fields.length ? 'false' : 'true' }}">
+              <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+                <mat-panel-title class="f-row">
+                  <pros-svg-icon size="24" icon="DATA_OBJECT" [viewBox]="'0 0 24 24'"></pros-svg-icon>
+                  <span class="f-col-spacer-half"></span>
+                  <lib-text-line type="base" enableWrap="true" class="text-overflow"
+                    [innerHTML]="tab.tabText || tab.description | highlight: searchTerm">
+                  </lib-text-line>
+                  <span class="f-spacer"></span>
+                  <lib-text-line type="base" textColor="secondary" enableWrap="true"  class="text-overflow">{{ tab.fields ? tab.fields.length : 0 }}
+                  </lib-text-line>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <mat-list [disableRipple]="true" class="level-down mdo-list" id="source_panel_tab_{{ tabIndex }}"
+                cdkDropList [cdkDropListData]="tab.fields" cdkDropListSortingDisabled
+                [cdkDropListConnectedTo]="getTargetDropIds('source_panel_tab')">
+                <mat-list-item *ngFor="let tField of tab.fields" cdkDrag [cdkDragData]="tField" cdkDragHandle
+                  cdkDragBoundary=".listing-container"
+                  (cdkDragEnded)="enableAllTargetFormTabs($event)"
+                  class="header-data-item">
+                  <div class="task-search-list-drag-el flex">
+                    <lib-text-line type="leading" textColor="secondary">
+                      <mat-icon fontSet="mdo-icons-light"> {{ getFieldIcon(tField) }} </mat-icon>
+                    </lib-text-line>
+                    <span class="f-col-spacer-half"></span>
+                    <lib-text-line type="base" enableWrap="true"  class="text-overflow">
+                      <div *ngIf="tField?.metadata; else showDescription"
+                        [innerHTML]="tField?.metadata[0]?.description | highlight: searchTerm"></div>
+                      <ng-template #showDescription>
+                        <div [innerHTML]="tField?.description | highlight: searchTerm"></div>
+                      </ng-template>
+                    </lib-text-line>
+                  </div>
+
+                  <!-- Do not remove -->
+                  <!-- Using empty placeholder to enable custom placeholder during drag to target -->
+                  <div class="cdk-drag-placeholder" *cdkDragPlaceholder></div>
+                </mat-list-item>
+              </mat-list>
+            </mat-expansion-panel>
+          </mat-accordion>
+
+          <mat-accordion>
+            <lib-section class="lib-section" [text]="searchTerm ? 'Unused form fields' : 'Form fields'"></lib-section>
+            <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" expanded="expanded"
+              hideToggle="{{ unassignedTabFields && unassignedTabFields.length ? 'false' : 'true' }}">
+              <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+                <mat-panel-title class="f-row">
+                  <lib-text-line type="base" enableWrap="true" i18n="@@header">Header data</lib-text-line>
+                  <span class="f-spacer"></span>
+                  <!-- <lib-button icon="plus" type="plain"></lib-button> -->
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+
+              <ng-container *ngFor="let hierarchy of unassignedTabFields; let hierarchyIndex = index">
+                <mat-accordion *ngIf="hierarchy.hierarchyId || hierarchy.hierarchyDesc; else noHierarchy">
+                  <mat-expansion-panel [expanded]="searchTerm && hierarchy?.fields?.length < 10" togglePosition="before"
+                    class="mat-elevation-z0">
+                    <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px"
+                      class="undertree-expansion-panel">
+                      <mat-panel-title class="f-row">
+                        <lib-text-line type="base" enableWrap="true" i18n="@@header" class="text-overflow">
+                          {{ hierarchy.hierarchyDesc || hierarchy.hierarchyId }}
+                        </lib-text-line>
+                        <span class="f-spacer"></span>
+                        <lib-text-line type="base" textColor="secondary">
+                          {{ hierarchy.fields ? hierarchy.fields.length : 0 }}</lib-text-line>
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="f-col" cdkDropList [cdkDropListData]="hierarchy.fields" cdkDropListSortingDisabled
+                    [cdkDropListConnectedTo]="getTargetDropIds('source_panel_hierarchy')"
+                    id="source_panel_hierarchy_{{ hierarchyIndex }}">
+                      <mat-list [disableRipple]="true" class="mdo-list">
+                        <mat-list-item *ngFor="let uField of hierarchy.fields" cdkDrag [cdkDragData]="uField"
+                          cdkDragHandle cdkDragBoundary=".listing-container"
+                          (cdkDragEnded)="enableAllTargetFormTabs($event)" class="two-level-down header-data-item">
+                          <div class="task-search-list-drag-el flex">
+                            <lib-text-line class="list-icon" type="leading" textColor="secondary">
+                              <mat-icon fontSet="mdo-icons-light"> {{ getFieldIcon(uField) }} </mat-icon>
+                            </lib-text-line>
+                            <span class="f-col-spacer-half"></span>
+                            <lib-text-line type="base" enableWrap="true" class="text-overflow">
+                              <div [innerHTML]="uField.description | highlight: searchTerm"></div>
+                            </lib-text-line>
+                          </div>
+
+                        <!-- Do not remove -->
+                        <!-- Using empty placeholder to enable custom placeholder during drag to target -->
+                        <div class="cdk-drag-placeholder" *cdkDragPlaceholder></div>
+                        </mat-list-item>
+                      </mat-list>
+                    </div>
+                  </mat-expansion-panel>
+                </mat-accordion>
+                <ng-template #noHierarchy>
+                  <div class="f-col" cdkDropList
+                      cdkDropListSortingDisabled
+                      [cdkDropListConnectedTo]="getTargetDropIds('source_panel_hierarchy')"
+                      id="source_panel_hierarchy_{{ hierarchyIndex }}">
+                    <mat-list *ngFor="let hField of hierarchy.headerFields" [cdkDropListData]="hField.fields" [disableRipple]="true"
+                      class="mdo-list level-down">
+                      <mat-list-item class="header-data-item" *ngFor="let uField of hField.fields" cdkDrag
+                        [cdkDragData]="uField" cdkDragHandle cdkDragBoundary=".listing-container"
+                        (cdkDragEnded)="enableAllTargetFormTabs($event)">
+                        <div class="flex task-search-list-drag-el">
+                          <lib-text-line class="list-icon" type="leading" textColor="secondary">
+                            <mat-icon fontSet="mdo-icons-light"> {{ getFieldIcon(uField) }} </mat-icon>
+                          </lib-text-line>
+                          <span class="f-col-spacer-half"></span>
+                          <lib-text-line type="base" enableWrap="true" class="text-overflow">
+                            <div [innerHTML]="uField.description | highlight: searchTerm"></div>
+                          </lib-text-line>
+                        </div>
+
+                        <!-- Do not remove -->
+                        <!-- Using empty placeholder to enable custom placeholder during drag to target -->
+                        <ng-container *cdkDragPlaceholder></ng-container>
+                      </mat-list-item>
+                    </mat-list>
+                    </div>
+                </ng-template>
+              </ng-container>
+            </mat-expansion-panel>
+          </mat-accordion>
+        </div>
+
+        <div class="f-col field-list-container" id="tabs_list" cdkDropList [cdkDropListData]="formTabs"
+          (cdkDropListDropped)="dropFormTab($event)">
+
+          <!-- loader area -->
+          <ng-container *ngIf="this.dataLoaders.loadFormTabs">
+            <mat-card *ngFor="let a of [].constructor(3)" class="mat-elevation-z0 f-row colunm-box loading-state add-fields">
+              <div class="col">
+                <lib-skeleton type="button"></lib-skeleton>
+              </div>
+              <div class="col-spacer"></div>
+              <div class="col col-x6">
+                <lib-skeleton class="w-100" type="line-half"></lib-skeleton>
+              </div>
+              <div class="col col-x4">
+                <lib-skeleton class="w-100" type="line-half"></lib-skeleton>
+              </div>
+              <div class="col col-x4 end-item">
+                <lib-skeleton class="w-100" type="line-half"></lib-skeleton>
+              </div>
+            </mat-card>
+          </ng-container>
+          <!-- loader area -->
+
+          <div *ngFor="let formTab of formTabs; let tabIndex = index; let isFirst = first" cdkDrag
+            [cdkDragData]="formTab" cdkDragLockAxis="y" cdkDragBoundary=".field-list-container" class="add-fields">
+            <mat-accordion multi="true" scrollableContainer>
+              <mat-expansion-panel #panel="matExpansionPanel" [expanded]="true" togglePosition="before"
+                class="mat-elevation-z0 form-tab">
+                <mat-expansion-panel-header (click)="onSelectSection(formTab, tabIndex)" expandedHeight="48px"
+                  collapsedHeight="48px">
+                  <mat-panel-title (keydown.Space)="$event.stopPropagation()" class="f-row">
+                    <lib-text-line *ngIf="!formTab?.isEditable" (click)="formTab.isEditable = true" type="base"
+                      weight="strong" enableWrap="true">
+                      {{ formTab.tabText || formTab.description }}
+                    </lib-text-line>
+                    <div *ngIf="formTab?.isEditable" cdkTrapFocus [cdkTrapFocusAutoCapture]="true"
+                      prosClickStopPropagation>
+                      <mat-form-field appearance="outline" prosClickStopPropagation>
+                        <input matInput cdkFocusInitial class="lib-input"
+                          [value]="formTab.description || formTab.tabText"
+                          (blur)="updateFormTabName(formTab, valueInput.value); formTab.isEditable = false" #valueInput
+                          prosClickStopPropagation />
+                      </mat-form-field>
+                    </div>
+                    <span class="f-spacer"> </span>
+                    <!-- <lib-button type="plain" icon="sliders-h" iconFontType="light" (click)="openDisplayCriteriaSheet()"
+                      prosClickStopPropagation></lib-button> -->
+                    <lib-button type="plain" icon="ellipsis-h" [matMenuTriggerFor]="tabActionsMenu"
+                      prosClickStopPropagation></lib-button>
+                    <mat-menu #tabActionsMenu="matMenu" class="navigation-menu">
+                      <button mat-menu-item i18n="@@duplicate" (click)="duplicateFormTab(tabIndex)">Duplicate</button>
+                      <button mat-menu-item i18n="@@remove" (click)="deleteFormTab(tabIndex)">Remove</button>
+                    </mat-menu>
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <div
+                  id="target_form_tab_{{ tabIndex }}"
+                  cdkDropList
+                  [cdkDropListData]="formTab?.fields"
+                  [cdkDropListEnterPredicate]="dropListEnterPredicate"
+                  (cdkDropListDropped)="dropFormField($event)"
+                  (cdkDropListEntered)="panel.open();dropItemEntered($event, tabIndex)"
+                  [cdkDropListConnectedTo]="getTargetDropIds('target_form_tab')"
+                  class="drag-drop row-spacer" [ngClass]="{'border': !formTab.fields?.length, 'no-flex': !!currentDropItem && currentDropItem?.index === tabIndex, 'hover-border': !!formTab.fields?.length}">
+                    <div *ngIf="!formTab.fields.length && (!currentDropItem || currentDropItem?.index !== tabIndex)" class="define-contents" cdkDragBoundary=".field-list-container">
+                      <lib-text-line type="base" [enableWrap]="true">
+                        Drag and drop fields here to define the contents of the section
+                      </lib-text-line>
+                    </div>
+
+                    <div *ngIf="currentDropItem && currentDropItem?.index === tabIndex">
+                      <pros-form-tab-widget
+                        [isLast]="currentDropItem.data?.isLast"
+                        [tabFields]="currentDropItem?.data"
+                        [parentTabIndex]="tabIndex"
+                        [moduleId]="moduleId"
+                        [tabsList]="formTabs"
+                      ></pros-form-tab-widget>
+                    </div>
+
+                    <div *ngFor="let tField of formTab.fields; let fieldIndex = index; let isLast = last" cdkDrag
+                      [cdkDragData]="tField" cdkDragLockAxis="y" cdkDragBoundary=".field-list-container"
+                      (cdkDragEnded)="enableAllTargetFormTabs($event)"
+                      class="header-data-item">
+                      <div class="f-col">
+                        <ng-template [ngIf]="formTab?.fields?.length" [ngIfElse]="emptyTab">
+                          <pros-form-tab-widget [isLast]="isLast" [tabFields]="tField" [parentTabIndex]="tabIndex"
+                            [moduleId]="moduleId" [tabsList]="formTabs" (deleteFormWidget)="deleteField(tabIndex, fieldIndex)"
+                            (addFormSection)="addFormTab(tabIndex)"
+                            (moveFieldToSection)="moveFieldToSection(tabIndex, $event, fieldIndex)"
+                            ></pros-form-tab-widget>
+                        </ng-template>
+                        <ng-template #emptyTab>
+                          <div class="row-spacer flex">
+                            <lib-empty-state class="f-col load-empty" primaryText="Nothing to see here" icon="order"
+                              iconSize="200" secondaryText="Drag and drop a field here to start building your form">
+                            </lib-empty-state>
+                          </div>
+                        </ng-template>
+                      </div>
+                    </div>
+                </div>
+
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>

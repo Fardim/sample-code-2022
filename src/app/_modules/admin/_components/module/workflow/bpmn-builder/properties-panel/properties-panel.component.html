@@ -1,0 +1,44 @@
+<mat-card class="mat-elevation-z0 property-col">
+    <mat-toolbar class="c-toolbar-row">
+        <mat-toolbar-row>
+            <h3 class="mat-h3"> {{bpmnElement && bpmnElement.businessObject.name ? bpmnElement.businessObject.name : ''}} properties </h3>
+            <span class="f-spacer"></span>
+        </mat-toolbar-row>
+    </mat-toolbar>
+    <mat-card-content *ngIf="bpmnElement">
+        <ng-container [ngSwitch]="bpmnElement.type">
+            <!-- Activity step -->
+            <pros-activity-step-properties *ngSwitchCase="ELEMENT_TYPES.Activity" 
+                                            [bpmnElement]="bpmnElement"
+                                            (updateProperties)="updateStepProperties($event)">
+            </pros-activity-step-properties>
+
+            <!-- Determination step -->
+            <pros-determination-step-properties *ngSwitchCase="ELEMENT_TYPES.Determination"
+                                                [bpmnElement]="bpmnElement"
+                                                (updateProperties)="updateStepProperties($event)">
+            </pros-determination-step-properties>
+
+            <!-- Connection -->
+            <pros-connection-properties *ngSwitchCase="ELEMENT_TYPES.Connection"
+                                        [bpmnElement]="bpmnElement"
+                                        (updateProperties)="updateStepProperties($event)">
+            </pros-connection-properties>
+
+            <!-- Email escalation -->
+            <pros-email-escalation-properties *ngSwitchCase="ELEMENT_TYPES.Email_Escalation"
+                                        [bpmnElement]="bpmnElement"
+                                        (updateProperties)="updateStepProperties($event)">
+            </pros-email-escalation-properties>
+
+            <!-- Background -->
+            <pros-background-step-properties *ngSwitchCase="ELEMENT_TYPES.Background"
+                                        [bpmnElement]="bpmnElement"
+                                        (updateProperties)="updateStepProperties($event)">
+            </pros-background-step-properties>
+
+            <!-- Other elements -->
+            <ng-container *ngSwitchDefault><div> Other types</div></ng-container>
+        </ng-container>
+    </mat-card-content>
+</mat-card>

@@ -1,0 +1,22 @@
+mat-card.widget {
+  box-sizing: border-box;
+  padding: 8px;
+  height: 100%;
+
+  .lib-text {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  mat-card-content {
+    height: calc(100% - 36px - 16px);
+    overflow: hidden;
+
+    .fix-now {
+      bottom: 10px;
+      position: absolute;
+      cursor: pointer;
+    }
+  }
+}

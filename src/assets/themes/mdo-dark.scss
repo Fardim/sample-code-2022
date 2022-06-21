@@ -1,0 +1,12 @@
+// Dark theme
+$mdo-dark-primary: mat-palette($mat-blue, 700, 300, 900);
+$mdo-dark-accent:  mat-palette($mat-pink);
+$mdo-dark-warn:    mat-palette($mat-red);
+
+$mdo-dark:   mat-dark-theme($mdo-dark-primary, $mdo-dark-accent, $mdo-dark-warn);
+
+.mdo-dark {
+  @include angular-material-theme($mdo-dark);
+  @include pros-cmp-theme($mdo-dark);
+  @include pros-cmp-typography(mat-typography-config());
+}

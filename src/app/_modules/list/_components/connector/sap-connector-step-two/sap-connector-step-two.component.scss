@@ -1,0 +1,28 @@
+div.root {
+  height: calc(100% - 44px - 68px);
+  user-select: text;
+  padding: 0;
+  overflow: auto;
+
+  .manually-dataset {
+    margin: 0 auto;
+    width: 62%;
+
+    .field-label {
+      margin-bottom: 6px;
+    }
+  }
+}
+
+.system-fields-col {
+  margin: 12px;
+
+  .lib-section {
+    margin: 8px 0;
+  }
+}
+
+.sidesheetcontent-listing {
+  height: 100%;
+  padding: 12px;
+}

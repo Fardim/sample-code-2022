@@ -1,0 +1,164 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  width: 900px;
+
+  .breadcrum-toolbar {
+    padding: 8px 16px;
+
+    .mdo-constrained-right {
+      width: 100%;
+
+      #uploader {
+        display: none;
+        height: 0;
+        overflow: hidden;
+        width: 0;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px);
+    overflow: auto;
+
+    .mdo-justify {
+      margin: 0 16px;
+      height: 100%;
+
+      .gap-12 {
+        gap: 12px;
+
+        .half {
+          flex: 1 1 50%;
+        }
+      }
+
+      .colunm-box {
+        box-sizing: border-box;
+        min-height: 48px;
+
+        .col {
+          display: flex;
+          flex: 1 0 auto;
+          width: 1px;
+          align-items: center;
+          margin-left: 8px;
+
+          &.col-x4 {
+            flex: 4;
+          }
+
+          &.col-x6 {
+            flex: 6;
+          }
+
+          &.col-x2 {
+            flex: 2;
+          }
+
+          &.col-x8 {
+            flex: 8;
+            height: 36px;
+
+            .lib-input {
+              height: 36px;
+            }
+          }
+
+          &.col-half {
+            flex: 1 1 50%;
+            height: 36px;
+
+            .lib-input {
+              height: 36px;
+            }
+          }
+
+          &.end-item {
+            justify-content: flex-end;
+            visibility: hidden;
+          }
+        }
+      }
+
+      .colunm-box:hover {
+        .end-item {
+          visibility: visible;
+        }
+      }
+    }
+
+    .list-values {
+      position: relative;
+      width: 100%;
+      overflow: auto;
+
+      .action-header {
+        position: absolute;
+        z-index: 999;
+        left: 65px;
+        width: 100%;
+        top: 10px;
+      }
+
+      table.mat-table {
+        width: 100%;
+        overflow: auto;
+        border-collapse: separate;
+
+        td.mat-cell {
+          border-right: none;
+
+          .lib-chip {
+            margin-bottom: 0;
+          }
+
+          .link-text {
+            padding-left: 8px;
+            cursor: pointer;
+          }
+
+          &.no-result {
+            text-align: center;
+          }
+        }
+      }
+    }
+  }
+
+  .hide {
+    padding-left: 8px;
+    cursor: pointer;
+    display: none;
+  }
+
+  .hover-value:hover .hide {
+    display: block;
+  }
+
+  .hover-code:hover .hide {
+    display: block;
+  }
+
+  .addbutton {
+    margin: 6px;
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 66px;
+      }
+    }
+  }
+}

@@ -1,0 +1,54 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button (click)="closeDialog()" type="plain" iconFontType="light" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <div class="display-heading-large" i18n="@@invite_people_to_team">Invite people to your team</div>
+                <span class="f-col-spacer-half"></span>
+                <span class="f-spacer"></span>
+                <lib-button type="major" (click)="sendInvitation()" i18n="@@invite">Invite</lib-button>
+            </div>
+            <div class="row-spacer"></div>
+        </div>
+    </div>
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <div class="f-row invite-colunm">
+                <lib-button type="plain" (click)="addFormRow()">
+                    <mat-icon fontSet="mdo-icons">plus</mat-icon>&nbsp;<span i18n="@@add_user">Add user</span>
+                </lib-button>
+            </div>
+            <form [formGroup]="invitationForm">
+                <div formArrayName="invites">
+                    <ng-container *ngFor="let item of invites().controls; let i=index">
+                        <div class="f-row invite-colunm" [formGroupName]="i">
+                            <div class="col-x2">
+                                <lib-input class="mdo-scheduler-input" [formControl]="invites().controls[i].get('email')" type="text" [value]="invites().controls[i].get('email').value" i18n-label="@@name" label="Name" i18n-placeholder="@@email_address" placeholder="Email address" (valueChange)="setFormValue($event, 'email', i)" [hasError]="invites().controls[i].get('email').errors && submitted" [hint]="invites().controls[i].get('email').errors && submitted ? 'Email is required' : ''"></lib-input>
+                                <mat-error *ngIf="invites().controls[i].get('email').errors && submitted">
+                                    Email is required
+                                </mat-error>
+                            </div>
+                            <div class="col-x2">
+                                <mat-form-field appearance="outline" class="divided-matfield">
+                                    <mat-select formControlName="role">
+                                        <mat-option i18n="@@admin" value="admin">Admin</mat-option>
+                                        <mat-option i18n="@@reviewer" value="reviewer">Reviewer</mat-option>
+                                        <mat-option i18n="@@viewer" value="viewer">Viewer</mat-option>
+                                        <mat-option i18n="@@editor" value="editer">Editer</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <mat-error i18n="@@role_required" *ngIf="invites().controls[i].get('role').errors && submitted">
+                                    Role is required
+                                </mat-error>
+                            </div>
+                            <div class="col-x1">
+                                <lib-button  (click)="removeInvite(i)" type="plain" icon="trash-alt"></lib-button>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

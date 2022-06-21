@@ -1,0 +1,77 @@
+<div class="root" *ngIf="loader; else showContent">
+  <lib-skeleton-table></lib-skeleton-table>
+</div>
+
+<div class="f-col root" #showContent>
+  <div class="f-row breadcrum-toolbar">
+    <lib-text-line i18n="@@package" type="leading" enableWrap="true">Packages</lib-text-line>
+    <div class="f-spacer"></div>
+    <!-- If Empty State It Is Hide -->
+    <lib-button type="minor" i18n="@@new_package" icon="caret-down" iconFontType="solid" [matMenuTriggerFor]="actions"
+      *ngIf="!isEmptyState">New package</lib-button>
+    <mat-menu #actions="matMenu" class="navigation-menu">
+      <button mat-menu-item i18n="@@build_your_own" (click)="newButtonHandler()">Build your own</button>
+      <button mat-menu-item i18n="@@create_form_existing_package" (click)="openExistingPackage()">Create from existing
+        package</button>
+      <button mat-menu-item i18n="@@explore_connekthub" (click)="openConnekthubPackage()">Explore Connekthub</button>
+    </mat-menu>
+  </div>
+
+  <div class="content-container">
+    <div class="f-row empty-block" *ngIf="isEmptyState">
+      <lib-empty-state primaryText="Nothing to see here" icon="order"
+        secondaryText="You don't have any packages. Would you like to create one?">
+        <lib-button type="minor" i18n="@@new_package" icon="caret-down" iconFontType="solid"
+          [matMenuTriggerFor]="actions">New package</lib-button>
+        <mat-menu #actions="matMenu" class="navigation-menu">
+          <button mat-menu-item i18n="@@build_your_own" (click)="newButtonHandler()">Build your own</button>
+          <button mat-menu-item i18n="@@create_form_existing_package" (click)="openExistingPackage()">Create from
+            existing
+            package</button>
+          <button mat-menu-item i18n="@@explore_connekthub" (click)="openConnekthubPackage()">Explore
+            Connekthub</button>
+        </mat-menu>
+      </lib-empty-state>
+    </div>
+
+    <div class="f-col sheetCont" *ngIf="!isEmptyState">
+      <lib-chip-list class="mdo-chip-list">
+        <lib-search i18n="@@search_package" placeholder="Search packages" class="lib-search"
+          (valueChange)="searchPackage.next($event)"></lib-search>
+        <lib-chip label="Solutions"></lib-chip>
+        <lib-chip label="Dashboards"></lib-chip>
+        <lib-chip label="Forms"></lib-chip>
+        <lib-chip label="Schema"></lib-chip>
+      </lib-chip-list>
+
+      <div class="f-row dataListingCont" style="flex-wrap: wrap;" prosInfiniteScroll (scrollEnd)="loadMore()"
+        *ngIf="!filter">
+        <mat-card class="mat-elevation-z0 extension-blocks" *ngFor="let item of packageList">
+          <div class="extension-image">
+            <pros-svg-icon [size]="svgIconSize" [height]="svgIconHeight" [viewBox]="svgIconViewBox" [icon]="icon"></pros-svg-icon>
+          </div>
+          <div class="f-row extension-content">
+            <lib-text-line type="base">{{item?.packageName}}</lib-text-line>
+            <div class="f-spacer"></div>
+            <lib-button type="plain" icon="ellipsis-h" [matMenuTriggerFor]="intergration">
+            </lib-button>
+            <mat-menu #intergration="matMenu" class="navigation-menu">
+              <button mat-menu-item i18n="@@edit" (click)="editPackage(item?.packageId)">Edit</button>
+              <button mat-menu-item i18n="@@publish_to_library" (click)="publishPackage(item?.packageId)">Publish to
+                library</button>
+              <lib-section></lib-section>
+              <button mat-menu-item type="base" i18n="@@delete">Delete</button>
+            </mat-menu>
+          </div>
+        </mat-card>
+
+      </div>
+      <div class="f-row empty-block" *ngIf="filter">
+        <lib-empty-state [primaryText]="'Nothing to see here'"
+          [secondaryText]="'Your search did not return any results, try modifying your search'" [icon]="'search'"
+          [iconSize]="200">
+        </lib-empty-state>
+      </div>
+    </div>
+  </div>
+</div>

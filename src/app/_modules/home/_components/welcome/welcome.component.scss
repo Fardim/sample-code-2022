@@ -1,0 +1,47 @@
+mat-card.root {
+  padding: 0 16px;
+  user-select: text;
+
+  .breadcrum-toolbar {
+    padding-top: 8px;
+    margin-bottom: 32px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    min-height: 40px;
+  }
+
+  .paragraph-text {
+    text-align: justify;
+    margin-right: 48px;
+  }
+
+  pros-svg-icon {
+    height: 75px;
+  }
+
+  mat-list {
+    position: relative;
+
+    mat-list-item {
+      padding: 16px 0;
+
+      .grid-line {
+        padding: 0 16px;
+        width: 100%;
+      }
+
+      .lib-button {
+        min-width: 100px;
+        display: flex;
+      }
+    }
+  }
+}
+
+@media (min-width: 1200px) {
+  mat-card.root {
+    width: 62%;
+    margin: 0 auto;
+  }
+}

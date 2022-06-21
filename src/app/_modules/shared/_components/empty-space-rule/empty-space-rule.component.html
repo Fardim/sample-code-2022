@@ -1,0 +1,34 @@
+<div class="f-col">
+  <div class="f-row rule-types">
+  <ng-container  *ngFor="let rule of emptySpaceRuleTypeList">
+    <lib-checkbox (valueChange)="updateEmptySpaceOptions(rule.key)" [label]="rule.value" [checked]="emptySpaceRules[rule.key]"></lib-checkbox>
+  </ng-container>
+  </div>
+  <div class="f-col ">
+     <lib-text-line type="xsmall" class="field-label" weight="strong" i18n="@@rule_type">Selected fields<span  class="mandatory">*</span></lib-text-line>
+    <div class="user-defined-set">
+      <ng-container *ngFor="let rule of emptySpaceRules.fields;let i = index">
+        <ng-container>
+          <div class="f-row defined-row">
+            <div class="col select-col udr-select-col"></div>
+            <!-- Field Name -->
+            <div class="col" [ngStyle]="{'pointer-events': isAppliedNewRuleForMapping ? 'none' : 'inherit'}" >
+              <pros-option-filter [availableOptions]="sourceFieldsObject.list" (selectionChange)="setLookupTargetField($event, i)" (inputBlur)="updateLookupTargetField($event, i)" [value]="rule.fldId" class="w-100" placeholder="Field name">
+              </pros-option-filter>
+            </div>
+            <!-- Remove -->
+            <div class="col">
+              <lib-button type="plain" icon="trash-alt" iconFontType="light" libTooltip="Delete" [disabled]="isAppliedNewRuleForMapping" (afterClick)="removeZeroRule(i)">
+              </lib-button>
+            </div>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+    <div class="col-spacer"></div>
+    <div class="f-row button-add-block">
+      <lib-button [disabled]="isAppliedNewRuleForMapping" (afterClick)="addZeroRule()" type="minor" iconFontType="light" icon="plus" rounded="true">
+      </lib-button>
+    </div>
+  </div>
+</div>

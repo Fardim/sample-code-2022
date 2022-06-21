@@ -1,0 +1,33 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@int_mapping">Mapping</lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-button type="major" (afterClick)="saveMapping()" i18n="@@submit" width="80px">Submit</lib-button>
+      </div>
+    </div>
+  </div>
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <span class="f-row-spacer-half"></span>
+      <lib-banner *ngIf="bannerText" [text]="bannerText" status="error"></lib-banner>
+      <div class="f-col mdo-field">
+        <lib-text-line type="xsmall" weight="strong" i18n="@@class_name" class="field-label"> Class name </lib-text-line>
+        <mat-form-field appearance="outline">
+          <mat-select [formControl]="selectedTargetCtrl">
+            <mat-option *ngFor="let class of classes" [value]="class?.uuid">{{class?.code}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <pros-mapping-wrapper class="mapping-container-wrapper" [sourceTitle]="sourceTitle" [targetTitle]="targetTitle"
+        [mappingSourceLoader]="mappingSourceLoader" [mappingTargetLoader]="mappingTargetLoader" [isResponseType]="null"
+        [sourceFields]="sourceFields" [targetFields]="targetFields" [existingMapping]="existingMapping"
+        (infoMessage)="setBannerText($event)" (updateTargetMapping)="updateMappedTarget($event)"
+        [reloadMappingData]="mappingTargetLoader">
+      </pros-mapping-wrapper>
+    </div>
+  </div>
+</div>

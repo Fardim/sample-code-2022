@@ -1,0 +1,19 @@
+.multipickcheck {
+  .menu-spacing {
+    padding: 12px;
+  }
+
+  .multiselect-checkbox {
+    max-height: 190px;
+    overflow: auto;
+  }
+}
+
+.clear {
+  position: absolute;
+  right: 0;
+}
+
+.multiselect-input {
+  display: flex;
+}

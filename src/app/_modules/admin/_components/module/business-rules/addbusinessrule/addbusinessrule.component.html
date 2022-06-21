@@ -1,0 +1,164 @@
+<div class="root">
+
+    <div class="breadcrumb-wrapper">
+        <pros-breadcrumb [crumbs]="breadcrumb"></pros-breadcrumb>
+    </div>
+
+    <!-- WHILE RULE IN EDIT MODE THEN COTAINER SHOULD BE HIDDEN-->
+    <div class="f-col addrule" [style.display]="brId ? 'none':'block'">
+        <h3 class="mat-h3">Add Rule</h3>
+        <mat-radio-group [formControl] ="ruleFrmCtrl" class="f-row">
+            <mat-card class="mat-elevation-z3 rules">
+                <div class="f-row">
+                    <mat-radio-button value="missing" color="primary"></mat-radio-button>
+                    <div class="f-col">
+                        <h4 class="mat-h4">Missing Rule</h4>
+                        <p>This rule establish a dependency relationship between source and target fields</p>
+                    </div>
+                    <span class="f-spacer"></span>
+                    <pros-svg-icon size="70" icon="P_BR_MANDATORY_FIELDS" color="primary"></pros-svg-icon>
+                </div>
+            </mat-card>
+
+            <mat-card class="mat-elevation-z3 rules">
+                <div class="f-row">
+                    <mat-radio-button value="metadata" color="primary"></mat-radio-button>
+                    <div class="f-col">
+                        <h4 class="mat-h4">Metadata Rule</h4>
+                        <p>This rule establish a dependency relationship between source and target fields</p>
+                    </div>
+                    <span class="f-spacer"></span>
+                    <pros-svg-icon size="70" icon="P_BR_METADATA_RULE" color="primary"></pros-svg-icon>
+                </div>
+            </mat-card>
+
+            <mat-card class="mat-elevation-z3 rules">
+                <div class="f-row">
+                    <mat-radio-button value="userdefined" color="primary"></mat-radio-button>
+                    <div class="f-col">
+                        <h4 class="mat-h4">User Defined Rule</h4>
+                        <p>This rule establish a dependency relationship between source and target fields</p>
+                    </div>
+                    <span class="f-spacer"></span>
+                    <pros-svg-icon size="70" icon="P_BR_CUSTOM_SCRIPT" color="primary"></pros-svg-icon>
+                </div>
+            </mat-card>
+            
+        
+
+            <mat-card class="mat-elevation-z3 rules">
+                <div class="f-row">
+                    <mat-radio-button color="primary" value="dependency">
+                    </mat-radio-button>
+                    <div class="f-col">
+                        <h4 class="mat-h4">Dependency Rule</h4>
+                        <p>This rule establish a dependency relationship between source and target fields</p>
+                    </div>
+                    <span class="f-spacer"></span>
+                    <pros-svg-icon size="70" icon="P_BR_DEPENDANCY_RULE" color="primary"></pros-svg-icon>
+                </div>
+            </mat-card>
+
+            <mat-card class="mat-elevation-z3 rules">
+                <div class="f-row">
+                    <mat-radio-button color="primary" value="duplicate">
+                    </mat-radio-button>
+                    <div class="f-col">
+                        <h4 class="mat-h4">Duplicate Rule</h4>
+                        <p>This rule establish a dependency relationship between source and target fields</p>
+                    </div>
+                    <span class="f-spacer"></span>
+                    <pros-svg-icon size="70" icon="P_BR_DUPLICATE_RULE" color="primary"></pros-svg-icon>
+                </div>
+            </mat-card>
+
+            <mat-card class="mat-elevation-z3 rules">
+                <div class="f-row">
+                    <mat-radio-button color="primary" value="api">
+                    </mat-radio-button>
+                    <div class="f-col">
+                        <h4 class="mat-h4">API Rule</h4>
+                        <p>This rule establish a dependency relationship between source and target fields</p>
+                    </div>
+                    <span class="f-spacer"></span>
+                    <pros-svg-icon size="70" icon="P_BR_API_RULE" color="primary"></pros-svg-icon>
+                </div>
+            </mat-card>
+
+            <mat-card class="mat-elevation-z3 rules">
+                <div class="f-row">
+                    <mat-radio-button color="primary" value="external">
+                    </mat-radio-button>
+                    <div class="f-col">
+                        <h4 class="mat-h4">External Validation Rule</h4>
+                        <p>This rule establish a dependency relationship between source and target fields</p>
+                    </div>
+                    <span class="f-spacer"></span>
+                    <pros-svg-icon size="70" icon="P_BR_EXTERNALVALIDATION_RULE" color="primary"></pros-svg-icon>
+                </div>
+            </mat-card>
+
+            <mat-card class="mat-elevation-z3 rules">
+                <div class="f-row">
+                    <mat-radio-button color="primary" value="regex">
+                    </mat-radio-button>
+                    <div class="f-col">
+                        <h4 class="mat-h4">Regex Rule</h4>
+                        <p>This rule establish a dependency relationship between source and target fields</p>
+                    </div>
+                    <span class="f-spacer"></span>
+                    <pros-svg-icon size="70" icon="P_BR_REGEX_RULE" color="primary"></pros-svg-icon>
+                </div>
+            </mat-card>
+        </mat-radio-group>
+    </div>
+   
+
+    <!-- Missing Buisness Rule & Metada rule Container Starts Here-->
+
+    <mat-card class="mat-elevation-z3 rulesfields" *ngIf="ruleFrmCtrl.value === 'missing' || ruleFrmCtrl.value === 'metadata'">
+        <pros-missingrule
+        [schemaId] ="schemaId"
+        [moduleId] = "moduleId"
+        [brId] ="brId"
+        [brType] ="brType"
+        (evtSaved) ="afterSaved($event)">
+        </pros-missingrule>
+    </mat-card>
+
+    <!-- Missing Buisness Rule Container End Here-->
+
+
+    <!-- User Defined Buisness Rule Container Starts Here-->
+    <div class="rulesfields" *ngIf="ruleFrmCtrl.value === 'userdefined'">
+        <pros-user-defined-rule
+        [paramsData]="paramsData"
+        [schemaId] ="schemaId"
+        [moduleId]="moduleId"
+        [brId]="brId"
+        [brType] ="brType"
+        (evtSaved) ="afterSaved($event)">
+        </pros-user-defined-rule>
+
+    </div>
+    <!-- User Defined Buisness Rule Container End Here-->
+
+
+    <!-- START CONTAINER FOR REGEX RULE -->
+    <mat-card class="mat-elevation-z3 rulesfields" *ngIf="ruleFrmCtrl.value === 'regex'">
+        <pros-regex-rule
+        [schemaId] ="schemaId"
+        [moduleId] = "moduleId"
+        [brId] ="brId"
+        [brType] ="brType"
+        (evtSaved) ="afterSaved($event)">
+        </pros-regex-rule>
+    </mat-card>
+    
+    <!-- START CONTAINER FOR REGEX RULE -->
+    
+
+
+
+
+</div>

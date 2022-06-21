@@ -1,0 +1,16 @@
+.input-actions {
+  mat-icon {
+    margin: 3px 8px 0 0;
+  }
+}
+
+.edit-cell.text {
+  background: white;
+}
+
+.edit-cell .textarea {
+  overflow: hidden;
+  resize: none;
+  font-size: 14px;
+  line-height: 24px;
+}

@@ -1,0 +1,68 @@
+<!-- <div class="root">
+  <div class="f-col login-container">
+      <div class="login-logo">
+        <pros-svg-icon size="160" icon="MDO_LOGO" class="company-logo"></pros-svg-icon>
+      </div>
+      <div class="row-spacer"></div>
+      <mat-card class="f-col login-section">
+          <div class="display-heading"> Sign in to your account </div>
+          <div class="f-col">
+              <pros-form-input [type]="'text'" [label]="'Username'" (valueChange)="emailChange($event);"></pros-form-input>
+              <div class="row-spacer"></div>
+              <pros-form-input [type]="'password'" [label]="'Password'" (valueChange)="passChange($event);"></pros-form-input>
+          </div>
+          <ng-template [ngIf]="errorMsg">
+            <div class="row-spacer"></div>
+            <div class="f-col">
+                <mat-error class="err-msg"> {{ errorMsg }}</mat-error>
+            </div>
+          </ng-template>
+
+          <div class="row-spacer"></div>
+          <div class="f-col">
+              <button mat-flat-button color="primary" (click)="signIn()">Sign in</button>
+          </div>
+
+      </mat-card>
+  </div>
+</div>  -->
+
+
+<div class="root">
+	<div class="f-col login-container">
+		<div class="login-logo">
+			<pros-svg-icon size="160" icon="MDO_LOGO" class="company-logo"></pros-svg-icon>
+		</div>
+		<div class="row-spacer"></div>
+		<mat-card class="f-col login-section">
+			<form [formGroup]="signInForm" (ngSubmit)="signIn()">
+				<div class="display-heading">Sign in to your account</div>
+				<div class="f-col">
+					<pros-form-input
+						[type]="'text'"
+						[control]="signInForm.get('userName')"
+						[label]="'Username'"
+					></pros-form-input>
+					<div class="row-spacer"></div>
+					<pros-form-input
+						[type]="'password'"
+						[control]="signInForm.get('password')"
+						[label]="'Password'"
+					></pros-form-input>
+				</div>
+				<ng-template [ngIf]="errorMsg">
+					<div class="row-spacer"></div>
+					<div class="f-col">
+						<mat-error class="err-msg"> {{ errorMsg }}</mat-error>
+					</div>
+				</ng-template>
+
+				<div class="row-spacer"></div>
+				<div class="f-col">
+					<button mat-flat-button color="primary">Sign in</button>
+				</div>
+			</form>
+		</mat-card>
+	</div>
+</div>
+

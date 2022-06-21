@@ -1,0 +1,88 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  padding: 1px;
+
+  .breadcrum-toolbar {
+    position: sticky;
+    padding-top: 16px;
+    top: 0;
+    z-index: 2;
+
+    .mdo-constrained-right {
+      width: 100%;
+
+      .breadcrum-head {
+        align-items: center;
+        width: 100%;
+        min-height: 36px;
+
+        .display-heading-large {
+          font-size: 1.2rem;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 1200px) {
+  .mdo-constrained-right {
+    margin-right: 52px;
+  }
+
+  .mdo-justify {
+    margin: 0 52px;
+  }
+}
+
+.schema-details {
+  width: 40%;
+  flex-shrink: 0;
+  flex-grow: 0;
+  max-width: 600px;
+  min-width: max-content;
+  align-self: flex-start;
+
+  .f-col .f-row {
+    padding: 7px;
+
+    &:nth-child(even) {
+      background: #f5f8fd;
+    }
+
+    .f-col {
+      flex: 1;
+
+      &.label {
+        color: #677079;
+      }
+
+      &.value {
+        font-weight: 500;
+      }
+    }
+
+    &.errors {
+      color: #ce423a;
+    }
+
+    &.warnings {
+      color: #ee8437;
+    }
+
+    &.duplicates {
+      color: #509ae9;
+    }
+
+    &.skipped {
+      color: #67bc63;
+    }
+  }
+}
+
+.schema-trends {
+  width: 100%;
+}

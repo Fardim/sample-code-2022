@@ -1,0 +1,42 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+      <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+      <div class="col-spacer"></div>
+      <div class="f-col mdo-constrained-right">
+        <div class="f-row breadcrum-head">
+          <lib-text-line type="leading">Data restrictions</lib-text-line>
+          <div class="f-spacer"></div>
+          <lib-button type="major" width="80px"  (click)="close()">Save</lib-button>
+        </div>
+      </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="mdo-justify">
+      <div *ngIf="isLoading" class="f-col">
+        <lib-skeleton-listmenu></lib-skeleton-listmenu>
+      </div>
+      <div class="f-row" *ngIf="!isLoading">
+        <lib-search
+          class="lib-search"
+          i18n-placeholder="@@search"
+          placeholder="Search privileges"
+          [formControl]="datasetfieldsItemsCtrl"
+        >
+        </lib-search>
+      </div>
+      <mat-list role="list" class="mdo-list">
+        <mat-list-item role="listitem" *ngFor="let item of moduleList" class="f-row">
+          <lib-checkbox [label]="item?.moduleDesc" (valueChange)="toggle(item)" [checked]="selection.isSelected(item)">
+          </lib-checkbox>
+          <div class="f-spacer"></div>
+          <lib-button type="plain" icon="arrow-right" iconFontType="light"
+            *ngIf="selection.isSelected(item) && privilegeDetails?.canAllowFilterRestriction"
+            (click)="gotoFilter(item.moduleId)"></lib-button>
+        </mat-list-item>
+      </mat-list>
+
+    </div>
+  </div>
+
+</div>

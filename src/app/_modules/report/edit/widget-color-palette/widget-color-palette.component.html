@@ -1,0 +1,28 @@
+<div class="root">
+  <div class="row-spacer"></div>
+  <div class="f-row breadcrum-toolbar">
+    <lib-text-line type="leading">Color palette "{{ widgetColorPalette ? widgetColorPalette.widgetDesc : 'Unknown'}}"
+    </lib-text-line>
+    <div class="f-spacer"></div>
+    <lib-button (click)="close(true)" iconFontType="light" type="plain" icon="times"></lib-button>
+  </div>
+  <div class="row-spacer"></div>
+  <div class="f-col palette-list">
+    <mat-list *ngIf="widgetColorPalette">
+      <mat-list-item *ngFor="let color of widgetColorPalette.colorPalettes;let idx = index">
+        <div matTooltip="Choose color" matTooltipPosition="right">
+          <input class="colorpalettebox" matInput type="color" value="{{ color.colorCode }}"
+            (change)="updateColorCode(color, $event.target.value, idx)">
+        </div>
+        <div mat-line>{{ color.text }}</div>
+      </mat-list-item>
+    </mat-list>
+  </div>
+  <div class="row-spacer"></div>
+  <!-- buttons -->
+  <div class="f-row">
+    <lib-button type="minor" (click)="close(true)">Cancel</lib-button>
+    <span class="f-spacer"></span>
+    <lib-button (click)="updateColorPalette()" type="major">Update</lib-button>
+  </div>
+</div>

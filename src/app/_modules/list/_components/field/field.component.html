@@ -1,0 +1,165 @@
+<mat-drawer-container class="example-container" autosize hasBackdrop="false">
+  <!-- initially both the isEditDataSet && enablePropertyPanel has to be false, other wise it cannot push the button at top.
+       first enable the enablePropertyPanel when fragment property-panel is present
+       Then after rendering the widgets of fields enable isEditDataSet and enable enablePropertyPanel also, this will enable both the drawer  -->
+  <mat-drawer #drawer mode="over" position="end" id="property-panel">
+    <pros-fields-properties [currentField]="currentField" ></pros-fields-properties>
+  </mat-drawer>
+  <mat-drawer-content>
+
+    <div class="f-row flex-row">
+      <div class="f-col root">
+        <div class="f-row breadcrum-toolbar">
+          <lib-text-line type="leading" enableWrap="false" class="heading-overflow">{{ (objectType && objectType.objectInfo ?
+            objectType.objectInfo:
+            'Untitled') | slice:0:30 }}</lib-text-line>
+          <div class="f-spacer"></div>
+          <div class="f-row">
+            <lib-search placeholder="Search fields" class="lib-search" [formControl]="searchFieldSub"></lib-search>
+            <span class="f-col-spacer"></span>
+            <span class="f-col-spacer"></span>
+            <lib-button type="plain" [matMenuTriggerFor]="moreactionfile" icon="ellipsis-h"></lib-button>
+            <span class="f-col-spacer"></span>
+            <span class="f-col-spacer-half"></span>
+            <lib-button i18n="@@discard" type="plain" (click)="close()" [disabled]="saving"> Discard </lib-button>
+            <span class="f-col-spacer-half"></span>
+            <lib-button *ngIf="!isReadOnlyMode" i18n="@@save" type="major" width="80px" (afterClick)="save()"
+              [disabled]="saving || fieldIdsWithError.length>0"> Save </lib-button>
+            <mat-menu #moreactionfile="matMenu" class="navigation-menu">
+              <button mat-menu-item i18n="@@export_to_csv">Export to CSV</button>
+              <button mat-menu-item i18n="@@import_from_csv">Import from CSV</button>
+            </mat-menu>
+          </div>
+        </div>
+
+
+        <!-- <div class="f-row">
+          <lib-search class="search" i18n-placeholder="@@search" placeholder="Search field"
+            (valueChange)="searchFieldSub.next($event)">
+          </lib-search>
+          <div class="f-col-spacer-half"></div>
+          <lib-chip-list>
+          <lib-chip label="Changes" i18n-label="@@changes" type="info" [selectable]="true"
+            [selected]="currentFilter == 'Changes'" (click)="currentFilterSub.next('Changes')"></lib-chip>
+          <lib-chip label="Errors" i18n-label="@@errors" type="info" [selectable]="true"
+            [selected]="currentFilter == 'Errors'" (click)="currentFilterSub.next('Errors')"></lib-chip>
+          <lib-chip label="Deleted" i18n-label="@@deleted" type="info" [selectable]="true"
+            [selected]="currentFilter == 'Deleted'" (click)="currentFilterSub.next('Deleted')"></lib-chip>
+        </lib-chip-list>
+        </div> -->
+        <div class="f-row listing-container" #listingContainer
+          [hidden]="!(datasetFieldList.length>0 || addManually == true)">
+          <div class="f-col listset-navigation" [style.width.px]="320" *ngIf="objectType.type != 'SYS'">
+            <mat-accordion multi="true">
+              <pros-hierarchy-list [selectedStructureId]="structureId" [nextStructureId]="nextStructureId"
+                [hierarchyList]="hierarchyList" [moduleId]="moduleId" (valueChange)="hierarchyUpdate($event)"
+                [readOnlyMode]="isReadOnlyMode" [searchString]="searchString">
+              </pros-hierarchy-list>
+            </mat-accordion>
+          </div>
+
+          <div class="f-col field-list-container">
+
+            <div class="f-col" *ngIf="hasFieldError">
+              <lib-banner status="error" [text]="'Please fix the errors below before saving your changes'"
+                (click)="showFirstFieldWithError()"></lib-banner>
+            </div>
+
+            <div class="f-row field-header" [ngStyle]="{'margin-top': hasFieldError ? '': ''}">
+              <lib-text-line type="leading" *ngIf="fieldListLoadingState === null; else showLoadState">
+                {{selectedStructureDescription}}</lib-text-line>
+              <ng-template #showLoadState>
+                <lib-skeleton class="titleLoader" type="line"></lib-skeleton>
+              </ng-template>
+              <span class="f-spacer"></span>
+              <lib-button type="plain" width="80px" iconFontType="solid" icon="caret-down" (click)="dataSetFieldListVisibiltyChange()"
+              [matMenuTriggerFor]="manuallyselection" *ngIf="!isReadOnlyMode">New field</lib-button>
+              <mat-menu #manuallyselection="matMenu" [ngStyle]="{ display: showDataSetFieldList ? 'block' : 'none' }"
+                class="manually-adddropdown">
+                <mat-card class="mat-elevation-z0 f-col">
+                  <lib-search placeholder="Search" prosClickStopPropagation></lib-search>
+                  <div class="f-row-spacer-half"></div>
+                  <div class="f-row define-fieldsdata">
+                    <mat-list role="list" class="f-col mdo-list define-fieldlist">
+                      <ng-container [ngSwitch]="objectType.type">
+                        <ng-container *ngSwitchCase="'SYS'">
+                          <ng-container *ngFor="let fieldType of systemDatasetFieldsCol1">
+                            <mat-list-item role="listitem" class="list-item" (click)="addFieldToList(fieldType)"
+                              (mouseover)="fieldExplanation=fieldType?.explanation">
+                              <lib-text-line type="base">{{ fieldType?.displayText }}</lib-text-line>
+                            </mat-list-item>
+                          </ng-container>
+                        </ng-container>
+                        <ng-container *ngSwitchDefault>
+                          <ng-container *ngFor="let fieldType of datasetFieldsCol1">
+                            <mat-list-item role="listitem" class="list-item" (click)="addFieldToList(fieldType)"
+                              (mouseover)="fieldExplanation=fieldType?.explanation">
+                              <lib-text-line type="base">{{ fieldType?.displayText }}</lib-text-line>
+                            </mat-list-item>
+                          </ng-container>
+                        </ng-container>
+                      </ng-container>
+                    </mat-list>
+                    <span class="f-col-spacer-half"></span>
+                    <mat-list role="list" class="f-col mdo-list define-fieldlist">
+                      <ng-container [ngSwitch]="objectType.type">
+                        <ng-container *ngSwitchCase="'SYS'">
+                          <ng-container *ngFor="let fieldType of []">
+                            <mat-list-item role="listitem" class="list-item" (click)="addFieldToList(fieldType)"
+                              (mouseover)="fieldExplanation=fieldType?.explanation">
+                              <lib-text-line type="base">{{ fieldType?.displayText }}</lib-text-line>
+                            </mat-list-item>
+                          </ng-container>
+                        </ng-container>
+                        <ng-container *ngSwitchDefault>
+                          <ng-container *ngFor="let fieldType of datasetFieldsCol2">
+                            <mat-list-item role="listitem" class="list-item" (click)="addFieldToList(fieldType)"
+                              (mouseover)="fieldExplanation=fieldType?.explanation">
+                              <lib-text-line type="base">{{ fieldType?.displayText }}</lib-text-line>
+                            </mat-list-item>
+                          </ng-container>
+                        </ng-container>
+  
+                      </ng-container>
+                    </mat-list>
+                  </div>
+                  <div class="f-row-spacer-half"></div>
+                  <lib-section></lib-section>
+                  <div class="f-row-spacer-half"></div>
+                  <lib-text-line [libTooltip]="fieldExplanation" type="base" textColor="secondary">{{fieldExplanation}}
+                  </lib-text-line>
+                </mat-card>
+              </mat-menu>
+            </div>
+
+            <div class="row-spacer"></div>
+            <!-- <div [ngClass]="{'bottom-fixed': datasetFieldList?.length, 'centered': !datasetFieldList?.length}"
+              *ngIf="(addManually && !fieldListLoadingState) || (datasetFieldList?.length && !fieldListLoadingState)">
+              <lib-button icon="plus" rounded="rounded" type="major" ></lib-button>
+              
+            </div> -->
+            <div class="f-col-spacer-half"></div>
+
+            <pros-data-builder-nullstate class="f-row empty-block"
+              *ngIf="!datasetFieldList?.length && !addManually && !fieldListLoadingState"
+              [readOnlyMode]="isReadOnlyMode" (addManually)="triggerAddManually($event)">
+            </pros-data-builder-nullstate>
+
+            <ng-template [ngIf]="fieldListLoadingState || datasetFieldList?.length">
+              <pros-fields-widgets (deleteWidget)="deleteWidget($event)" (deleteChildWidget)="deleteChildWidget($event)"
+                (deleteSubChildWidget)="deleteSubChildWidget($event)" (cloneWidget)="cloneWidget($event)"
+                (cloneChildWidget)="cloneChildWidget($event)" (cloneSubChildWidget)="cloneSubChildWidget($event)"
+                (widgetFieldTypeChanged)="onWidgetFieldTypeChanged($event)" (scrollDown)="onScrollDown($event)"
+                [selectedStructureId]="structureId" [fieldWidgets]="filteredDatasetFieldList"
+                [fieldIdsWithError]="fieldIdsWithError" [currentFilter]="currentFilter" [hasFieldError]="hasFieldError"
+                [loadingState]="fieldListLoadingState" [readOnlyMode]="isReadOnlyMode" [searchString]="searchString">
+              </pros-fields-widgets>
+
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <pros-edit-dataset [moduleId]="moduleId"></pros-edit-dataset>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>

@@ -1,0 +1,74 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" (click)="close()" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line i18n="@@default_values" type="leading">Default values</lib-text-line>
+                <span class="f-spacer"></span>
+
+                <lib-button *ngIf="valueList.length" i18n="@@new_value" class="lib-button" type="major"
+                    (click)="addValueRow()">
+                    New value
+                </lib-button>
+            </div>
+        </div>
+    </div>
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <ng-container *ngIf="!valueList.length">
+                <lib-input i18n-placeholder="type_value_to_add" placeholder="Type value name to add" (keyup.enter)="addFirstItem()" [(value)]="searchStr">
+                </lib-input>
+                <lib-empty-state icon="table" iconSize="120" i18n-primaryText="@@nothing_to_see_here"
+                    primaryText="Nothing to see here"
+                    secondaryText="You don’t have any values defined for this list yet. Type the value name in the box above to add."
+                    i18n-secondaryText="@@default_values_empty_msg">
+                </lib-empty-state>
+            </ng-container>
+            <ng-container *ngIf="valueList.length">
+                <div class="f-row">
+                    <lib-search class="lib-search" placeholder="Search" (valueChange)="doSearch($event)"></lib-search>
+                </div>
+                <div *ngIf="valueList.length" class="colunm-listing">
+                    <div class="f-row colunm-box rule-border-row">
+                        <div class="col col-x4">
+                            <lib-text-line class="lib-text-line" i18n="@@value" type="small" weight="strong">Value
+                            </lib-text-line>
+                        </div>
+                        <div class="col col-x4">
+                            <lib-text-line class="lib-text-line" type="small" i18n="@@code" weight="strong">Code
+                            </lib-text-line>
+                        </div>
+                        <div class="col action mat-item-end"></div>
+                    </div>
+
+                    <ng-container *ngFor="let row of valueList;let i=index">
+                        <div *ngIf="canDisplayRow(row)" class="f-row colunm-box rule-border-row value-row">
+                            <div class="col col-x4 val-input-field" (click)="editRowValue(row, 'code')"
+                                [class.editable]="row.codeEditable">
+                                <lib-text-line class="lib-text-line">{{row.code || ' '}}</lib-text-line>
+                                <lib-input (keydown.escape)="row.codeEditable=false"
+                                    (keyup.enter)="saveRowValue(row, 'code')" class="lib-input" id="attr-val-{{i}}"
+                                    [(value)]="row.codeTemp" placeholder="Value"></lib-input>
+                            </div>
+                            <div class="col col-x4 val-input-field" (click)="editRowValue(row, 'shortValue')"
+                                [class.editable]="row.shortValueEditable">
+                                <lib-text-line class="lib-text-line">{{row.shortValue || ' '}}</lib-text-line>
+                                <lib-input (keydown.escape)="row.shortValueEditable=false"
+                                    (keyup.enter)="saveRowValue(row, 'shortValue')" class="lib-input"
+                                    id="attr-code-{{i}}" [(value)]="row.shortValueTemp" placeholder="Code"></lib-input>
+                            </div>
+                            <div class="col action mat-item-end">
+                                <lib-button type="plain" (click)="copyData(i)" iconFontType="light" icon="copy">
+                                </lib-button>
+                                <lib-button type="plain" (click)="deleteValueRow(i)" iconFontType="light"
+                                    icon="trash-alt">
+                                </lib-button>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,24 @@
+div.root {
+  .collapsible {
+    display: flex;
+    justify-content: center;
+
+    mat-accordion {
+      width: 510px;
+
+      mat-panel-title {
+        display: flex;
+        justify-content: space-between;
+
+        .icon {
+          display: flex;
+          align-items: center;
+
+          .header-tex {
+            margin-left: 20px;
+          }
+        }
+      }
+    }
+  }
+}

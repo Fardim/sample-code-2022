@@ -1,0 +1,111 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right" [ngStyle]="{'pointer-events': isReadOnly ? 'none' : 'inherit'}">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading">{{modeType}}</lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-button [disabled]="isSave" *ngIf="!isReadOnly" width="80px" type="major" (afterClick)="saveNewInterface()">Save</lib-button>
+      </div>
+    </div>
+  </div>
+  <div class="f-col sidesheetcontent-listing" [ngStyle]="{'pointer-events': isReadOnly ? 'none' : 'inherit'}">
+    <ng-template [ngIf]="isReadOnly" [ngIfElse]="normalView">
+      <div class="f-col mdo-justify interface-details">
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z0 table-vertical">
+          <ng-container matColumnDef="header" sticky>
+            <td mat-cell *matCellDef="let element">
+              {{element.header}}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="cell" sticky>
+            <td mat-cell *matCellDef="let element">
+              {{element.cell}}
+            </td>
+          </ng-container>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+    </ng-template>
+    <ng-template #normalView>
+      <form [formGroup]="newInterfaceForm">
+        <div class="f-col mdo-justify">
+          <div class="f-col" *ngIf="showTestConnectionMsg">
+            <lib-banner status="error">
+              <lib-text-line type="base">Something went wrong!</lib-text-line>
+              <span class="f-spacer"></span>
+              <lib-button type="plain" icon="times" iconFontType="light" (click)="showTestConnectionMsg = false;"></lib-button>
+            </lib-banner>
+          </div>
+          <div class="f-row-spacer-half"></div>
+          <div class="f-col">
+            <lib-input label="Name" i18n-label="@@name" formControlName="interfaceName" type="text" [isRequired]="true"
+              [hint]="(newInterfaceForm.controls.interfaceName.touched && newInterfaceForm.controls.interfaceName.errors && (newInterfaceForm.controls.interfaceName.errors.required || newInterfaceForm.controls.interfaceName.errors.whitespace)) ? 'This is a required field' : ''"
+              [hasError]="newInterfaceForm.controls.interfaceName.touched &&newInterfaceForm.controls.interfaceName.errors && (newInterfaceForm.controls.interfaceName.errors.required || newInterfaceForm.controls.interfaceName.errors.whitespace)">
+            </lib-input>
+          </div>
+  
+          <div class="f-col">
+            <pros-dataset-search class="dataset-search"
+                [isRequired]="true"
+                formControlName="datasetName"
+                i18n-label="@@dataset_name"
+                label="Dataset name"
+                labelKey="moduleName" valueKey="moduleId"
+                [error]="(newInterfaceForm.controls.datasetName.touched && newInterfaceForm.controls.datasetName.errors && newInterfaceForm.controls.datasetName.errors.required) ? 'This is a required field' : ''"
+                [hasError]="newInterfaceForm.controls.datasetName.touched && newInterfaceForm.controls.datasetName.errors && newInterfaceForm.controls.datasetName.errors.required"
+                [availableOptions]="dataSetModules"
+                (selectionChange)="newInterfaceForm.controls.moduleId.setValue($event)">
+              </pros-dataset-search>
+          </div>
+  
+          <div class="f-col mdo-field" [class.has-error]="newInterfaceForm.controls.interfaceType.touched && newInterfaceForm.controls.interfaceType.errors && newInterfaceForm.controls.interfaceType.errors.required">
+            <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@select_text_case" [textColor]="(newInterfaceForm.controls.interfaceType.touched && newInterfaceForm.controls.interfaceType.errors && newInterfaceForm.controls.interfaceType.errors.required) ? 'error' : 'primary'">Interface type
+            </lib-text-line>
+            <div class="mdo-field-input">
+              <input matInput #optionsInput formControlName="interfaceType" [matAutocomplete]="interFaceTypeFilterAuto" />
+              <mat-icon matSuffix fontSet="mdo-icons" class="autocomplete-icon">chevron-down</mat-icon>
+              <mat-autocomplete class="mdo-autocomplete" #interFaceTypeFilterAuto="matAutocomplete"
+                (optionSelected)="onSelectInterfaceType($event)" [displayWith]="displayNewInterfaceType">
+                <mat-option class="mdo-option" *ngFor="let type of interfaceType" [value]="type">
+                  {{ type.label }}
+                </mat-option>
+              </mat-autocomplete>
+            </div>
+            <mat-error>
+              <mat-error *ngIf="newInterfaceForm.controls.interfaceType.touched && newInterfaceForm.controls.interfaceType.errors && newInterfaceForm.controls.interfaceType.errors.required">
+                 <lib-text-line type="small"> This is required</lib-text-line>
+              </mat-error>
+           </mat-error>
+          </div>
+  
+          <div class="f-row mdo-field">
+            <lib-slide-toggle formControlName="interfaceStatus" labelposition="after"
+              theme="primary" class="toggle-col">
+            </lib-slide-toggle>
+            <lib-text-line type="xsmall" weight="strong" i18n-label="@@interface_active">Active</lib-text-line>
+          </div>
+  
+          <div class="f-col mdo-field" [class.has-error]="newInterfaceForm.controls.file.touched && newInterfaceForm.controls.file.errors && newInterfaceForm.controls.file.errors.required">
+            <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@industry" [textColor]="(newInterfaceForm.controls.file.touched && newInterfaceForm.controls.file.errors && newInterfaceForm.controls.file.errors.required) ? 'error' : 'default'">
+              Import files
+            </lib-text-line>
+            <div class="mdo-field-input import-files">
+              <input class="drag-input" type="file" (change)="fileChange($event)" (drop)="fileChange($event)" accept=".wsdl,.xml,.json,.xlsx" multiple="false"
+                id="fileUpload" />
+              <div class="f-col-spacer-half"></div>
+              <lib-text-line *ngIf="newInterfaceForm.get('fileName').value">{{newInterfaceForm.get('fileName').value}}</lib-text-line>
+              <div class="f-row" *ngIf="!newInterfaceForm.get('fileName').value">
+                <lib-text-line type="base" textColor="secondary">Drag files here or&nbsp;</lib-text-line>
+                <lib-text-line type="base" textColor="link" class="cursor">browse </lib-text-line>
+                <lib-text-line textColor="secondary" type="base">&nbsp;to upload</lib-text-line>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </ng-template>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+<div class="f-col">
+  <div class="f-col user-defined-set">
+    <ng-container *ngFor="let rule of constRules;let i = index">
+      <ng-container>
+        <div class="f-row defined-row">
+          <div class="col select-col udr-select-col"></div>
+          <!-- Field Name -->
+          <div class="col">
+            <div>
+              <pros-option-filter [availableOptions]="sourceFieldsObject.list" (selectionChange)="setLookupTargetField($event, i)" (inputBlur)="updateLookupTargetField($event, i)" class="w-100" placeholder="Field name" [value]="rule.fldId">
+              </pros-option-filter>
+            </div>
+          </div>
+          <!-- Value Field -->
+          <div class="col">
+            <pros-udr-value-control 
+              [metataData]="targetListMetaData"
+              [fieldId]="rule.fldId"
+              [value]="rule.value"
+              targetInfo="VALUE"
+              [isLookupRule]="true"
+              [conditionalFieldValueCtrl]="rule.valueCtrl"
+              [parentMetadata]="parentMetadata"
+              [moduleId]="moduleId"
+              [hideTargetFieldsList]="true"
+              (valueChange)="setLookupComparaisonValue($event, i)">
+            </pros-udr-value-control>
+            </div>
+          <!-- Remove -->
+          <div class="col">
+            <lib-button type="plain" icon="trash-alt" iconFontType="light" libTooltip="Delete" (click)="removeConstantRule(i)">
+            </lib-button>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+    <div class="col-spacer"></div>
+    <div class="f-row button-add-block">
+      <lib-button (click)="addConstantRule()" type="minor" iconFontType="light" icon="plus" rounded="true">
+      </lib-button>
+    </div>
+  </div>
+</div>

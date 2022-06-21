@@ -1,0 +1,182 @@
+<form [formGroup]="characteristicsForm">
+    <div class="col col-x2 f-left">
+        <lib-checkbox theme="primary" formControlName="selected"></lib-checkbox>
+        <lib-button-group class="form-lib-button-group">
+            <lib-button type="minor" icon="ellipsis-h" [matMenuTriggerFor]="newCharacteristic"></lib-button>
+            <lib-button type="minor" icon="expand-arrows" (click)="openDialog()">
+            </lib-button>
+        </lib-button-group>
+    </div>
+    <div class="col col-x2">
+        <lib-input class="lib-input input-upper-case" placeholder="Value" i18n-placeholder="@@value" formControlName="charCode"
+          inputPreventKey [keyList]="['Space']"
+          [hasError]="characteristicsForm.controls.charCode.touched && characteristicsForm.controls.charCode.errors && characteristicsForm.controls.charCode.errors.required">
+        </lib-input>
+    </div>
+    <div class="col col-x2_5">
+        <div class="f-col mdo-field">
+            <div class="mdo-field-input">
+                <input matInput placeholder="Value" [matAutocomplete]="moduleAutoCmpLanguage" [value]="selectedLanguage"/>
+                <mat-autocomplete class="mdo-autocomplete" #moduleAutoCmpLanguage="matAutocomplete"
+                    (optionSelected)="onLanguageChange($event)" [displayWith]="displayLanguageFn.bind(this)">
+                    <mat-option class="mdo-option" *ngFor="let obj of allLanguages" [value]="obj.id">
+                        {{obj.name}}
+                    </mat-option>
+                </mat-autocomplete>
+            </div>
+        </div>
+    </div>
+    <div class="col col-x5 text-editor">
+        <pros-rich-text-editor [tabFieldId]="descriptionEditorId" [control]="descriptionControl"
+            (valueChange)="editorValueChange($event)"></pros-rich-text-editor>
+    </div>
+    <div class="col col-x3">
+        <lib-input class="lib-input" placeholder="Value" i18n-placeholder="@@value" formControlName="numCode"
+            [hasError]="characteristicsForm.controls.numCode.touched && characteristicsForm.controls.numCode.errors && characteristicsForm.controls.numCode.errors.required">
+        </lib-input>
+    </div>
+    <div class="col col-x2_5">
+        <div class="f-col mdo-field" [ngClass]="{'mdo-form-error': characteristicsForm.controls.fieldType.touched
+                && characteristicsForm.controls.fieldType.invalid}">
+            <div class="mdo-field-input">
+                <input matInput placeholder="Value" formControlName="fieldType"
+                    [matAutocomplete]="moduleAutoCmpField" />
+                <mat-autocomplete class="mdo-autocomplete" #moduleAutoCmpField="matAutocomplete"
+                    (optionSelected)="onFieldTypeChange($event)">
+                    <mat-option class="mdo-option" *ngFor="let obj of fieldTypeList" [value]="obj.name">
+                        {{obj.name}}
+                    </mat-option>
+                </mat-autocomplete>
+            </div>
+        </div>
+    </div>
+    <div class="col col-x2_5">
+        <div class="f-col mdo-field" [ngClass]="{'mdo-form-error': characteristicsForm.controls.dataType.touched
+            && characteristicsForm.controls.dataType.invalid}">
+            <div class="mdo-field-input">
+                <input matInput placeholder="Value" formControlName="dataType" [matAutocomplete]="moduleAutoCmpData" />
+                <mat-autocomplete class="mdo-autocomplete" #moduleAutoCmpData="matAutocomplete"
+                    (optionSelected)="onDataTypeChange($event)">
+                    <mat-option class="mdo-option" *ngFor="let data of typeList" [value]="data.name">
+                        {{data.name}}
+                    </mat-option>
+                </mat-autocomplete>
+            </div>
+        </div>
+    </div>
+    <div class="col col-x2">
+        <lib-input type="number" class="lib-input" placeholder="Value" i18n-placeholder="@@value" formControlName="length"
+            [hasError]="characteristicsForm.controls.length.touched && characteristicsForm.controls.length.errors && (characteristicsForm.controls.length.errors.required || characteristicsForm.controls.length.errors.pattern)">
+        </lib-input>
+    </div>
+    <div class="col col-x2">
+        <lib-input type="number" class="lib-input" placeholder="Value" i18n-placeholder="@@value" formControlName="decimal"
+            [hasError]="characteristicsForm.controls.decimal.touched && characteristicsForm.controls.decimal.errors && (characteristicsForm.controls.decimal.errors.required || characteristicsForm.controls.decimal.errors.pattern)">
+        </lib-input>
+    </div>
+    <div class="col col-x2">
+        <lib-input class="lib-input" placeholder="Value" i18n-placeholder="@@value" formControlName="currency"
+            [hasError]="characteristicsForm.controls.currency.touched && characteristicsForm.controls.currency.errors && characteristicsForm.controls.currency.errors.required">
+        </lib-input>
+    </div>
+
+    <div class="col col-x4">
+        <lib-input class="lib-input" placeholder="Value" i18n-placeholder="@@value" formControlName="prefix">
+        </lib-input>
+    </div>
+
+    <div class="col col-x4">
+        <lib-input class="lib-input" placeholder="Value" i18n-placeholder="@@value" formControlName="longPrefix">
+        </lib-input>
+    </div>
+    <div class="col col-x4">
+        <lib-input class="lib-input" placeholder="Value" i18n-placeholder="@@value" formControlName="suffix">
+        </lib-input>
+    </div>
+    <div class="col col-x4">
+        <lib-input class="lib-input" placeholder="Value" i18n-placeholder="@@value" formControlName="longSuffix">
+        </lib-input>
+    </div>
+    <div class="col col-x3">
+        <lib-slide-toggle theme="primary" formControlName="isAllowMultipleValue"></lib-slide-toggle>
+    </div>
+    <div class="col col-x3">
+        <lib-slide-toggle theme="primary" formControlName="isManatory"></lib-slide-toggle>
+    </div>
+    <div class="col col-x3">
+        <lib-slide-toggle theme="primary" formControlName="isAllowValueRange"></lib-slide-toggle>
+    </div>
+    <div class="col col-x4">
+        <lib-slide-toggle theme="primary" formControlName="isAllowUpperCase"></lib-slide-toggle>
+    </div>
+    <div class="col col-x3">
+        <lib-slide-toggle theme="primary" formControlName="isAllowNegative"></lib-slide-toggle>
+    </div>
+    <div class="col col-x3">
+        <lib-slide-toggle theme="primary" formControlName="isAllowNewValue"></lib-slide-toggle>
+    </div>
+    <div class="col col-x3">
+        <lib-slide-toggle theme="primary" formControlName="enableDuplicateCheck"></lib-slide-toggle>
+    </div>
+    <div class="col col-x2">
+        <div class="f-col mdo-field">
+            <div class="mdo-field-input">
+                <input matInput placeholder="Value" formControlName="dimensionType" [matAutocomplete]="moduleAutoCmpDimension" />
+                <mat-autocomplete class="mdo-autocomplete" #moduleAutoCmpDimension="matAutocomplete" [displayWith]="displayDimensionFn.bind(this)"
+                    (optionSelected)="onDimensionTypeChange($event)">
+                    <mat-option class="mdo-option" *ngFor="let obj of dimensionTypeList" [value]="obj.uuid">
+                        {{obj.description}}
+                    </mat-option>
+                </mat-autocomplete>
+            </div>
+        </div>
+    </div>
+    <div class="col col-x3">
+        <div class="f-col mdo-field">
+            <div class="mdo-field-input">
+                <input matInput placeholder="Value" formControlName="defaultUoM"
+                    [matAutocomplete]="moduleAutoCmpDefaultMeasure" />
+                <mat-autocomplete class="mdo-autocomplete" #moduleAutoCmpDefaultMeasure="matAutocomplete"
+                    (optionSelected)="onDefaultMeasureChange($event)">
+                    <mat-option class="mdo-option" *ngFor="let obj of defaultMeasureList" [value]="obj.uomValue">
+                        {{obj.uomValue}}
+                    </mat-option>
+                </mat-autocomplete>
+            </div>
+        </div>
+    </div>
+    <div class="col col-x2">
+        <lib-slide-toggle theme="primary" formControlName="status"></lib-slide-toggle>
+    </div>
+    <div class="col col-x2">
+        <lib-date-picker class="date-picker" placeholder="Value" i18n-placeholder="@@value" formControlName="validFrom"
+            [selectedDate]="getValidFromValue()" (valueChange)="validFromChanged($event)"></lib-date-picker>
+    </div>
+    <div class="col col-x2">
+        <lib-date-picker class="date-picker" placeholder="Value" i18n-placeholder="@@value" formControlName="validTo"
+            [selectedDate]="getValidToValue()" (valueChange)="validToChanged($event)"></lib-date-picker>
+    </div>
+    <div class="col col-x5 text-editor">
+        <pros-rich-text-editor [tabFieldId]="helpTextEditorId" [control]="helpTextControl"
+            (valueChange)="helpTextEditorValueChange($event)">
+        </pros-rich-text-editor>
+    </div>
+    <div class="col col-x2 p-right-25">
+        <lib-input class="lib-input" placeholder="Value" i18n-placeholder="@@value" formControlName="sapChars">
+        </lib-input>
+    </div>
+</form>
+
+<!--For Characteristics Options -->
+<mat-menu #newCharacteristic>
+    <button mat-menu-item i18n="@@newLanguage" (click)="onNewLanguage()">
+        New Language
+    </button>
+    <button mat-menu-item i18n="@@duplicate" (click)="onDuplicate()">
+        Duplicate
+    </button>
+    <mat-divider></mat-divider>
+    <button mat-menu-item i18n="@@delete" (click)="onDelete()">
+        Delete
+    </button>
+</mat-menu>

@@ -1,0 +1,42 @@
+<div class="root" cdkScrollable>
+  <div class="f-row breadcrum-toolbar">
+    <lib-button (click)="closePanel()" type="plain" icon="times" iconFontType="light"></lib-button>
+    <div class="f-row mdo-constrained-right">
+      <lib-text-line type="leading">All errors</lib-text-line>
+    </div>
+  </div>
+  <div *ngIf="!isFieldLoading" class="f-col sidesheetcontent-listing">
+    <div *ngIf="allErrorsLogs && allErrorsLogs.length === 0" class="f-col mdo-justify">
+      <ng-container *ngFor="let field of fieldsWithErrors">
+        <div class="f-row error-listing">
+          <ng-container *ngIf="field?.icon.iconType === 'material'; else svgIcon">
+            <mat-icon [fontSet]="getFonSet(field)" class="error-value">{{ field?.icon.icon }}</mat-icon>
+          </ng-container>
+          <ng-template #svgIcon>
+            <pros-svg-icon *ngIf="field?.icon.iconType === 'svg'" size="24" [viewBox]="'0 0 24 24'"
+              [icon]="field?.icon.icon" class="error-value"></pros-svg-icon>
+          </ng-template>
+          <span class="col-spacer"></span>
+          <lib-text-line type="base" textColor="error" enableWrap="true">{{ field.errMsg }}
+          </lib-text-line>
+        </div>
+      </ng-container>
+    </div>
+    <div *ngIf="allErrorsLogs && allErrorsLogs.length > 0" class="f-col mdo-justify">
+      <ng-container *ngFor="let field of allErrorsLogs">
+        <div class="f-row error-listing">
+          <ng-container *ngIf="field?.icon.iconType === 'material'; else svgIcon">
+            <mat-icon [fontSet]="getFonSet(field)">{{ field?.icon.icon }}</mat-icon>
+          </ng-container>
+          <ng-template #svgIcon>
+            <pros-svg-icon *ngIf="field?.icon.iconType === 'svg'" size="24" [viewBox]="'0 0 24 24'"
+              [icon]="field?.icon.icon"></pros-svg-icon>
+          </ng-template>
+          <span class="f-col-spacer-half"></span>
+          <lib-text-line type="small" textColor="error" enableWrap="true">{{ getErrorMessage(field) }}
+          </lib-text-line>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>

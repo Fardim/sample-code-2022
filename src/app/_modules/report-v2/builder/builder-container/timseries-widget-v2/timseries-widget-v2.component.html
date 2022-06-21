@@ -1,0 +1,115 @@
+<mat-card class="mat-elevation-z0 widget">
+  <div class="f-row">
+    <div #displayHeading [libTooltip]="widgetInfo.widgetTitle" matTooltipPosition="right" [matTooltipDisabled]="false">
+      <lib-text-line type="base" enableWrap="true">{{ widgetInfo.widgetTitle }} </lib-text-line>
+    </div>
+    <span class="f-spacer"></span>
+    <lib-button type="plain" icon="pencil-alt" *ngIf="editedMode" (click)="openPanel.emit()"></lib-button>
+    <lib-button [matMenuTriggerFor]="menu" type="plain" icon="ellipsis-h"></lib-button>
+
+    <mat-menu #menu="matMenu" class="navigation-menu">
+      <lib-filter-option *ngIf="editedMode" (click)="deleteWidget.emit()">Delete</lib-filter-option>
+      <lib-filter-option *ngIf="!editedMode" (click)="downloadImage()">Image download (.png)</lib-filter-option>
+      <lib-filter-option *ngIf="!editedMode" (click)="downloadCSV()">Data download (.csv)</lib-filter-option>
+      <button *ngIf="!editedMode" mat-menu-item [matMenuTriggerFor]="zoomOptionMenu" i18n="@@switch_period_view">Switch period view</button>
+      <mat-menu #zoomOptionMenu="matMenu" class="mat-elevation-z0 tooltip-fields-menu">
+        <lib-radio-group
+          layout="vertical"
+          [(value)]="selectedPeriodOption"
+          [options]="periodOptions"
+          (valueChange)="changePeriodView()"
+          name="period{{ widgetId }}"
+        ></lib-radio-group>
+      </mat-menu>
+      <button *ngIf="!editedMode" mat-menu-item [matMenuTriggerFor]="tcOptionMenu" i18n="@@viewAs">View as...</button>
+      <mat-menu #tcOptionMenu="matMenu" class="mat-elevation-z0 tooltip-fields-menu">
+        <lib-radio-group
+          layout="vertical"
+          [(value)]="displayCriteriaOption"
+          [options]="displayCriteriaOptions"
+          (valueChange)="saveDisplayCriteria()"
+          name="displayCriteria{{ widgetId }}"
+        ></lib-radio-group>
+      </mat-menu>
+      <!-- <button mat-menu-item (click)="openColorPalette()">Color palette</button> -->
+      <lib-filter-option *ngIf="!editedMode">
+        <lib-slide-toggle
+          class="lib-toggle"
+          labelPosition="before"
+          [checked]="isTableView"
+          (toggleChange)="viewChange($event)"
+          label="Table view"
+          theme="primary"
+          prosClickStopPropagation
+        ></lib-slide-toggle>
+      </lib-filter-option>
+    </mat-menu>
+  </div>
+  <div class="row-spacer"></div>
+  <mat-card-content *ngIf="chartType">
+    <ng-template [ngIf]="showFilterOption">
+      <div class="f-row datafilter">
+        <button
+          *ngFor="let dateType of dateFilters"
+          mat-stroked-button
+          [color]="dateType.isActive ? 'primary' : ''"
+          (click)="updateForm('date', dateType)"
+        >
+          {{ dateType.value === 'millisecond' ? 'Today' : dateType.value }}
+          <ng-template [ngIf]="dateType.value !== 'millisecond'">
+            {{ widgetInfo.chartProperties ? widgetInfo.chartProperties.seriesWith : '' }}s
+          </ng-template>
+        </button>
+        <div>
+          <!-- <mat-form-field appearance="outline">
+              <mat-date-range-input [rangePicker]="picker">
+                <input matStartDate placeholder="Start date" [formControl]="startDateCtrl">
+                <input matEndDate placeholder="End date" [formControl]="endDateCtrl">
+              </mat-date-range-input>
+              <div class="f-row input-actions">
+                <mat-divider [vertical]="true"></mat-divider>
+                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-date-range-picker #picker></mat-date-range-picker>
+              </div>
+            </mat-form-field> -->
+
+          <lib-date-range-picker
+            label="Start date"
+            *ngIf="styleCtrlGrp && styleCtrlGrp.get('dateSelectionType').value === 'CUSTOM'"
+            formControlName="startDate"
+          >
+          </lib-date-range-picker>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template [ngIf]="!isGroupByChart" [ngIfElse]="groupTimeSeries">
+      <canvas
+        baseChart
+        [ngClass]="{ hide: isTableView }"
+        [datasets]="dataSet"
+        class="inner-flexcol-12"
+        [options]="timeSeriesOption"
+        [plugins]="lineChartPlugins"
+        [chartType]="chartType"
+      >
+      </canvas>
+      <pros-table-view [ngClass]="{ hide: !isTableView }" [displayedColumnsId]="displayedColumnsId" [tableDataSource]="tableDataSource">
+      </pros-table-view>
+    </ng-template>
+    <ng-template #groupTimeSeries>
+      <canvas
+        baseChart
+        [ngClass]="{ hide: isTableView }"
+        [datasets]="dataSet"
+        class="inner-flexcol-12"
+        [options]="timeSeriesOption"
+        [plugins]="lineChartPlugins"
+        [chartType]="chartType"
+      >
+      </canvas>
+      <pros-table-view [displayedColumnsId]="displayedColumnsId" [tableDataSource]="tableDataSource" [ngClass]="{ hide: !isTableView }">
+      </pros-table-view>
+    </ng-template>
+  </mat-card-content>
+</mat-card>

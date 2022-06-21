@@ -1,0 +1,17 @@
+<mat-form-field appearance="outline" [formGroup]="fldFrmGrp">
+    <mat-label>Field</mat-label>
+    <input
+    type="text"
+    placeholder="Field"
+    formControlName="conFld"
+    aria-label="Number"
+    matInput
+    [matAutocomplete]="fieldListAuto">
+    <mat-autocomplete #fieldListAuto="matAutocomplete" [displayWith] ="displayWith">
+        <mat-optgroup *ngFor="let field of searchFld | async" [label]="field.fieldDescription">
+            <mat-option  *ngFor="let fld of field.fields " [value]="fld">
+                {{ fld.fieldDescri }} 
+            </mat-option>
+        </mat-optgroup>
+    </mat-autocomplete>
+</mat-form-field>

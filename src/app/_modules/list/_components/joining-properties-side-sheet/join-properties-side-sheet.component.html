@@ -1,0 +1,96 @@
+<div class="root">
+  <form [formGroup]="frmGroup">
+    <div class="f-row breadcrum-toolbar">
+      <lib-button icon="times" iconFontType="light" type="plain" (click)="close()"></lib-button>
+
+      <div class="col-spacer"></div>
+
+      <div class="f-col mdo-constrained-right">
+        <div class="f-row breadcrum-head">
+          <lib-text-line type="leading" enableWrap="true" i18n="@@join_properties">Join properties</lib-text-line>
+
+          <div class="f-spacer"></div>
+
+          <lib-button id="save" type="major" i18n="@@apply" (click)="save()" prosClickStopPropagation>Apply</lib-button>
+        </div>
+      </div>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing">
+      <div class="f-col mdo-justify">
+        <div class="row-spacer"></div>
+
+        <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@join_type">Join type</lib-text-line>
+
+        <div class="f-col mdo-field">
+          <mat-form-field appearance="outline">
+            <mat-select id="join-types" formControlName="joinType">
+              <mat-option *ngFor="let item of joinTypes" [value]="item.value" >
+                {{item?.label}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="f-col mdo-field" *ngIf="frmGroup?.controls?.joinType?.value!=='UNION'">
+          <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@condition">Condition</lib-text-line>
+          <lib-segment id="condition-operators" formControlName="joinOperator" [optionsList]="optionsList"
+            labelKey="label" valueKey="label">
+          </lib-segment>
+        </div>
+
+        <lib-banner status="warning" *ngIf="error">
+          {{error}}
+        </lib-banner>
+
+        <div class="f-col mdo-field">
+          <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@properties">Properties</lib-text-line>
+          <div id="select-join-fields" class="f-col user-defined-set"
+            *ngIf="frmGroup?.controls?.joinType?.value!=='UNION'">
+            <div formArrayName="joinMapping" *ngFor="let item of frmGroup.get('joinMapping').controls; let i = index;">
+              <ng-container [formGroupName]="i">
+                <div class="f-row defined-row">
+                  <div class="col">
+                    <mat-select [value]="sourceOneField" id="source-one" class="col-field" formControlName="sourceOneField"
+                      (selectionChange)="areFieldsValid()">
+                      <mat-option *ngFor="let item of leftColumns" [value]="item?.id">
+                        {{item?.name}}
+                      </mat-option>
+                    </mat-select>
+                  </div>
+
+                  <div class="col divider-col">
+                    <mat-select id="join-operators" [value]="operator" class="col-field" formControlName="operator">
+                      <mat-option *ngFor="let item of joinOperators" [value]="item?.value"> {{item?.label}} </mat-option>
+                    </mat-select>
+                  </div>
+
+                  <div class="col">
+                    <mat-select [value]="sourceTwoField" class="col-field" formControlName="sourceTwoField"
+                      (selectionChange)="areFieldsValid()">
+                      <mat-option *ngFor="let item of rightColumns" [value]="item?.id">
+                        {{item?.name}}
+                      </mat-option>
+                    </mat-select>
+                  </div>
+
+                  <div class="col end-col-item">
+                    <lib-button type="plain" icon="plus" id="add-item"
+                      *ngIf="i===frmGroup?.controls?.joinMapping?.length-1" (click)="addItem(i+1)"></lib-button>
+
+                    <lib-button type="plain" icon="trash-alt" id="remove-item" (click)="removeItem(i)"></lib-button>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+
+          <div *ngIf="frmGroup?.controls?.joinType?.value==='UNION'">
+            <lib-button type="plain" id="map-fields" iconFontType="light" i18n="@@map_fields" (click)="openMapFields()">Map fields
+            </lib-button>
+            <lib-button type="plain" icon="trash-alt"></lib-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

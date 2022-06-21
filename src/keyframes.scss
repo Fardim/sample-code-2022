@@ -1,0 +1,30 @@
+@keyframes pulse_opacity_step_10_repeat {
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  10%,
+  90% {
+    opacity: 0.2;
+  }
+
+  20%,
+  80% {
+    opacity: 0.4;
+  }
+
+  30%,
+  70% {
+    opacity: 0.6;
+  }
+
+  40%,
+  60% {
+    opacity: 0.8;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}

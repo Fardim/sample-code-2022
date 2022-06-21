@@ -1,0 +1,25 @@
+<div class="root">
+    <!-- <ng-container *ngIf="diwListComponent?.dataLoaders.tableHasData"> -->
+        <div class="f-row breadcrum-toolbar">
+            <lib-text-line type="leading"> Data Intelligence Workbench </lib-text-line>
+            <span class="f-spacer"></span>
+            <pros-check-data-btn></pros-check-data-btn>
+        </div>
+        <!-- DIW view tabs -->
+        <pros-diw-view-tabs [activeTab] = "activeTab" (openTab) = "navigateToDetails($event)"></pros-diw-view-tabs>
+    <!-- </ng-container> -->
+
+    <!-- <ng-template [ngIf]="diwListComponent?.dataLoaders?.loadTable && !diwListComponent?.dataLoaders.tableHasData">
+        <pros-toolbar-skeleton></pros-toolbar-skeleton>
+    </ng-template> -->
+
+    <!-- schema overview / list page -->
+    <ng-template [ngIf]="activeTab === '0'">
+        <pros-diw-list (openTab)="setActiveTab($event)"></pros-diw-list>
+    </ng-template>
+    <!-- Container for data correction area ... -->
+
+    <ng-template [ngIf]="activeTab !== '0'">
+        <pros-detail-builder [schemaId]="activeTab"></pros-detail-builder>
+    </ng-template>
+</div>

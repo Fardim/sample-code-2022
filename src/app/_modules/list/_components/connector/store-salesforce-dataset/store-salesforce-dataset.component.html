@@ -1,0 +1,26 @@
+<div class="root">
+    <div class="sap-imports">
+      <div class="f-col">
+        <lib-tab-group disableRipple="true" animationDuration="0ms" (selectedIndexChange)="changeImportTab($event)"
+           appearance="toggle">
+          <lib-tab label="New dataset" i18n-label="@@new_dataset">
+            <div class="f-col mdo-field">
+            </div>
+          </lib-tab>
+          <lib-tab label="Existing dataset" i18n-label="@@existing_dataset">
+          </lib-tab>
+          <lib-tab label="ConnektHub module" i18n-label="@@connektHub_module"></lib-tab>
+        </lib-tab-group>
+      </div>
+
+      <div class="f-col">
+        <div class="f-row dataset-button">
+          <lib-button type="plain" (click)="onCancelClick()" i18n="@@cancel">Cancel</lib-button>
+          <span class="f-spacer"></span>
+          <div class="f-row">
+            <lib-button type="plain" (click)="back()" i18n="@@back">Back</lib-button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

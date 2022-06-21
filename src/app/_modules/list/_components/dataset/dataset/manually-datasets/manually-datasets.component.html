@@ -1,0 +1,184 @@
+<mat-card class="root mat-elevation-z0">
+  <div class="modal-wrapper">
+    <div class="f-row modal-header">
+      <lib-text-line type="leading">Standard dataset</lib-text-line>
+      <lib-button icon="times" iconFontType="light" (click)="onCancelClick()"></lib-button>
+    </div>
+
+    <div class="modal-body">
+      <div class="f-col manually-dataset">
+        <form [formGroup]="datasetForm" *ngIf="datasetForm" class="dataset-form">
+          <div class="f-col">
+            <lib-banner *ngIf="showBanner()" status="error">
+              <lib-text-line>Please correct errors below before saving the dataset</lib-text-line>
+              <span class="f-spacer"></span>
+              <lib-button type="plain" icon="times" iconFontType="light" (click)="showErrorBanner = false"></lib-button>
+            </lib-banner>
+          </div>
+
+          <div class="f-col">
+            <lib-input label="Dataset name" i18n-label="@@dataset_name"
+              formControlName="datasetName" type="text" [isRequired]="true" autocomplete="off"
+              [hint]="getHint('datasetName')" [hasError]="hasError['datasetName']">
+            </lib-input>
+          </div>
+
+          <div class="f-col">
+            <lib-textarea label="Dataset description" id="datasetDescription" [isRequired]="true"
+              i18n-label="@@dataset_description" type="text" class="lib-input" autocomplete="off"
+              formControlName="datasetDescription" placeholder="Enter the value" [rows]="2"
+              [hint]="getHint('datasetDescription')" [hasError]="hasError['datasetDescription']">
+            </lib-textarea>
+          </div>
+
+          <div class="f-col">
+            <lib-input label="Dataset company ID" i18n-label="@@dataset_company_id" formControlName="datasetCompanyId"
+              type="text">
+            </lib-input>
+          </div>
+
+          <ng-template [ngIf]="isSystemDatasetType">
+            <!-- Note : Hidden as not required as of now -->
+            <div class="f-col" *ngIf="!datasetForm.get('systemDataset').value">
+              <lib-input label="App name" i18n-label="@@app_name" formControlName="appName" type="text">
+              </lib-input>
+            </div>
+
+            <div class="f-col mdo-field" *ngIf="!datasetForm.get('systemDataset').value">
+              <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@industry">Industry<span
+                  class="mandatory">*</span>
+              </lib-text-line>
+              <div class="mdo-field-input">
+                <!-- <lib-chip-list>
+                  <ng-container *ngFor="let opt of selectedOptions; let i=index">
+                    <ng-container *ngIf="i<=limit-1">
+                      <lib-chip [removable]="true" (removed)="removeIndustryOption(opt)">{{opt}}</lib-chip>
+                    </ng-container>
+                  </ng-container>
+                  <lib-chip *ngIf="hasLimit(false)">+{{selectedOptions.length - limit}}</lib-chip>
+                </lib-chip-list> -->
+                <input matInput placeholder="Type to search" id="optionInput" formControlName="industry"
+                  [matAutocomplete]="auto" />
+                <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" (optionSelected)="selected($event)">
+                  <mat-option class="mdo-option" name="industry" *ngFor="let opt of industryOptions | async" [value]="opt">
+                    {{opt}}
+                  </mat-option>
+                </mat-autocomplete>
+              </div>
+      
+              <lib-text-line type="xsmall" *ngIf="datasetForm.controls.industry.touched && datasetForm.controls.industry.invalid"
+                textColor="error">
+                This is a required field
+              </lib-text-line>
+            </div> 
+
+            <div class="f-col mdo-field" *ngIf="!datasetForm.get('systemDataset').value">
+              <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@system_type">System type
+              </lib-text-line>
+              <lib-segment formControlName="systemType" [optionsList]="systemTypeOptions" labelKey="label"
+                valueKey="value">
+              </lib-segment>
+            </div>
+
+            <div class="f-col mdo-field">
+              <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@owner">Owner<span
+                  class="mandatory">*</span>
+              </lib-text-line>
+              <lib-segment formControlName="owner" [optionsList]="ownerOptions" labelKey="label" valueKey="value">
+              </lib-segment>
+              <mat-error
+                *ngIf="datasetForm.controls.owner.touched && datasetForm.controls.owner.errors && datasetForm.controls.owner.errors.required">
+                This is a required field</mat-error>
+            </div>
+
+            <div class="f-col mdo-field" *ngIf="!datasetForm.get('systemDataset').value">
+              <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@data_type">Datatype<span
+                  class="mandatory">*</span>
+              </lib-text-line>
+              <lib-segment formControlName="datatype" [optionsList]="dataTypeOptions" labelKey="label" valueKey="value">
+              </lib-segment>
+              <mat-error
+                *ngIf="datasetForm.controls.datatype.touched && datasetForm.controls.datatype.errors && datasetForm.controls.datatype.errors.required">
+                This is a required field</mat-error>
+            </div>
+
+            <div class="f-col mdo-field">
+              <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@persistence">Persistence<span
+                  class="mandatory">*</span>
+              </lib-text-line>
+              <lib-segment formControlName="persistence" [optionsList]="persistenceOptions" labelKey="label"
+                valueKey="value">
+              </lib-segment>
+              <mat-error
+                *ngIf="datasetForm.controls.persistence.touched && datasetForm.controls.persistence.errors && datasetForm.controls.persistence.errors.required">
+                This is a required field</mat-error>
+            </div>
+
+            <div class="f-col mdo-field" *ngIf="!datasetForm.get('systemDataset').value">
+              <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@data_privacy">Data privacy<span
+                  class="mandatory">*</span>
+              </lib-text-line>
+              <lib-segment formControlName="dataPrivacy" [optionsList]="dataPrivacyOptions" labelKey="label"
+                valueKey="value">
+              </lib-segment>
+              <mat-error
+                *ngIf="datasetForm.controls.dataPrivacy.touched && datasetForm.controls.dataPrivacy.errors && datasetForm.controls.dataPrivacy.errors.required">
+                This is a required field</mat-error>
+            </div>
+          </ng-template>
+          <div class="f-col mdo-field" *ngIf="!datasetForm.get('systemDataset').value">
+            <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@parent_dataset">Parent dataset(s)
+            </lib-text-line>
+            <div class="mdo-field-input">
+              <lib-chip-list>
+                <ng-container *ngFor="let opt of selectedParentDatasetOptions; let i=index">
+                  <ng-container *ngIf="i<=limit-1">
+                    <lib-chip class="parent-dataset-chip" [removable]="true"
+                      (removed)="removeParentDatasetOptions(opt.moduleId)" [title]="opt?.description">
+                      <lib-text-line type="base">{{opt?.description}}</lib-text-line>
+                    </lib-chip>
+                  </ng-container>
+                </ng-container>
+                <lib-chip *ngIf="hasLimit(true)">+{{selectedParentDatasetOptions.length - limit}}</lib-chip>
+                <input matInput placeholder="Type to search" id="parentOptionInput" formControlName="parentDataset"
+                  [matAutocomplete]="parentDatsetAuto" />
+              </lib-chip-list>
+              <mat-autocomplete class="mdo-autocomplete" #parentDatsetAuto="matAutocomplete"
+                (optionSelected)="selectedParentDataset($event)">
+                <mat-option class="mdo-option" name="parentDataset" *ngFor="let opt of parentDatasetOptions"
+                  [value]="opt.moduleId">
+                  {{opt.moduleDescriptionRequestDTO?.description}}
+                </mat-option>
+              </mat-autocomplete>
+            </div>
+          </div>
+
+          <!-- Note : Hidden as not required as of now -->
+          <!-- <div class="f-col">
+            <div class="f-row">
+              <lib-button (click)="downloadDatasetConfig()" type="major" i18n="@@download_dataset_config">Download Dataset Configuration
+              </lib-button>
+              <div class="f-spacer"></div>
+              <lib-button type="major" i18n="@@upload_dataset_config" (click)="uploadDataset()">Upload Dataset Configuration</lib-button>
+            </div>
+          </div> -->
+        </form>
+      </div>
+    </div>
+
+    <div class="f-row modal-footer space-between">
+      <lib-button type="plain" width="80px" (click)="onCancelClick()" i18n="@@cancel">Cancel</lib-button>
+      <span class="f-spacer"></span>
+      <div class="f-row">
+        <lib-button type="plain" width="80px" (click)="back()" i18n="@@back">Back</lib-button>
+        &nbsp;
+        <lib-button type="major" width="80px" i18n="@@create" (click)="onSubmitClick()" *ngIf="selectedDatasetId === 0">
+          Create
+        </lib-button>
+        <lib-button type="major" width="80px" i18n="@@update" (click)="onSubmitClick()" *ngIf="selectedDatasetId !== 0">
+          Update
+        </lib-button>
+      </div>
+    </div>
+  </div>
+</mat-card>

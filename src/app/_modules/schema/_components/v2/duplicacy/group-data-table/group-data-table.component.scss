@@ -1,0 +1,19 @@
+div.root {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 12px;
+
+  .load-more-data {
+    height: 20px;
+    padding: 6px;
+  }
+}
+
+.group-row {
+  width: 100%;
+}
+
+.inactive {
+  display: none;
+}

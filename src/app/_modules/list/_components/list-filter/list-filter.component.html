@@ -1,0 +1,333 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" icon="times" (click)="close()" iconFontType="light"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row">
+                <lib-text-line type="leading">Filter</lib-text-line>
+                <!-- <lib-segment [optionsList]="optionsList" labelKey="label" valueKey="value"></lib-segment> -->
+                <span class="f-spacer"></span>
+                <lib-button type="plain" icon="ellipsis-h" [matMenuTriggerFor]="navigation"></lib-button>
+                <mat-menu #navigation="matMenu" class="navigation-menu">
+                  <button mat-menu-item (click)="clearAllFilters()" i18n="@@reset_all">Reset
+                  </button>
+                </mat-menu>
+            </div>
+        </div>
+    </div>
+    <div class="f-row-spacer-half"></div>
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+
+            <div class="f-row system">
+                <div class="f-col system-fields-col">
+                    <lib-search i18n-placeholder="@@search" placeholder="Search filters"
+                        (valueChange)="searchFieldSub.next($event)">
+                    </lib-search>
+
+                     <div class="row-spacer"></div>
+
+                    <div class="filter-tree" prosInfiniteScroll bufferPercentage="20"
+                        (scrollEnd)="getModuleFldMetadata(true)">
+                        <mat-list class="mdo-list">
+                            <mat-list-item class="f-row cursor" *ngFor="let filter of suggestedFilters; let index=index">
+                                <div class="f-col" (click)="upsertFilter(filter.fieldId)">
+                                    <lib-text-line type="base" class="text-overflow"> {{ getFieldDescription(filter.fieldId) }}
+                                    </lib-text-line>
+                                    <lib-text-line type="base" textColor="secondary" class="list-textline">
+                                        {{ FormatFilterValue(filter) }}
+                                    </lib-text-line>
+                                </div>
+                                <span class="f-spacer"></span>
+                                <span class="f-col-spacer-half"></span>
+                                <lib-button type="plain" iconFontType="light" icon="times"
+                                    (click)="removeFilter(index, filter.fieldId)"></lib-button>
+                            </mat-list-item>
+                        </mat-list>
+
+                        <lib-section></lib-section>
+
+                        <div class="mat-tree-container filters-list">
+                            <mat-list class="mdo-list">
+                                <mat-list-item [ngClass]="{ 'background-highlight' : selectedListItem === field.fieldId }"  *ngFor="let field of moduleFieldsMetatdata"
+                                    (click)="upsertFilter(field.fieldId)" class="f-row cursor">
+                                    <lib-text-line type="base" enableWrap="false" class="text-overflow">{{ field.fieldDescri }}</lib-text-line>
+                                </mat-list-item>
+                            </mat-list>
+                        </div>
+                    </div>
+                </div>
+ 
+
+                <div class="f-col system-values-col">
+                    <ng-template [ngIf]="activeFilter">
+                        <div class="f-row">
+                            <lib-text-line type="leading" class="heading-overflow"> {{ getFieldDescription(activeFilter.fieldId) }}
+                            </lib-text-line>
+                            <span class="col-spacer"></span>
+                            <span class="f-spacer"></span>
+                            <lib-button type="minor" (click)="applyFilter()" i18n="@@apply">Apply
+                            </lib-button>
+                        </div>
+                        <div class="row-spacer"></div>
+
+                        <div class="f-col">
+                            <pros-list-filter-field-elements *ngIf="activeFilter" [showRuleToggled]="true"
+                                [moduleId]="moduleId" [filterList]="filtersList"
+                                [selectedCurrentFilter]="activeFilter" [moduleFieldsMetatdata]="moduleFieldsMetatdata"
+                                [filterFieldsMetadata]="filterFieldsMetadata"
+                                (valueChanged)="emitFilterValueChange($event)"></pros-list-filter-field-elements>
+                        </div>
+                    </ng-template>
+
+                    <!-- Location Tab -->
+                    <ng-template>
+                        <div class="f-row">
+                            <lib-text-line type="base" weight="strong">Location</lib-text-line>
+                            <span class="f-spacer"></span>
+                            <lib-button type="type" libBadge="322" [matBadgeOverlap]="true">
+                                <mat-icon fontSet="mdo-icons-light">sliders-h</mat-icon>
+                            </lib-button>
+                            <span class="f-col-spacer-half"></span>
+                            <lib-button-group>
+                                <lib-button type="major">Apply</lib-button>
+                                <lib-button type="major" icon="ellipsis-h"></lib-button>
+                            </lib-button-group>
+                        </div>
+                        <div class="f-row-spacer-half"></div>
+                        <div class="f-col">
+                            <lib-text-line type="base" weight="strong">Rule</lib-text-line>
+                            <lib-segment [optionsList]="rulelist" labelKey="label" valueKey="value"></lib-segment>
+
+                            <lib-section></lib-section>
+
+                            <lib-search placeholder="Search"></lib-search>
+                            <div class="row-spacer"></div>
+                            <div class="f-row">
+                                <span class="col-spacer"></span>
+                                <lib-slide-toggle label="Show selected" labelPosition="after" theme="primary">
+                                </lib-slide-toggle>
+                            </div>
+                            <div class="row-spacer"></div>
+                            <mat-list>
+                                <mat-list-item>
+                                    <lib-checkbox label="All" labelPosition="after" theme="primary">
+                                    </lib-checkbox>
+                                </mat-list-item>
+                                <ng-template>
+                                    <div class="f-row">
+                                        <span class="col-spacer"></span>
+                                        <lib-button type="plain" iconFontType="solid" icon="times"></lib-button>
+                                        <span class="f-col-spacer-half"></span>
+                                        <lib-text-line type="base">Remove all</lib-text-line>
+                                    </div>
+                                </ng-template>
+                                <lib-section></lib-section>
+                                <mat-list-item>
+                                    <lib-checkbox label="Algeria" labelPosition="after" theme="primary"></lib-checkbox>
+                                </mat-list-item>
+                                <mat-list-item>
+                                    <lib-checkbox label="America" labelPosition="after" theme="primary"></lib-checkbox>
+                                </mat-list-item>
+                                <mat-list-item>
+                                    <lib-checkbox label="Austria" labelPosition="after" theme="primary"></lib-checkbox>
+                                </mat-list-item>
+                                <mat-list-item>
+                                    <lib-checkbox label="Brussels" labelPosition="after" theme="primary"></lib-checkbox>
+                                </mat-list-item>
+                                <mat-list-item>
+                                    <lib-checkbox label="France" labelPosition="after" theme="primary"></lib-checkbox>
+                                </mat-list-item>
+                                <mat-list-item>
+                                    <lib-checkbox label="Germany" labelPosition="after" theme="primary"></lib-checkbox>
+                                </mat-list-item>
+                            </mat-list>
+                        </div>
+                    </ng-template>
+
+                    <!-- Approved date Tab -->
+                    <ng-template>
+                        <div class="f-row">
+                            <lib-text-line type="base" weight="strong">Approved date</lib-text-line>
+                            <span class="f-spacer"></span>
+                            <lib-button type="type">
+                                <mat-icon fontSet="mdo-icons-solid">sliders-h</mat-icon>
+                            </lib-button>
+                            <span class="f-col-spacer-half"></span>
+                            <lib-button-group>
+                                <lib-button type="major">Apply</lib-button>
+                                <lib-button type="major" icon="ellipsis-h"></lib-button>
+                            </lib-button-group>
+                        </div>
+                        <div class="f-row-spacer-half"></div>
+                        <div class="f-row system">
+                            <div class="f-col date-list">
+                                <mat-list>
+                                    <mat-list-item>
+                                        <lib-text-line type="base">Day</lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <mat-icon fontSet="mdo-icons-solid">long-arrow-alt-right</mat-icon>
+                                    </mat-list-item>
+                                    <mat-list-item>
+                                        <lib-text-line type="base">Week</lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <mat-icon fontSet="mdo-icons-solid">long-arrow-alt-right</mat-icon>
+                                    </mat-list-item>
+                                    <mat-list-item>
+                                        <lib-text-line type="base">Month</lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <mat-icon fontSet="mdo-icons-solid">long-arrow-alt-right</mat-icon>
+                                    </mat-list-item>
+                                    <mat-list-item>
+                                        <lib-text-line type="base">Quarter</lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <mat-icon fontSet="mdo-icons-solid">long-arrow-alt-right</mat-icon>
+                                    </mat-list-item>
+                                    <mat-list-item>
+                                        <lib-text-line type="base">Year</lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <mat-icon fontSet="mdo-icons-solid">long-arrow-alt-right</mat-icon>
+                                    </mat-list-item>
+                                    <mat-list-item>
+                                        <lib-text-line type="base">Specific date </lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <mat-icon fontSet="mdo-icons-solid">long-arrow-alt-right</mat-icon>
+                                    </mat-list-item>
+                                    <mat-list-item>
+                                        <lib-text-line type="base">Date range</lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <mat-icon fontSet="mdo-icons-solid">long-arrow-alt-right</mat-icon>
+                                    </mat-list-item>
+
+                                </mat-list>
+                            </div>
+                            <div class="col-spacer"></div>
+                            <div class="f-col date-list">
+                                <lib-radio-group [options]="options" layout="vertical"></lib-radio-group>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <!-- Period Tab -->
+                    <ng-template>
+                        <div class="f-row">
+                            <lib-text-line type="base" weight="strong">Period</lib-text-line>
+                            <span class="f-spacer"></span>
+                            <span class="f-col-spacer-half"></span>
+                            <lib-button type="minor">Save</lib-button>
+                        </div>
+                        <div class="f-row-spacer-half"></div>
+                        <div class="f-row system">
+                            <div class="f-col date-list">
+                                <lib-radio-group [options]="periods" layout="vertical"></lib-radio-group>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <!-- Numeric Range Tab -->
+                    <ng-template>
+                        <div class="f-row">
+                            <lib-text-line type="base" weight="strong">Range</lib-text-line>
+                            <span class="f-spacer"></span>
+                            <lib-button type="type">
+                                <mat-icon fontSet="mdo-icons-light">sliders-h</mat-icon>
+                            </lib-button>
+                            <span class="f-col-spacer-half"></span>
+                            <lib-button type="minor">Save</lib-button>
+                        </div>
+                        <div class="f-row-spacer-half"></div>
+                        <div class="f-row system">
+                            <div class="f-col date-list">
+                                <lib-input></lib-input>
+                                <lib-range-slider value="12"></lib-range-slider>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <!-- Selectdropdown Tab -->
+                    <ng-template>
+                        <div class="f-col system-values-col">
+                            <div class="f-row">
+                                <lib-input placeholder="Select range"></lib-input>
+                                <mat-menu #selectOptions="matMenu">
+                                    <div class="f-col">
+                                        <div class="f-row">
+                                            <lib-text-line type="base">Rule</lib-text-line>
+                                            <span class="f-spacer"></span>
+                                            <lib-button type="plain" iconFontType="light" icon="sliders-h"></lib-button>
+                                        </div>
+                                        <div class="f-row">
+                                            <lib-search placeholder="Search"></lib-search>
+                                        </div>
+                                    </div>
+                                    <mat-list>
+                                        <mat-list-item>
+                                            <lib-checkbox label="Algeria" labelPosition="after" theme="primary">
+                                            </lib-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <lib-checkbox label="America" labelPosition="after" theme="primary">
+                                            </lib-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <lib-checkbox label="Austria" labelPosition="after" theme="primary">
+                                            </lib-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <lib-checkbox label="Brussels" labelPosition="after" theme="primary">
+                                            </lib-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <lib-checkbox label="France" labelPosition="after" theme="primary">
+                                            </lib-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <lib-checkbox label="Germany" labelPosition="after" theme="primary">
+                                            </lib-checkbox>
+                                        </mat-list-item>
+                                    </mat-list>
+                                </mat-menu>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <!-- Single select drowdown Tab -->
+                    <ng-template>
+                        <div class="f-col system-values-col">
+                            <div class="f-row">
+                                <div class="f-col mdo-field">
+                                    <lib-text-line class="field-label" type="xsmall" weight="strong">Single-select
+                                    </lib-text-line>
+                                    <div class="mdo-field-input">
+                                        {{selected}}
+                                        <input matInput placeholder="Type to search" #optionInput2
+                                            [formControl]="optionCtrl2" [matAutocomplete]="auto2" />
+                                        <mat-icon matSuffix fontSet="mdo-icons">angle-down</mat-icon>
+
+                                        <mat-autocomplete class="mdo-autocomplete" #auto2="matAutocomplete"
+                                            (optionSelected)="selectSingle($event)">
+                                            <mat-option class="mdo-option" *ngFor="let opt of filteredOptions | async"
+                                                [value]="opt">
+                                                {{opt}}
+                                            </mat-option>
+                                        </mat-autocomplete>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <!-- Textarea Tab -->
+                    <ng-template>
+                        <div class="f-col system-values-col">
+                            <div class="f-row">
+                                <lib-textarea label="Single-select"></lib-textarea>
+                            </div>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

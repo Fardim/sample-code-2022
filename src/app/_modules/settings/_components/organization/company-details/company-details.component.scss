@@ -1,0 +1,14 @@
+.tabs-content {
+  .company-details {
+    width: 100%;
+    align-items: flex-start;
+
+    .avatar {
+      margin-right: 24px;
+    }
+
+    .entry-fields {
+      flex: 3;
+    }
+  }
+}

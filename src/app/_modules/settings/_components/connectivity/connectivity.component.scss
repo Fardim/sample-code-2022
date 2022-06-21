@@ -1,0 +1,78 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  padding: 0 12px;
+  align-items: flex-start;
+
+  .breadcrum-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding-top: 8px;
+    min-height: 36px;
+  }
+
+  .lib-search {
+    width: 213px;
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+}
+
+.system-container {
+  height: calc(100% - 44px - 36px - 8px * 3);
+  align-items: flex-start;
+
+  .filter-list {
+    height: 100%;
+    width: 220px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 12px;
+    border-right-width: 1px;
+    border-right-style: solid;
+
+    .filter-heading {
+      min-height: 36px;
+    }
+  }
+}
+
+.details-accordion {
+  width: calc(100% - 220px);
+  overflow: auto;
+  height: 100%;
+  padding-left: 12px;
+
+  .mat-expansion-panel {
+    margin-bottom: 8px;
+
+    .mat-expansion-panel-header {
+      padding: 0 8px;
+      border-radius: 3px;
+
+      &.cdk-mouse-focused {
+        background: transparent;
+      }
+    }
+  }
+
+  .mat-table {
+    width: 100%;
+    overflow: auto;
+    border-collapse: separate;
+
+    .mat-cell {
+      border-right: none;
+
+      &.mat-column-star {
+        width: 48px;
+      }
+    }
+  }
+}
+
+.f-row-spacer-mt-1 {
+  margin-top: 1.5rem;
+}

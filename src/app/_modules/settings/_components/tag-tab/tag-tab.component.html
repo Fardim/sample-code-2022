@@ -1,0 +1,74 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-text-line type="leading" i18n="@@tags">Tags</lib-text-line>
+    <div class="f-spacer"></div>
+    <lib-button type="minor" width="80px" (click)="addNewTag()" i18n="@@new_tag">New tag</lib-button>
+  </div>
+  <div class="f-row-spacer-half"></div>
+  <lib-search i18n-placeholder="@@search" placeholder="Search tags" class="lib-search" (valueChange)="searchFieldSub.next($event)"></lib-search>
+  <div class="f-row-spacer-half"></div>
+  <div class="f-col colunm-list" prosInfiniteScroll bufferPercentage="20" (scrollEnd)="scroll(true)">
+    <div class="f-row colunm-box list-header rule-border-row">
+      <div class="col">
+        <lib-checkbox
+          theme="primary"
+          (valueChange)="masterToggle()"
+          [checked]="selection.hasValue() && isAllSelected()"
+          [indeterminate]="selection.hasValue() && !isAllSelected()"
+        ></lib-checkbox>
+      </div>
+      <ng-container *ngIf="selection.hasValue(); else headers">
+        <div class="col col-x8">
+          <lib-button-group>
+            <lib-button type="minor" (click)="mergeTags()" i18n="@@merge">Merge</lib-button>
+            <lib-button type="minor" (click)="deleteSelectedTags()" i18n="@@delete">Delete</lib-button>
+            <lib-button type="minor" (click)="selection.clear()" i18n="@@clear_selection">Clear selection</lib-button>
+          </lib-button-group>
+        </div>
+        <div class="col col-x4"></div>
+        <div class="col col-x4"></div>
+      </ng-container>
+      <ng-template #headers>
+        <div class="col col-x8">
+          <lib-text-line type="base" weight="strong" i18n="@@tag">Tag</lib-text-line>
+        </div>
+        <div class="col col-x4">
+          <lib-text-line type="base" weight="strong" i18n="@@usage">Usage</lib-text-line>
+        </div>
+        <div class="col col-x4"></div>
+      </ng-template>
+    </div>
+    
+    <ng-container *ngFor="let tag of tags; trackBy: tagName">
+      <div class="f-row colunm-box rule-border-row hover-me">
+        <div class="col">
+          <lib-checkbox
+            theme="primary"
+            (valueChange)="selection.toggle(tag)"
+            [indeterminate]="selection.hasValue() && !isAllSelected()"
+            [checked]="selection.isSelected(tag)"
+          ></lib-checkbox>
+        </div>
+        <div class="col col-x8">
+          <lib-label text="{{ tag?.description | slice:0:100 }}{{tag?.description.length>100 ? '...': ''}}" *ngIf="tag.edit != true" matTooltip="{{tag?.description}}"></lib-label>
+          <lib-text-line textColor="link" type="small" *ngIf="tag.edit != true" class="hide" (click)="tag.edit = true">Click to edit...</lib-text-line>
+          <lib-input
+            class="lib-input"
+            placeholder="New Tag Name"
+            i18n-placeholder="@@new_tag_name"
+            *ngIf="tag.edit == true"
+            [value]="tag.description"
+            (afterBlur)="updateTagName(tagInput.control.value, tag); tag.edit = false"
+            #tagInput
+          ></lib-input>
+        </div>
+        <div class="col col-x4">
+          <lib-text-line type="base">{{ tag?.usage || 0 }}</lib-text-line>
+        </div>
+        <div class="col col-x4">
+          <lib-button type="plain" icon="trash-alt" iconFontType="light" (click)="deleteSelectedTags(tag)"></lib-button>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</div>

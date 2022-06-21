@@ -1,0 +1,173 @@
+<mat-card class="mat-elevation-z0 widget">
+  <div class="f-row">
+    <div #displayHeading
+      [libTooltip]="widgetHeader.desc" matTooltipPosition="right" [matTooltipDisabled]="false">
+      <lib-text-line type="leading" enableWrap="true"> {{ widgetHeader.desc }}</lib-text-line>
+    </div>
+    
+    <div class="f-spacer"></div>
+    <lib-button [matMenuTriggerFor]="menu" type="plain" icon="ellipsis-h"
+    *ngIf="filterWidget?.getValue()?.metaData?.picklist !== '0' &&  filterWidget?.getValue()?.metaData?.dataType !== 'DTMS' &&  filterWidget?.getValue()?.metaData?.dataType !== 'DATS'"></lib-button>
+    <lib-button aria-label="Clear" (click)="clearFilterCriteria(true)" *ngIf="enableClearIcon" type="plain" iconFontType="light" icon="times"></lib-button>
+    <mat-menu #menu="matMenu" class="navigation-menu">
+      <button mat-menu-item [matMenuTriggerFor]="tcOptionMenu" i18n="@@viewAs">View as...</button>
+      <mat-menu #tcOptionMenu="matMenu" class="mat-elevation-z0 tooltip-fields-menu">
+        <lib-radio-group layout="vertical" [(value)]="displayCriteriaOption" [options]="displayCriteriaOptions"
+          (valueChange)="saveDisplayCriteria()" name="displayCriteria{{widgetId}}"></lib-radio-group>
+      </mat-menu>
+    </mat-menu>
+  </div>
+  <div class="row-spacer"></div>
+  <mat-card-content>
+    <!-- CONTROL FOR DROPDOWNS -->
+    <ng-template
+    [ngIf]="filterWidget && filterWidget.getValue() && filterWidget.getValue().metaData && filterWidget.getValue().metaData.picklist && (filterWidget.getValue().metaData.picklist === '1' || filterWidget.getValue().metaData.picklist === '30' || filterWidget.getValue().metaData.picklist === '37' || filterWidget.getValue().metaData.picklist === '4' || filterWidget.getValue().metaData.picklist === '38' || filterWidget.getValue().metaData.picklist === '35' || (filterWidget.getValue().metaData.picklist === '0' && filterWidget.getValue().metaData.dataType === 'TEXT'))">
+    <!-- DROPDOWN_VALS -->
+      <ng-template [ngIf]="(filterWidget.getValue() ? filterWidget.getValue().type : '') === 'DROPDOWN_VALS'">
+        <ng-template [ngIf]="filterWidget.getValue().isMultiSelect" [ngIfElse]="single_select_drop">
+          <div class="f-col">
+            <mat-form-field appearance="outline" class="direction-chip">
+              <mat-chip-list #chipList aria-label="Select">
+                <lib-chip *ngFor="let option of selectedDropVals" [selectable]="true" [removable]="true"
+                  (removed)="remove(option)">
+                  {{ option.display }}
+                </lib-chip>
+              </mat-chip-list>
+              <input type="text" placeholder="Select" aria-label="Number" matInput [formControl]="filterFormControl"
+                (focus)="onfocus()" [matAutocomplete]="auto" class="mat-input" [matChipInputFor]="chipList"
+                (matChipInputTokenEnd)="$event.input.value = ''" [matChipInputAddOnBlur]="true">
+            </mat-form-field>
+          </div>
+        </ng-template>
+        <ng-template #single_select_drop>
+          <div class="f-col">
+            <mat-form-field appearance="outline">
+              <input type="text" placeholder="Select" aria-label="Number"
+                value="{{ selectedDropVals.length ? selectedDropVals[0].display : ''}}" matInput
+                [formControl]="filterFormControl" [matAutocomplete]="auto" (focus)="onfocus()">
+              <!-- <button *ngIf="enableClearIcon" mat-button matSuffix mat-icon-button (click)="removeSingleSelectedVal(true)">
+                <mat-icon>close</mat-icon>
+              </button>  -->
+            </mat-form-field>
+          </div>
+        </ng-template>
+
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="fieldDisplayFn" prosAutoCompleteScroll
+          (autoCompleteScroll)="onScroll($event)" prosClickStopPropagation (optionSelected)="optionClicked($event)">
+          <mat-option *ngFor="let option of filteredOptions | async" [value]="option" matTooltip="{{ option.display }}"
+            matTooltipPosition="right">
+            <ng-template [ngIf]="filterWidget.getValue().isMultiSelect" [ngIfElse]="singleSelection">
+              <lib-checkbox prosClickStopPropagation (valueChange)="toggleSelection(option)" [checked]="isSelected(option)"
+                [label]="option.display">
+              </lib-checkbox>
+            </ng-template>
+            <ng-template #singleSelection>
+              {{ option.display }}
+            </ng-template>
+          </mat-option>
+        </mat-autocomplete>
+      </ng-template>
+
+      <!-- HORIZONTAL_VALS -->
+      <ng-template [ngIf]="(filterWidget.getValue() ? filterWidget.getValue().type : '') === 'HORIZONTAL_VALS'">
+        <div class="f-row horizontal-row">
+          <lib-chip-list *ngFor="let option of filteredOptions | async">
+            <lib-chip (click)="optionClicked($event, option)" [selectable]="true" [selected]="isSelected(option)">
+              {{ option.display }}
+            </lib-chip>
+          </lib-chip-list>
+        </div>
+      </ng-template>
+
+      <!-- VERTICAL_VALS -->
+      <ng-template [ngIf]="(filterWidget.getValue() ? filterWidget.getValue().type : '') === 'VERTICAL_VALS'">
+        <div class="f-col vertical-row">
+          <lib-chip-list layout="vertical" *ngFor="let option of filteredOptions | async">
+            <lib-chip (click)="optionClicked($event, option)" [selectable]="true" [selected]="isSelected(option)">
+              {{ option.display }}
+            </lib-chip>
+          </lib-chip-list>
+        </div>
+      </ng-template>
+    </ng-template>
+
+    <!-- CONTROL FOR DATE PICKER -->
+    <ng-template
+      [ngIf]="filterWidget && filterWidget.getValue() && filterWidget.getValue().metaData && filterWidget.getValue().metaData.picklist && filterWidget.getValue().metaData.picklist === '0' && (filterWidget.getValue().metaData.dataType === 'DTMS' || filterWidget.getValue().metaData.dataType === 'DATS')">
+      <div class="f-row horizontal-row">
+        <ng-template ngFor let-quickDate [ngForOf]="dateFilterQuickSelect">
+          <ng-template [ngIf]="quickDate.isSelected" [ngIfElse]="nopselect">
+            <!-- <button mat-stroked-button color="primary" (click)="selectQuickDate(quickDate.code, true)">{{ quickDate.text
+              }}</button> -->
+            <lib-chip-list>
+              <lib-chip (click)="selectQuickDate(quickDate.code, true)">{{ quickDate.text}}</lib-chip>
+            </lib-chip-list>
+          </ng-template>
+          <ng-template #nopselect>
+            <lib-chip-list>
+              <lib-chip (click)="selectQuickDate(quickDate.code, false)">{{ quickDate.text }}</lib-chip>
+            </lib-chip-list>
+            <!-- <button mat-stroked-button (click)="selectQuickDate(quickDate.code, false)">{{ quickDate.text }}</button> -->
+          </ng-template>
+        </ng-template> 
+        <!-- <button mat-flat-button color="primary">Today</button>
+      <button mat-flat-button color="primary">10 Days</button>
+      <button mat-flat-button color="primary">20 Days</button>
+      <button mat-flat-button color="primary">30 Days</button> -->
+      </div>
+      <span class="f-row-spacer-half"></span>
+      <div class="f-row">
+        <div class="f-col">
+          <mat-label>Choose start date</mat-label>
+          <mat-form-field appearance="outline">
+            <input matInput [matDatepicker]="picker1" [formControl]="startDateCtrl"
+              (dateInput)="changeStartDate($event)" (dateChange)="changeStartDate($event)">
+            <div class="f-row input-actions">
+              <mat-divider [vertical]="true"></mat-divider>
+              <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+              <mat-datepicker #picker1></mat-datepicker>
+            </div>
+          </mat-form-field>
+        </div>
+        <span class="f-col-spacer-half"></span>
+        <div class="f-col">
+          <mat-label>Choose end date</mat-label>
+          <mat-form-field appearance="outline">
+            <input matInput [matDatepicker]="picker2" [formControl]="endDateCtrl" (dateInput)="changeEndtDate($event)"
+              (dateChange)="changeEndtDate($event)">
+            <div class="f-row input-actions">
+              <mat-divider [vertical]="true"></mat-divider>
+              <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+              <mat-datepicker #picker2></mat-datepicker>
+            </div>
+          </mat-form-field>
+          
+        </div>
+        <!-- <div class="f-col">
+        <button mat-raised-button (click)="picker2.open(); picker1.open(); setPositionOfDatePicker()">Open</button>
+      </div> -->
+      </div>
+    </ng-template>
+
+    <!-- CONTROL FOR INPUT TYPE NUM -->
+    <!-- MAL-411: to bring back later
+    <ng-template [ngIf]="filterWidget && filterWidget.getValue() && filterWidget.getValue().metaData && filterWidget.getValue().metaData.picklist && filterWidget.getValue().metaData.picklist === '0' && filterWidget.getValue().metaData.dataType === 'NUMC'">
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="Enter maximum value" [formControl]="sliderval"
+          (input)="slidervalue($event.target)">
+      </mat-form-field>
+      <mat-slider color="primary" thumbLabel [formControl]="numericValCtrl" [displayWith]="formatMatSliderLabel"
+        tickInterval="1000" [min]="filterResponse ? filterResponse.min : 0"
+        [max]="filterResponse ? filterResponse.max : 0" [value]="filterResponse ? filterResponse.max : 0"
+        (change)="sliderValueChange($event)"></mat-slider>
+    </ng-template>
+    -->
+
+    <!-- CONTROL FOR THE LOCATION HIRERACHY FILTER -->
+    <ng-template
+      [ngIf]="filterWidget && filterWidget.getValue() && filterWidget.getValue().metaData && filterWidget.getValue().metaData.picklist && filterWidget.getValue().metaData.picklist === '29'">
+      <pros-hierarchy-filter (selectionChange)="getLocationSelection($event)" [isClearButtonClicked]="isClearButtonClicked" [clearFilterClicked]="isClearFilter">
+      </pros-hierarchy-filter>
+    </ng-template>
+  </mat-card-content>
+</mat-card>

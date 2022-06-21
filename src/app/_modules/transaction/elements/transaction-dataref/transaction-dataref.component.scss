@@ -1,0 +1,39 @@
+.field-label {
+  margin-bottom: 6px;
+}
+
+.multi-select {
+  width: 84%;
+  flex: 1;
+
+  .field-chip-list {
+    flex-wrap: wrap;
+    margin: 0;
+
+    .lib-chip {
+      display: flex;
+      flex-direction: row;
+      width: auto;
+      padding: 2px 4px 3px 0;
+
+      .mdo-filter-pill {
+        padding: 0 9px;
+        height: 28px;
+      }
+    }
+
+    .mat-input {
+      width: auto;
+      flex: 1;
+    }
+  }
+}
+
+.close-icon {
+  cursor: pointer;
+}
+
+.lib-search {
+  margin-right: 6px;
+  margin-bottom: 6px;
+}

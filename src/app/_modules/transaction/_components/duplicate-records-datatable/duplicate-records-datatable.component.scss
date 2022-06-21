@@ -1,0 +1,79 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  padding: 0 12px;
+  overflow: hidden;
+
+  .breadcrum-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 8px 0;
+    min-height: 36px;
+
+    .s-close {
+      margin-right: 8px;
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px - 8px);
+    width: 600px;
+    max-width: 600px;
+    overflow: hidden;
+    margin: 0 44px;
+
+    .filters-list {
+      align-items: flex-start;
+
+      .lib-search {
+        width: 213px;
+        margin-right: 6px;
+      }
+    }
+
+    .data-listing {
+      height: calc(100% - 110px);
+      overflow: auto;
+
+      &.hide-table {
+        display: none;
+      }
+
+      table.mat-table {
+        border-collapse: separate;
+
+        &.resizing {
+          -moz-user-select: text;
+          -ms-user-select: text;
+          user-select: text;
+          cursor: col-resize;
+        }
+
+        .large-cell-header,
+        .large-cell-content {
+          word-break: break-word;
+        }
+
+        .mat-cell,
+        .mat-header-cell {
+          &.more-icon {
+            justify-content: center;
+          }
+
+          .sort-container {
+            cursor: pointer;
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+
+  .list-pagination {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}

@@ -1,0 +1,18 @@
+.title-skeleton {
+  padding: 12px;
+  justify-content: space-between;
+
+  .l-section {
+    width: 40%;
+  }
+
+  .f-row {
+    .btn-skeleton {
+      padding-left: 12px;
+
+      &:first-of-type {
+        padding-left: none;
+      }
+    }
+  }
+}

@@ -1,0 +1,75 @@
+div.root {
+  height: 100%;
+  overflow: hidden;
+  padding: 0 12px;
+  user-select: text;
+
+  .filters-list {
+    .lib-search {
+      width: 213px;
+      margin-right: 6px;
+    }
+  }
+
+  table.mat-table {
+    width: 100%;
+    overflow: auto;
+    border-collapse: separate;
+
+    td.mat-cell {
+      border-right: none;
+      min-width: 152px;
+
+      .lib-chip {
+        margin-bottom: 0;
+      }
+
+      &.no-result {
+        text-align: center;
+      }
+
+      &.mat-column-_select {
+        min-width: 36px;
+        width: 36px;
+      }
+
+      &.mat-column-description {
+        min-width: 36px;
+        width: 36px;
+      }
+
+      &.mat-column-data_restrictions {
+        div.relative {
+          position: relative;
+
+          div.absolute-blue-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: blue;
+            position: absolute;
+            top: 9px;
+            right: 8px;
+          }
+        }
+      }
+
+      &.mat-column-actions_allowed {
+        mat-icon.mat-icon {
+          padding-top: 6px;
+          font-size: 24px;
+        }
+      }
+    }
+
+    th.mat-header-cell {
+      &.mat-column-actions_allowed {
+        text-align: right;
+      }
+
+      &.mat-column-data_restrictions {
+        text-align: center;
+      }
+    }
+  }
+}

@@ -1,0 +1,655 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button
+      type="plain"
+      (click)="close()"
+      iconFontType="light"
+      icon="times"
+    ></lib-button>
+    <div class="col-spacer"></div>
+    <div
+      [hidden]="isFormLoading"
+      [class.f-col]="!isFormLoading"
+      class="mdo-constrained-right"
+    >
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading"  i18n="@@scope"
+          >{{vdName}} scope</lib-text-line
+        >
+        <span class="f-col-spacer-half"></span>
+        <span class="f-spacer"></span>
+        <lib-button
+          type="major"
+          i18n="@@save"
+          (click)="save()"
+          prosClickStopPropagation
+          >Apply</lib-button
+        >
+      </div>
+    </div>
+    <div *ngIf="isFormLoading" class="f-row skeleton-loading">
+      <div>
+        <lib-skeleton type="line-half"></lib-skeleton>
+      </div>
+      <span class="f-spacer"></span>
+      <lib-skeleton type="button"></lib-skeleton>
+    </div>
+  </div>
+  <div *ngIf="isFormLoading" class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <div class="f-col mdo-form-field" *ngFor="let a of [].constructor(5)">
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line-half"></lib-skeleton>
+      </div>
+    </div>
+  </div>
+
+  <div [hidden]="isFormLoading" class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <lib-banner
+        *ngIf="validationError.status"
+        status="error"
+        [text]="validationError.message"
+      ></lib-banner>
+
+      <form [formGroup]="udrNodeForm">
+        <div class="f-col">
+          <div class="f-col user-defined-set" formArrayName="frmArray">
+            <ng-container
+              *ngFor="let item of udrNodeForm.get('frmArray')['controls']; let i = index"
+            >
+              <ng-container [formGroupName]="i">
+                <div class="f-row defined-row" [id]="item.value.id">
+                  <!-- rule type -->
+                  <div
+                    class="col select-col udr-select-col"
+                    *ngIf="i > 0"
+                    [class.has-error]="submitted && (!item.value.blockType || item.value.blockType=='COND')"
+                  >
+                    <lib-text-line type="base" textColor="secondary"
+                      >{{item.value.blockType ? (item.value.blockType |
+                      titlecase) : 'And'}}</lib-text-line
+                    >
+                  </div>
+                  <div class="col select-col udr-select-col" *ngIf="i === 0">
+                    <lib-text-line type="base" textColor="secondary"
+                      >{{item.value.blockType ? (item.value.blockType |
+                      titlecase) : 'And'}}</lib-text-line
+                    >
+                    <lib-button
+                      type="plain"
+                      rounded="true"
+                      icon="caret-down"
+                      iconFontType="solid"
+                      class="udr-change"
+                      [matMenuTriggerFor]="UDRMenu"
+                    ></lib-button>
+                    <mat-menu #UDRMenu="matMenu" class="navigation-menu">
+                      <button
+                        mat-menu-item
+                        value="AND"
+                        (click)="updateBlocksType({value:'AND'})"
+                      >
+                        And
+                      </button>
+                      <button
+                        mat-menu-item
+                        value="OR"
+                        (click)="updateBlocksType({value:'OR'})"
+                      >
+                        Or
+                      </button>
+                    </mat-menu>
+                  </div>
+                  <!-- field name -->
+                  <div class="col">
+                    <!-- <mat-select formControlName="conditionFieldId" placeholder="Select field">
+                                      <mat-option *ngFor="let fieldItem of fieldsList" [value]="fieldItem.fieldId">
+                                          {{fieldItem.fieldDescri}}
+                                      </mat-option>
+                                  </mat-select> -->
+                    <pros-generic-field-control
+                      class="pros-generic-field-control"
+                      [class.has-error]="submitted && !(item.controls.conditionFieldId?.value)"
+                      [moduleId]="moduleId"
+                      [metataData]="metataData"
+                      [selectedFldId]="item.controls.conditionFieldId ? [item.controls.conditionFieldId.value] : []"
+                      [isMultiSelection]="false"
+                      placeholder="Select field"
+                      [showBadge]="true"
+                      [regexCtrl]="item.controls.sRegex"
+                      (selectionChange)="udrFieldSelectionChange($event, i)"
+                    >
+                    </pros-generic-field-control>
+                  </div>
+                  <!-- operators -->
+                  <div class="col">
+                    <mat-form-field
+                      [class.has-error]="submitted && !(item.controls.conditionOperator?.value)"
+                      *ngIf="true"
+                      class="udr-operator-select"
+                      appearance="outline"
+                    >
+                      <input
+                        matInput
+                        i18n-placeholder="@@select_operator"
+                        placeholder="Select Operator"
+                        [value]="displayOperatorFn(item.controls.conditionOperator.value)"
+                        (focus)="filterOperator('')"
+                        (input)="filterOperator($event.target.value);item.controls.conditionOperator.setValue('')"
+                        [matAutocomplete]="fieldsCtrl"
+                      />
+                      <mat-autocomplete
+                        [displayWith]="displayOperatorFn"
+                        class="mdo-autocomplete"
+                        #fieldsCtrl="matAutocomplete"
+                        (optionSelected)="udrOperatorSelected(item.controls.conditionOperator, $event)"
+                      >
+                        <mat-optgroup
+                          *ngFor="let group of operatorsFiltered"
+                          [label]="group.desc"
+                        >
+                          <ng-container *ngFor="let child of group.childs">
+                            <mat-option
+                              [matTooltip]="displayOperatorFn(child)"
+                              matTooltipPosition="right"
+                              [value]="child"
+                            >
+                              {{displayOperatorFn(child)}}
+                            </mat-option>
+                          </ng-container>
+                        </mat-optgroup>
+                      </mat-autocomplete>
+                    </mat-form-field>
+                  </div>
+                  <!-- Comparison value -->
+                  <div
+                    [class.range-col]="item.value.conditionOperator  === 'RANGE'"
+                    class="col"
+                    *ngIf="i == 0"
+                  >
+                    <div
+                      class="f-row"
+                      *ngIf="item.value.conditionOperator !== 'EMPTY' && item.value.conditionOperator !== 'NOT_EMPTY'"
+                    >
+                      <pros-udr-value-control
+                        [metataData]="metataData"
+                        [fieldId]="item.controls.conditionFieldId?.value"
+                        [placeholder]="item.value.conditionOperator === 'REGEX' ? 'Enter the Regex' : 'Comparison value or field'"
+                        [value]="item.value.conditionFieldValue"
+                        [operator]="item.value.conditionOperator"
+                        [range]="item.value.conditionOperator  === 'RANGE'"
+                        [rangeValue]="{start: item.value.conditionFieldStartValue, end: item.value.conditionFieldEndValue}"
+                        [targetInfo]="item.controls.targetInfo?.value"
+                        [conditionalFieldValueCtrl]="item.controls.conditionalFieldValueCtrl?.value"
+                        (valueChange)="setComparisonValue($event,i)"
+                      ></pros-udr-value-control>
+                      <div class="f-col-spacer-half"></div>
+                    </div>
+                  </div>
+                  <div
+                    class="col"
+                    [class.range-col]="item.value.conditionOperator  === 'RANGE'"
+                    *ngIf="i != 0 && item.value.conditionOperator !== 'EMPTY' && item.value.conditionOperator !== 'NOT_EMPTY'"
+                  >
+                    <div class="f-row">
+                      <pros-udr-value-control
+                        [fieldId]="item.controls.conditionFieldId?.value"
+                        [metataData]="metataData"
+                        i18n-placeholder="@@comparison_value"
+                        [placeholder]="item.value.conditionOperator === 'REGEX' ? 'Enter the Regex' : 'Comparison value or field'"
+                        [value]="item.value.conditionFieldValue"
+                        [operator]="item.value.conditionOperator"
+                        [range]="item.value.conditionOperator  === 'RANGE'"
+                        [rangeValue]="{start: item.value.conditionFieldStartValue, end: item.value.conditionFieldEndValue}"
+                        [targetInfo]="item.controls.targetInfo?.value"
+                        [conditionalFieldValueCtrl]="item.controls.conditionalFieldValueCtrl?.value"
+                        (valueChange)="setComparisonValue($event,i)"
+                      ></pros-udr-value-control>
+                      <div class="f-col-spacer-half"></div>
+                    </div>
+                  </div>
+                  <!-- three dots -->
+                  <div class="col">
+                    <lib-button
+                      [matMenuTriggerFor]="menu"
+                      type="plain"
+                      icon="ellipsis-h"
+                      i18n-libTooltip="@@udrmenu_tooltip"
+                      libTooltip="Add a subsequent child logic or delete the condition"
+                    >
+                    </lib-button>
+                  </div>
+                  <mat-menu #menu="matMenu" class="navigation-menu">
+                    <!-- give local reference and tell this is manu by assigning 'matMenu' -->
+                    <button
+                      i18n="@@add_rule"
+                      mat-menu-item
+                      (click)="addParentBlock()"
+                    >
+                      Add rule
+                    </button>
+                    <button
+                      i18n="@@add_child_rule"
+                      mat-menu-item
+                      (click)="addChildBlock(i)"
+                    >
+                      Add sub-rule
+                    </button>
+                    <button
+                      i18n="@@delete"
+                      mat-menu-item
+                      *ngIf="i > 0"
+                      (click)="removeParentNode(i)"
+                    >
+                      Delete
+                    </button>
+                  </mat-menu>
+                </div>
+                <!-- nested row -->
+                <ng-container formArrayName="childs">
+                  <div
+                    *ngFor="let chldNode of getChildAsControl(i).controls; let childIndex=index"
+                    class="subrule-row"
+                  >
+                    <ng-container [formGroupName]="childIndex">
+                      <ul class="f-row sub-defined">
+                        <div class="f-row defined-row inline-row">
+                          <div
+                            class="col select-col udr-select-col"
+                            [class.has-error]="submitted && chldNode.errors?.required"
+                          >
+                            <ng-template
+                              [ngIf]="childIndex === 0"
+                              [ngIfElse]="normalCtrl"
+                            >
+                              <lib-text-line type="base" textColor="secondary"
+                                >{{chldNode.value.blockDesc ?
+                                (chldNode.value.blockDesc | titlecase) :
+                                'And'}}</lib-text-line
+                              >
+                              <lib-button
+                                type="plain"
+                                rounded="true"
+                                icon="caret-down"
+                                iconFontType="solid"
+                                class="udr-change"
+                                [matMenuTriggerFor]="UDRMenu"
+                              ></lib-button>
+                              <mat-menu
+                                #UDRMenu="matMenu"
+                                class="navigation-menu"
+                              >
+                                <button
+                                  mat-menu-item
+                                  value="AND"
+                                  (click)="updateBlocksDesc({value:'AND'}, i)"
+                                >
+                                  And
+                                </button>
+                                <button
+                                  mat-menu-item
+                                  value="OR"
+                                  (click)="updateBlocksDesc({value:'OR'}, i)"
+                                >
+                                  Or
+                                </button>
+                              </mat-menu>
+                            </ng-template>
+                            <ng-template #normalCtrl>
+                              <lib-text-line type="base" textColor="secondary"
+                                >{{chldNode.value.blockDesc ?
+                                (chldNode.value.blockDesc | titlecase) :
+                                'And'}}</lib-text-line
+                              >
+                            </ng-template>
+                          </div>
+                          <div class="col">
+                            <pros-generic-field-control
+                              class="pros-generic-field-control"
+                              [class.has-error]="submitted && !(chldNode.controls.conditionFieldId?.value)"
+                              [moduleId]="moduleId"
+                              [metataData]="metataData"
+                              [selectedFldId]="chldNode.controls.conditionFieldId ? [chldNode.controls.conditionFieldId.value] : []"
+                              [isMultiSelection]="false"
+                              placeholder="Select field"
+                              [showBadge]="true"
+                              [regexCtrl]="chldNode.controls.sRegex"
+                              (selectionChange)="udrFieldSelectionChange($event, i , childIndex)"
+                            >
+                            </pros-generic-field-control>
+                          </div>
+                          <div class="col">
+                            <mat-form-field
+                              [class.has-error]="submitted && !(chldNode.controls.conditionOperator?.value)"
+                              *ngIf="true"
+                              class="udr-operator-select"
+                              appearance="outline"
+                            >
+                              <input
+                                matInput
+                                i18n-placeholder="@@select_operator"
+                                placeholder="Select Operator"
+                                [value]="displayOperatorFn(chldNode.controls.conditionOperator.value)"
+                                (focus)="filterOperator('')"
+                                (input)="filterOperator($event.target.value);chldNode.controls.conditionOperator.setValue('')"
+                                [matAutocomplete]="fieldsCtrl"
+                              />
+                              <mat-autocomplete
+                                [displayWith]="displayOperatorFn"
+                                class="mdo-autocomplete"
+                                #fieldsCtrl="matAutocomplete"
+                                (optionSelected)="udrOperatorSelected(chldNode.controls.conditionOperator, $event)"
+                              >
+                                <mat-optgroup
+                                  *ngFor="let group of operatorsFiltered"
+                                  [label]="group.desc"
+                                >
+                                  <ng-container
+                                    *ngFor="let child of group.childs"
+                                  >
+                                    <mat-option
+                                      [matTooltip]="displayOperatorFn(child)"
+                                      matTooltipPosition="right"
+                                      [value]="child"
+                                    >
+                                      {{displayOperatorFn(child)}}
+                                    </mat-option>
+                                  </ng-container>
+                                </mat-optgroup>
+                              </mat-autocomplete>
+                            </mat-form-field>
+                          </div>
+                          <div
+                            [class.range-col]="chldNode.value.conditionOperator  === 'RANGE'"
+                            class="col"
+                            *ngIf="chldNode.value.conditionOperator !== 'EMPTY' && chldNode.value.conditionOperator !== 'NOT_EMPTY'"
+                          >
+                            <pros-udr-value-control
+                              [fieldId]="chldNode.controls.conditionFieldId?.value"
+                              [metataData]="metataData"
+                              [placeholder]="chldNode.value.conditionOperator === 'REGEX' ? 'Enter the Regex' : 'Comparison value or field'"
+                              [value]="chldNode.value.conditionFieldValue"
+                              [operator]="chldNode.value.conditionOperator"
+                              [range]="chldNode.value.conditionOperator  === 'RANGE'"
+                              [rangeValue]="{start: chldNode.value.conditionFieldStartValue, end: chldNode.value.conditionFieldEndValue}"
+                              [targetInfo]="chldNode.controls.targetInfo?.value"
+                              [conditionalFieldValueCtrl]="chldNode.controls.conditionalFieldValueCtrl?.value"
+                              (valueChange)="setComparisonValueForChild($event,childIndex,i)"
+                            >
+                            </pros-udr-value-control>
+                          </div>
+                          <div class="col">
+                            <lib-button
+                              [matMenuTriggerFor]="nestedMenu"
+                              type="plain"
+                              icon="ellipsis-h"
+                              i18n-libTooltip="@@udrmenu_tooltip"
+                              libTooltip="Add a subsequent child logic or delete the condition"
+                            ></lib-button>
+                            <mat-menu
+                              #nestedMenu="matMenu"
+                              class="navigation-menu"
+                            >
+                              <!-- give local reference and tell this is manu by assigning 'matMenu' -->
+                              <!-- <button mat-menu-item (click)="addNestedBlock(udrBlock,i)">
+                                                          <mat-icon>add</mat-icon>
+                                                          <span>Add</span>
+                                                      </button> -->
+                              <button
+                                i18n="@@add_rule"
+                                mat-menu-item
+                                (click)="addChildBlock(i)"
+                              >
+                                Add rule
+                              </button>
+                              <button
+                                i18n="@@add_child_rule"
+                                mat-menu-item
+                                (click)="addChildBlock(i,null, childIndex)"
+                              >
+                                Add sub-rule
+                              </button>
+                              <button
+                                mat-menu-item
+                                (click)="removeChildNode(i,childIndex)"
+                                i18n="@@delete"
+                              >
+                                Delete
+                              </button>
+                            </mat-menu>
+                          </div>
+                        </div>
+                        <div class="col-spacer"></div>
+                        <lib-button
+                          class="inline-add-block"
+                          (click)="addChildBlock(i)"
+                          type="minor"
+                          icon="plus"
+                          i18n-libTooltip="@@udr_addrow_tooltip"
+                          libTooltip="Add another logic or condition  to rule by selecting AND / OR"
+                          rounded="true"
+                        >
+                        </lib-button>
+                      </ul>
+                      <ng-container formArrayName="childs">
+                        <div
+                          *ngFor="let subChldNode of getChildAsControl(i, childIndex).controls; let subChildIndex=index"
+                          class="sub-row"
+                        >
+                          <ng-container [formGroupName]="subChildIndex">
+                            <ul
+                              class="f-row sub-defined"
+                              style="margin-left: 100px;"
+                            >
+                              <div class="f-row defined-row inline-row">
+                                <div
+                                  class="col select-col udr-select-col"
+                                  [class.has-error]="submitted && subChldNode.errors?.required"
+                                >
+                                  <ng-template
+                                    [ngIf]="subChildIndex === 0"
+                                    [ngIfElse]="normalSubCtrl"
+                                  >
+                                    <lib-text-line
+                                      type="base"
+                                      textColor="secondary"
+                                      >{{subChldNode.value.blockDesc ?
+                                      (subChldNode.value.blockDesc | titlecase)
+                                      : 'And'}}</lib-text-line
+                                    >
+                                    <lib-button
+                                      type="plain"
+                                      rounded="true"
+                                      icon="caret-down"
+                                      iconFontType="solid"
+                                      class="udr-change"
+                                      [matMenuTriggerFor]="UDRMenu"
+                                    ></lib-button>
+                                    <mat-menu
+                                      #UDRMenu="matMenu"
+                                      class="navigation-menu"
+                                    >
+                                      <button
+                                        mat-menu-item
+                                        value="AND"
+                                        (click)="updateBlocksDesc({value:'AND'}, i, childIndex)"
+                                      >
+                                        And
+                                      </button>
+                                      <button
+                                        mat-menu-item
+                                        value="OR"
+                                        (click)="updateBlocksDesc({value:'OR'}, i, childIndex)"
+                                      >
+                                        Or
+                                      </button>
+                                    </mat-menu>
+                                  </ng-template>
+                                  <ng-template #normalSubCtrl>
+                                    <lib-text-line
+                                      type="base"
+                                      textColor="secondary"
+                                      >{{subChldNode.value.blockDesc ?
+                                      (subChldNode.value.blockDesc | titlecase)
+                                      : 'And'}}</lib-text-line
+                                    >
+                                  </ng-template>
+                                </div>
+                                <div class="col">
+                                  <pros-generic-field-control
+                                    class="pros-generic-field-control"
+                                    [class.has-error]="submitted && !(subChldNode.controls.conditionFieldId?.value)"
+                                    [moduleId]="moduleId"
+                                    [metataData]="metataData"
+                                    [selectedFldId]="subChldNode.controls.conditionFieldId ? [subChldNode.controls.conditionFieldId.value] : []"
+                                    [isMultiSelection]="false"
+                                    placeholder="Select field"
+                                    [showBadge]="true"
+                                    [regexCtrl]="subChldNode.controls.sRegex"
+                                    (selectionChange)="udrFieldSelectionChange($event, i , childIndex, subChildIndex)"
+                                  >
+                                  </pros-generic-field-control>
+                                </div>
+
+                                <div class="col">
+                                  <mat-form-field
+                                    [class.has-error]="submitted && !(subChldNode.controls.conditionOperator?.value)"
+                                    *ngIf="true"
+                                    class="udr-operator-select"
+                                    appearance="outline"
+                                  >
+                                    <input
+                                      matInput
+                                      i18n-placeholder="@@select_operator"
+                                      placeholder="Select Operator"
+                                      [value]="displayOperatorFn(subChldNode.controls.conditionOperator.value)"
+                                      (focus)="filterOperator('')"
+                                      (input)="filterOperator($event.target.value);subChldNode.controls.conditionOperator.setValue('')"
+                                      [matAutocomplete]="fieldsCtrl"
+                                    />
+                                    <mat-autocomplete
+                                      [displayWith]="displayOperatorFn"
+                                      class="mdo-autocomplete"
+                                      #fieldsCtrl="matAutocomplete"
+                                      (optionSelected)="udrOperatorSelected(subChldNode.controls.conditionOperator, $event)"
+                                    >
+                                      <mat-optgroup
+                                        *ngFor="let group of operatorsFiltered"
+                                        [label]="group.desc"
+                                      >
+                                        <ng-container
+                                          *ngFor="let child of group.childs"
+                                        >
+                                          <mat-option
+                                            [matTooltip]="displayOperatorFn(child)"
+                                            matTooltipPosition="right"
+                                            [value]="child"
+                                          >
+                                            {{displayOperatorFn(child)}}
+                                          </mat-option>
+                                        </ng-container>
+                                      </mat-optgroup>
+                                    </mat-autocomplete>
+                                  </mat-form-field>
+                                </div>
+                                <div
+                                  [class.range-col]="subChldNode.value.conditionOperator  === 'RANGE'"
+                                  class="col"
+                                  *ngIf="subChldNode.value.conditionOperator !== 'EMPTY' && subChldNode.value.conditionOperator !== 'NOT_EMPTY'"
+                                >
+                                  <pros-udr-value-control
+                                    [fieldId]="subChldNode.controls.conditionFieldId?.value"
+                                    [metataData]="metataData"
+                                    [placeholder]="subChldNode.value.conditionOperator === 'REGEX' ? 'Enter the Regex' : 'Comparison value or field'"
+                                    [value]="subChldNode.value.conditionFieldValue"
+                                    [operator]="subChldNode.value.conditionOperator"
+                                    [range]="subChldNode.value.conditionOperator  === 'RANGE'"
+                                    [rangeValue]="{start: subChldNode.value.conditionFieldStartValue, end: subChldNode.value.conditionFieldEndValue}"
+                                    [targetInfo]="subChldNode.controls.targetInfo?.value"
+                                    [conditionalFieldValueCtrl]="subChldNode.controls.conditionalFieldValueCtrl?.value"
+                                    (valueChange)="setComparisonValueForChild($event,subChildIndex,i,childIndex)"
+                                  >
+                                  </pros-udr-value-control>
+                                </div>
+                                <div class="col">
+                                  <lib-button
+                                    [matMenuTriggerFor]="nestedMenu"
+                                    type="plain"
+                                    icon="ellipsis-h"
+                                    i18n-libTooltip="@@udrmenu_tooltip"
+                                    libTooltip="Add a subsequent child logic or delete the condition"
+                                  ></lib-button>
+                                  <mat-menu
+                                    #nestedMenu="matMenu"
+                                    class="navigation-menu"
+                                  >
+                                    <!-- give local reference and tell this is manu by assigning 'matMenu' -->
+                                    <!-- <button mat-menu-item (click)="addNestedBlock(udrBlock,i)">
+                                                                      <mat-icon>add</mat-icon>
+                                                                      <span>Add</span>
+                                                                  </button> -->
+                                    <button
+                                      mat-menu-item
+                                      (click)="removeChildNode(i,childIndex, subChildIndex)"
+                                      i18n="@@delete"
+                                    >
+                                      Delete
+                                    </button>
+                                  </mat-menu>
+                                </div>
+                              </div>
+                              <div class="col-spacer"></div>
+                              <lib-button
+                                class="inline-add-block"
+                                (click)="addChildBlock(i,null, childIndex)"
+                                type="minor"
+                                i18n-libTooltip="@@udr_addrow_tooltip"
+                                libTooltip="Add another logic or condition  to rule by selecting AND / OR"
+                                icon="plus"
+                                rounded="true"
+                              >
+                              </lib-button>
+                            </ul>
+                          </ng-container>
+                        </div>
+                      </ng-container>
+                    </ng-container>
+                  </div>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+            <!-- button to ad primary block -->
+            <div class="f-row">
+              <lib-button
+                class="add-col"
+                (click)="addParentBlock()"
+                type="minor"
+                i18n-libTooltip="@@udr_addrow_tooltip"
+                libTooltip="Add another logic or condition  to rule by selecting AND / OR"
+                rounded="true"
+                icon="plus"
+              >
+              </lib-button>
+            </div>
+          </div>
+          <div class="row-spacer"></div>
+        </div>
+      </form>
+
+      <!-- Duplicate Rule form group  -->
+      <ng-container *ngIf="isDuplicateType">
+        <pros-setup-duplicate-rule
+          [brId]="brId"
+          [schemaId]="schemaId"
+          [moduleId]="moduleId"
+          [coreSchemaBrInfo]="coreSchemaBrInfo"
+          [fieldsList]="fieldsList"
+          [submitted]="submitted"
+          (formChange)="setDuplicateFormRef($event)"
+        ></pros-setup-duplicate-rule>
+      </ng-container>
+    </div>
+  </div>
+</div>

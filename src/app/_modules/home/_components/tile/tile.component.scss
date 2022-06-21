@@ -1,0 +1,17 @@
+.root {
+  mat-card.mat-card {
+    position: relative;
+    width: 174px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    margin-right: 16px;
+    margin-bottom: 16px;
+    text-align: center;
+
+    .plain-icon {
+      font-size: 14px;
+    }
+  }
+}

@@ -1,0 +1,29 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-row mdo-constrained-right">
+      <lib-text-line type="leading">Filter criteria</lib-text-line>
+      <span class="f-spacer"></span>
+      <lib-button (click)="saveRuleData()" type="major" width="80px" i18n="@@save">Save</lib-button>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <ng-container *ngIf="existingData">
+        <pros-lookup-dataset-rule
+          [operatorsList]="operators"
+          [moduleId]="moduleId"
+          [parentMetadata]="[]"
+          [parentFieldsList]="[]"
+          [checkValidation]="saveRule"
+          (saveRule)="setLookupRuleData($event)"
+          [isDataFiltering]="true"
+          [selectedFields]="[]"
+          [existingData]="existingData"
+        ></pros-lookup-dataset-rule>
+      </ng-container>
+    </div>
+  </div>
+</div>

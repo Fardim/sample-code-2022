@@ -1,0 +1,63 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading">
+          Assign process
+        </lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="major" width="80px" [disabled]="selectedEvents.length<=0 || !isClose "  (click)="saveEvent()">Save</lib-button>
+      </div>
+    </div>
+  </div>
+
+  <div class="f-col sidesheetcontent-listing">
+    <div class="mdo-justify">
+      <div>
+        <!-- Multi select example -->
+        <div class="f-col mdo-field">
+          <!-- label -->
+          <mat-label class="mdo-field-label">Process</mat-label>
+          <!-- input container -->
+            <div class="mdo-field-input">
+              <lib-chip-list>
+                <ng-container *ngFor="let opt of selectedEvents; let i=index">
+                  <ng-container *ngIf="i<=limit-1">
+                    <lib-chip [removable]="true" (removed)="removeActionOptions(opt)"
+                      [title]="opt.name">
+                      <lib-text-line type="base">{{opt.name}}</lib-text-line>
+                    </lib-chip>
+                  </ng-container>
+                </ng-container>
+                <lib-chip *ngIf="hasLimit()">+{{selectedEvents.length - limit}}</lib-chip>
+                <!-- formControlName="actionsData" -->
+                <input matInput autocomplete="off" #optionInput [formControl]="searchActions" 
+                  [matMenuTriggerFor]="actionDrop" (menuOpened)="menuOpen()" />
+              </lib-chip-list>
+
+              <mat-menu #actionDrop="matMenu" xPosition="after" [hasBackdrop]="false" class="filter-menudropdown">
+                <lib-filter-dropdown class="chip-filters">
+                  <div class="dropdown-options-wrapper f-col">
+                    <div class="dropdown-options-inner-container">
+                      <div class="options">
+                        <lib-filter-option prosClickStopPropagation *ngFor="let ckbox of actions;">
+                          <lib-checkbox (valueChange)="selectedActions(ckbox,$event)" [checked]="isActionChecked(ckbox)"
+                            [label]="ckbox.name">
+                          </lib-checkbox>
+                        </lib-filter-option>
+                      </div>
+                    </div>
+                    <div class="filter-button-wrapper">
+                      <lib-button type="minor" i18n="@@apply" (click)="applyValues()"> Apply value </lib-button>
+                    </div>
+                  </div>
+                </lib-filter-dropdown>
+              </mat-menu>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

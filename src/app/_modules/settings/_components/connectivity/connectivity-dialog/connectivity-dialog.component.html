@@ -1,0 +1,28 @@
+<div class="root modal-wrapper">
+  <div class="f-row modal-header">
+    <lib-text-line type="leading" [enableWrap]="true">Alert</lib-text-line>
+    <lib-button icon="times" iconFontType="light" (click)="close(false)"></lib-button>
+  </div>
+
+  <div class="f-row modal-body">
+    <lib-button [sizeLarge]="true" [rounded]="true" icon="exclamation" iconFontType="solid" type="major">
+    </lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col">
+      <lib-text-line [enableWrap]="true" type="base">{{pageDetails?.headerLine}}
+      </lib-text-line>
+      <ul class="interface-list">
+        <li *ngFor="let content of pageDetails?.contentList">
+          <lib-text-line [enableWrap]="true" type="base">{{content}}
+          </lib-text-line>
+        </li>
+      </ul>
+      <lib-text-line type="base">{{pageDetails?.confirmationLine}}</lib-text-line>
+    </div>
+  </div>
+  <div class="f-row modal-footer">
+    <lib-button (click)="close(false)">Cancel</lib-button>
+    <div class="f-spacer"></div>
+    <lib-button type="major" (click)="close(true)">{{pageDetails?.confirmButtonLabel}}</lib-button>
+  </div>
+</div>

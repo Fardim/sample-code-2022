@@ -1,0 +1,182 @@
+/* You can add global styles to this file, and also import other style files */
+@import 'assets/themes/themes.scss';
+@import 'assets/fonts/_fonts.css';
+@import '~mdo-ui-library/assets/themes/themes.scss';
+@import '~mdo-ui-library/assets/styles.scss';
+@import '~mdo-ui-library/assets/fonts/_fonts.css';
+@import 'keyframes.scss';
+// bpmn-js style files
+@import '~bpmn-js/dist/assets/diagram-js.css';
+@import '~bpmn-js/dist/assets/bpmn-font/css/bpmn.css';
+@import '~bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css';
+@import '~bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css';
+@import '~bpmn-js-properties-panel/dist/assets/bpmn-js-properties-panel.css';
+@import '~bpmn-js-bpmnlint/dist/assets/css/bpmn-js-bpmnlint.css';
+@import '~mdo-ui-library/assets/quill/quill.snow.css';
+@import 'assets/themes/chat.scss';
+@import 'assets/themes/introjs.scss';
+
+html,
+body {
+  height: 100%;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a {
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+//Flex row and col
+.f-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.f-col {
+  display: flex;
+  flex-direction: column;
+}
+
+//Spacer's
+.f-col-spacer-half {
+  width: 8px;
+}
+
+.f-row-spacer-half {
+  height: 8px;
+}
+
+.f-justify-center {
+  justify-content: center;
+}
+
+.col-spacer {
+  width: 16px;
+}
+
+.row-spacer {
+  height: 16px;
+}
+
+.f-spacer {
+  flex-grow: 1;
+}
+
+.cursor {
+  cursor: pointer;
+}
+
+.skeleton-loader-overview {
+  padding: 8px 12px;
+  display: block;
+}
+
+.empty-block {
+  height: 100%;
+  justify-content: center;
+}
+
+.heading-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.field-label {
+  margin-bottom: 6px;
+}
+
+.content-container {
+  flex: 1;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.profile-skeleton {
+  .skeleton-button {
+    width: 150px !important;
+    margin-right: 10px;
+  }
+
+  .skeleton-avatar {
+    height: 138px !important;
+    width: 138px !important;
+  }
+
+  .avatar-div {
+    .skeleton {
+      display: flex;
+      flex: 2;
+      justify-content: space-around;
+    }
+  }
+}
+
+.ql-mention-list {
+  overflow: scroll;
+  min-height: 100px;
+  max-height: 400px;
+}
+
+.ql-toolbar.ql-hidden-toolbar {
+  display: none;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  visibility: hidden;
+}
+
+*:hover::-webkit-scrollbar {
+  visibility: visible;
+}
+
+::-webkit-scrollbar-track {
+  background: #f6f9fa;
+  visibility: hidden;
+  border-radius: 8px;
+}
+
+*:hover::-webkit-scrollbar-track {
+  visibility: visible;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d9e3ef;
+  border-radius: 8px;
+  visibility: hidden;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+  visibility: visible;
+}
+
+::-webkit-scrollbar:hover {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d9e3ef;
+}

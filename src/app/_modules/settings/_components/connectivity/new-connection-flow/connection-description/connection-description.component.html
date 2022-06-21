@@ -1,0 +1,75 @@
+<div class="modal-wrapper">
+  <div class="f-row modal-header">
+    <lib-text-line type="leading">New dataset/Bring over/{{ connectionDetails?.title }}</lib-text-line>
+    <lib-button icon="times" iconFontType="light" (afterClick)="close()"></lib-button>
+  </div>
+
+  <div class="modal-body">
+    <div class="f-col manually-dataset">
+      <div class="f-col" *ngIf="!!bannerText">
+        <lib-banner status="error" [text]="bannerText"></lib-banner>
+      </div>
+      <div class="f-col">
+        <lib-banner status="info" text="Provide the details of the SAP system you wish to connect to"></lib-banner>
+      </div>
+      <form [formGroup]="createConnectionForm" class="dataset-form">
+        <div class="f-col">
+          <lib-input label="Name" [isRequired]="true" i18n-label="@@name" formControlName="systemName" type="text"
+            placeholder="Name for this connection..."
+            [hint]="(createConnectionForm.controls.systemName.touched && createConnectionForm.controls.systemName.errors && createConnectionForm.controls.systemName.errors.required) ? 'This is a required field' : ''"
+            [hasError]="createConnectionForm.controls.systemName.touched && createConnectionForm.controls.systemName.errors && createConnectionForm.controls.systemName.errors.required">
+          </lib-input>
+        </div>
+  
+        <div class="f-col">
+          <lib-textarea label="System description" [isRequired]="true" i18n-label="@@systemDesc" type="text"
+            formControlName="systemDesc" placeholder="This is the pre-populated system description for the adaptor"
+            [hint]="(createConnectionForm.controls.systemDesc.touched && createConnectionForm.controls.systemDesc.errors && createConnectionForm.controls.systemDesc.errors.required) ? 'This is a required field' : ''"
+            [hasError]="createConnectionForm.controls.systemDesc.touched && createConnectionForm.controls.systemDesc.errors && createConnectionForm.controls.systemDesc.errors.required">
+          </lib-textarea>
+        </div>
+  
+        <div class="f-col">
+          <lib-input label="System URL" [isRequired]="true" type="text" i18n-label="@@systemURL"
+            placeholder="URL of the system you wish to connect..." formControlName="systemUrl"
+            [hint]="(createConnectionForm.controls.systemUrl.touched && createConnectionForm.controls.systemUrl.errors && createConnectionForm.controls.systemUrl.errors.required) ? 'This is a required field' : ''"
+            [hasError]="createConnectionForm.controls.systemUrl.touched && createConnectionForm.controls.systemUrl.errors && createConnectionForm.controls.systemUrl.errors.required">
+          </lib-input>
+        </div>
+  
+        <div class="f-col">
+          <lib-input label="Username" [isRequired]="true" i18n-label="@@username" type="text" formControlName="username"
+            [hint]="(createConnectionForm.controls.username.touched && createConnectionForm.controls.username.errors && createConnectionForm.controls.username.errors.required) ? 'This is a required field' : ''"
+            [hasError]="createConnectionForm.controls.username.touched && createConnectionForm.controls.username.errors && createConnectionForm.controls.username.errors.required">
+          </lib-input>
+        </div>
+  
+        <div class="f-col">
+          <lib-input label="Password" [isRequired]="true" type="password" i18n-label="@@password"
+            formControlName="userPassword"
+            [hint]="(createConnectionForm.controls.userPassword.touched && createConnectionForm.controls.userPassword.errors && createConnectionForm.controls.userPassword.errors.required) ? 'This is a required field' : ''"
+            [hasError]="createConnectionForm.controls.userPassword.touched && createConnectionForm.controls.userPassword.errors && createConnectionForm.controls.userPassword.errors.required">
+          </lib-input>
+        </div>
+        <!-- <div class="f-col">
+            <lib-button (afterClick)="goBack()">
+              <lib-text-line type="base" textColor="info">
+                <mat-icon class="mdo-icons">plus</mat-icon>
+                new system
+              </lib-text-line>
+            </lib-button>
+          </div> -->
+      </form>
+    </div>
+  </div>
+
+  <div class="f-row modal-footer space-between">
+    <lib-button width="80px" type="plain" (afterClick)="close()">Cancel</lib-button>
+    <span class="f-spacer"></span>
+    <div class="f-row">
+      <lib-button type="plain" width="80px">Back</lib-button>
+      &nbsp;
+      <lib-button type="major" width="80px" [disabled]="!createConnectionForm.valid || saveLoader" (click)="createConnection()">Submit</lib-button>
+    </div>
+  </div>
+</div>

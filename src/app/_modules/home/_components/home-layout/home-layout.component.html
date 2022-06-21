@@ -1,0 +1,21 @@
+<mat-sidenav-container>
+
+
+  <mat-sidenav mode="side" opened [disableClose]="true" id="primarySidenav" #primarySidenav>
+    <pros-primary-navigation (emitAfterSel)="activatedPrimaryNav = $event" (toggleEmitter)="togglePrimarySideBar()">
+    </pros-primary-navigation>
+  </mat-sidenav>
+  <!-- margin-left: 74px; -->
+
+  <mat-sidenav-content id="primaryContent">
+    <mat-sidenav-container autosize>
+      <mat-sidenav mode="side" opened [disableClose]="true" id="secondarySidenav" #secondarySidenav>
+        <!-- secondary side nav -->
+        <pros-secondary-navbar [activatedPrimaryNav]="activatedPrimaryNav" (toggleEmitter)="toggleSecondarySideBar($event)"></pros-secondary-navbar>
+      </mat-sidenav>
+      <mat-sidenav-content id="secondaryContent" #secondaryContent>
+        <router-outlet></router-outlet>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </mat-sidenav-content>
+</mat-sidenav-container>

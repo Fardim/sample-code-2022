@@ -1,0 +1,51 @@
+<div class="root">
+    <div class="f-row-spacer-half"></div>
+    <div class="f-row">
+        <lib-button type="plain" icon="times" iconFontType="light"
+            (afterClick)="close()"></lib-button>
+        <div class="f-col-spacer-half"></div>
+        <lib-text-line type="leading" enableWrap="true" i18n="@@Grid_form_view"> Grid form view </lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-button i18n="@@save" type="major" (afterClick)="save()"> Save </lib-button>
+    </div>
+    <div class="f-col conflict-data">
+        <table class="mat-table">
+            <tr class="mat-header-row">
+                <th class="mat-header-cell"> Field </th>
+                <th class="mat-header-cell">
+                  <div class="f-row">
+                      <lib-radio-group class="lib-radio" name="grid_globalSelection"
+                          [(ngModel)]="conflictedRow._action.selectedRow"
+                          labelPosition="after" layout="vertical" theme="primary" [options]="[{key: 'Base', value: 'BASE'}]"
+                          (valueChange)="globalToggleMergeSelection($event)"></lib-radio-group>
+                  </div>
+                </th>
+                <th class="mat-header-cell">
+                    <lib-radio-group class="lib-radio" name="grid_globalSelection"
+                        labelPosition="after" layout="vertical" theme="primary" [options]="[{key: 'CR', value: 'CR'}]"
+                        [(ngModel)]="conflictedRow._action.selectedRow"
+                        (valueChange)="globalToggleMergeSelection($event)"></lib-radio-group>
+                </th>
+            </tr>
+            <tr class="mat-row" *ngFor="let field of conflictedRow?.fields">
+                <td class="mat-cell">
+                    {{ field.fieldDesc }}
+                  </td>
+                  <td class="mat-cell">
+                    <div class="f-row">
+                        <lib-radio-group class="lib-radio" [value]="getMergeSelection(field)" [disabled]="!hasFieldPermission(field)" name="group_{{field.fieldId}}"
+                            labelPosition="after" layout="vertical" theme="primary" [options]="[{key: field.base.value, value: 'BASE'}]"
+                            labelKey="key" valueKey="value" (valueChange)="toggleMergeSelection(field, $event)"></lib-radio-group>
+                    </div>
+                  </td>
+                  <td class="mat-cell">
+                    <div class="f-row">
+                        <lib-radio-group class="lib-radio" [value]="getMergeSelection(field)" [disabled]="!hasFieldPermission(field)" name="group_{{field.fieldId}}"
+                            labelPosition="after" layout="vertical" theme="primary" [options]="[{key: field.cr.value, value: 'CR'}]"
+                            labelKey="key" valueKey="value" (valueChange)="toggleMergeSelection(field, $event)"></lib-radio-group>
+                    </div>
+                  </td>
+            </tr>
+        </table>
+    </div>
+</div>

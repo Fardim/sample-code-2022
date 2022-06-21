@@ -1,0 +1,22 @@
+mat-card.root {
+  height: 100%;
+  user-select: text;
+  padding: 16px;
+
+  .breadcrum-toolbar {
+    align-items: center;
+    margin-bottom: 32px;
+    padding-top: 16px;
+
+    .display-heading-large {
+      font-size: 1.2rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  }
+
+  .margin-10 {
+    margin-bottom: 10px;
+  }
+}

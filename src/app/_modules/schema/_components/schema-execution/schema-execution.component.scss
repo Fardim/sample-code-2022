@@ -1,0 +1,111 @@
+.root {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  align-content: flex-start;
+  background: transparent;
+
+  .breadcrumb-wrapper {
+    flex: 1 100%;
+  }
+
+  .flex-col-1 {
+    flex: 1 1 30%;
+    margin: 16px;
+  }
+
+  .flex-col-12 {
+    flex: 1 100%;
+  }
+
+  .flex-container-grow {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+
+    .grid-flexcol-9 {
+      flex: 1;
+    }
+
+    .grid-flexcol-3 {
+      flex: 0 0 24%;
+    }
+
+    .inner-flexcol-12 {
+      flex: 0 0 100%;
+    }
+
+    .H3 {
+      color: #313131;
+    }
+
+    @media only screen and (min-width: 447px) and (max-width: 1024px) {
+      //Put your CSS here for 447px to 1024px width devices(covers all iPad portrait width //
+      .grid-flexcol-9 {
+        flex: 1 100%;
+      }
+
+      .grid-flexcol-3 {
+        flex: 1 100%;
+      }
+
+      .mat-subheader {
+        padding: 0;
+      }
+
+      .variant-listcount {
+        display: flex;
+        align-items: center;
+
+        .mat-list-item {
+          margin-top: 0;
+
+          h4 {
+            font-size: 30px;
+          }
+        }
+      }
+    }
+
+    @media only screen and (min-width: 200px) and (max-width: 447px) {
+      .variant-listcount {
+        display: block;
+      }
+    }
+  }
+
+  .flex-row-container {
+    display: grid;
+    flex-flow: row;
+    flex-wrap: wrap;
+    flex: 1 100%;
+
+    mat-radio-group {
+      display: flex;
+      flex-direction: column;
+      margin: 15px 0;
+    }
+
+    mat-form-field {
+      flex: 1 100%;
+    }
+  }
+
+  .variant-listcount {
+    mat-list-item {
+      margin: 0 0;
+
+      h4 {
+        font-size: 36px;
+        font-weight: 600;
+        line-height: 30px;
+      }
+
+      p {
+        font-size: 14px;
+        opacity: 0.5;
+      }
+    }
+  }
+}

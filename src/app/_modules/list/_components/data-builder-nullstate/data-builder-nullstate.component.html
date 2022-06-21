@@ -1,0 +1,6 @@
+<lib-empty-state class="f-col load-empty" primaryText="Nothing to see here" icon="order" iconSize="200"
+    [secondaryText]="secondaryText">
+    <lib-button-group *ngIf="!readOnlyMode">
+        <lib-button type="minor" (click)="addManually.emit(true)">Add manually</lib-button>
+    </lib-button-group>
+</lib-empty-state>

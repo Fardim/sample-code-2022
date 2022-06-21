@@ -1,0 +1,133 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button (click)="close()" type="plain" iconFontType="light" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading">Configure view</lib-text-line>
+                <span class="f-col-spacer-half"></span>
+                <span class="f-spacer"></span>
+                <lib-button type="major" (click)="submitSetting()">Save</lib-button>
+            </div>
+            <div class="f-row" *ngIf="showConfiguredBanner && userConfigured === undefined">
+                <div class="row-spacer"></div>
+                <lib-banner status="info"
+                    text="The configured view is different to your selected view option. Would like to update to the original?">
+                </lib-banner>
+                <lib-button type="major" (afterClick)="setUserConfigured(true)" i18n="@@yes">yes</lib-button>
+                <lib-button type="plain" (afterClick)="setUserConfigured(false)" i18n="@@no">No</lib-button>
+            </div>
+            <div class="row-spacer"></div>
+            <lib-search placeholder="Search fields" [formControl]="searchFormControl"></lib-search>
+        </div>
+    </div>
+    <div *ngIf="showLoader" class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <div class="f-col mdo-form-field" *ngFor="let a of [].constructor(5)">
+                <lib-skeleton type="line"></lib-skeleton>
+                <lib-skeleton type="line"></lib-skeleton>
+                <lib-skeleton type="line-half"></lib-skeleton>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="!showLoader" class="f-col sidesheetcontent-listing" #scrollEl (scroll)="updateDataOnScroll(scrollEl)">
+        <div class="f-col mdo-justify" >
+            <div class="checkedall">
+                <lib-checkbox [(ngModel)]="allCheckboxSelected" [indeterminate]="allIndeterminate"
+                    (valueChange)="selectAllCheckboxes()" label="All">
+                </lib-checkbox>
+                <div class="f-spacer"></div>
+                <mat-form-field appearance="outline">
+                    <mat-select [(ngModel)]="allDisplayCriteria" (ngModelChange)="changeAllDisplayCriteria()">
+                        <mat-option value="TEXT" i18n="@@text">Text</mat-option>
+                        <mat-option value="CODE" i18n="@@code">Code</mat-option>
+                        <mat-option value="CODE_TEXT" i18n="@@codeAndText">Code and Text</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div cdkDropList [cdkDropListData]="selectedHeadersObs | async" (cdkDropListDropped)="drop($event)">
+                <div *ngFor="let header of selectedHeadersObs | async; let index = index" id="{{ header.fieldId }}"
+                    cdkDragHandle cdkDrag class="colunm-list">
+                    <div class="f-row colunm-box">
+                        <div class="col">
+                            <lib-button  type="plain" icon="grip-lines"></lib-button>
+                        </div>
+                        <div class="col-spacer"></div>
+                        <lib-checkbox (valueChange)="selectionChange(header)" [checked]="isChecked(header)"
+                            [label]="header.fieldDescri ? header.fieldDescri : 'Untitled'">
+                        </lib-checkbox>
+                        <div class="f-spacer"></div>
+                        <mat-form-field appearance="outline"
+                            *ngIf="header.picklist == '1' || header.picklist == '30' || header.picklist == '37' || header.picklist == '29'">
+                            <mat-select [(ngModel)]="header.displayCriteria"
+                                (ngModelChange)="manageAllDisplayCriteria(); manageConfigure()">
+                                <mat-option value="TEXT" i18n="@@text">Text</mat-option>
+                                <mat-option value="CODE" i18n="@@code">Code</mat-option>
+                                <mat-option value="CODE_TEXT" i18n="@@codeAndText">Code and Text</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <mat-accordion togglePosition="before">
+                <mat-expansion-panel *ngFor="let node of selectedNestedDataSOurce" class="mat-elevation-z0">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <div class="expand-title">{{node.nodeDesc}}</div>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <mat-nav-list [disableRipple]="true" class="dnd-task-search-list">
+                        <div cdkDropList (cdkDropListDropped)="drop($event)" [cdkDropListData]="node.child">
+                            <div *ngFor="let data of node.child">
+                                <div cdkDrag cdkDragBoundary=".dnd-task-search-list" class="colunm-list">
+                                    <div class="f-row colunm-box">
+                                        <div class="col">
+                                            <lib-button type="plain" iconFontType="light" icon="grip-lines"></lib-button>
+                                        </div>
+                                        <div class="col-spacer"></div>
+                                        <lib-checkbox [checked]="isChecked(data)" (valueChange)="selectionChange(data)"
+                                            [label]="data.fieldDescri">
+                                        </lib-checkbox>
+                                        <div class="f-spacer"></div>
+                                        <mat-form-field appearance="outline"
+                                            *ngIf="data.picklist == '1' || data.picklist == '30' || data.picklist == '37' || data.picklist == '29'">
+                                            <mat-select [(ngModel)]="data.displayCriteria"
+                                                (ngModelChange)="changeDisplayCriteria(data); manageAllDisplayCriteria(); manageConfigure()">
+                                                <mat-option value="TEXT" i18n="@@text">Text</mat-option>
+                                                <mat-option value="CODE" i18n="@@code">Code</mat-option>
+                                                <mat-option value="CODE_TEXT" i18n="@@codeAndText">Code and Text
+                                                </mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                                <!-- <div cdkDrag class="list-drag-el" cdkDragBoundary=".dnd-task-search-list">
+                                    <div class="filter-option" mat-line>
+                                        <mat-icon fontSet="mdo-icons">grip-lines</mat-icon>
+                                        <div class="col-spacer"></div>
+                                        <div class="tree-node-data">
+                                            <lib-checkbox [checked]="isChecked(data)"
+                                                (valueChange)="selectionChange(data)" [label]="data.fieldDescri">
+                                            </lib-checkbox>
+
+                                            <mat-form-field appearance="outline"
+                                                *ngIf="data.picklist == '1' || data.picklist == '30' || data.picklist == '37'">
+                                                <mat-select [(ngModel)]="data.displayCriteria"
+                                                    (ngModelChange)="changeDisplayCriteria(data); manageAllDisplayCriteria(); manageConfigure()">
+                                                    <mat-option value="TEXT" i18n="@@text">Text</mat-option>
+                                                    <mat-option value="CODE" i18n="@@code">Code</mat-option>
+                                                    <mat-option value="CODE_TEXT" i18n="@@codeAndText">Code and Text
+                                                    </mat-option>
+                                                </mat-select>
+                                            </mat-form-field>
+                                        </div>
+                                    </div>
+                                </div> -->
+                            </div>
+                        </div>
+                    </mat-nav-list>
+                </mat-expansion-panel>
+            </mat-accordion>
+        </div>
+    </div>
+</div>

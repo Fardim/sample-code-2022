@@ -1,0 +1,80 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: hidden;
+  width: 600px;
+
+  .breadcrum-toolbar {
+    padding: 8px 12px;
+
+    .mdo-constrained-right {
+      align-items: center;
+      width: 100%;
+
+      .breadcrum-head {
+        width: 100%;
+      }
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: calc(100% - 52px);
+    overflow: auto;
+
+    .mdo-justify {
+      margin: 0 16px;
+
+      .field-label {
+        margin-bottom: 6px;
+        flex: 1;
+
+        .label-icon {
+          font-size: 12px;
+        }
+      }
+
+      .lib-section {
+        margin: 12px 0;
+        display: block;
+      }
+
+      .colunm-box {
+        padding: 4px 0;
+        min-height: 48px;
+        width: 100%;
+
+        .col {
+          display: flex;
+          flex: 1 0 auto;
+          width: 1px;
+          align-items: center;
+
+          &.col-x4 {
+            flex: 4;
+          }
+
+          .mdo-field {
+            height: 36px;
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 62px;
+      }
+    }
+  }
+}

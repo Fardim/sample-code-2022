@@ -1,0 +1,48 @@
+<div class="root">
+  <div class="f-col odata-login">
+    <div class="f-row-spacer-half"></div>
+    <form [formGroup]="sapOdataLoginForm">
+      <div class="f-col mdo-field">
+        <lib-banner *ngIf="hasError" status="error" [text]="errorMessage"></lib-banner>
+      </div>
+
+      <div class="f-col">
+        <lib-input label="Name" i18n-label="@@dataset_id" formControlName="name" type="text" [isRequired]="true"
+          placeholder="Name for this connection...">
+        </lib-input>
+      </div>
+
+      <div class="f-col">
+        <lib-input i18n-label="@@dataset_id" formControlName="system_description" type="text" [isRequired]="true"
+          label="System Description" labelIconTooltip="TEST Tootlip" labelIconFont="mdo-icons" labelCharacterLimit="100"
+          labelIconClass="">
+        </lib-input>
+      </div>
+
+      <div class="f-col">
+        <lib-input label="System URL" i18n-label="@@dataset_id" formControlName="system_url" type="text"
+          [isRequired]="true" placeholder="URL of the system you wish to connect...">
+        </lib-input>
+      </div>
+
+      <div class="f-col">
+        <lib-input label="Username" i18n-label="@@username" formControlName="username" type="text" [isRequired]="true">
+        </lib-input>
+      </div>
+
+      <div class="f-col">
+        <lib-input label="Password" i18n-label="@@password" formControlName="password" type="text" [isRequired]="true">
+        </lib-input>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="row-spacer"></div>
+<div class="f-row">
+  <lib-button type="plain" width="80px" (click)="onCancelClick()" i18n="@@cancel">Cancel</lib-button>
+  <span class="f-spacer"></span>
+  <lib-button type="plain" width="80px" (click)="back()" i18n="@@back">Back</lib-button>
+  &nbsp;
+    <lib-button type="major" width="80px" i18n="@@next" (click)="onConnectRequest()">Next
+    </lib-button>
+</div>

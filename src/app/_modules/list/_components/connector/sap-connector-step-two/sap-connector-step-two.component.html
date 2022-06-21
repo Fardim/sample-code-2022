@@ -1,0 +1,85 @@
+<div class="root">
+  <div class="f-col manually-dataset">
+    <div class="f-row-spacer-half"></div>
+    <form>
+      <div class="f-col mdo-field">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n-label="@@record_number">Record number
+        </lib-text-line>
+        <div class="mdo-field-input">
+          <input matInput placeholder="Value" i18n-placeholder="@@value" autocomplete="off"/>
+        </div>
+        <lib-text-line type="xsmall" textColor="secondary">Add multiple records number separated by a comma
+        </lib-text-line>
+      </div>
+
+      <div class="f-col">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@date_created">Date created
+        </lib-text-line>
+        <lib-date-range-picker (valueChange)="setCreateDate($event)" placeholder="Value"> </lib-date-range-picker>
+      </div>
+
+      <div class="f-col">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@date_modified">Date modified
+        </lib-text-line>
+        <lib-date-range-picker (valueChange)="setModifiedDate($event)" placeholder="Value"> </lib-date-range-picker>
+      </div>
+
+      <div class="f-col mdo-field">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@standard_package">Hierarchy
+        </lib-text-line>
+        <div class="mdo-field-input">
+          <input matInput placeholder="Select data type" #optionsInput [matMenuTriggerFor]="typesMenu" autocomplete="off" />
+          <mat-menu #typesMenu="matMenu" class="field-matmenu">
+            <div class="f-col system">
+              <div class="f-col system-fields-col">
+                <lib-search i18n-placeholder="@@search" placeholder="Search" #searchInput></lib-search>
+                <lib-section class="lib-section"></lib-section>
+                <lib-checkbox label="All" prosClickStopPropagation [checked]="true"></lib-checkbox>
+                <lib-section class="lib-section"></lib-section>
+              </div>
+              <div class="mat-tree-container filters-list" id="mat-tree">
+                <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+                  <!-- This is the tree node template for leaf nodes -->
+                  <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+                    <!-- use a disabled button to provide padding for tree leaf -->
+                    <button mat-icon-button disabled></button>
+                    <lib-checkbox [label]="node.name" prosClickStopPropagation
+                      [checked]="checklistSelection.isSelected(node)"
+                      (valueChange)="todoLeafItemSelectionToggle(node)"></lib-checkbox>
+                  </mat-tree-node>
+                  <!-- This is the tree node template for expandable nodes -->
+                  <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
+                    <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
+                      <mat-icon class="mat-icon-rtl-mirror">
+                        {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                      </mat-icon>
+                    </button>
+                    <lib-checkbox [label]="node.name" prosClickStopPropagation
+                      [checked]="descendantsAllSelected(node)" (valueChange)="todoItemSelectionToggle(node)">
+                    </lib-checkbox>
+                  </mat-tree-node>
+                </mat-tree>
+              </div>
+            </div>
+          </mat-menu>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="f-row dataset-button">
+    <lib-button type="plain" i18n="@@cancel">Cancel</lib-button>
+    <span class="f-spacer"></span>
+    <div class="f-row">
+      <lib-button type="plain" i18n="@@back" (click)="connectorService.updateNextStep(-1)">Back</lib-button>
+      <lib-button type="major" i18n="@@next" (click)="connectorService.updateNextStep(1)">Next </lib-button>
+    </div>
+  </div>
+</div>
+<div class="row-spacer"></div>
+<div class="f-row">
+  <lib-button type="plain" i18n="@@cancel">Cancel</lib-button>
+  <span class="f-spacer"></span>
+  <lib-button type="plain" i18n="@@back">Back</lib-button>
+  <span class="f-col-spacer-half"></span>
+  <lib-button type="major" i18n="@@next">Next </lib-button>
+</div>

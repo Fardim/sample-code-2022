@@ -1,0 +1,52 @@
+<div class="root f-row">
+    <div class="f-col hierarchy-listing" [style.width.px]="widthOfHierarchies">
+        <pros-transaction-hierarchy-list
+            [style.visibility]="widthOfHierarchies === 0 ? 'hidden' : 'visible'"
+            [style.overflow]="widthOfHierarchies === 0 ? 'hidden' : 'visible'"
+            [moduleId]="moduleId"
+            [isChildDataset]="isChildDataset"
+            [recordId]="recordId"
+            [process]="process"
+            [crId]="crId"
+            [dataControl]="dataControl"
+            [relatedDatasets]="relatedDatasets"
+            (structureChanged)="structureChanged($event)"
+        >
+        </pros-transaction-hierarchy-list>
+    </div>
+    <div class="split-col" (click)="toggleSideBar()">
+        <div class="split-arrow">
+          <mat-icon fontSet="mdo-icons">{{ arrowIcon }}</mat-icon>
+        </div>
+    </div>
+    <div *ngIf="!isLoadingTemplate" class="f-col form-area-container" [ngStyle]="{'width':'calc(100% - ' +widthOfHierarchies + 'px - 24px)' }">
+        <pros-transaction-tabs
+            *ngIf="activeTabsArray"
+            [moduleId]="moduleId"
+            [layoutId]="layoutId"
+            [recordId]="recordId"
+            [process]="process"
+            [crId]="crId"
+            [dataEventId]="dataEventId"
+            [activeStructures]="activeStructures"
+            [tabsArray]="activeTabsArray"
+            [tabs]="tabList"
+            [isChildDataset]="isChildDataset"
+            [relatedDatasets]="relatedDatasets"
+            [dataControl]="dataControl"
+            [flowId]="flowId"
+            [stepId]="stepId"
+            ></pros-transaction-tabs>
+            <div *ngIf="!activeTabsArray" class="f-row empty-state">
+            <lib-empty-state primaryText="Nothing to see here" secondaryText="You have not added any new class type yet. Would you like to create one?" icon="order" iconSize="200">
+                <lib-button *ngIf="this.process !== 'view' && this.process !== 'copy'" type="minor" (click)="createNewRecord()">Create new</lib-button>
+            </lib-empty-state>
+            </div>
+    </div>
+    <div *ngIf="isLoadingTemplate" class="loading-state">
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line-half"></lib-skeleton>
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line-half"></lib-skeleton>
+    </div>
+</div>

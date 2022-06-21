@@ -1,0 +1,153 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading"> Notification setting </lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="major" width="80px" (afterClick)="save()">Save</lib-button>
+      </div>
+    </div>
+  </div>
+  <div class="f-col sidesheetcontent-listing">
+    <div class="mdo-justify">
+      <div class="f-row colunm-box rule-border-row">
+        <div class="colgit s col-x4">
+          <lib-text-line type="base" weight="strong">Dataset</lib-text-line>
+        </div>
+
+        <div class="col col-x4">
+          <lib-text-line type="base" weight="strong">Notification event</lib-text-line>
+        </div>
+
+        <div class="col col-x4">
+          <lib-text-line type="base" weight="strong">Email template</lib-text-line>
+        </div>
+
+        <div class="col"></div>
+      </div>
+
+      <form [formGroup]="notificationForm">
+        <ng-container formArrayName="notifications" *ngFor="let rowObj of notifications.controls; let i = index">
+          <div class="f-row colunm-box rule-border-row">
+            <div class="col col-x4">
+              <div class="f-col mdo-field">
+                <div class="mdo-field-input">
+                  <input
+                    matInput
+                    placeholder="Select"
+                    [matAutocomplete]="options"
+                    [formControl]="notifications.controls[i].get('dataset')"
+                    (focus) = "activeElementType = 'dataset'"
+                    #conInput
+                  />
+                  <mat-icon
+                    matSuffix
+                    fontSet="mdo-icons"
+                    class="autocomplete-icon"
+                    prosClickStopPropagation
+                    (click)="conInput.focus();activeElementType = 'dataset'"
+                    >chevron-down</mat-icon
+                  >
+                </div>
+                <mat-error>
+                  <mat-error *ngIf="submitted && notifications.controls[i].get('dataset')?.errors?.required">
+                    <lib-text-line type="small">Dataset is required</lib-text-line>
+                  </mat-error>
+                </mat-error>
+              </div>
+            </div>
+            <div class="col col-x4">
+              <div class="f-col mdo-field">
+                <div class="mdo-field-input">
+                  <input
+                    matInput
+                    placeholder="Select"
+                    [matAutocomplete]="options"
+                    [formControl]="notifications.controls[i].get('event')"
+                    (focus) = "activeElementType = 'event'"
+                    #datasetInput
+                  />
+                  <mat-icon
+                    matSuffix
+                    fontSet="mdo-icons"
+                    class="autocomplete-icon"
+                    prosClickStopPropagation
+                    (click)="datasetInput.focus();activeElementType = 'event'"
+                    >chevron-down</mat-icon
+                  >
+                </div>
+                <mat-error>
+                  <mat-error *ngIf="submitted && notifications.controls[i].get('event')?.errors?.required">
+                    <lib-text-line type="small">Evnet is required </lib-text-line>
+                  </mat-error>
+                </mat-error>
+              </div>
+            </div>
+            <div class="col col-x4">
+              <div class="f-col mdo-field">
+                <div class="mdo-field-input">
+                  <input
+                    matInput
+                    placeholder="Select"
+                    [matAutocomplete]="options"
+                    #interfaceInput
+                    [formControl]="notifications.controls[i].get('template')"
+                    (focus) = "activeElementType = 'template'"
+                    (keyup)="getTemplate(i,$event) "
+                  />
+                  <mat-icon
+                    matSuffix
+                    fontSet="mdo-icons"
+                    class="autocomplete-icon"
+                    prosClickStopPropagation
+                    (click)="interfaceInput.focus();activeElementType = 'template'"
+                    >chevron-down</mat-icon
+                  >
+                </div>
+                <mat-error>
+                  <mat-error *ngIf="submitted && notifications.controls[i].get('template')?.errors?.required">
+                    <lib-text-line type="small">Template is required</lib-text-line>
+                  </mat-error>
+                </mat-error>
+              </div>
+            </div>
+
+            <!-- auto complete for options -->
+            <mat-autocomplete [displayWith]="displayFn"
+              class="mdo-autocomplete"
+              #options="matAutocomplete">
+              <ng-template [ngIf]="activeElementType === 'dataset'">
+                <mat-option class="mdo-option" *ngFor="let dataset of dataset$ | async" [value]="dataset" (click)="getTemplate">
+                    {{ dataset.moduleDesc || dataset.moduleId }}
+                </mat-option>
+              </ng-template>
+
+              <ng-template [ngIf]="activeElementType === 'event'">
+                <mat-option class="mdo-option" *ngFor="let event of events$ | async" [value]="event">
+                    {{ event.t || event.c }}
+                </mat-option>
+              </ng-template>
+
+              <ng-template [ngIf]="activeElementType === 'template'">
+                <mat-option class="mdo-option" *ngFor="let temp of templates$ | async" [value]="temp">
+                    {{ temp.templateName || temp.id }}
+                </mat-option>
+              </ng-template>
+              
+            </mat-autocomplete>
+
+            <div class="col mat-item-end">
+              <lib-button (afterClick)="removeMapping()" icon="trash-alt" iconFontType="light"> </lib-button>
+            </div>
+          </div>
+        </ng-container>
+        <div class="f-row-spacer-half"></div>
+        <lib-text-line class="cursor" textColor="link" (click)="addTargetSystem()">
+          Add target system</lib-text-line
+        >
+      </form>
+    </div>
+  </div>
+</div>

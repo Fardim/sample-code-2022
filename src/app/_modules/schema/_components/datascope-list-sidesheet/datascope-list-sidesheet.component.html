@@ -1,0 +1,40 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading" i18n="@@data_scope">Data scope</lib-text-line>
+            </div>
+        </div>
+    </div>
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+
+            <div class="variants-list" prosInfiniteScroll bufferPercentage="10" (scrollEnd)="updateVariantsList()">
+                <div class="f-row colunm-box rule-border-row list-item" *ngFor="let item of variantsList">
+                    <lib-text-line type="base" textColor="link" (click)="editDataScope(item.variantId)" class="cursor">{{ item.variantName }}</lib-text-line>
+                    <div class="f-spacer"></div>
+                    <lib-button type="plain" icon="trash-alt" iconFontType="light" (click)="deleteVariant(item.variantId)"></lib-button>
+                </div>
+                <ng-container *ngIf="!variantsList.length && loader">
+                    <div *ngFor="let a of [].constructor(11)" class="f-row rule-border-row list-item">
+                        <lib-skeleton type="line" class="line"></lib-skeleton>
+                        <div class="col-spacer"></div>
+                        <lib-skeleton type="button"></lib-skeleton>
+                    </div>
+                </ng-container>
+            </div>
+
+            <ng-container *ngIf="!variantsList.length && !loader">
+                <div class="f-row empty-block">
+                    <lib-empty-state 
+                    icon="search"
+                    primaryText="Nothing to see here"
+                    secondaryText="Your search did not return any results, try modifying your search">
+                </lib-empty-state>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>

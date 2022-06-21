@@ -1,0 +1,168 @@
+<div class="root" cdkDropListGroup *ngIf="!fragment">
+    <div class="breadcrumb-wrapper">
+        <pros-breadcrumb [crumbs]="breadcrumb"></pros-breadcrumb>
+        <div class="row-spacer"></div>
+    </div>
+
+    <!-- Categories Section Starts Here-->
+
+    <mat-card class="mat-elevation-z0 container-show f-col categories">
+
+        <mat-form-field appearance="outline">
+            <mat-label>Select Module</mat-label>
+            <input matInput placeholder="Select module" [formControl]="moduleInpCtrl" [matAutocomplete]="moduleAutoCmp">
+            <mat-autocomplete #moduleAutoCmp="matAutocomplete" [displayWith]="displayFn"
+                (optionSelected)="selectModule($event)">
+                <mat-option *ngFor="let module of filteredModules | async" [value]="module">
+                    {{module.objectdesc}}
+                </mat-option>
+            </mat-autocomplete>
+        </mat-form-field>
+
+        <div class="f-row">
+            <mat-form-field class="schema-name" appearance="outline">
+                <mat-label>Schema Name</mat-label>
+                <input matInput [(ngModel)]="schemaName">
+            </mat-form-field>
+            <span class="col-spacer"></span>
+            <mat-form-field class="schema-weightage" appearance="outline">
+                <mat-label>Threshold</mat-label>
+                <input matInput placeholder="Ex. 0-100" value="0" min="0" max="100" [formControl]="schemaThresholdCtrl">
+                <mat-hint>Threshold in 0 - 100</mat-hint>
+            </mat-form-field>
+
+        </div>
+        <div class="row-spacer"></div>
+        <h2 class="mat-headline-caps">Categories</h2>
+        <form [formGroup]="dynCategoryFrmGrp">
+            <div formArrayName="categories"
+                *ngFor="let category of dynCategoryFrmGrp.get('categories').controls; let i = index"
+                class="group-containers">
+                <ng-container [formGroupName]="i">
+                    <mat-card class="mat-elevation-z3 categorygroup">
+                        <mat-toolbar>
+                            <mat-toolbar-row>
+                                <mat-form-field>
+                                    <mat-label>Category Name</mat-label>
+                                    <input placeholder="Category Name" aria-label="Number" matInput
+                                        [matAutocomplete]="auto" formControlName="category">
+                                    <mat-autocomplete #auto="matAutocomplete" [displayWith]="categoryDisplayWith">
+                                        <mat-option *ngFor="let cat of categoryList" [value]="cat">
+                                            {{ cat.categoryDesc }}
+                                        </mat-option>
+                                    </mat-autocomplete>
+                                </mat-form-field>
+                                <span class="f-spacer"></span>
+                                <button mat-button color="warn" (click)="removeCategory(i)">
+                                    Delete
+                                </button>
+                            </mat-toolbar-row>
+                        </mat-toolbar>
+
+                        <mat-divider></mat-divider>
+
+                        <div cdkDropList [cdkDropListData]="categoryBrMap[i]"
+                            (cdkDropListDropped)="drop($event, i, true)" class="f-row InCategory">
+                            <div class="boxStyle matStyle" *ngFor="let br of categoryBrMap[i]" cdkDrag>
+                                <mat-card class="mat-elevation-z3 br-tile f-col ">
+                                    <div class="f-row">
+                                        <pros-svg-icon size="50" icon="P_{{br.brType}}" color="primary"></pros-svg-icon>
+                                        <h4 class="mat-h4">{{ br.brInfo }}</h4>
+                                    </div>
+                                    <div class="f-row">
+                                        <button mat-icon-button (click)="editBusinessRuls(br.brIdStr, br.brType)">
+                                            <mat-icon matTooltip="Edit">edit</mat-icon>
+                                        </button>
+                                        <!-- (click)="removeBrFromCategory(i,j)" -->
+                                        <button mat-icon-button (click)="removeMappedBr(br, i)">
+                                            <mat-icon matTooltip="Delete">delete_outline</mat-icon>
+                                        </button>
+                                    </div>
+
+                                </mat-card>
+                            </div>
+                        </div>
+                    </mat-card>
+                </ng-container>
+            </div>
+
+            <div class="row-spacer"></div>
+            <!-- [ngIf]="brList.length" [ngIfElse] ="showNullStage" -->
+            <ng-template [ngIf]="brList.length !== 0">
+                <pros-add-tile class="tile" text="Add a Category" (click)="addCategory()"></pros-add-tile>
+                <div class="row-spacer"></div>
+                <div class="f-row">
+                    <button mat-flat-button (click)="navigateToListPage()">Cancel</button>
+                    <span class="f-spacer"></span>
+                    <button mat-flat-button color="primary" (click)="createUpdateSchema()">Save</button>
+                </div>
+            </ng-template>
+            <ng-template #showNullStage>
+                <div class="row nullstate">
+                    <button mat-fab disabled>
+                        <mat-icon color="primary">layers_clear</mat-icon>
+                    </button>
+                    <p>Please create at least one businessRule </p>
+                </div>
+            </ng-template>
+        </form>
+    </mat-card>
+
+    <!-- Categories Section End Here-->
+
+
+    <!-- Add Business Rules Section -->
+
+    <mat-card class="mat-elevation-z3 brs">
+        <h2 class="mat-headline-caps">Business Rules</h2>
+        <div class="f-row-spacer-half"></div>
+        <div class="f-col brs-tilecol">
+            <mat-form-field>
+                <input matInput placeholder="Search">
+            </mat-form-field>
+
+            <div cdkDropList [cdkDropListData]="brList" class="example-list inBrList"
+                (cdkDropListDropped)="drop($event, 1)">
+
+                <div *ngFor="let data of brListOb | async; let k = index" cdkDrag>
+
+                    <mat-card class="mat-elevation-z0 br-tile">
+                        <div class="f-row">
+                            <pros-svg-icon size="50" icon="P_{{data.brType}}" color="primary"></pros-svg-icon>
+                            <h4 class="mat-h4">{{data.brInfo}}</h4>
+                        </div>
+                        <div class="f-row">
+                            <button mat-icon-button (click)="editBusinessRuls(data.brIdStr, data.brType)">
+                                <mat-icon matTooltip="Edit">edit</mat-icon>
+                            </button>
+                            <button mat-icon-button (click)="deleteBr(data.brIdStr)">
+                                <mat-icon matTooltip="Delete">delete_outline</mat-icon>
+                            </button>
+                            <button mat-icon-button>
+                                <mat-icon [matBadge]="data.order" matTooltip="Ordring" matBadgeColor="primary"
+                                    matBadgeSize="small">reorder</mat-icon>
+                            </button>
+                            <span class="col-spacer"></span>
+                            <mat-form-field class="br-weightage">
+                                <mat-label>Weightage</mat-label>
+                                <input matInput placeholder="Ex. 0-100" min="0" max="100"
+                                    [value]="data.brWeightage ? data.brWeightage : 0"
+                                    (keyup)="brWightageChange(data,$event.target.value);">
+                                <mat-hint>Weightage in 0-100%</mat-hint>
+                            </mat-form-field>
+
+                        </div>
+                    </mat-card>
+                    <div class="row-spacer"></div>
+                </div>
+                <pros-add-tile class="tile" text="Add a new business rule" (click)="createbusinessrule()">
+                </pros-add-tile>
+            </div>
+        </div>
+    </mat-card>
+    <!-- Add Business Rules Section End Here -->
+</div>
+
+<pros-addbusinessrule *ngIf="fragment" [moduleId]="moduleId" [schemaId]="schemaId" [schemaGroupId]="schemaGroupId"
+    [fragment]="fragment" (evtSavedBrInfo)="afterSavedBrinfo($event)">
+</pros-addbusinessrule>

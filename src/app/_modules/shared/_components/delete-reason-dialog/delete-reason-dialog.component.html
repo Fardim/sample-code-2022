@@ -1,0 +1,17 @@
+  <div class="modal-wrapper">
+    <div class="f-row modal-header">
+      <lib-text-line type="leading">Do you want to continue ?</lib-text-line>
+      <lib-button type="plain" (click)="close(false)" iconFontType="light" icon="times"></lib-button>
+    </div>
+
+    <div class="modal-body">
+      <lib-textarea placeholder="placeholder" label="Reason for deletion" isRequired="true" [(ngModel)]="reason">
+      </lib-textarea>
+    </div>
+
+    <div class="f-row modal-footer space-between">
+      <lib-button type="plain" width="80px" (click)="close(false)">Cancel</lib-button>
+      <span class="f-spacer"></span>
+      <lib-button type="major" width="80px" (click)="close(true)">Continue</lib-button>
+    </div>
+  </div>

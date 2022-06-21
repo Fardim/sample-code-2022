@@ -1,0 +1,160 @@
+<div class="mapping-inner-container" id="mapping-area" [style.height]="!!bannerText? 'calc(100% - 112px)': 'calc(100% - 50px)'">
+    <div class="source-container">
+        <!-- To be used when the target div is out of view -->
+        <div class="hidden-top-reference-source" id="top-reference-source"></div>
+        <div class="hidden-bottom-reference-source" id="bottom-reference-source"></div>
+
+        <ng-container *ngIf="sourceFields?.length; else noSourceData">
+
+            <div class="f-row header-wrapper">
+                <lib-text-line textColor="primary" type="base" weight="strong">{{sourceTitle || 'MDO Structure'}}</lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-button [icon]="sourceMenuToggle? 'angle-down': 'angle-up'" (click)="sourceMenuToggle = !sourceMenuToggle; removeAllMappingLines()"></lib-button>
+                <lib-button icon="expand-alt" iconFontType="light" (afterClick)="expand()" *ngIf="showExpandButton"></lib-button>
+            </div>
+            <div class="f-row-spacer-half"></div>
+            <div class="f-row search-wrapper">
+                <lib-search class="lib-search" [formControl]="sourceControl" placeholder="search source fields"></lib-search>
+            </div>
+
+            <div class="f-row-spacer-half"></div>
+            <div #sourceContainer class="cdk-wrapper-container" [ngClass]="{'align-items': !(filteredSourceFields | async)?.length}">
+
+                <ng-container *ngIf="!(filteredSourceFields | async)?.length">
+                    <lib-empty-state class="empty-state" primaryText="Nothing to see here"
+                        secondaryText="Your search did not return any results, try modifying your search" icon="search"
+                        iconSize="100">
+                    </lib-empty-state>
+                </ng-container>
+
+                <cdk-virtual-scroll-viewport itemSize="64" class="collapsible">
+                    <mat-accordion togglePosition="before" [multi]="true">
+                        <ng-container *ngFor="let item of filteredSourceFields | async; trackBy: trackSource;">
+                            <pros-source-section class="mapping-section-item"
+                                [item]="item"
+                                [isSource]="true"
+                                [control]="sourceControl"
+                                [menuToggle]="sourceMenuToggle"
+                                [currentMapping]="currentMapping"
+                                [existingMapping]="existingMapping"
+                                (sourceSelected)="selectSourceField($event)"
+                                (dragReleased)="dragReleased($event)"
+                                (showTargets)="showMappedTargets($event)">
+                            </pros-source-section>
+                        </ng-container>
+                    </mat-accordion>
+                </cdk-virtual-scroll-viewport>
+            </div>
+        </ng-container>
+
+        <ng-template #noSourceData>
+            <ng-template [ngIf]="mappingSourceLoader">
+                <cdk-virtual-scroll-viewport itemSize="64" #virtualScroll class="collapsible">
+                    <mat-accordion togglePosition="before" [multi]="true">
+                        <div class="f-col">
+                            <pros-nav-title-skeleton></pros-nav-title-skeleton>
+                        </div>
+                        <div class="row-spacer"></div>
+                        <div class="f-row loader-element" *ngFor="let a of [].constructor(10)">
+                            <lib-skeleton class="line" type="line"></lib-skeleton>
+                            <div class="f-col-spacer-half"></div>
+                            <lib-skeleton class="avatar" type="avatar"></lib-skeleton>
+                        </div>
+                    </mat-accordion>
+                </cdk-virtual-scroll-viewport>
+            </ng-template>
+            <div class="collapsible f-row f-justify-center" *ngIf="!mappingSourceLoader">
+                <lib-empty-state class="empty-state" primaryText="Nothing to see here"
+                    secondaryText="Source dataset has not been
+                    selected yet." icon="search"
+                    iconSize="100">
+                </lib-empty-state>
+            </div>
+        </ng-template>
+    </div>
+    <!-- Spacer between grids, do not remove -->
+    <div></div>
+    <!-- target container -->
+    <div class="target-container">
+        <!-- To be used when the target div is out of view -->
+        <div class="hidden-top-reference" id="top-reference"></div>
+        <div class="hidden-bottom-reference" id="bottom-reference"></div>
+
+        <ng-container *ngIf="targetFields?.length; else noTargetData">
+
+            <div class="f-row header-wrapper">
+                <lib-text-line textColor="primary" type="base" weight="strong">{{targetTitle||'HCI Connection Structure'}}
+                </lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-button [icon]="targetMenuToggle? 'angle-down': 'angle-up'" (click)="targetMenuToggle = !targetMenuToggle; removeAllMappingLines()"></lib-button>
+                <lib-button icon="expand-alt" iconFontType="light" (afterClick)="expand()" *ngIf="showExpandButton"></lib-button>
+            </div>
+            <div class="f-row-spacer-half"></div>
+            <div class="f-row search-wrapper">
+                <lib-search class="lib-search" [formControl]="targetControl" placeholder="search target fields"></lib-search>
+            </div>
+            <div class="f-row-spacer-half"></div>
+
+            <div class="cdk-wrapper-container" [ngClass]="{'align-items': !(filteredTargetFields | async)?.length}">
+
+                <ng-container *ngIf="!(filteredTargetFields | async)?.length">
+                    <lib-empty-state class="empty-state" primaryText="Nothing to see here"
+                        secondaryText="Your search did not return any results, try modifying your search" icon="search"
+                        iconSize="100">
+                    </lib-empty-state>
+                </ng-container>
+
+                <cdk-virtual-scroll-viewport *ngIf="(filteredTargetFields | async)?.length" itemSize="64" #virtualScroll class="collapsible" (scroll)="onScroll($event)">
+                    <mat-accordion togglePosition="before" [multi]="true">
+                        <ng-container *ngIf="mappingTargetLoader; else targetLoaded">
+                            <div class="f-row loader-element" *ngFor="let a of [].constructor(10)">
+                                <lib-skeleton class="line" type="line"></lib-skeleton>
+                                <div class="f-col-spacer-half"></div>
+                                <lib-skeleton class="avatar" type="avatar"></lib-skeleton>
+                            </div>
+                        </ng-container>
+                        <ng-template #targetLoaded>
+                            <ng-container *ngFor="let item of filteredTargetFields | async; trackBy: trackTarget;">
+                                <pros-target-section class="mapping-section-item"
+                                    [item]="item"
+                                    [isSource]="false"
+                                    [control]="targetControl"
+                                    [menuToggle]="targetMenuToggle"
+                                    [currentMapping]="currentMapping"
+                                    [existingMapping]="existingMapping"
+                                    (targetSelected)="selectTargetField($event)"
+                                    (mouseOnTarget)="droppedOnTarget = $event">
+                                </pros-target-section>
+                            </ng-container>
+                        </ng-template>
+                    </mat-accordion>
+                </cdk-virtual-scroll-viewport>
+            </div>
+        </ng-container>
+
+        <ng-template #noTargetData>
+            <ng-template [ngIf]="mappingTargetLoader">
+                <cdk-virtual-scroll-viewport itemSize="64" #virtualScroll class="collapsible">
+                    <mat-accordion togglePosition="before" [multi]="true">
+                        <div class="f-col">
+                            <pros-nav-title-skeleton></pros-nav-title-skeleton>
+                        </div>
+                        <div class="row-spacer"></div>
+                        <div class="f-row loader-element" *ngFor="let a of [].constructor(10)">
+                            <lib-skeleton class="line" type="line"></lib-skeleton>
+                            <div class="f-col-spacer-half"></div>
+                            <lib-skeleton class="avatar" type="avatar"></lib-skeleton>
+                        </div>
+                    </mat-accordion>
+                </cdk-virtual-scroll-viewport>
+            </ng-template>
+            <div class="collapsible f-row f-justify-center" *ngIf="!mappingTargetLoader">
+                <lib-empty-state class="empty-state" primaryText="Nothing to see here"
+                    secondaryText="Target dataset has not been
+                    selected yet." icon="search"
+                    iconSize="100">
+                </lib-empty-state>
+            </div>
+        </ng-template>
+    </div>
+</div>

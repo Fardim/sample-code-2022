@@ -1,0 +1,21 @@
+.overlay-content-container {
+  .inner-content-wrapper {
+    position: relative;
+    max-height: 300px;
+
+    .search-container {
+      padding: 6px 12px;
+    }
+
+    .content-container {
+      padding: 6px 12px;
+      max-height: calc(100% - 48px);
+      overflow-y: auto;
+
+      .table-loader {
+        width: 100%;
+        min-height: 200px;
+      }
+    }
+  }
+}

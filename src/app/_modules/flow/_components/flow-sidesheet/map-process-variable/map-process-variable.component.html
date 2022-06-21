@@ -1,0 +1,35 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading">
+          Map process variable
+        </lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="major" width="80px" (click)="saveProcessVariable()">Save</lib-button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="sidesheetcontent-listing">
+    <div class="f-row">
+        <lib-text-line type="base" weight="strong">
+          Process variables
+        </lib-text-line>
+        <span class="f-spacer"></span>
+    </div>
+
+    <div class="f-col">
+      <form [formGroup]="processVariableForm">
+        <ng-container formArrayName="processVariables" *ngFor="let rowObj of processVariables.controls; let i = index">
+          <lib-section></lib-section>
+          <pros-process-variable [frmGrp]="rowObj" [datasetId]="dataModel.datasetId"></pros-process-variable>
+      </ng-container>
+    </form>
+    </div>
+  </div>
+  
+</div>

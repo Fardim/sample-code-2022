@@ -1,0 +1,25 @@
+mat-card.root {
+  padding: 0 12px;
+  user-select: text;
+
+  .breadcrum-toolbar {
+    padding-top: 8px;
+    margin-bottom: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    min-height: 40px;
+    justify-content: space-between;
+  }
+
+  .dataset-palette {
+    flex-wrap: wrap;
+  }
+}
+
+@media (min-width: 1200px) {
+  mat-card.root {
+    width: 92%;
+    margin: 0 auto;
+  }
+}

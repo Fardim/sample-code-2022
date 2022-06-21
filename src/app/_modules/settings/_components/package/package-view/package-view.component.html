@@ -1,0 +1,12 @@
+<div class="root">
+  <div class="f-row packageView">
+    <div class="f-row left-sec">
+      <lib-button icon="{{packageIconName}}" iconFontType="light" iconPosition="before" type="plain"></lib-button>
+      <lib-text-line type="base">{{childName}}</lib-text-line>
+    </div>
+    <div class="f-row right-sec">
+      <lib-text-line class="data-set-name" type="base">{{datasetname}}</lib-text-line>
+      <lib-button [icon]="'trash-alt'" iconFontType="light" [type]="'plain'" (click)="deletenode()"></lib-button>
+    </div>
+  </div>
+</div>

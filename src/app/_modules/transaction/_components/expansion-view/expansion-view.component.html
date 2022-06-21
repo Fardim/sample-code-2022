@@ -1,0 +1,21 @@
+<div class="f-col root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" (click)="close()" iconFontType="light" icon="compress-alt"></lib-button>
+    <div class="f-col-spacer-half"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" enableWrap="true">
+          {{ 'Expansion view' }}
+        </lib-text-line>
+      </div>
+    </div>
+  </div>
+  
+  <div *ngIf="fieldObj" class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <pros-transaction-grid [tabDetails]="tabDetails" [fieldObj]="fieldObj" [layoutId]="layoutId" [flowId]="flowId" [stepId]="stepId"
+          [moduleId]="moduleId" [parentRowId]="null" [recordId]="recordId" [expansionview]="true">
+      </pros-transaction-grid>
+    </div>
+  </div>
+</div>

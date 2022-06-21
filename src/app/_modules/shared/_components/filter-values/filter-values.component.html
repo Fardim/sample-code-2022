@@ -1,0 +1,10 @@
+<div class="root f-col">
+    <lib-search prosClickStopPropagation (valueChange)="searchData($event)" placeholder="Search..."></lib-search>
+    <mat-nav-list prosClickStopPropagation>
+        <mat-list-item *ngFor="let checkbox of searchValue;">
+            <lib-checkbox (valueChange)="onChange(checkbox)" [checked]="isChecked(checkbox)" [label]="checkbox.TEXT ? checkbox.TEXT : checkbox.CODE">
+            </lib-checkbox>
+        </mat-list-item>
+    </mat-nav-list>
+    <lib-button type="minor" i18n="@@apply" (click)="submit()" class="f-col">Apply</lib-button>
+</div>

@@ -1,0 +1,244 @@
+
+<div class="root" *ngIf="isShowSkeleton;else showContent">
+  <lib-skeleton-overview class="skeleton-loader-overview"></lib-skeleton-overview>
+</div>
+
+<ng-template #showContent>
+  <div class="root">
+    <div class="f-row breadcrum-toolbar">
+      <lib-button type="plain" icon="times" (click)="close()" iconFontType="light"></lib-button>
+      <div class="col-spacer"></div>
+      <div class="f-col mdo-constrained-right">
+        <div class="f-row">
+          <lib-text-line type="leading">Filter</lib-text-line>
+          <span class="f-spacer"></span>
+          <lib-button type="plain" icon="ellipsis-h" [matMenuTriggerFor]="navigation"></lib-button>
+          <mat-menu #navigation="matMenu" class="navigation-menu">
+            <button mat-menu-item (click)="clearAllFilters()" i18n="@@reset_all">Reset
+            </button>
+          </mat-menu>
+        </div>
+      </div>
+    </div>
+    <div class="f-row-spacer-half"></div>
+    <div class="f-col sidesheetcontent-listing">
+      <div class="f-col mdo-justify">
+        <div class="f-row system">
+          <div class="f-col system-fields-col">
+          <div>          
+            <lib-search i18n-placeholder="@@search" placeholder="Search filters" #searchInput></lib-search>
+            <div class="row-spacer"></div>
+            <div class="f-col filter-tree">
+              <mat-tree [dataSource]="suggestedFiltersDataSource" [treeControl]="treeControlSuggFilter">
+                <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding (click)="upsertFilter(node)"
+                  class="suggest-filter">
+                  <lib-text-line type="base" class="list-textline">{{ node.name }}</lib-text-line>
+                  <span class="f-spacer"></span>
+                  <lib-button type="plain" iconFontType="light" icon="times" (click)="removeFilter(node, 'field')">
+                  </lib-button>
+                </mat-tree-node>
+                <!-- This is the tree node template for expandable nodes -->
+                <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding matTreeNodePaddingIndent="48">
+                  <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle -' + node.name">
+                    <mat-icon class="mat-icon-rtl-mirror" fontSet="mdo-icons-light">
+                      {{ treeControlSuggFilter.isExpanded(node) ? 'angle-down' : 'angle-right' }}
+                    </mat-icon>
+                  </button>
+                  <lib-text-line type="base" class="list-textline">{{ node.name }}</lib-text-line>
+                  <span class="f-spacer"></span>
+                  <lib-button type="plain" iconFontType="light" icon="times" (click)="removeFilter(node, 'module')">
+                  </lib-button>
+                </mat-tree-node>
+              </mat-tree>
+
+             <lib-section *ngIf="suggestedFiltersDataSource?.data?.length"></lib-section>  
+
+              <div class="mat-tree-container filters-list" id="mat-tree" prosInfiniteScroll bufferPercentage="20"
+                (scrollEnd)="scroll(true)">
+                <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+                  <mat-tree-node (click)="activeNode = node" [ngClass]="{ 'background-highlight': activeNode === node }" *matTreeNodeDef="let node" matTreeNodePadding matTreeNodePaddingIndent="48" [ngClass]="{'empty-node': node.isEmpty}"
+                    (click)="upsertFilter(node)">
+                    <lib-text-line type="base" class="list-textline"> {{ node.name }}</lib-text-line> 
+                  </mat-tree-node>
+                  <!-- This is the tree node template for expandable nodes -->
+                  <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding
+                    (click)="loadModuleFields(node)">
+                    <button mat-icon-button [attr.aria-label]="'Toggle ' + node.name">
+                      <mat-icon class="mat-icon-rtl-mirror" fontSet="mdo-icons-light">
+                        {{ treeControl.isExpanded(node) ? 'angle-down' : 'angle-right' }}
+                      </mat-icon>
+                    </button>
+                    <lib-text-line type="base" class="list-textline"> {{ node.name }}</lib-text-line>
+                  </mat-tree-node>
+                </mat-tree>
+              </div>
+            </div>
+            </div>
+          </div>
+  
+          <div class="f-col system-values-col">
+            <ng-template [ngIf]="activeFilter">
+              <div class="f-row">
+                <lib-text-line type="leading"> {{ activeFilter.name }}</lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button type="minor" (click)="applyFilter()" i18n="@@apply">Apply</lib-button>
+              </div>
+  
+              <div class="row-spacer"></div>
+  
+              <div class="f-col">
+                <ng-container [ngSwitch]="getFieldControlType(activeFilter)">
+                  <!-- Text, Password, Email -->
+                  <lib-input
+                    *ngSwitchCase="[FieldControlType.TEXT, FieldControlType.EMAIL, FieldControlType.PASSWORD].includes(getFieldControlType(activeFilter.fieldId)) ? getFieldControlType(activeFilter.fieldId): !getFieldControlType(activeFilter.fieldId) "
+                    i18n-placeholder="@@type_filter_value" placeholder="Type filter value"
+                    [value]="getFilterValue(activeFilter)" (valueChange)="updateFilterValue($event)">
+                  </lib-input>
+  
+                  <!-- input type Text area -->
+                  <mat-form-field *ngSwitchCase="FieldControlType.TEXT_AREA" appearance="outline">
+                    <textarea matInput class="mdo-textarea" i18n-placeholder="@@type_filter_value"
+                      placeholder="Type filter value" [value]="getFilterValue(activeFilter)"
+                      (change)="updateFilterValue($event.target.value)"></textarea>
+                  </mat-form-field>
+  
+                  <!-- Input type number -->
+                  <lib-range-slider *ngSwitchCase="FieldControlType.NUMBER" thumbLabel
+                    [value]="activeFilter.startValue || 0" [highValue]="activeFilter.endValue || 1"
+                    (valueChange)="updateFilterValue($event)"></lib-range-slider>
+  
+                  <!-- Single select -->
+                  <ng-container *ngSwitchCase="FieldControlType.SINGLE_SELECT">
+                    <lib-segment [optionsList]="rulelist" labelKey="label" valueKey="value"
+                      [(ngModel)]="activeFilter.operator"></lib-segment>
+  
+                      <div class="row-spacer"></div>
+                    <lib-search *ngIf="filteredDropdownValues.length > 0"  placeholder="Search" (valueChange)="filterOptionSearch($event, 'key', true)"></lib-search>
+                    <div class="row-spacer"></div>
+  
+                    <mat-list>
+                      <lib-radio-group layout="vertical" [value]="getFilterValue(activeFilter)"
+                        [options]="filteredDropdownValues" (valueChange)="updateFilterValue($event)">
+                      </lib-radio-group>
+                    </mat-list>
+                  </ng-container>
+  
+                  <!-- Multi select -->
+                  <ng-container *ngSwitchCase="FieldControlType.MULTI_SELECT">
+                    <lib-segment [optionsList]="rulelist" labelKey="label" valueKey="value"
+                      [(ngModel)]="activeFilter.operator"></lib-segment>
+  
+                    <div class="row-spacer"></div>
+  
+                    <lib-search *ngIf="filteredDropdownValues.length > 0" placeholder="Search" (valueChange)="filterOptionSearch($event, 'value', true)"
+                      [(ngModel)]="this.activeFilter.serchString"></lib-search>
+  
+                    <div class="row-spacer"></div>
+                    <mat-list>
+                      <mat-list-item class="cursor" *ngIf="filteredDropdownValues.length > 0">
+                        <lib-checkbox label="All" labelPosition="after" theme="primary"
+                          (valueChange)="onSelectDeselect($event)" [checked]="activeFilter.selectAll">
+                        </lib-checkbox>
+                      </mat-list-item>
+                      <mat-list-item *ngFor="let option of filteredDropdownValues" class="cursor">
+                        <lib-checkbox [label]="option.value" labelPosition="after" theme="primary"
+                          [checked]="activeFilter.values.includes(option.key)"
+                          (valueChange)="updateFilterValue(option.key)"></lib-checkbox>
+                      </mat-list-item>
+                    </mat-list>
+                  </ng-container>
+  
+                  <!-- Date -->
+                  <ng-container *ngSwitchCase="FieldControlType.DATE">
+                    <div class="f-row system">
+                      <div class="f-col date-list">
+                        <mat-list>
+                          <mat-list-item *ngFor="let filterMetadata of DATE_FILTERS_METADATA"
+                            (click)="dateFilterSelected(filterMetadata)" class="cursor" [ngClass]="{activeList: selectedList?.toLowerCase() === filterMetadata?.label?.toLowerCase() }">
+                            <lib-text-line type="base"> {{ filterMetadata.label }}
+                            </lib-text-line>
+                            <span class="f-spacer"></span>
+                            <mat-icon fontSet="mdo-icons-light">long-arrow-right</mat-icon>
+                          </mat-list-item>
+                        </mat-list>
+                      </div>
+                      <div class="col-spacer"></div>
+                      <ng-container>
+                        <ng-container [ngSwitch]="activeFilter.unit">
+  
+                          <!-- static date -->
+                          <div class="f-col mdo-field date-list" *ngSwitchCase="'static_date'">  
+                            <lib-text-line class="field-label" weight="strong" type="xsmall" i18n="@@location">Choose a date</lib-text-line>
+                            <lib-date-picker class="date-picker" placeholder="Value" i18n-placeholder="@@value"
+                            [selectedDate]="getFilterValue(activeFilter)"
+                            (valueChange)="updateFilterValue($event)"></lib-date-picker>
+                          </div>
+  
+                          <!-- static date range -->
+                          <div class="f-col mdo-field date-list" *ngSwitchCase="'static_range'">
+                            <lib-text-line class="field-label" weight="strong" type="xsmall" i18n="@@location">Enter a date range</lib-text-line>
+                            <lib-date-range-picker class="date-picker" placeholder="Value" i18n-placeholder="@@value"
+                            libClickStopPropagation prosClickStopPropagation [selectedDate]="dateRangeValue"
+                            (valueChange)="updateFilterValue($event)"></lib-date-range-picker>
+                          </div>
+  
+                          <!-- Dynamic date range -->
+                          <div *ngSwitchDefault class="f-col date-list">
+                            <lib-radio-group layout="vertical" *ngIf="dateFilterOptions.length"
+                              [options]="dateFilterOptions" [value]="getFilterValue(activeFilter)"
+                              (valueChange)="updateFilterValue($event)">
+                            </lib-radio-group>
+                          </div>
+                        </ng-container>
+  
+                      </ng-container>
+                    </div>
+                  </ng-container>
+  
+                  <!-- Time -->
+                  <ng-container *ngSwitchCase="FieldControlType.TIME">
+                    <lib-tab-group disableRipple="true">
+                      <lib-tab i18n-label="@@start" label="Start">
+                        <div class="f-row">
+                          <lib-input type="number" minimum="0" maximum="23" #startHour
+                            [value]="getFilterValue(activeFilter).startHour"
+                            (valueChange)="timefilterChange($event, 'startHour')" class="lib-input">
+                          </lib-input>
+                          <span class="semicolon"> : </span>
+                          <lib-input type="number" minimum="0" maximum="59" #startMinutes
+                            [value]="getFilterValue(activeFilter).startMinutes"
+                            (valueChange)="timefilterChange($event, 'startMinutes')" class="lib-input">
+                          </lib-input>
+                          <span class="f-spacer"></span>
+                        </div>
+                      </lib-tab>
+                      <lib-tab i18n-label="@@end" label="End">
+                        <div class="f-row">
+                          <lib-input type="number" [minimum]="startHour.control.value" maximum="23" #endHour
+                            [value]="getFilterValue(activeFilter).endHour"
+                            (valueChange)="timefilterChange($event, 'endHour')" class="lib-input">
+                          </lib-input>
+                          <span class="semicolon"> : </span>
+                          <lib-input type="number"
+                            [minimum]="startHour.control.value === endHour.control.value ? startMinutes.control.value : 0"
+                            maximum="59" #endMinutes [value]="getFilterValue(activeFilter).endMinutes"
+                            (valueChange)="timefilterChange($event, 'endMinutes')" class="lib-input">
+                          </lib-input>
+                          <span class="f-spacer"></span>
+                        </div>
+                      </lib-tab>
+                    </lib-tab-group>
+                  </ng-container>
+  
+                  <!-- Default input text -->
+                  <lib-input *ngSwitchDefault i18n-placeholder="@@type_filter_value" placeholder="type filter value"
+                    [value]="getFilterValue(activeFilter)" (valueChange)="updateFilterValue($event)"></lib-input>
+                </ng-container>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

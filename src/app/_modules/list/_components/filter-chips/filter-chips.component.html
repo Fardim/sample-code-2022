@@ -1,0 +1,62 @@
+<div class="f-col root">
+    <span class="f-row-spacer-half"></span>
+    <div class="f-row filterchips-row">
+        <lib-search placeholder="Search"></lib-search>
+        <lib-chip-list>
+            <span class="f-col-spacer-half"></span>
+            <lib-chip label="Material number:" type="info" [matMenuTriggerFor]="selectOptions">ball</lib-chip>
+            <mat-menu #selectOptions="matMenu">
+                <div class="f-row">
+                    <lib-text-line type="base" weight="strong">Location</lib-text-line>
+                    <span class="f-spacer"></span>
+                    <lib-button type="type">
+                        <mat-icon fontSet="mdo-icons-solid">sliders-h</mat-icon>
+                    </lib-button>
+                </div>
+                <lib-search placeholder="Search"></lib-search>
+                <mat-list>
+                    <mat-list-item>
+                        <lib-checkbox label="Select all" labelPosition="after" theme="primary"></lib-checkbox>
+                    </mat-list-item>
+                    <lib-section></lib-section>
+                    <mat-list-item>
+                        <lib-checkbox label="Algeria" labelPosition="after" theme="primary"></lib-checkbox>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <lib-checkbox label="America" labelPosition="after" theme="primary"></lib-checkbox>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <lib-checkbox label="Austria" labelPosition="after" theme="primary"></lib-checkbox>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <lib-checkbox label="Brussels" labelPosition="after" theme="primary"></lib-checkbox>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <lib-checkbox label="France" labelPosition="after" theme="primary"></lib-checkbox>
+                    </mat-list-item>
+                    <mat-list-item>
+                        <lib-checkbox label="Germany" labelPosition="after" theme="primary"></lib-checkbox>
+                    </mat-list-item>
+                </mat-list>
+            </mat-menu>
+            <lib-chip removable="true">Binary filter</lib-chip>
+            <lib-chip icon="filter" libBadge="3"></lib-chip>
+            <lib-chip icon="ellipsis-h"></lib-chip>
+        </lib-chip-list>
+    </div>
+
+</div>
+
+<!-- <lib-filter-option>
+    Item One
+</lib-filter-option>
+<lib-filter-option>
+    Item Two
+</lib-filter-option>
+<lib-filter-option>
+    Item Three
+</lib-filter-option>
+<mat-divider></mat-divider>
+<lib-filter-option>
+    Item four
+</lib-filter-option> -->

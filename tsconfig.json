@@ -1,0 +1,44 @@
+/*
+  This is a "Solution Style" tsconfig.json file, and is used by editors and TypeScript’s language server to improve development experience.
+  It is not intended to be used to perform a compilation.
+
+  To learn more about this file see: https://angular.io/config/solution-tsconfig.
+*/
+{
+  "files": [],
+  "references": [
+    {
+      "path": "./src/tsconfig.app.json"
+    },
+    {
+      "path": "./src/tsconfig.spec.json"
+    }
+  ],  
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "declaration": false,
+    "module": "es2020", // changed from es2015 to esnext, to support module import
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es5",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2018",
+      "dom"
+    ],
+    "paths": {
+      "@modules/*": ["src/app/_modules/*"],
+      "@services/*": ["src/app/_services/*"],
+      "@models/*": ["src/app/_models/*"],
+      "@shared/*": ["src/app/_modules/shared/*"],
+      "@store/*": ["src/app/_store/*"],
+      "@constants/*": ["src/app/_constants/*"]
+    }
+  }
+}

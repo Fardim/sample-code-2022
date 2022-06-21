@@ -1,0 +1,356 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+       <lib-button type="plain" icon="times" (click)="close()" iconFontType="light"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row">
+                <lib-text-line type="leading">Applicable field values</lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button type="major" width="80px" (click)="save()">Save</lib-button>
+            </div>
+        </div>
+    </div>
+    <lib-banner *ngIf="validationError.status" status="error" [text]="validationError.message"></lib-banner>
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <div class="f-row filter-container">
+                <div class="f-col filter-fields-col" [ngClass]="{'hidden': hideSidebar}">
+                    <lib-search i18n-placeholder="@@search" placeholder="Search" (valueChange)="searchOption($event)">
+                    </lib-search>
+                    <div class="f-row-spacer-half"></div>
+                    <div class="filters-list">
+                        <lib-section class="lib-section" text="Defaults values"></lib-section>
+                        <ng-template [ngIf]="suggestedFilters.length > 0" [ngIfElse]="emptyTextTemplate">
+                            <div class="selected-filter">
+                                <mat-list role="list" class="mdo-list">
+                                    <mat-list-item class="f-row" *ngFor="let filter of suggestedFilters; let index=index"
+                                        (click)="setActiveFilter(filter)" [ngClass]="{'active': activeFilter?.fieldId == filter.fieldId}">
+                                        <lib-text-line type="leading" textColor="secondary">
+                                            <mat-icon fontSet="mdo-icons-light"> {{ getFieldIcon(filter) }} </mat-icon>
+                                        </lib-text-line>
+                                        <span class="f-col-spacer-half"></span>
+                                        <lib-text-line type="base" enableWrap="true" class="text-overflow" [innerHTML]="getFieldDescription(filter.fieldId)  | highlight: searchTearm">
+                                        </lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <span class="f-col-spacer-half"></span>
+                                        <lib-button type="plain" iconFontType="light" icon="times" prosClickStopPropagation
+                                            (click)="removeFilter(filter)"></lib-button>
+                                    </mat-list-item>
+                                </mat-list>
+                            </div>
+                        </ng-template>
+                        <ng-template #emptyTextTemplate>
+                            <lib-text-line [enableWrap]="true" type="base" class="no-data-text">No data found
+                            </lib-text-line>
+                        </ng-template>
+                        <lib-section class="lib-section" text="Form fields"></lib-section>
+                        <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+                            <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding matTreeNodePaddingIndent="24" (click)="applyFilter(node)" class="absolute-child">
+                                <lib-text-line type="leading" textColor="secondary">
+                                    <mat-icon fontSet="mdo-icons-light" class="tree-icon">{{ getFieldIcon(node) }}</mat-icon>
+                                </lib-text-line>
+                                <span class="f-col-spacer-half"></span>
+                                <lib-text-line type="base" enableWrap="true" class="text-overflow" [innerHTML]="node.name | highlight: searchTearm">{{ node.name }}</lib-text-line>
+                            </mat-tree-node>
+                            <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
+                                <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
+                                    <mat-icon class="mat-icon-rtl-mirror">
+                                        {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+                                    </mat-icon>
+                                </button>
+                                <div class="f-row node-parent" (click)="applyFilter(node)">
+                                    <ng-template [ngIf]="node.picklist == 15">
+                                        <lib-text-line type="leading" textColor="secondary">
+                                            <mat-icon fontSet="mdo-icons-light" class="tree-icon">{{ getFieldIcon(node) }}</mat-icon>
+                                        </lib-text-line>
+                                        <span class="f-col-spacer-half"></span>
+                                    </ng-template>
+                                    <lib-text-line type="base" enableWrap="true" class="text-overflow" [innerHTML]="node.name | highlight: searchTearm">{{ node.name }}</lib-text-line>
+                                </div>
+                            </mat-tree-node>
+                        </mat-tree>
+                    </div>
+                </div>
+                <div class="split-col" (click)="toggleSideBar()" [ngClass]="{'expanded': !hideSidebar}">
+                    <div class="split-arrow">
+                      <mat-icon fontSet="mdo-icons">{{ arrowIcon }}</mat-icon>
+                    </div>
+                </div>
+                <div class="col-spacer"></div>
+                <div class="f-col filter-values-col" [ngClass]="{'full-width': hideSidebar}">
+                    <ng-template [ngIf]="activeFilter">
+                        <lib-text-line type="leading"> {{ activeFilter.name }} </lib-text-line>
+                        <div class="f-row-spacer-half"></div>
+                        <pros-field-control [fieldObj]="activeFilter"
+                                (updateFilterObjValue)="updateFilterObjValue($event)"></pros-field-control>
+                    </ng-template>
+                </div>
+                <!-- 
+                    <ng-template [ngIf]="activeFilter">
+                        <div class="f-row">
+                            <lib-text-line type="base" weight="strong"> {{ getFieldDescription(activeFilter.fieldId) }}
+                            </lib-text-line>
+                            <span class="f-spacer"></span>
+                            <lib-button-group>
+                                <lib-button type="minor" width="80px" (click)="applyFilter()" i18n="@@apply">Apply
+                                </lib-button>
+                            </lib-button-group>
+                        </div>
+                        <div class="f-row-spacer-half"></div>
+                        <div class="f-col">
+                            <pros-list-filter-field-elements *ngIf="activeFilter" [showRuleToggled]="true"
+                                [moduleId]="moduleId" [rulelist]="rulelist" [filterList]="filtersList"
+                                [selectedCurrentFilter]="activeFilter" [moduleFieldsMetatdata]="moduleFieldsMetatdata"
+                                [filterFieldsMetadata]="filterFieldsMetadata"
+                                (valueChanged)="emitFilterValueChange($event)"></pros-list-filter-field-elements>
+                           </div>
+                    </ng-template>
+
+                    <ng-template>
+                        <div class="f-row">
+                            <lib-text-line type="base" weight="strong">Location</lib-text-line>
+                            <span class="f-spacer"></span>
+                            <lib-button type="type" libBadge="322" [matBadgeOverlap]="true">
+                                <mat-icon fontSet="mdo-icons-solid">sliders-h</mat-icon>
+                            </lib-button>
+                            <span class="f-col-spacer-half"></span>
+                            <lib-button-group>
+                                <lib-button type="major">Apply</lib-button>
+                                <lib-button type="major" icon="ellipsis-h"></lib-button>
+                            </lib-button-group>
+                        </div>
+                        <div class="f-row-spacer-half"></div>
+                        <div class="f-col">
+                            <lib-text-line type="base" weight="strong">Rule</lib-text-line>
+                            <lib-segment [optionsList]="rulelist" labelKey="label" valueKey="value"></lib-segment>
+
+                            <lib-section></lib-section>
+
+                            <lib-search placeholder="Search"></lib-search>
+                            <div class="row-spacer"></div>
+                            <div class="f-row">
+                                <span class="col-spacer"></span>
+                                <lib-slide-toggle label="Show selected" labelPosition="after" theme="primary">
+                                </lib-slide-toggle>
+                            </div>
+                            <div class="row-spacer"></div>
+                            <mat-list>
+                                <mat-list-item>
+                                    <lib-checkbox label="Select all" labelPosition="after" theme="primary">
+                                    </lib-checkbox>
+                                </mat-list-item>
+                                <ng-template>
+                                    <div class="f-row">
+                                        <span class="col-spacer"></span>
+                                        <lib-button type="plain" iconFontType="solid" icon="times"></lib-button>
+                                        <span class="f-col-spacer-half"></span>
+                                        <lib-text-line type="base">Remove all</lib-text-line>
+                                    </div>
+                                </ng-template>
+                                <lib-section></lib-section>
+                                <mat-list-item>
+                                    <lib-checkbox label="Algeria" labelPosition="after" theme="primary"></lib-checkbox>
+                                </mat-list-item>
+                                <mat-list-item>
+                                    <lib-checkbox label="America" labelPosition="after" theme="primary"></lib-checkbox>
+                                </mat-list-item>
+                                <mat-list-item>
+                                    <lib-checkbox label="Austria" labelPosition="after" theme="primary"></lib-checkbox>
+                                </mat-list-item>
+                                <mat-list-item>
+                                    <lib-checkbox label="Brussels" labelPosition="after" theme="primary"></lib-checkbox>
+                                </mat-list-item>
+                                <mat-list-item>
+                                    <lib-checkbox label="France" labelPosition="after" theme="primary"></lib-checkbox>
+                                </mat-list-item>
+                                <mat-list-item>
+                                    <lib-checkbox label="Germany" labelPosition="after" theme="primary"></lib-checkbox>
+                                </mat-list-item>
+                            </mat-list>
+                        </div>
+                    </ng-template>
+
+                    <ng-template>
+                        <div class="f-row">
+                            <lib-text-line type="base" weight="strong">Approved date</lib-text-line>
+                            <span class="f-spacer"></span>
+                            <lib-button type="type">
+                                <mat-icon fontSet="mdo-icons-solid">sliders-h</mat-icon>
+                            </lib-button>
+                            <span class="f-col-spacer-half"></span>
+                            <lib-button-group>
+                                <lib-button type="major">Apply</lib-button>
+                                <lib-button type="major" icon="ellipsis-h"></lib-button>
+                            </lib-button-group>
+                        </div>
+                        <div class="f-row-spacer-half"></div>
+                        <div class="f-row system">
+                            <div class="f-col date-list">
+                                <mat-list>
+                                    <mat-list-item>
+                                        <lib-text-line type="base">Day</lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <mat-icon fontSet="mdo-icons-solid">long-arrow-alt-right</mat-icon>
+                                    </mat-list-item>
+                                    <mat-list-item>
+                                        <lib-text-line type="base">Week</lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <mat-icon fontSet="mdo-icons-solid">long-arrow-alt-right</mat-icon>
+                                    </mat-list-item>
+                                    <mat-list-item>
+                                        <lib-text-line type="base">Month</lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <mat-icon fontSet="mdo-icons-solid">long-arrow-alt-right</mat-icon>
+                                    </mat-list-item>
+                                    <mat-list-item>
+                                        <lib-text-line type="base">Quarter</lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <mat-icon fontSet="mdo-icons-solid">long-arrow-alt-right</mat-icon>
+                                    </mat-list-item>
+                                    <mat-list-item>
+                                        <lib-text-line type="base">Year</lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <mat-icon fontSet="mdo-icons-solid">long-arrow-alt-right</mat-icon>
+                                    </mat-list-item>
+                                    <mat-list-item>
+                                        <lib-text-line type="base">Specific date </lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <mat-icon fontSet="mdo-icons-solid">long-arrow-alt-right</mat-icon>
+                                    </mat-list-item>
+                                    <mat-list-item>
+                                        <lib-text-line type="base">Date range</lib-text-line>
+                                        <span class="f-spacer"></span>
+                                        <mat-icon fontSet="mdo-icons-solid">long-arrow-alt-right</mat-icon>
+                                    </mat-list-item>
+
+                                </mat-list>
+                            </div>
+                            <div class="col-spacer"></div>
+                            <div class="f-col date-list">
+                                <lib-radio-group [options]="options" layout="vertical"></lib-radio-group>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <ng-template>
+                        <div class="f-row">
+                            <lib-text-line type="base" weight="strong">Period</lib-text-line>
+                            <span class="f-spacer"></span>
+                            <span class="f-col-spacer-half"></span>
+                            <lib-button type="minor">Save</lib-button>
+                        </div>
+                        <div class="f-row-spacer-half"></div>
+                        <div class="f-row system">
+                            <div class="f-col date-list">
+                                <lib-radio-group [options]="periods" layout="vertical"></lib-radio-group>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <ng-template>
+                        <div class="f-row">
+                            <lib-text-line type="base" weight="strong">Range</lib-text-line>
+                            <span class="f-spacer"></span>
+                            <lib-button type="type">
+                                <mat-icon fontSet="mdo-icons-solid">sliders-h</mat-icon>
+                            </lib-button>
+                            <span class="f-col-spacer-half"></span>
+                            <lib-button type="minor">Save</lib-button>
+                        </div>
+                        <div class="f-row-spacer-half"></div>
+                        <div class="f-row system">
+                            <div class="f-col date-list">
+                                <lib-input></lib-input>
+                                <lib-range-slider value="12"></lib-range-slider>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <ng-template>
+                        <div class="f-col system-values-col">
+                            <div class="f-row">
+                                <lib-input placeholder="Select range"></lib-input>
+                                <mat-menu #selectOptions="matMenu">
+                                    <div class="f-col">
+                                        <div class="f-row">
+                                            <lib-text-line type="base">Rule</lib-text-line>
+                                            <span class="f-spacer"></span>
+                                            <lib-button type="plain" iconFontType="solid" icon="sliders-h"></lib-button>
+                                        </div>
+                                        <div class="f-row">
+                                            <lib-search placeholder="Search"></lib-search>
+                                        </div>
+                                    </div>
+                                    <mat-list>
+                                        <mat-list-item>
+                                            <lib-checkbox label="Algeria" labelPosition="after" theme="primary">
+                                            </lib-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <lib-checkbox label="America" labelPosition="after" theme="primary">
+                                            </lib-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <lib-checkbox label="Austria" labelPosition="after" theme="primary">
+                                            </lib-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <lib-checkbox label="Brussels" labelPosition="after" theme="primary">
+                                            </lib-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <lib-checkbox label="France" labelPosition="after" theme="primary">
+                                            </lib-checkbox>
+                                        </mat-list-item>
+                                        <mat-list-item>
+                                            <lib-checkbox label="Germany" labelPosition="after" theme="primary">
+                                            </lib-checkbox>
+                                        </mat-list-item>
+                                    </mat-list>
+                                </mat-menu>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <ng-template>
+                        <div class="f-col system-values-col">
+                            <div class="f-row">
+                                <div class="f-col mdo-field">
+                                    <lib-text-line class="field-label" type="xsmall" weight="strong">Single-select
+                                    </lib-text-line>
+                                    <div class="mdo-field-input">
+                                        {{selected}}
+                                        <input matInput placeholder="Type to search" #optionInput2
+                                            [formControl]="optionCtrl2" [matAutocomplete]="auto2" />
+                                        <mat-icon matSuffix fontSet="mdo-icons">angle-down</mat-icon>
+
+                                        <mat-autocomplete class="mdo-autocomplete" #auto2="matAutocomplete"
+                                            (optionSelected)="selectSingle($event)">
+                                            <mat-option class="mdo-option" *ngFor="let opt of filteredOptions | async"
+                                                [value]="opt">
+                                                {{opt}}
+                                            </mat-option>
+                                        </mat-autocomplete>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <ng-template>
+                        <div class="f-col system-values-col">
+                            <div class="f-row">
+                                <lib-textarea label="Single-select"></lib-textarea>
+                            </div>
+                        </div>
+                    </ng-template>
+                </div> -->
+            </div>
+        </div>
+    </div>
+    <ng-template #emptyStateTemplate>
+        <lib-empty-state primaryText="No data found" icon="table">
+        </lib-empty-state>
+    </ng-template>
+</div>

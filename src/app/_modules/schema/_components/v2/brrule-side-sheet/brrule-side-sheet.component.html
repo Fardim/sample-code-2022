@@ -1,0 +1,839 @@
+<div class="root" [class.cross-dataset-rule]="crossDatasetRule">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div [hidden]="isFormLoading" [class.f-col]="!isFormLoading" class="mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading" i18n="@@new_br_rule">{{ isOnlyForTrans ? 'Transformation rule' :
+                    selectedRuleDesc || 'New business rule'}}</lib-text-line>
+                <span class="f-col-spacer-half"></span>
+                <span class="f-spacer"></span>
+                <lib-button type="major" width="80px" i18n="@@save" (afterClick)="saveRuleData();$event.stopPropagation()" [disabled]="disableSaveForClassificationAndAutoExtension ||  (currentWeightage !== 100 && isDuplicateRule)">Save</lib-button>
+            </div>
+        </div>
+        <div *ngIf="isFormLoading" class="f-row skeleton-loading">
+            <div>
+                <lib-skeleton type="line-half"></lib-skeleton>
+            </div>
+            <span class="f-spacer"></span>
+            <lib-skeleton type="button"></lib-skeleton>
+        </div>
+    </div>
+    <div *ngIf="isFormLoading" class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <div class="f-col mdo-form-field" *ngFor="let a of [].constructor(5)">
+                <lib-skeleton type="line"></lib-skeleton>
+                <lib-skeleton type="line"></lib-skeleton>
+                <lib-skeleton type="line-half"></lib-skeleton>
+            </div>
+        </div>
+    </div>
+
+    <div [hidden]="isFormLoading" class="f-col sidesheetcontent-listing" (scroll)="onScroll($event)" prosInfiniteScroll (scrollEnd)="scrollEnd()">
+        <div class="f-col mdo-justify">
+
+            <lib-banner *ngIf="validationError.status" status="error" [text]="validationError.message"></lib-banner>
+            <lib-banner *ngIf="tableConditionError.length" status="error" [text]="tableConditionError"></lib-banner>
+            <form [formGroup]="form">
+                <div *ngIf="!selectedRuleDesc && !isOnlyForTrans" class="f-col mdo-field">
+                    <lib-text-line type="xsmall" class="field-label" weight="strong" i18n="@@rule_type">Rule type<span
+                            class="mandatory">*</span></lib-text-line>
+                    <!-- input container -->
+                    <div class="mdo-field-input">
+                        <input matInput [(ngModel)]="searchRuleTypeStr" formControlName="rule_type"
+                            i18n-placeholder="@@rule_type" placeholder="Rule type" [matAutocomplete]="ruleTypeAuto" />
+                        <mat-autocomplete class="mdo-autocomplete" [displayWith]="displayRuleFn.bind(this)"
+                            #ruleTypeAuto="matAutocomplete" (optionSelected)="selectSingle(form, 'rule_type', $event)">
+                            <mat-option class="mdo-option" *ngIf="!businessRuleTypesFiltered.length" disabled>
+                                Result not found
+                            </mat-option>
+                            <ng-container *ngFor="let rule of businessRuleTypesFiltered">
+                                <mat-option class="mdo-option" *ngIf="rule.isImplemented" [value]="rule.ruleType">
+                                    {{rule.ruleDesc}}
+                                </mat-option>
+                            </ng-container>
+                        </mat-autocomplete>
+                    </div>
+                </div>
+
+                <div class="f-col"
+                    *ngIf="!isDuplicateType && !isDRTieBreaker && !isOnlyForTrans && !classificationRule && !isTransformationRule && !isAutoExtensionRule && !crossDatasetRule && !notificationRule">
+                    <lib-text-line type="xsmall" class="field-label" weight="strong" i18n="@@weightage">Weightage <mat-icon fontSet="mdo-icons-light" i18n-libTooltip="@@weightage_tooltip"
+                            libTooltip="
+                        Allocate weightage to the Business Rule to determine a successful validation of data. eg. 100% weightage means data in specified fields must exactly meet criteria or error message will display">
+                            question-circle</mat-icon><span class="mandatory">*</span></lib-text-line>
+
+                    <div class="f-row slider-row">
+                        <lib-range-slider class="lib-slider" formControlName="weightage" tickInterval="1" minValue="0"
+                            [formatLabelFn]="rangeSliderLabelFormat" [value]="form.controls.weightage.value"
+                            [maxValue]="currentweightageValue" color="primary"></lib-range-slider>
+                        &nbsp;
+                        <lib-text-line type="base" class="percentage">{{form.controls.weightage.value}}%
+                        </lib-text-line>
+                    </div>
+                    <mat-error i18n="@@weightage_missing_msg"
+                        *ngIf="submitted && form.controls.weightage.errors && form.controls.weightage.errors.required">
+                        <lib-text-line type="small">Please enter weightage</lib-text-line>
+                    </mat-error>
+                </div>
+
+                <div class="f-col" *ngIf="isMPNI && !isTransformationRule">
+                    <lib-text-line type="xsmall" class="field-label" weight="strong" i18n="@@accuracy_score">Accuracy
+                        score<mat-icon fontSet="mdo-icons-light" i18n-libTooltip="@@accuracy_tooltip"
+                            libTooltip="The accuracy score of the matched text">question-circle </mat-icon><span
+                            class="mandatory">*</span></lib-text-line>
+
+                    <div class="f-row slider-row">
+                        <lib-range-slider class="lib-slider" formControlName="accuracyScore" tickInterval="1"
+                            minValue="0" [formatLabelFn]="rangeSliderLabelFormat"
+                            [value]="form.controls.accuracyScore.value" [maxValue]="100" color="primary">
+                        </lib-range-slider>
+                        &nbsp;
+                        <lib-text-line type="base" class="percentage">{{form.controls.accuracyScore.value}}%
+                        </lib-text-line>
+                    </div>
+                    <mat-error i18n="@@accuracy_score_missing_msg"
+                        *ngIf="submitted && form.controls.accuracyScore.errors && form.controls.accuracyScore.errors.required">
+                        <lib-text-line type="small">Please enter accuracy score</lib-text-line>
+                    </mat-error>
+                </div>
+
+                <div class="f-col"
+                    [class.has-error]="submitted && (form.controls.categoryId.errors?.required || !form.controls.categoryId?.value)"
+                    *ngIf="categoryList?.length>0 && !isDuplicateType && !isUDR && !isWebServiceCall && !classificationRule && !isTransformationRule && !isAutoExtensionRule && !crossDatasetRule && !isLookupRule && !notificationRule">
+                    <lib-text-line
+                        [textColor]="submitted && (form.controls.categoryId.errors?.required || !form.controls.categoryId?.value) ? 'error' : 'default'"
+                        type="xsmall" weight="strong" class="field-label">
+                        <span i18n="@@category">Category</span>
+                        <mat-icon fontSet="mdo-icons-light"
+                            libTooltip="Select the Category for the rule">question-circle</mat-icon>
+                        <span class="mandatory">*</span>
+                    </lib-text-line>
+                    <pros-select formControlName="categoryId" label=""
+                        error="Please select category"
+                        [hasError]="submitted && (form.controls.categoryId.errors?.required || !form.controls.categoryId?.value)"
+                        [isRequired]="true" [availableOptions]="categoryList" labelKey="categoryDesc"
+                        valueKey="categoryId">
+                    </pros-select>
+                </div>
+
+                <div class="f-col" *ngIf="!isAutoExtensionRule">
+                    <lib-input [isRequired]="true" label="Rule name{{isWebServiceCall ? '' : ' (Description)'}}"
+                        placeholder="Type field name to add"
+                        [formControl]="form.controls['rule_name']"
+                        [hint]="submitted && form.controls.rule_name.errors && form.controls.rule_name.errors.required ? 'Please enter Rule name' : ''"
+                        [hasError]="submitted && form.controls.rule_name.errors && form.controls.rule_name.errors.required">
+                    </lib-input>
+                </div>
+
+                <pros-daxe-input *ngIf="!isDuplicateType && !isDRChildRule && isDaxeRule" [moduleId]="moduleId"></pros-daxe-input>
+
+                <ng-container *ngIf="isAutoExtensionRule">
+                    <form [formGroup]='autoExtensionFormGroup'>
+                        <pros-auto-extension-rule formControlName="autoExeInfo" [moduleId]="moduleId"></pros-auto-extension-rule>
+                    </form>
+                </ng-container>
+
+                <ng-container *ngIf="crossDatasetRule">
+                    <form [formGroup]='crossDatasetFormGroup'>
+                        <pros-cross-dataset-rule-input formControlName="crossDatasetId" [moduleId]="moduleId"></pros-cross-dataset-rule-input>
+                    </form>
+                </ng-container>
+
+                <ng-container *ngIf="notificationRule">
+                    <form [formGroup]="notificationRuleFormGroup">
+                        <pros-notification-rule [moduleId]="moduleId" formControlName="notificationInfo" [sourceFieldsObject]="sourceFieldsObject"></pros-notification-rule>
+                    </form>
+                </ng-container>
+
+                <div class="f-col mdo-field"
+                    *ngIf="form.controls.rule_type.value === 'MRO_GSN_DESC_MATCH' || form.controls.rule_type.value === 'MRO_MANU_PRT_NUM_LOOKUP' || form.controls.rule_type.value === 'MRO_MANU_PRT_NUM_IDENTI'">
+                    <lib-text-line
+                        [textColor]="submitted && form.controls.apiKey.errors && form.controls.apiKey.errors.required? 'error': ''"
+                        class="field-label" type="xsmall" weight="strong" i18n="@@enter_access_token">Enter
+                        access token<mat-icon class="mat-icon" fontSet="mdo-icons-light"
+                            i18n-libTooltip="@@access_token_tooltip"
+                            [libTooltip]="'Please enter your spare part library access token. If you do not have access to our spare part library, please contact sales@prospecta.com for more information.'">
+                            question-circle</mat-icon>
+                        <span class="mandatory">*</span>
+                    </lib-text-line>
+                    <pros-form-input helpIcon="question-circle" [control]="formField('apiKey')"
+                        [value]="coreSchemaBrInfo?.apiKey">
+                    </pros-form-input>
+                    <mat-error *ngIf="submitted && form.controls.apiKey.errors && form.controls.apiKey.errors.required"
+                        i18n="@@access_token_msg">
+                        <lib-text-line type="small">Please enter access token</lib-text-line>
+                    </mat-error>
+                </div>
+
+                <div class="f-col" *ngIf="isTransformationRule">
+                      <lib-text-line
+                        [textColor]="submitted && form.controls.transformationRuleType.errors && form.controls.transformationRuleType.errors.required? 'error': ''"
+                        class="field-label" type="xsmall" weight="strong" i18n="@@enter_access_token">Transformation type<span class="mandatory">*</span>
+                    </lib-text-line>
+                    <pros-select  formControlName="transformationRuleType" label=""
+                        error="Please transformation type"
+                        [hasError]="submitted && (form.controls.transformationRuleType.errors?.required || !form.controls.transformationRuleType?.value)"
+                        [isRequired]="true" [availableOptions]="transRuleTypeList" labelKey="value"
+                        valueKey="key" (selectionChange)="onSelectingTransformationRule($event)">
+                    </pros-select>
+                </div>
+                <ng-template [ngIf]="isTransformationRule && selectedTransformationType === transformationType.DATE">
+                    <div class="f-col">
+                        <pros-option-filter [availableOptions]="sourceFieldsObject.list" (selectionChange)="setDateTargetField($event)" [value]="transInfo?.date?.fldId" class="w-100" placeholder="Field name">
+                        </pros-option-filter>
+                    </div>
+
+                    <div class="f-col">
+                        <pros-date-format-dropdown formControlName="date" [labelKey]="'label'" [valueKey]="'value'"></pros-date-format-dropdown>
+                    </div>
+                </ng-template>
+
+                <pros-constant-rule [selectedRuleType]="currentSelectedRule" [selectedRuleData]="transInfo.constant"
+                    [sourceFieldsObject]="sourceFieldsObject" (constantRuleOutput)="setConstantRuleData($event)"
+                    [submitted]="submitted"
+                    [isNewModule]="!moduleId"
+                    (updateFldList)="updateUDRFldList($event)"
+                    [initialSrcList]="initialFieldList"
+                    [targetListMetaData]="parentMetadata"
+                    [moduleId]="moduleId"
+                    *ngIf="isTransformationRule && selectedTransformationType === transformationType.CONSTANT">
+                </pros-constant-rule>
+
+                <pros-zero-rule  [selectedRuleType]="currentSelectedRule" [selectedRuleData]="transInfo.zero" [sourceFieldsObject]="sourceFieldsObject"
+                    [isAppliedNewRuleForMapping]="mappingRule?.isAppliedNewRuleForMapping"
+                    *ngIf="isTransformationRule && selectedTransformationType === transformationType.ZERO"  (zeroRuleOutput)="setZeroRuleData($event)">
+                </pros-zero-rule>
+                <pros-empty-space-rule [selectedRuleType]="currentSelectedRule" [selectedRuleData]="transInfo.empty_space" [sourceFieldsObject]="sourceFieldsObject"
+                    [isAppliedNewRuleForMapping]="mappingRule?.isAppliedNewRuleForMapping"
+                    *ngIf="isTransformationRule && selectedTransformationType === transformationType.EMPTY" (emptySpaceRuleOutput)="setEmptySpaceRuleData($event)"></pros-empty-space-rule>
+
+                <pros-lookup-dataset-rule [operatorsList]="operators" [moduleId]="moduleId"
+                    [parentMetadata]="parentMetadata" [parentFieldsList]="fieldsList" 
+                    (saveRule)="setLookupRuleData($event)" [checkValidation]="saveRule" [existingData]="coreSchemaBrInfo"
+                    [selectedFields]="selectedFields" [isDRChild]="isDRChildRule"  *ngIf="(isTransformationRule && selectedTransformationType === transformationType.LOOKUP) || isLookupRule"></pros-lookup-dataset-rule>
+
+                <pros-transformation-rule
+                    *ngIf="isTransformationRule && selectedTransformationType === transformationType.REGEX"
+                    [selectedRuleType]="currentSelectedRule" [targetFieldsObject]="targetFieldsObject"
+                    [sourceFieldsObject]="sourceFieldsObject" [submitted]="submitted"
+                    [initialTransformationData]="transformationData"
+                    (transformationFormOutput)="setTransformationFormData($event)">
+                </pros-transformation-rule>
+
+                <div *ngIf="form.get('rule_type').value === 'BR_API_RULE'" class="f-col mdo-field"
+                    [class.has-error]="submitted && !form.get('apiSno').value">
+                    <lib-text-line type="xsmall" class="field-label" weight="strong"
+                        [textColor]="submitted && !form.get('apiSno').value ? 'error': ''">Custom validation<mat-icon
+                        fontSet="mdo-icons-light" i18n-libTooltip="@@custom_validation_tooltip"
+                            libTooltip="Select the validation to be applied">question-circle</mat-icon><span
+                            class="mandatory">*</span></lib-text-line>
+
+                    <div class="mdo-field-input">
+                        <input matInput formControlName="apiSno" (keyup)="searchApisRules($event.target.value)"
+                            placeholder="Type to search" [matAutocomplete]="apiRuleCustomValidation" />
+                        <mat-autocomplete class="mdo-autocomplete" [displayWith]="displayApisRuleFn.bind(this)"
+                            #apiRuleCustomValidation="matAutocomplete"
+                            (optionSelected)="selectSingle(form, 'apiSno', $event)">
+                            <mat-option class="mdo-option" *ngIf="!apiRules.length" disabled>
+                                Result not found
+                            </mat-option>
+                            <ng-container *ngFor="let aRule of apiRules">
+                                <mat-option class="mdo-option" [value]="aRule.sno">
+                                    {{aRule.description ? aRule.description : 'Unknown'}}
+                                </mat-option>
+                            </ng-container>
+                        </mat-autocomplete>
+
+                    </div>
+                    <mat-error i18n="@@fields_missing_msg" *ngIf="submitted && !form.get('apiSno').value">
+                        <lib-text-line type="small">Please select the fields</lib-text-line>
+                    </mat-error>
+                </div>
+
+                <pros-blocks-hierarchy
+                    *ngIf="isUDR && udrNodeForm"
+                    [blocksGrp]="udrNodeForm"
+                    [operatorsList]="operators"
+                    [submitted]="submitted"
+                    [sourceList]="fieldListFiltered"
+                    [blocksList]="udrBlockList"
+                    [showRegex]="true"  
+                    [isNewModule]="!moduleId"
+                    (updateFldList)="updateUDRFldList($event)"
+                    [initialSrcList]="initialFieldList"
+                    [targetListMetaData]="parentMetadata"
+                    [moduleId]="moduleId"
+                ></pros-blocks-hierarchy>
+
+                <div class="f-col mdo-field" [class.has-error]="submitted && !selectedFields.length"
+                    *ngIf="!isDuplicateType && !isTransformationRule && !isMPNI && !isWebServiceCall && !classificationRule && !isDaxeRule  && !isAutoExtensionRule && !crossDatasetRule && !notificationRule">
+                    <lib-text-line [textColor]="submitted && !selectedFields.length ? 'error' : 'default'"
+                        class="field-label" type="xsmall" weight="strong">
+                        <div class="f-row">
+                          <span *ngIf=" isLookupRule || isUDR">Select field(s) to display the error message</span>
+                          <span  *ngIf="!(isLookupRule || isUDR)">Fields</span>
+                          <mat-icon *ngIf="fieldsTooltip" fontSet="mdo-icons-light"
+                          [libTooltip]="fieldsTooltip">question-circle</mat-icon><span class="mandatory">*</span>
+                        </div>
+                        
+                        
+                    </lib-text-line>
+                    <mat-form-field appearance="outline">
+                        <mat-chip-list class="f-row field-chip-list" #chipList1>
+                            <lib-chip *ngFor="let field of selectedFields;let i = index" [removable]="true"
+                                class="lib-chip" (removed)="remove(field,i)">
+                                {{field.fieldDescri}}
+                            </lib-chip>
+                            <input matInput id="fieldsInput" #fieldsInput class="mat-input" [matAutocomplete]="auto"
+                                formControlName="fields" [matChipInputFor]="chipList1"
+                                [matChipInputSeparatorKeyCodes]="separatorKeysCodes">
+                        </mat-chip-list>
+                        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectField($event)"
+                            [displayWith]="displayFn.bind(this)">
+                            <mat-option class="mat-result-option" *ngFor="let fieldItem of filteredModules | async"
+                                [disabled]="!fieldItem.fieldId" [value]="fieldItem.fieldId">
+                                {{fieldItem.fieldDescri}}
+                            </mat-option>
+                            <mat-option class="mat-result-option no-result" *ngIf="!(dataSource?.data?.length)" disabled>
+                                Result not found
+                            </mat-option>
+                            <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" #tree>
+                                <!-- This is the tree node template for leaf nodes -->
+                                <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding class="cursor"
+                                    (click)="clickTreeNode(node)">
+                                    <!-- use a disabled button to provide padding for tree leaf -->
+                                    <lib-button disabled="true"></lib-button>
+                                    {{node.name}}
+                                </mat-tree-node>
+                                <!-- This is the tree node template for expandable nodes -->
+                                <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
+                                    <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
+                                        <mat-icon class="mat-icon-rtl-mirror">
+                                            {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                                        </mat-icon>
+                                    </button>
+                                    {{node.name}}
+                                </mat-tree-node>
+                            </mat-tree>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                    <mat-error i18n="@@fields_missing_msg" *ngIf="submitted && !selectedFields.length">
+                        <lib-text-line type="small">Please select the fields</lib-text-line>
+                    </mat-error>
+                </div>
+
+                <div class="f-col mdo-field" *ngIf="isMPNI">
+                    <lib-text-line class="field-label" type="xsmall" weight="strong"><span i18n="@@source_field">Source
+                            field</span>
+                        <mat-icon fontSet="mdo-icons-light" i18n-libTooltip="@@source_field_tooltip"
+                            libTooltip="Select the field to extract the manufacturer part number">question-circle
+                        </mat-icon>
+                        <span class="mandatory">*</span>
+                    </lib-text-line>
+
+                    <div class="mdo-field-input">
+                        <input matInput [formControl]="formField('sourceFieldSearchStr')"
+                            i18n-placeholder="@@source_field" placeholder="Source field"
+                            [matAutocomplete]="sourceFieldAuto" />
+                        <mat-autocomplete class="mdo-autocomplete" [displayWith]="displaySourceFieldFn.bind(this)"
+                            #sourceFieldAuto="matAutocomplete"
+                            (optionSelected)="selectSingle(form, 'source_field', $event)">
+                            <ng-container *ngFor="let field of sourceFieldsFiltered">
+                                <mat-option class="mdo-option" [value]="field[sourceFieldsObject.valueKey]">
+                                    {{field[sourceFieldsObject.labelKey]}}
+                                </mat-option>
+                            </ng-container>
+                        </mat-autocomplete>
+                    </div>
+                    <mat-error
+                        *ngIf="submitted && form.controls.source_field.errors && form.controls.source_field.errors.required"
+                        i18n="@@source_field_missing">
+                        <lib-text-line type="small">Please select the source field</lib-text-line>
+                    </mat-error>
+                </div>
+
+                <div class="f-col mdo-field" [class.has-error]="submitted && !selectedTargetFields.length"
+                    *ngIf="isMPNI">
+                    <lib-text-line class="field-label" type="xsmall" weight="strong"><span i18n="@@target_fields">Target
+                            fields</span>
+                        <mat-icon fontSet="mdo-icons-light"  i18n-libTooltip="@@target_fields_tooltip"
+                            libTooltip="Select the field(s) to insert the manufacturer part number">question-circle
+                        </mat-icon>
+                        <span class="mandatory">*</span>
+                    </lib-text-line>
+                    <mat-form-field appearance="outline">
+                        <mat-chip-list class="f-row field-chip-list" #chipList>
+                            <lib-chip *ngFor="let field of selectedTargetFields;let i = index" [removable]="true"
+                                (removed)="removeTargetField(field,i)" class="lib-chip">
+                                {{field.fieldDescri}}</lib-chip>
+                            <input matInput id="targetFieldsInput" #targetFieldsInput class="mat-input"
+                                [matAutocomplete]="auto" formControlName="target_field"
+                                [matChipInputSeparatorKeyCodes]="separatorKeysCodes">
+                        </mat-chip-list>
+                        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectTargetField($event)"
+                            [displayWith]="displayFn.bind(this)">
+                            <mat-option *ngFor="let fieldItem of targetFilteredModules | async"
+                                [disabled]="!fieldItem.fieldId" [value]="fieldItem.fieldId">
+                                {{fieldItem.fieldDescri}}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                    <mat-error i18n="@@fields_missing_msg" *ngIf="submitted && !selectedTargetFields.length">
+                        <lib-text-line type="small">Please select the fields</lib-text-line>
+                    </mat-error>
+                </div>
+
+                <div class="f-col mdo-field" *ngIf="isRegexType">
+                    <lib-text-line class="field-label" type="xsmall" weight="strong"><span
+                            i18n="@@standard_function">Standard function</span>
+                        <mat-icon fontSet="mdo-icons-light"  i18n-libTooltip="@@standard_function_tooltip"
+                            libTooltip="Select the standard function of the field">question-circle</mat-icon>
+                    </lib-text-line>
+                    <div class="mdo-field-input">
+                        <input matInput [(ngModel)]="searchRegexFunctionStr" [ngModelOptions]="{standalone: true}"
+                            i18n-placeholder="@@standard_function" placeholder="Standard function"
+                            [matAutocomplete]="regexNameAuto" />
+                        <mat-autocomplete class="mdo-autocomplete" [displayWith]="displayRegexFn.bind(this)"
+                            #regexNameAuto="matAutocomplete"
+                            (optionSelected)="selectSingle(form, 'standard_function', $event)">
+                            <ng-container *ngFor="let regex of preDefinedRegexFiltered">
+                                <mat-option class="mdo-option" [value]="regex.FUNC_TYPE">
+                                    {{regex.FUNC_NAME}}
+                                </mat-option>
+                            </ng-container>
+                        </mat-autocomplete>
+                    </div>
+                    <mat-error
+                        *ngIf="submitted && form.controls.standard_function.errors && form.controls.standard_function.errors.required"
+                        i18n="@@standard_fn_missing">
+                        <lib-text-line type="small">Please select the standard function</lib-text-line>
+                    </mat-error>
+                </div>
+
+                <div class="f-col" *ngIf="isRegexType">
+                    <lib-text-line
+                        [textColor]="submitted && form.controls.regex.errors && form.controls.regex.errors.required ? 'error' : 'default'"
+                        type="xsmall" weight="strong" class="field-label">
+                        <span i18n="@@regex_value">Regex value</span>
+                        <mat-icon fontSet="mdo-icons-light"  i18n-libTooltip="@@regexval_tooltip"
+                            libTooltip="Enter the value for the function selected">question-circle</mat-icon>
+                    </lib-text-line>
+                    <lib-input formControlName="regex" [isRequired]="true"
+                        [hint]="submitted && form.controls.regex.errors && form.controls.regex.errors.required ? 'Please enter regex' : ''"
+                        [hasError]="submitted && form.controls.regex.errors && form.controls.regex.errors.required">
+                    </lib-input>
+                </div>
+                <ng-container *ngIf="isWebServiceCall">
+                    <pros-setup-web-service-call [submitted]="submitted" [coreSchemaBrInfo]="coreSchemaBrInfo"
+                        (formChange)="setupWebServiceCallFormRef($event)"></pros-setup-web-service-call>
+                </ng-container>
+                <div class="f-col" *ngIf="!isDRChildRule && !isDuplicateType && !isUDR &&   !classificationRule && !isDaxeRule && !isTransformationRule  && !isAutoExtensionRule && !crossDatasetRule && !notificationRule">
+                    <lib-text-line
+                        [textColor]="submitted && form.controls.error_message.errors?.required ? 'error' : 'default'"
+                        type="xsmall" weight="strong" class="field-label">
+                        <span i18n="@@error_message">Error message</span>
+                        <mat-icon fontSet="mdo-icons-light"  i18n-libTooltip="@@errormsg_tooltip"
+                            libTooltip="Enter the error message to display if rule is not met">question-circle
+                        </mat-icon>
+                        <span class="mandatory">*</span>
+                    </lib-text-line>
+                    <lib-input formControlName="error_message"
+                        [hint]="submitted && form.controls.error_message.errors && form.controls.error_message.errors.required ? 'Please enter Error message' : ''"
+                        [hasError]="submitted && form.controls.error_message.errors && form.controls.error_message.errors.required">
+                    </lib-input>
+                </div>
+            </form>
+
+            <div *ngIf="isUDR && !isDRChildRule" class="f-col">
+                <lib-text-line
+                    [textColor]="submitted && form.controls.error_message.errors?.required ? 'error' : 'default'"
+                    type="xsmall" weight="strong" class="field-label">
+                    <span i18n="@@error_message">Error message</span>
+                    <mat-icon fontSet="mdo-icons-light"  i18n-libTooltip="@@errormsg_tooltip"
+                        libTooltip="Enter the error message to display if rule is not met">question-circle</mat-icon>
+                    <span class="mandatory">*</span>
+                </lib-text-line>
+                <lib-input [formControl]="formField('error_message')"
+                    [hint]="submitted && form.controls.error_message.errors && form.controls.error_message.errors.required ? 'Please enter Error message' : ''"
+                    [hasError]="submitted && form.controls.error_message.errors && form.controls.error_message.errors.required">
+                </lib-input>
+            </div>
+
+            <!-- Duplicate Rule form group  -->
+            <ng-container *ngIf="isDuplicateType">
+                <pros-setup-duplicate-rule [brId]="brId" [schemaId]="schemaId" [moduleId]="moduleId"
+                    [coreSchemaBrInfo]="coreSchemaBrInfo" [duplicateFields]="fieldsList" [submitted]="submitted"
+                    [metataData]="parentMetadata"
+                    (weightageEmitter)="currentWeightage=$event;"
+                    (formChange)="setDuplicateFormRef($event)"></pros-setup-duplicate-rule>
+            </ng-container>
+            <!-- Attach transformation rule in main rule -->
+            <div class="f-col" *ngIf="false">
+                <div class="f-row" *ngIf="!isDRChildRule && isTransEnabled && !isOnlyForTrans">
+                    <lib-slide-toggle label="Apply data transformation" labelPosition="after" theme="primary"
+                        [formControl]="hasAppliedTransformationCtrl"></lib-slide-toggle>
+                    <mat-icon i18n-libTooltip="@@activate_trans_help"
+                        libTooltip="Activate to apply transformation business rule" fontSet="mdo-icons"
+                        class="mat-head-icon">question-circle</mat-icon>
+                </div>
+
+                <ng-template [ngIf]="hasAppliedTransformationCtrl.value">
+                    <lib-tab-group class="schema-info-tabs" disableRipple="true" animationDuration="0ms"
+                        (selectedIndexChange)="transTabIndex = $event" [selectedIndex]="transTabIndex">
+                        <lib-tab label="On success"
+                            [badgeCount]="attachedTransRules && attachedTransRules.success ? attachedTransRules.success.length : 0">
+                            <div class="f-col mdo-field">
+                                <lib-text-line class="field-label" type="xsmall" weight="strong">Business rule</lib-text-line>
+                                <pros-form-input-autoselect fieldLabel="Type rule name to add"
+                                    (emitExtraLabelClick)="openBusinessRuleSideSheet()"
+                                    (openCustomDialog)="openTransRuleLib()" [updatedOptionsList]="transformationRules"
+                                    [labelKey]="'brInfo'" (optionSelectedEmit)="addTransRule($event, 'success')"
+                                    (emitSearchValue)="searchTransRules($event)" [isExtraLabel]="true"
+                                    i18n-extraOptionLabel="@@add_br_rule" extraOptionLabel="Add new business rule">
+                                </pros-form-input-autoselect>
+                            </div>
+                            <div class="f-col">
+                                <div class="f-row colunm-box rule-border-row">
+                                    <div class="col"></div>
+                                    <div class="col col-x4">
+                                        <lib-text-line type="small" weight="strong">Business rule</lib-text-line>
+                                    </div>
+                                    <div class="col col-x4 mat-item-center">
+                                        <lib-text-line type="small" weight="strong">Enable</lib-text-line>
+                                    </div>
+                                    <div class="col mat-item-end"></div>
+                                </div>
+
+                                <div cdkDropList (cdkDropListDropped)="reorderTrans($event, 'success')">
+                                    <div cdkDrag class="f-row colunm-box rule-border-row"
+                                        *ngFor="let scsRule of attachedTransRules?.success">
+                                        <div class="col">
+                                            <lib-button cdkDragHandle icon="grip-lines"></lib-button>
+                                        </div>
+                                        <div class="col col-x4">
+                                            <lib-text-line type="base" textColor="link" class="cursor"
+                                                (click)="editTransRule(scsRule,'success')">{{ scsRule.ruleInfo &&
+                                                scsRule.ruleInfo.brInfo ? scsRule.ruleInfo.brInfo : 'Unknown'}}
+                                            </lib-text-line>
+                                        </div>
+
+                                        <div class="col col-x4 mat-item-center">
+                                            <lib-checkbox color="primary" [checked]="scsRule?.isEnabled"
+                                                (valueChange)="updateTransStatus(scsRule,'success',$event)">
+                                            </lib-checkbox>
+                                        </div>
+
+                                        <div class="col mat-item-end">
+                                            <lib-button icon="trash-alt"
+                                                (afterClick)="removeTrans(scsRule,'success',$event)"></lib-button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </lib-tab>
+
+                        <lib-tab label="On failure"
+                            [badgeCount]="attachedTransRules && attachedTransRules.error ? attachedTransRules.error.length : 0">
+                            <div class="f-col mdo-field">
+                                <lib-text-line class="field-label" type="xsmall" weight="strong">Business rule
+                                </lib-text-line>
+                                <pros-form-input-autoselect fieldLabel="Type rule name to add"
+                                    (emitExtraLabelClick)="openBusinessRuleSideSheet()"
+                                    (openCustomDialog)="openTransRuleLib()" [isExtraLabel]="true"
+                                    [updatedOptionsList]="transformationRules" [labelKey]="'brInfo'"
+                                    (optionSelectedEmit)="addTransRule($event, 'error')"
+                                    (emitSearchValue)="searchTransRules($event)" i18n-extraOptionLabel="@@add_br_rule"
+                                    extraOptionLabel="Add new business rule">
+                                </pros-form-input-autoselect>
+                            </div>
+
+                            <div class="f-col">
+                                <div class="f-row colunm-box rule-border-row">
+                                    <div class="col"></div>
+                                    <div class="col col-x4">
+                                        <lib-text-line type="small" weight="strong">Business rule</lib-text-line>
+                                    </div>
+                                    <div class="col col-x4 mat-item-center">
+                                        <lib-text-line type="small" weight="strong">Enable</lib-text-line>
+                                    </div>
+                                    <div class="col mat-item-end"></div>
+                                </div>
+
+                                <div cdkDropList (cdkDropListDropped)="reorderTrans($event, 'success')">
+                                    <div cdkDrag class="f-row colunm-box rule-border-row"
+                                        *ngFor="let errRule of attachedTransRules?.error">
+                                        <div class="col">
+                                            <lib-button cdkDragHandle icon="grip-lines"></lib-button>
+                                        </div>
+                                        <div class="col col-x4">
+                                            <lib-text-line type="base" textColor="link" class="cursor"
+                                                (click)="editTransRule(errRule,'error')">{{ errRule && errRule.ruleInfo
+                                                && errRule.ruleInfo.brInfo ? errRule.ruleInfo.brInfo : 'Unknown'}}
+                                            </lib-text-line>
+                                        </div>
+
+                                        <div class="col col-x4 mat-item-center">
+                                            <lib-checkbox color="primary" [checked]="errRule?.isEnabled"
+                                                (valueChange)="updateTransStatus(errRule,'error',$event)">
+                                            </lib-checkbox>
+                                        </div>
+
+                                        <div class="col mat-item-end">
+                                            <lib-button icon="trash-alt"
+                                                (afterClick)="removeTrans(errRule,'error',$event)"></lib-button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </lib-tab>
+                    </lib-tab-group>
+                </ng-template>
+            </div>
+
+            <ng-container *ngIf="classificationRule">
+                <!-- Rule Settings -->
+                <div class="collapsible">
+                    <mat-accordion>
+                        <mat-expansion-panel class="mat-elevation-z0" togglePosition="before" expanded="true">
+                            <mat-expansion-panel-header expandedHeight="36px" collapsedHeight="36px">
+                                <mat-panel-title>
+                                    <lib-text-line type="base" weight="strong" i18n="@@ruleSettings">
+                                        Rule settings
+                                    </lib-text-line>
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <form [formGroup]='ruleSettingForm'>
+                                <div class="f-col">
+                                    <div class="f-col user-defined-set" formArrayName="frmArray">
+                                        <ng-container
+                                            *ngFor="let item of ruleSettingForm.get('frmArray')['controls']; let i = index">
+                                            <ng-container [formGroupName]="i">
+                                                <div class="f-row defined-row" [id]="item.value.id">
+                                                    <div class="col select-col udr-select-col"></div>
+                                                    <!-- Table -->
+                                                    <div class="col">
+                                                        <mat-form-field appearance="outline">
+                                                            <input matInput placeholder="Table" [matAutocomplete]="fieldsCtrl"
+                                                                [formControl]="item.controls.tableName ? item.controls.tableName : ''"
+                                                                (click)="getTableNameFields()">
+                                                            <mat-autocomplete class="mdo-autocomplete" (optionSelected)="tableNameSelected($event,i)"
+                                                                #fieldsCtrl="matAutocomplete" [displayWith]="displayDescData">
+                                                                <mat-option *ngFor="let group of tableNameOptions"
+                                                                    [value]="group" [libTooltip]="group.description">
+                                                                    {{group.description}}
+                                                                </mat-option>
+                                                            </mat-autocomplete>
+                                                        </mat-form-field>
+                                                    </div>
+                                                    <!-- Language Field -->
+                                                    <div class="col">
+                                                        <mat-form-field appearance="outline">
+                                                            <input matInput placeholder="Language field"
+                                                                [matAutocomplete]="languageField"
+                                                                (input)="languageSearching($event.target.value,i)"
+                                                                [formControl]="item.controls.langField ? item.controls.langField : ''">
+                                                            <mat-autocomplete class="mdo-autocomplete"
+                                                                #languageField="matAutocomplete">
+                                                                <ng-container *ngFor="let group of languageFieldsOptions[i]">
+                                                                    <mat-option *ngIf="item.controls.descField.value !== group.shortText[locale].description"
+                                                                        [value]="group.shortText[locale].description" [libTooltip]="group.shortText[locale].description">
+                                                                        {{group.shortText[locale].description}}
+                                                                    </mat-option>
+                                                                </ng-container>
+                                                            </mat-autocomplete>
+                                                        </mat-form-field>
+                                                    </div>
+
+                                                    <!-- Description Field -->
+                                                    <div class="col">
+                                                        <mat-form-field appearance="outline">
+                                                            <input matInput placeholder="Description field"
+                                                                [matAutocomplete]="descriptionField" (input)="descFieldSearching($event.target.value,i)"
+                                                                [formControl]="item.controls.descField ? item.controls.descField : ''">
+                                                            <mat-autocomplete class="mdo-autocomplete"
+                                                                #descriptionField="matAutocomplete">
+                                                                <ng-container *ngFor="let group of tableDescFieldsOptions[i]">
+                                                                    <mat-option *ngIf="item.controls.langField.value !== group.shortText[locale].description" [value]="group.shortText[locale].description" [libTooltip]="group.shortText[locale].description">
+                                                                        {{group.shortText[locale].description}}
+                                                                    </mat-option>
+                                                                </ng-container>
+                                                            </mat-autocomplete>
+                                                        </mat-form-field>
+                                                    </div>
+
+                                                    <!-- Description Type -->
+                                                    <div class="col">
+                                                        <mat-form-field appearance="outline">
+                                                            <input matInput placeholder="Description type"
+                                                                [matAutocomplete]="descriptionType1"
+                                                                [formControl]="item.controls.descType ? item.controls.descType : ''">
+                                                            <mat-autocomplete class="mdo-autocomplete"
+                                                                #descriptionType1="matAutocomplete">
+                                                                <mat-option *ngFor="let opt of descriptionType"
+                                                                    [value]="opt" [libTooltip]="opt">
+                                                                    {{opt}}
+                                                                </mat-option>
+                                                            </mat-autocomplete>
+                                                        </mat-form-field>
+                                                    </div>
+
+                                                    <!-- Remove -->
+                                                    <div class="col">
+                                                        <lib-button type="plain" icon="trash-alt" iconFontType="light" libTooltip="Delete"
+                                                            (click)="removeRuleSetting(i)">
+                                                        </lib-button>
+                                                    </div>
+                                                </div>
+                                            </ng-container>
+                                        </ng-container>
+                                        <div class="col-spacer"></div>
+                                        <div class="f-row button-add-block">
+                                            <lib-button (click)="addNewRule()" type="minor" iconFontType="light"
+                                                icon="plus" rounded="true">
+                                            </lib-button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </mat-expansion-panel>
+                    </mat-accordion>
+                </div>
+                <div class="row-spacer"></div>
+                <form [formGroup]="classicForm">
+                    <div class="f-col mdo-field">
+                        <lib-text-line type="xsmall" weight="strong" class="field-label">
+                            <span i18n="@@shortDescription">Short description field</span>
+                            <mat-icon fontSet="mdo-icons-light"  libTooltip="Users can maintain the short description field from the header structure.">
+                                question-circle</mat-icon>
+                        </lib-text-line>
+                        <div class="mdo-field-input">
+                            <input matInput  #optionsInput [matAutocomplete]="fieldShortDesc"
+                                formControlName="shortDescription" />
+                            <mat-autocomplete class="mdo-autocomplete" #fieldShortDesc="matAutocomplete" [displayWith]="displayWithProposeNoun">
+                                <mat-option *ngFor="let opt of shortDescList" [value]="opt">
+                                    {{ opt.description }}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </div>
+                    </div>
+
+                    <div class="f-col mdo-field">
+                        <lib-text-line type="xsmall" weight="strong" class="field-label">
+                            <span i18n="@@longDescription">Long description field</span>
+                            <mat-icon fontSet="mdo-icons-light"  libTooltip="Users can maintain the long description field from the header structure.">
+                                question-circle</mat-icon>
+                        </lib-text-line>
+                        <div class="mdo-field-input">
+                            <input matInput #optionsInput [matAutocomplete]="fieldLongDesc"
+                                formControlName="longDescription" />
+                            <mat-autocomplete class="mdo-autocomplete" #fieldLongDesc="matAutocomplete" [displayWith]="displayWithProposeNoun">
+                                <mat-option *ngFor="let opt of longDescList" [value]="opt">
+                                    {{ opt.description }}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </div>
+                    </div>
+
+                    <div class="f-col mdo-field">
+                        <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@proposeNoun">
+                            Field for system to analyze and propose noun
+                        </lib-text-line>
+                        <div class="mdo-field-input">
+                            <input matInput placeholder="Value" #optionsInput [matAutocomplete]="fieldAnalyze"
+                                formControlName="nounField" />
+                            <mat-autocomplete class="mdo-autocomplete" #fieldAnalyze="matAutocomplete" [displayWith]="displayWithProposeNoun">
+                                <mat-option *ngFor="let opt of proposeNounField" [value]="opt">
+                                    {{ opt.description }}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </div>
+                    </div>
+
+                    <!-- Field for defining description settings -->
+                    <div class="f-col mdo-field">
+                        <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@descSettings">
+                            Field for defining description settings
+                        </lib-text-line>
+                        <div class="mdo-field-input">
+                            <lib-chip-list>
+                                <ng-container *ngFor="let opt of selectedDescSettingsOptions; let i=index">
+                                    <ng-container *ngIf="i<=limit-1">
+                                        <lib-chip [removable]="true" (removed)="removeDescSetting(opt)">{{opt.description}}
+                                        </lib-chip>
+                                    </ng-container>
+                                </ng-container>
+                                <input matInput placeholder="Type to search" #optionInput formControlName="descSetField"
+                                    [matAutocomplete]="descriptionSetting" />
+                            </lib-chip-list>
+                            <mat-autocomplete class="mdo-autocomplete" #descriptionSetting="matAutocomplete"
+                                (optionSelected)="selectedDescSettings($event)">
+                                <mat-option class="mdo-option" *ngFor="let opt of descSettingsField" [value]="opt">
+                                    {{opt.description}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </div>
+                        <mat-error>{{ descValidationError }}</mat-error>
+                    </div>
+
+                    <!-- Conditions -->
+                    <div class="collapsible">
+                        <mat-accordion>
+                            <mat-expansion-panel class="mat-elevation-z0" togglePosition="before" expanded="false">
+                                <mat-expansion-panel-header expandedHeight="36px" collapsedHeight="36px">
+                                    <mat-panel-title>
+                                        <lib-text-line type="base" weight="strong">
+                                            Conditions
+                                        </lib-text-line>
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+
+                                <ng-template [ngIf]="tableData.length" [ngIfElse]="emptyState">
+                                    <mat-card class="mat-elevation-z0 view-table">
+                                        <div class="f-row">
+                                            <lib-text-line type="base" weight="strong">Conditions</lib-text-line>
+                                            <div class="f-spacer"></div>
+                                            <lib-button [matMenuTriggerFor]="menu" type="plain" icon="ellipsis-h">
+                                            </lib-button>
+                                            <mat-menu #menu="matMenu" class="navigation-menu">
+                                                <button mat-menu-item (click)="addNewCondition()">Edit</button>
+                                            </mat-menu>
+                                        </div>
+                                        <mat-card-content class="condition-table" cdkScrollable>
+                                            <table mat-table [dataSource]="dataSourceRule">
+                                                <ng-container *ngFor="let column of displayedColumns">
+                                                    <ng-container matColumnDef="{{column}}">
+                                                        <th mat-header-cell *matHeaderCellDef> {{columnDesc[column] ? columnDesc[column] : column}}
+                                                        </th>
+                                                        <td mat-cell *matCellDef="let element">{{element[column]}}
+                                                        </td>
+                                                    </ng-container>
+                                                </ng-container>
+                                                <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true">
+                                                </tr>
+                                                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                                            </table>
+                                        </mat-card-content>
+                                    </mat-card>
+                                </ng-template>
+                                <ng-template #emptyState>
+                                    <lib-empty-state primaryText="Nothing to see here" icon="table" iconSize=200
+                                        secondaryText="You don't have any conditions created yet. Would you like to create one?">
+                                    </lib-empty-state>
+                                    <div class="f-row condition-button">
+                                        <lib-button (afterClick)="addNewCondition()" type="minor"
+                                            [disabled]="(!conditonSidesheet || !selectedDescSettingsOptions?.length)"
+                                            [libTooltip]="(!conditonSidesheet || !selectedDescSettingsOptions?.length) ? 'Fields for defining description settings” is empty and no fields are maintained' : ''">
+                                            New condition
+                                        </lib-button>
+                                    </div>
+                                </ng-template>
+                            </mat-expansion-panel>
+                        </mat-accordion>
+                    </div>
+                </form>
+            </ng-container>
+        </div>
+    </div>
+</div>
+<router-outlet></router-outlet>

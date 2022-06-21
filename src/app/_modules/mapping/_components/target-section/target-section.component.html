@@ -1,0 +1,46 @@
+<div class="root">
+    <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" [expanded]="menuToggle">
+        <mat-expansion-panel-header>
+            <mat-panel-title>
+                <div class="title-container">
+                    <lib-text-line class="title" [title]="item?.segmentName" textColor="primary" [enableWrap]="false">
+                        <div [innerHTML]="item?.segmentName | highlight: control?.value">
+                            {{item?.segmentName}}
+                        </div>
+                    </lib-text-line>
+                    <lib-text-line textColor="secondary">1:1</lib-text-line>
+                </div>
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <ng-container *ngFor="let field of item?.segmentMappings">
+                  <div class="f-row child-panel">
+                    <div class="f-col-spacer-half"></div>
+                    <pros-target-section class="mapping-section-item"
+                        *ngIf="shouldShowSection(field)"
+                        [item]="field"
+                        [control]="control"
+                        [menuToggle]="menuToggle"
+                        [currentMapping]="currentMapping"
+                        (targetSelected)="selectTargetField($event)"
+                        (mouseOnTarget)="emitMouseEvent($event)">
+                    </pros-target-section>
+                  </div>
+        </ng-container>
+
+        <ng-container *ngFor="let targetField of item?.mdoMappings; trackBy: trackTargetItem;">
+            <!-- Target fields list -->
+            <pros-target-field
+                *ngIf="isFieldOrHeaderMatching(targetField)"
+                [hasTransformation]="targetField?.translation?.transalationIds?.length ? true : false"
+                [searchTerm]="control?.value"
+                (mouseup)="selectTargetField(targetField)"
+                (mouseenter)="emitMouseEvent(true)"
+                (mouseleave)="emitMouseEvent(false)"
+                [selected]="isSelected(targetField.uuid)"
+                [targetField]="targetField"
+                (click)="targetFieldClicked(targetField)">
+            </pros-target-field>
+        </ng-container>
+    </mat-expansion-panel>
+</div>

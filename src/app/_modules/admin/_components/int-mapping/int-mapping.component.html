@@ -1,0 +1,118 @@
+<mat-card class="flex-container">
+        <mat-card class="flex-col-2 padd-0">
+          <mat-toolbar color="primary" class="B_R-top_lr-3">
+            <mat-toolbar-row>
+              <span class="mat-h3 mar-0">MDO Structure</span>
+              <span class="f-spacer"></span>
+              <button mat-button>Expand All</button>
+              <button mat-button>Collapse All</button>
+            </mat-toolbar-row>
+          </mat-toolbar>
+          <mat-divider></mat-divider>
+          <mat-card-content class="padd-16">
+            <div class="F-display">
+              <mat-form-field appearance="outline">
+                <mat-label>Search</mat-label>
+                <input matInput placeholder="Search here...">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+              <span class="f-spacer"></span>
+              <mat-card-actions>
+                <button mat-button [matMenuTriggerFor]="menu" class="mdl-filter-action"><mat-icon aria-hidden="false" aria-label="Example filter_list icon">filter_list</mat-icon> Filters</button>
+                  <mat-menu #menu="matMenu">
+                    <button mat-menu-item>All</button>
+                    <button mat-menu-item>Mapped</button>
+                    <button mat-menu-item>Unmapped</button>
+                    <button mat-menu-item>Static</button>
+                  </mat-menu>
+              </mat-card-actions>
+            </div>
+    
+            <mat-divider></mat-divider> 
+            <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+                <!-- This is the tree node template for leaf nodes -->
+                <mat-tree-node class="mdl_mat-subtree-node" *matTreeNodeDef="let node" matTreeNodePadding>
+                <!-- use a disabled button to provide padding for tree leaf -->
+                <mat-icon matSuffix class="subtree-icon">code</mat-icon>
+                        
+                        {{node.name}}
+                </mat-tree-node>
+                <!-- This is the tree node template for expandable nodes -->
+                <mat-tree-node class="mdl_mat-tree-node" *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
+                  <button mat-icon-button matTreeNodeToggle
+                                [attr.aria-label]="'toggle ' + node.name">
+                    <mat-icon class="mat-icon-rtl-mirror">
+                              {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                    </mat-icon>
+                  </button>
+                        {{node.name}}
+                </mat-tree-node>
+            </mat-tree>      
+          </mat-card-content>
+        </mat-card> 
+    
+    <div class="col-spacer"></div>
+    
+        <mat-card class="flex-col-1 bxshadow-no padd-0">
+          <mat-card-content class="padd-8">
+            <div class="mapping-align">
+              <mat-icon aria-hidden="false" aria-label="Example compare_arrows icon">compare_arrows</mat-icon>
+              <span class="mat-h3 mar-0">Mapping</span>
+            </div>
+            <p class="textcenter">Drag and Drop MDO Structure to Target</p> 
+          </mat-card-content>
+        </mat-card>
+    
+    <div class="col-spacer"></div>
+    
+        <mat-card class="flex-col-2 padd-0">
+          <mat-toolbar color="primary" class="B_R-top_lr-3">
+            <mat-toolbar-row>
+              <span class="mat-h3 mar-0">Target</span>
+              <span class="f-spacer"></span>
+              <button mat-button>Expand All</button>
+              <button mat-button>Collapse All</button>
+            </mat-toolbar-row>
+          </mat-toolbar>
+          <mat-divider></mat-divider>
+          <mat-card-content class="padd-16">
+            <div class="F-display">
+              <mat-form-field appearance="outline">
+                <mat-label>Search</mat-label>
+                <input matInput placeholder="Search here...">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+              <span class="f-spacer"></span>
+              <mat-card-actions>
+                <button mat-button [matMenuTriggerFor]="menu" class="mdl-filter-action"><mat-icon aria-hidden="false" aria-label="Example filter_list icon">filter_list</mat-icon> Filters</button>
+                <mat-menu #menu="matMenu">
+                  <button mat-menu-item>All</button>
+                  <button mat-menu-item>Mapped</button>
+                  <button mat-menu-item>Unmapped</button>
+                  <button mat-menu-item>Static</button>
+                </mat-menu>
+    
+              </mat-card-actions>
+            </div>
+          <mat-divider></mat-divider> 
+            <mat-tree [dataSource]="dataSource2" [treeControl]="treeControl">
+            <!-- This is the tree node template for leaf nodes -->
+              <mat-tree-node class="mdl_mat-subtree-node" *matTreeNodeDef="let node" matTreeNodePadding>
+              <!-- use a disabled button to provide padding for tree leaf -->
+                <mat-icon matSuffix class="subtree-icon">code</mat-icon>          
+                          {{node.name}}
+              </mat-tree-node>
+              <!-- This is the tree node template for expandable nodes -->
+              <mat-tree-node class="mdl_mat-tree-node" *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
+                <button mat-icon-button matTreeNodeToggle
+                                  [attr.aria-label]="'toggle ' + node.name">
+                <mat-icon class="mat-icon-rtl-mirror">
+                      {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                </mat-icon>
+                </button>
+                          {{node.name}}
+              </mat-tree-node>
+            </mat-tree>    
+          </mat-card-content>
+        </mat-card>
+    </mat-card>

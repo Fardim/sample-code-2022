@@ -1,0 +1,19 @@
+<mat-card class="mat-elevation-z0 check-list">
+  <mat-optgroup label="Workflow">
+    <mat-option>
+      <lib-checkbox class="checkedall" (valueChange)="selectAll()" [(ngModel)]="allChecked"
+        [indeterminate]="allIndeterminate" label="All">
+      </lib-checkbox>
+    </mat-option>
+    <mat-option *ngFor="let module of dataSetWorkflow | async">
+      <div class="colunm-list">
+        <div class="f-row colunm-box" #datasetOption>
+          <lib-checkbox [label]="module.objectdesc ? module.objectdesc : 'Untitled'"
+            (valueChange)="selectionChange(module)" [checked]="isChecked(module)" [libTooltip] = "getTooltip(module)"
+            [matTooltipDisabled]="!(datasetOption.offsetWidth < datasetOption.scrollWidth)">
+          </lib-checkbox>
+        </div>
+      </div>
+    </mat-option>
+  </mat-optgroup>
+</mat-card>

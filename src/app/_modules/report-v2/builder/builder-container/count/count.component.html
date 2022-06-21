@@ -1,0 +1,30 @@
+<mat-card class="mat-elevation-z0 widget">
+  <ng-template [ngIf]="!isFetchingData">
+    <div class="f-row breadcrum-toolbar">
+      <div #displayHeading [libTooltip]="widgetInfo.widgetTitle" matTooltipPosition="right"
+        [matTooltipDisabled]="false">
+        <lib-text-line type="base" enableWrap="true">{{ widgetInfo.widgetTitle }}</lib-text-line>
+      </div>
+      <div class="f-spacer"></div>
+      <lib-button type="plain" icon="pencil-alt" *ngIf="editedMode" (click)="openPanel.emit()"></lib-button>
+      <lib-button [matMenuTriggerFor]="menu" type="plain" icon="ellipsis-h" *ngIf="editedMode"></lib-button>
+      <mat-menu #menu="matMenu" class="navigation-menu">
+        <lib-filter-option (click)="deleteWidget.emit()">Delete</lib-filter-option>
+      </mat-menu>
+      <lib-button type="plain" (click)="clearFilter()" *ngIf="showClearButton" iconFontType="light" icon="times">
+      </lib-button>
+    </div>
+    <div class="row-spacer"></div>
+    <mat-card-content (click)="emitEvtFilterCriteria($event)">
+      <lib-text-line type="subheading" weight="strong" enableWrap="true">{{ count | number }}</lib-text-line>
+      <lib-text-line prosClickStopPropagation *ngIf="widgetInfo.datasetType === 'diw_dataset' && !editedMode" type="base" enableWrap="true"
+        textColor="link" (click)="openSchemaDetailsTab()" class="fix-now" i18n="@@fixNow">Fix now
+      </lib-text-line>
+    </mat-card-content>
+  </ng-template>
+  <ng-template [ngIf]="isFetchingData">
+      <lib-skeleton type="line"></lib-skeleton>
+      <lib-skeleton type="line"></lib-skeleton>
+      <lib-skeleton type="line"></lib-skeleton>
+  </ng-template>
+</mat-card>

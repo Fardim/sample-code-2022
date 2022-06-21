@@ -1,0 +1,31 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading" i18n="@@team_title">
+                    Quick preview
+                </lib-text-line>
+            </div>
+        </div>
+    </div>
+    <div class="row-spacer"></div>
+
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <lib-skeleton-overview *ngIf="showSkeleton"></lib-skeleton-overview>
+            <ng-container *ngIf="emailTemplate">
+                <div class="f-col">
+                    <lib-input inputState="undefined" autocomplete="off" label="Email subject" [disabled]="true"
+                        labelIcon="question-circle" labelIconFont="mdo-icons" [(ngModel)]="emailTemplate.subject">
+                    </lib-input>
+                </div>
+                <div class="f-col mdo-field">
+                    <lib-text-line class="field-label" type="xsmall" weight="strong">Email body</lib-text-line>
+                    <div id="quill-editor-preview"></div>
+                </div>
+            </ng-container>
+        </div>
+    </div>
+</div>

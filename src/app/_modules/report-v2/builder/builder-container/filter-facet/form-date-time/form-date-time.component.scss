@@ -1,0 +1,19 @@
+.date-fields {
+  align-items: baseline;
+
+  .data-column {
+    flex: 1;
+
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      align-items: center;
+    }
+  }
+}
+
+.datepicker {
+  padding: 0 12px;
+  display: block;
+}

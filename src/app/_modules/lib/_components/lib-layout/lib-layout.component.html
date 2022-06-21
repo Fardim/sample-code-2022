@@ -1,0 +1,22 @@
+<mat-toolbar color="primary">
+  <button type="button" aria-label="Toggle sidenav" mat-icon-button (click)="snav.toggle()">
+    <mat-icon>menu</mat-icon>
+  </button>
+</mat-toolbar>
+<mat-sidenav-container>
+  <mat-sidenav opened="true" mode="side" #snav>
+    <mat-nav-list>
+      <a mat-list-item routerLink="{{nav['link']}}" *ngFor="let nav of sideNavList; let i=index">{{nav['navElement']}}
+        <mat-divider></mat-divider>
+      </a>
+
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-card>
+      <router-outlet></router-outlet>
+    </mat-card>
+    <!-- content -->
+  </mat-sidenav-content>
+</mat-sidenav-container>

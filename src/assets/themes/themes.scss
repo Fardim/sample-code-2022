@@ -1,0 +1,10 @@
+@import '~@angular/material/theming';
+
+@include mat-core();
+
+@import 'mixins.scss';
+@import 'mdo-light.scss';
+@import 'mdo-dark.scss';
+@import 'ckh-light.scss';
+@import 'ckh-dark.scss';
+@import '~mdo-ui-library/assets/quill/quill.snow.css';

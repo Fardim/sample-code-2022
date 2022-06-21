@@ -1,0 +1,41 @@
+<div class="f-col root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+    <div class="f-col-spacer-half"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" enableWrap="true">
+          {{ 'Expansion view' }}
+        </lib-text-line>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="fieldObj" class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <!-- <lib-tab-group [disableRipple]="true">
+        <lib-tab [label]="fieldObj?.fieldCtrl?.description">
+          <pros-transaction-grid [tabDetails]="tabDetails" [fieldObj]="fieldObj" [layoutId]="layoutId"
+            [moduleId]="moduleId" [parentRowId]="activeRowId" [recordId]="recordId" [expansionview]="true">
+          </pros-transaction-grid>
+        </lib-tab>
+        <ng-template ngFor let-subGrid [ngForOf]="subGridFields">
+          <lib-tab [label]="subGrid.fieldDescri">
+            <pros-transaction-grid [tabDetails]="tabDetails" [fieldObj]="subGrid" [layoutId]="layoutId"
+              [expansionview]="true" [moduleId]="moduleId" [parentRowId]="activeRowId" [isSubGrid]="true">
+            </pros-transaction-grid>
+          </lib-tab>
+        </ng-template>
+      </lib-tab-group> -->
+      <!-- <pros-transaction-input [moduleId]="moduleId" [control]="fGroup.controls[field.fieldId]"
+        [controlName]="field.fieldId" [tabDetails]="tabDetails" [fieldObj]="field" [layoutId]="layoutId"
+        [recordId]="recordId" [process]="process" [dataControl]="dataControl"
+        [generateDescriptionValue]="generateDescriptionValue"></pros-transaction-input>
+      <ng-template [ngIf]="isShowDescription(fieldObj)">
+      </ng-template> -->
+      <pros-transaction-generate-description [tabDetails]="tabDetails" [layoutId]="layoutId" [moduleId]="moduleId" [flowId]="flowId" [stepId]="stepId"
+        [fieldObj]="fieldObj" [process]="process" (evtParentDesciptionValueUpdate)="generateDescriptionValue = $event" [expansionview]="true">
+      </pros-transaction-generate-description>
+    </div>
+  </div>
+</div>

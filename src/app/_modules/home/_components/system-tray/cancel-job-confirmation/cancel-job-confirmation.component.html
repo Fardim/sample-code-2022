@@ -1,0 +1,23 @@
+<div class="modal-wrapper">
+    <div class="f-row modal-header">
+        <lib-text-line type="leading" [enableWrap]="true">{{data ? data.dialogTitle : ''}}</lib-text-line>
+        <lib-button icon="times" (click)="close(false)" iconFontType="light"></lib-button>
+    </div>
+    <div class="f-row modal-body">
+        <lib-button [sizeLarge]="true" [rounded]="true" icon="{{data && data.icon ? data.icon : 'exclamation'}}" iconFontType="solid" type="major">
+        </lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col">
+            <lib-text-line type="base" [enableWrap]="true">{{data ? data.label : ''}}</lib-text-line>
+        </div>
+    </div>
+    <div class="row-spacer"></div>
+    <div class="f-col extra-content">
+        <lib-textarea label="Reason" [isRequired]="true" [(ngModel)]="reason" ></lib-textarea>
+    </div>
+    <div class="f-row modal-footer">
+        <lib-button type="minor"  (click)="close(false)">No</lib-button>
+        <div class="f-spacer"></div>
+        <lib-button type="major" [disabled]="!reason" (afterClick)="close(true)">Yes</lib-button>
+    </div>
+</div>

@@ -1,0 +1,46 @@
+<div class="f-col skeleton-list">
+    <div class="f-row header-skeleton">
+        <div class="f-col half-line">
+            <lib-skeleton type="line">
+                <div class="skeleton">
+                    <div class="skeleton-line"></div>
+                </div>
+            </lib-skeleton>
+            <lib-skeleton type="line-half">
+                <div class="skeleton">
+                    <div class="skeleton-line-half"></div>
+                </div>
+            </lib-skeleton>
+        </div>
+        <div class="f-spacer"></div>
+        <lib-skeleton type="avatar">
+            <div class="skeleton">
+                <div class="skeleton-avatar"></div>
+            </div>
+        </lib-skeleton>
+        <div class="col-spacer"></div>
+        <lib-skeleton type="button">
+            <div class="skeleton">
+                <div class="skeleton-button"></div>
+            </div>
+        </lib-skeleton>
+        <div class="col-spacer"></div>
+        <lib-skeleton type="button">
+            <div class="skeleton">
+                <div class="skeleton-button"></div>
+            </div>
+        </lib-skeleton>
+    </div>
+    <div class="f-row skeleton-row" *ngFor="let a of [].constructor(5)">
+        <lib-skeleton class="skeleton-column" *ngFor="let a of [].constructor(5)" type="line">
+            <div class="skeleton">
+                <div class="skeleton-line"></div>
+            </div>
+        </lib-skeleton>
+        <lib-skeleton type="avatar">
+            <div class="skeleton">
+                <div class="skeleton-avatar"></div>
+            </div>
+        </lib-skeleton>
+    </div>
+</div>

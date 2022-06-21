@@ -1,0 +1,20 @@
+<div class="root" [id]="targetField?.uuid">
+    <lib-filter-option class="lib-filter-option" [ngClass]="{'selected': selected}">
+       <div class="f-row">
+        <!-- <lib-button [disabled]="true"></lib-button> -->
+        <div class="f-col-spacer-half"></div>
+        <lib-text-line class="target-name" type="base" textColor="primary" [enableWrap]="false">
+            <div [innerHTML]="(targetField?.externalFieldDesc || targetField?.externalFieldId) | highlight: searchTerm">
+                {{(targetField?.externalFieldDesc || targetField?.externalFieldId)}}
+            </div>
+        </lib-text-line>
+        <ng-container *ngIf="!!targetField?.mdoFieldId">
+            <div class="f-col-spacer-half"></div>
+            <lib-label class="mapped-source">{{targetField?.mdoFieldDesc}}</lib-label>
+        </ng-container>
+       </div>
+       <div class="f-spacer"></div>
+       <span class="indicator" libTooltip="Transformation rule applied" *ngIf="hasTransformation"></span>
+       <div class="col-spacer"></div>
+    </lib-filter-option>
+</div>

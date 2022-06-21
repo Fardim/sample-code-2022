@@ -1,0 +1,249 @@
+<div class="root">
+    <ng-container>
+      <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+        <div class="f-row title">
+          <lib-text-line type="leading" i18n="@@field_properties">Field properties</lib-text-line>
+        </div>
+      </div>
+      <div class="section-container">
+        <form [formGroup]="fieldFormGroup" *ngIf="fieldFormGroup">
+          <div class="f-col">
+            <div class="f-col field-name">
+              <lib-input matInput [formControl]="fieldFormGroup.controls['fieldName']" i18n-label="@@field_name" label="Field name">
+              </lib-input>
+            </div>
+
+            <div class="f-row mdo-field">
+              <lib-slide-toggle formControlName="invisible" [checked]="fieldFormGroup.get('invisible').value" label="Invisible"
+                labelposition="after" (toggleChange)="toggleInvisible($event);onFormValueChange();" theme="primary">
+              </lib-slide-toggle>
+            </div>
+
+            <div class="f-row mdo-field">
+              <lib-slide-toggle formControlName="required" label="Required"
+                labelposition="after" (toggleChange)="fieldFormGroup.get('required').setValue($event);onFormValueChange()" theme="primary">
+              </lib-slide-toggle>
+            </div>
+
+            <div class="f-row mdo-field">
+              <lib-slide-toggle formControlName="nonEditable" label="Non-editable"
+                labelposition="after" (toggleChange)="toggleNonEditable($event);onFormValueChange();" theme="primary">
+              </lib-slide-toggle>
+            </div>
+
+            <div class="f-col">
+              <lib-input matInput type="number" [formControl]="fieldFormGroup.controls['defaultRowCnt']" i18n-label="@@row_count" label="Default row counts"
+                [maxLength]="2"
+                (afterBlur)="onFormValueChange()"
+                labelIconTooltip="This property can be used to maintain the default number of rows to be enabled on the form."
+                labelIcon="question-circle"
+                [hasError]="fieldFormGroup.controls.defaultRowCnt.errors && fieldFormGroup.controls.defaultRowCnt.errors.maxLength"
+                [hint]="(fieldFormGroup.controls.defaultRowCnt.dirty && fieldFormGroup.controls.defaultRowCnt.errors && fieldFormGroup.controls.defaultRowCnt.errors.maxLength) ? 'Allowing numeric values up to 2 characters' : ''">
+              </lib-input>
+            </div>
+
+            <div class="f-row mdo-field">
+              <lib-slide-toggle formControlName="addRow" label="Add row"
+                labelposition="after" (toggleChange)="fieldFormGroup.get('addRow').setValue($event);onFormValueChange()" theme="primary">
+              </lib-slide-toggle>
+              &nbsp;
+              <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                libTooltip="This property can be used to enable or disable the “Add row” option against the grid on the form.">
+                question-circle </mat-icon>
+            </div>
+
+            <div class="f-row mdo-field">
+              <lib-slide-toggle formControlName="editRow" label="Edit row"
+                labelposition="after" (toggleChange)="fieldFormGroup.get('editRow').setValue($event);onFormValueChange()" theme="primary">
+              </lib-slide-toggle>
+              &nbsp;
+              <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                libTooltip="This property can be used to enable or disable the “Edit row” option against the grid on the form.">
+                question-circle </mat-icon>
+            </div>
+
+            <div class="f-row mdo-field">
+              <lib-slide-toggle formControlName="removeRow" label="Remove row"
+                labelposition="after" (toggleChange)="fieldFormGroup.get('removeRow').setValue($event);onFormValueChange()" theme="primary">
+              </lib-slide-toggle>
+              &nbsp;
+              <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                libTooltip="This property can be used to enable or disable the “Remove row” option against a grid line on the form.">
+                question-circle </mat-icon>
+            </div>
+
+            <div class="f-row mdo-field">
+              <lib-slide-toggle formControlName="removeMultipleRow" label="Remove multiple rows"
+                labelposition="after" (toggleChange)="fieldFormGroup.get('removeMultipleRow').setValue($event);onFormValueChange()" theme="primary">
+              </lib-slide-toggle>
+              &nbsp;
+              <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                libTooltip="This property can be used to enable or disable the “Multi-select remove row” option against the grid on the form.">
+                question-circle </mat-icon>
+            </div>
+
+            <div class="f-row mdo-field">
+              <lib-slide-toggle formControlName="copyRow" label="Copy row"
+                labelposition="after" (toggleChange)="fieldFormGroup.get('copyRow').setValue($event);onFormValueChange()" theme="primary">
+              </lib-slide-toggle>
+              &nbsp;
+              <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                libTooltip="This property can be used to enable or disable the “Copy row” option against a grid line on the form">
+                question-circle </mat-icon>
+            </div>
+
+            <div class="f-row mdo-field">
+              <lib-slide-toggle formControlName="export" label="Export"
+                labelposition="after" (toggleChange)="fieldFormGroup.get('export').setValue($event);onFormValueChange()" theme="primary">
+              </lib-slide-toggle>
+              &nbsp;
+              <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                libTooltip="This property can be used to enable or disable the “Export” data option against the grid on the form.">
+                question-circle </mat-icon>
+            </div>
+
+            <div class="f-row mdo-field">
+              <lib-slide-toggle formControlName="import" label="Import"
+                labelposition="after" (toggleChange)="fieldFormGroup.get('import').setValue($event);onFormValueChange()" theme="primary">
+              </lib-slide-toggle>
+              &nbsp;
+              <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                libTooltip="This property can be used to enable or disable the “Import” data option against the grid on the form">
+                question-circle </mat-icon>
+            </div>
+
+            <div class="f-col mdo-field">
+              <!-- label -->
+              <lib-text-line type="xsmall" weight="strong" i18n="@@sort_fields">Sort fields
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                libTooltip="This property can be used to maintain one or more fields from the grid for enabling sorting when maintaining data.">
+                question-circle </mat-icon>
+              </lib-text-line>
+
+              <!-- input container -->
+              <div class="mdo-field-input">
+                <!-- chip list -->
+                <lib-chip-list>
+                  <ng-container *ngFor="let opt of formSelectedValues.selectedSortFields; let i = index">
+                    <ng-container *ngIf="i <= limit - 1">
+                      <lib-chip [removable]="true" (removed)="manageDropdownValue(opt,'selectedSortFields')">{{ opt.description }}</lib-chip>
+                    </ng-container>
+                  </ng-container>
+                  <lib-chip *ngIf="formSelectedValues.selectedSortFields.length > limit">+{{ formSelectedValues?.selectedSortFields?.length - limit }}</lib-chip>
+                  <input matInput placeholder="Type to search" #optionInput [formControl]="sortFieldCtrl" [matAutocomplete]="auto" />
+                </lib-chip-list>
+                <!-- autocomplete -->
+                <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" (optionSelected)="manageDropdownValue($event.option.value,'selectedSortFields')" [displayWith]="displaySequenceField">
+                  <mat-option class="mdo-option" *ngFor="let opt of formObs.sortFieldsObs | async" [value]="opt">
+                    {{ opt.description }}
+                  </mat-option>
+                  <!-- <mat-option *ngIf="!availableOptions?.length" class="mdo-option" disabled>
+                    No data found
+                  </mat-option> -->
+                </mat-autocomplete>
+              </div>
+            </div>
+
+            <div class="f-col mdo-field">
+              <!-- label -->
+              <lib-text-line type="xsmall" weight="strong" i18n="@@sort_order">Sort order
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                libTooltip="This property can be used to sort the data in ascending or descending order, as per the defined sort fields when maintaining data.">
+                question-circle </mat-icon>
+              </lib-text-line>
+              <div class="mdo-field-input">
+                  <input matInput placeholder="Select dataset"
+                      [formControl]="sortFieldOrderCtrl" [matAutocomplete]="sortOrderList" />
+                  <mat-autocomplete class="mdo-autocomplete" #sortOrderList="matAutocomplete" (optionSelected)="manageSortOrderValue($event)" [displayWith]="displaySortOrderField">
+                      <ng-template [ngIf]="(formObs.sortOrderObs | async)?.length !== 0" [ngIfElse]="noSortOption">
+                        <mat-option class="mdo-option" *ngFor="let opt of formObs.sortOrderObs | async" [value]="opt">
+                          {{opt.label}}
+                        </mat-option>
+                      </ng-template>
+                      <ng-template #noSortOption>
+                        <mat-option disabled>No data found</mat-option>
+                      </ng-template>
+                  </mat-autocomplete>
+              </div>
+            </div>
+
+            <div class="f-col mdo-field">
+              <lib-text-line type="xsmall" weight="strong" i18n="@@sequence_field">Sequence field
+                <mat-icon fontSet="mdo-icons-light" class="label-icon"
+                libTooltip="This property can be used to define a counter-type field from the grid that is required to be auto-generated when maintaining data.">
+                question-circle </mat-icon>
+              </lib-text-line>
+              <div class="mdo-field-input">
+                  <input matInput placeholder="Select" [matAutocomplete]="sequenceFieldList"  formControlName="sequenceField"/>
+
+                  <mat-icon matSuffix fontSet="mdo-icons-light" class="autocomplete-icon" prosClickStopPropagation
+                      >chevron-down</mat-icon>
+                  <mat-autocomplete class="mdo-autocomplete" #sequenceFieldList="matAutocomplete" [displayWith]="displaySequenceField"
+                      (optionSelected)="sequencyFieldSelected()">
+                      <ng-template [ngIf]="(formObs.sequenceFieldObs | async)?.length !== 0" [ngIfElse]="noOption">
+                        <mat-option class="mdo-option" *ngFor="let field of formObs.sequenceFieldObs | async" [value]="field">
+                          {{ field?.description }}
+                        </mat-option>
+                      </ng-template>
+                      <ng-template #noOption>
+                        <mat-option disabled>No data found</mat-option>
+                      </ng-template>
+                  </mat-autocomplete>
+              </div>
+          </div>
+
+          <div class="f-col" [ngStyle]="{'pointer-events': !fieldFormGroup.get('sequenceField').value ? 'none' : 'inherit'}">
+            <lib-input matInput [formControl]="fieldFormGroup.controls['sequenceInterval']" i18n-label="@@sequence_interval" label="Sequence interval"
+            (afterBlur) = "onFormValueChange()"
+            labelIconTooltip="This property can be used to define the initial value for the defined sequence field while maintaining the first grid line data."
+              labelIcon="question-circle">
+            </lib-input>
+          </div>
+
+          <div class="f-col" [ngStyle]="{'pointer-events': !fieldFormGroup.get('sequenceField').value ? 'none' : 'inherit'}">
+            <lib-input matInput [formControl]="fieldFormGroup.controls['sequenceStart']" i18n-label="@@sequence_start" label="Sequence start"
+            (afterBlur) = "onFormValueChange()"
+            labelIconTooltip="This property can be used to define the incremental value, for the system to generate the counter for the defined sequence field when maintaining more than one grid lines."
+            labelIcon="question-circle">
+            </lib-input>
+          </div>
+
+          <div class="f-col mdo-field">
+            <!-- label -->
+            <lib-text-line type="xsmall" weight="strong" i18n="@@unique_row">Unique row
+              <mat-icon fontSet="mdo-icons-light" class="label-icon"
+              libTooltip="This property can be used to maintain one or more fields from the grid that needs to be checked by the system for uniqueness.">
+              question-circle </mat-icon>
+            </lib-text-line>
+
+            <!-- input container -->
+            <div class="mdo-field-input">
+              <!-- chip list -->
+              <lib-chip-list>
+                <ng-container *ngFor="let opt of formSelectedValues.selectedUniqueRow; let i = index">
+                  <ng-container *ngIf="i <= limit - 1">
+                    <lib-chip [removable]="true" (removed)="manageDropdownValue(opt,'selectedUniqueRow')">{{ opt.description }}</lib-chip>
+                  </ng-container>
+                </ng-container>
+                <lib-chip *ngIf="formSelectedValues.selectedUniqueRow.length > limit">+{{ formSelectedValues.selectedUniqueRow.length - limit }}</lib-chip>
+                <input matInput placeholder="Type to search" #optionInput [formControl]="uniqueFieldCtrl" [matAutocomplete]="uniqueRow" />
+              </lib-chip-list>
+              <!-- autocomplete -->
+              <mat-autocomplete class="mdo-autocomplete" #uniqueRow="matAutocomplete" (optionSelected)="manageDropdownValue($event.option.value,'selectedUniqueRow')" [displayWith]="displaySequenceField">
+                <ng-template [ngIf]="(formObs.uniqueRowObs | async)?.length !== 0" [ngIfElse]="noUniqueOption">
+                  <mat-option class="mdo-option" *ngFor="let opt of formObs.uniqueRowObs | async" [value]="opt">
+                    {{ opt.description }}
+                  </mat-option>
+                </ng-template>
+                <ng-template #noUniqueOption>
+                  <mat-option disabled>No data found</mat-option>
+                </ng-template>
+              </mat-autocomplete>
+            </div>
+          </div>
+          </div>
+        </form>
+      </div>
+    </ng-container>
+  </div>

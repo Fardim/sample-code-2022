@@ -1,0 +1,50 @@
+.collaborators-list {
+  mat-list-item {
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    height: auto;
+    padding: 8px 0;
+
+    .f-col {
+      width: 100%;
+
+      .f-row {
+        align-items: center;
+
+        mat-icon.mat-list-icon {
+          font-size: 24px;
+          height: 24px;
+          width: 24px;
+          margin-right: 16px;
+
+          &.icon-user {
+            color: #0d66d0;
+          }
+
+          &.icon-role {
+            color: #cb6f10;
+          }
+
+          &.icon-group {
+            color: #12805c;
+          }
+        }
+
+        .mat-line:nth-child(1) {
+          font-size: 0.9rem;
+          font-weight: 500;
+        }
+      }
+
+      .permissions {
+        justify-content: space-between;
+        margin-top: 8px;
+        font-size: 0.8rem;
+
+        mat-slide-toggle {
+          margin: 4px 8px;
+        }
+      }
+    }
+  }
+}

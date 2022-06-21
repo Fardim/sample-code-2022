@@ -1,0 +1,43 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" icon="times" iconFontType="light" (click)="close()"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading" i18n="@@new_tenant">New data model</lib-text-line>
+                <div class="f-spacer"></div>
+                <lib-button type="major" i18n="@@Save" width="80px">Save</lib-button>
+            </div>
+        </div>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <div>
+                <lib-input value="Value" label="Name" i18n="@@name"></lib-input>
+                <lib-section text="Data model definition"></lib-section>
+                <div class="row-spacer"></div>
+                <div class="f-row plus-action">
+                    <lib-button [matMenuTriggerFor]="menu" [icon]="'plus'" [rounded]="true" [iconFontType]="'light'"
+                        [type]="'major'">
+                    </lib-button>
+                </div>
+                    <pros-data-model-hierarchy-level></pros-data-model-hierarchy-level>
+                <mat-menu #menu="matMenu">
+                    <div class="f-row-spacer-half"></div>
+                    <lib-search placeholder="Search"></lib-search>
+                    <div class="f-row-spacer-half"></div>
+                    <mat-list role="list" class="mdo-list">
+                        <mat-list-item role="listitem" (click)="setProperties()">Data item 1</mat-list-item>
+                        <mat-list-item role="listitem">Data item 2</mat-list-item>
+                        <mat-list-item role="listitem">Data item 3</mat-list-item>
+                    </mat-list>
+                </mat-menu>
+
+            </div>
+            <lib-button [matMenuTriggerFor]="menu" [icon]="'plus'" [rounded]="true" [iconFontType]="'light'"
+                [type]="'major'">
+            </lib-button>
+        </div>
+    </div>
+</div>

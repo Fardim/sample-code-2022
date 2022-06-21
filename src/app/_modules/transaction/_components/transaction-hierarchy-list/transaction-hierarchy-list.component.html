@@ -1,0 +1,239 @@
+<div class="root" *ngIf="hierarchyList?.length">
+
+  <!-- Hierarchy for the parent dataset-->
+  <ng-container *ngIf="!isChildDataset" >
+    <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" class="hierarchy-tree">
+      <mat-tree-node
+        *matTreeNodeDef="let node"
+        matTreeNodePadding
+        [ngClass]="{ selected: isActive(node) }"
+        (click)="navigateToNode(node)"
+        class="f-row"
+      >
+        <lib-text-line *ngIf="!node?.isMultiField" class="hierarchy-name" type="base">
+          <lib-checkbox
+            (valueChange)="changeNodeCopyStatus(node, $event)"
+            [checked]="true"
+            *ngIf="process === 'copy'"
+            class="copy-box"
+          ></lib-checkbox
+          >{{ node.label }}
+        </lib-text-line>
+        <lib-text-line
+          class="hierarchy-name"
+          *ngIf="node?.isMultiField && node?.multiFieldOptions?.length !== 0"
+          [enableWrap]="true"
+          type="base"
+          [innerHTML]="getNodeLabel(node?.multiFieldOptions)"
+        >
+        </lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button
+          *ngIf="node.level < 4 && process !== 'view'"
+          type="plain"
+          icon="ellipsis-h"
+          [matMenuTriggerFor]="navigation"
+          [matMenuTriggerData]="{ node: node }"
+          (afterClick)="setStructureDetails(node)"
+          prosClickStopPropagation
+        >
+        </lib-button>
+      </mat-tree-node>
+      <mat-tree-node
+        *matTreeNodeDef="let node; when: hasChild"
+        matTreeNodePadding
+        [ngClass]="{ selected: isActive(node) }"
+        class="f-row"
+        (click)="navigateToNode(node)"
+      >
+        <button mat-icon-button matTreeNodeToggle prosClickStopPropagation>
+          <mat-icon class="mat-icon-rtl-mirror">
+            {{ treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
+          </mat-icon>
+        </button>
+        <lib-text-line class="hierarchy-name" type="base">
+          <lib-checkbox
+            (valueChange)="changeNodeCopyStatus(node, $event)"
+            [checked]="true"
+            *ngIf="process === 'copy'"
+            class="copy-box"
+          ></lib-checkbox
+          >{{ node.label }}
+        </lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button
+          *ngIf="node.level < 4 && process !== 'view'"
+          type="plain"
+          icon="ellipsis-h"
+          prosClickStopPropagation
+          [matMenuTriggerFor]="navigation"
+          [matMenuTriggerData]="{ node: node }"
+          (afterClick)="setStructureDetails(node)"
+        >
+        </lib-button>
+      </mat-tree-node>
+    </mat-tree>
+  </ng-container>
+
+  <!--Hierarchy for child datasets-->
+  <ng-container *ngIf="isChildDataset">
+    <div class="f-row">
+      <lib-text-line class="hierarchy-name" type="base">
+        {{ datasetDescription }}
+      </lib-text-line>
+      <span class="f-spacer"></span>
+      <lib-button
+        *ngIf="process !== 'view' && this.process !== 'copy'"
+        [matMenuTriggerFor]="recordOption"
+        type="plain"
+        icon="ellipsis-h"
+      >
+      </lib-button>
+    </div>
+
+    <ng-container *ngIf="activeForm">
+      <mat-tree *ngFor="let record of allRecordList" [dataSource]="dataSource" [treeControl]="treeControl">
+        <mat-tree-node
+          *matTreeNodeDef="let node"
+          matTreeNodePadding
+          [ngClass]="{ selected: record === this.activeForm.objnr }"
+          class="f-row"
+          (click)="navigateToRecord(record)"
+        >
+          <button mat-icon-button disabled></button>
+          <lib-text-line class="hierarchy-name" type="base"> {{ node.label }} - {{ record }} </lib-text-line>
+        </mat-tree-node>
+      </mat-tree>
+    </ng-container>
+
+  </ng-container>
+
+</div>
+
+<!--Navigation Menu Template-->
+<mat-menu #navigation="matMenu" class="navigation-menu">
+  <ng-template let-currentNode="node" matMenuContent>
+    <button
+      mat-menu-item
+      i18n="@@Add_new"
+      [matMenuTriggerFor]="currentNode.isHeader || currentNode.isKeyValue ? structuresMenu : keyFieldsMenu"
+      [matMenuTriggerData]="getNavigationData(currentNode)"
+    >
+      Add new
+    </button>
+    <button
+      mat-menu-item
+      i18n="@@Reset"
+      *ngIf="currentNode?.structureId || currentNode?.isHeader"
+      (click)="resetNode(currentNode)"
+    >
+      Reset
+    </button>
+  </ng-template>
+</mat-menu>
+
+<!-- Structures Menu Template-->
+<mat-menu #structuresMenu="matMenu" class="navigation-menu">
+  <ng-template let-parentNode="node" matMenuContent>
+    <button
+      mat-menu-item
+      [matMenuTriggerFor]="keyFieldsMenu"
+      *ngFor="let child of getChildsByNode(parentNode)"
+      [matMenuTriggerData]="{ childNode: child, parentNode: parentNode }"
+      (mouseenter)="structureSub.next({ node: child, parentNode: parentNode })"
+    >
+      {{ !child?.isMultiField ? child.label : getNodeKeyValueLabel(child?.multiFieldOptions) }}
+    </button>
+  </ng-template>
+</mat-menu>
+
+<!--Key Field Menu Template-->
+<mat-menu #keyFieldsMenu="matMenu" class="filter-menudropdown">
+  <ng-template let-outerNode="parentNode" let-childNode="childNode" matMenuContent>
+    <lib-filter-dropdown class="chip-filters">
+      <div class="dropdown-search-wrapper">
+        <lib-search
+          prosClickStopPropagation
+          placeholder="Search..."
+          (valueChange)="dropdowOptionsSearchSub.next($event)"
+        ></lib-search>
+      </div>
+      <div class="dropdown-options-wrapper f-col">
+        <div class="dropdown-options-inner-container">
+          <div class="options">
+            <ng-template [ngIf]="isLoadingKeyFieldOptions" [ngIfElse]="showOptions">
+              <lib-skeleton type="line"></lib-skeleton>
+              <lib-skeleton type="line"></lib-skeleton>
+              <lib-skeleton type="line"></lib-skeleton>
+            </ng-template>
+            <ng-template #showOptions>
+              <div *ngIf="(keyFieldOptionsObs | async)?.length && !isLoadingKeyFieldOptions; else noDataFound">
+                <lib-filter-option prosClickStopPropagation *ngFor="let option of keyFieldOptionsObs | async">
+                  <ng-template [ngIf]="keyField.id" [ngIfElse]="showKeyFieldsOptions">
+                    <lib-checkbox
+                      [checked]="isOptionChecked(option)"
+                      [label]="option.text"
+                      (valueChange)="updateKeyFieldValues(option, outerNode, childNode, false)"
+                    >
+                    </lib-checkbox>
+                  </ng-template>
+
+                  <ng-template #showKeyFieldsOptions>
+                    <div class="f-row" *ngIf="!keyField.id && multiKeyFields.length !== 0">
+                      <lib-checkbox
+                        class="f-col"
+                        [checked]="isMultiOptionChecked(option)"
+                        (valueChange)="updateKeyFieldValues(option, outerNode, childNode, true)"
+                      >
+                      </lib-checkbox>
+                      <span class="f-col-spacer-half"></span>
+                      <div class="f-col">
+                        <lib-text-line *ngFor="let item of option | keyvalue" [enableWrap]="true">{{
+                          item.value.text
+                        }}</lib-text-line>
+                      </div>
+                    </div>
+                  </ng-template>
+                </lib-filter-option>
+              </div>
+              <ng-template #noDataFound>
+                <lib-filter-option>
+                  <div class="f-row">
+                    <span class="f-col-spacer-half"></span>
+                    <div class="f-col">
+                      <lib-text-line>No data found</lib-text-line>
+                    </div>
+                  </div>
+                </lib-filter-option>
+              </ng-template>
+            </ng-template>
+          </div>
+        </div>
+        <div class="filter-button-wrapper">
+          <lib-button
+            type="minor"
+            [disabled]="!(keyFieldOptionsObs | async)?.length"
+            i18n="@@apply"
+            (afterClick)="applyKeyFieldValues(outerNode, childNode)"
+          >
+            Apply
+          </lib-button>
+        </div>
+      </div>
+    </lib-filter-dropdown>
+  </ng-template>
+</mat-menu>
+
+<!--Record Menu Template-->
+<mat-menu #recordOption="matMenu" class="navigation-menu">
+  <ng-template let-currentNode="node" matMenuContent>
+    <button [matMenuTriggerFor]="newRecordOption" mat-menu-item i18n="@@Add_new">Add new</button>
+  </ng-template>
+</mat-menu>
+
+<!--New Record Menu Template-->
+<mat-menu #newRecordOption="matMenu" class="navigation-menu">
+  <ng-template let-currentNode="node" matMenuContent>
+    <button mat-menu-item i18n="@@Add_new" (click)="addNewRecord()">Create new</button>
+  </ng-template>
+</mat-menu>

@@ -1,0 +1,14 @@
+mat-card.widget {
+  box-sizing: border-box;
+  padding: 8px;
+  height: 100%;
+
+  mat-card-content {
+    height: calc(100% - 36px - 16px);
+    overflow: auto;
+  }
+
+  .bar-height {
+    height: 100%;
+  }
+}

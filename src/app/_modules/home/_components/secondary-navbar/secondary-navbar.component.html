@@ -1,0 +1,240 @@
+<div class="root">
+  <mat-card class="secondary-card mat-elevation-z0">
+    <ng-container *ngIf="!initialLoadingState; else secondaryNavLoader">
+      <div class="f-row-spacer-half"></div>
+
+      <div class="f-row secondary-padd-lr">
+        <lib-text-line type="leading">{{ getRoutedDescription }}</lib-text-line>
+        <span class="f-spacer"></span>
+        <ng-container *ngIf="activatedPrimaryNav === 'welcome'" >
+          <lib-button type="plain" iconFontType="light" icon="plus" iconPosition="before" [matMenuTriggerFor]="homePlusMenu">
+            <mat-icon fontSet="mdo-icons-solid">caret-down</mat-icon>
+          </lib-button>
+          <mat-menu #homePlusMenu="matMenu" class="navigation-menu">
+            <lib-filter-option (click)="openPackageSideSheet()">Explore ConnektHub</lib-filter-option>
+          </mat-menu>
+        </ng-container>
+        <ng-container *ngIf="activatedPrimaryNav === 'report'; else singleButton">
+          <lib-button type="plain" iconFontType="light" icon="plus" iconPosition="before" [matMenuTriggerFor]="plusMenu">
+            <mat-icon fontSet="mdo-icons-solid">caret-down</mat-icon>
+          </lib-button>
+          <mat-menu #plusMenu="matMenu" class="navigation-menu">
+            <lib-filter-option (click)="importReport()">Import</lib-filter-option>
+            <lib-filter-option (click)="globalCreate()">Create new</lib-filter-option>
+            <lib-filter-option [routerLink]="['', { outlets: { sb: 'sb/report/connekthub-import' } }]">From ConnektHub
+              library</lib-filter-option>
+          </mat-menu>
+        </ng-container>
+        <ng-template #singleButton>
+          <lib-button type="plain" iconFontType="light" icon="plus"
+            *ngIf="activatedPrimaryNav !== 'schema' && activatedPrimaryNav === 'list' && activatedPrimaryNav !== 'welcome'; else isSchema"
+            (click)="globalCreate()"></lib-button>
+        </ng-template>
+        <ng-template #isSchema>
+          <lib-button type="plain" iconFontType="light" icon="plus" [matMenuTriggerFor]="moduleMenu"
+            *ngIf="activatedPrimaryNav !== 'list' && activatedPrimaryNav !== 'welcome'"></lib-button>
+          <mat-menu #moduleMenu="matMenu" xPosition="before" (closed)="searchInput.clearSearch()" class="navigation-menu">
+            <lib-search class="menu-search-row" placeholder="Search for module" (valueChange)="filterModulesMenu($event)"
+              #searchInput prosClickStopPropagation></lib-search>
+            <div class="menu-customdropdown">
+              <button mat-menu-item [focus]="false" *ngFor="let module of filteredModulesMenu | async"
+                (click)="createNewSchema(module.moduleId)" [disableRipple]="true">
+                {{ module.moduleDesc || 'Untitled' }}
+              </button>
+              <button mat-menu-item [focus]="false" [disableRipple]="true" class="no-result" disabled>No results
+                found</button>
+            </div>
+          </mat-menu>
+        </ng-template>
+      </div>
+
+      <div class="f-row-spacer-half"></div>
+  
+      <div class="secondary-padd-lr">
+        <lib-search [placeholder]="getPlaceholderText()" #schemaSearchInput [formControl]="searchControl"></lib-search>
+        <!-- placeholder="activatedPrimaryNav ==='report' ? 'Search report' : activatedPrimaryNav ==='list'? 'Search' :'Search schema'" -->
+      </div>
+  
+      <div class="row-spacer"></div>
+  
+      <div prosInfiniteScroll bufferPercentage="20" class="nav-tree" id="nav-tree">
+        <mat-accordion *ngIf="activatedPrimaryNav === 'welcome'">
+          <lib-section class="divider-section" text="Dashboards"></lib-section>
+          <mat-list [disableRipple]="true" class="mdo-list">
+            <mat-list-item [routerLink]="['/home/dash/welcome']" [routerLinkActive]="'selected'">
+              <lib-text-line type="base"> Welcome to MDO FUSE </lib-text-line>
+            </mat-list-item>
+          </mat-list>
+          <!-- <mat-accordion> -->
+          <lib-section class="divider-section" text="Tasks" *ngIf="mockTaskList.length"></lib-section>
+          <div cdkDropList class="dnd-tasks-list" (cdkDropListDropped)="dropTask($event)">
+            <ng-container *ngFor="let task of filteredTaskList; let i = index">
+              <div cdkDrag class="tasks-list-drag-el" cdkDragBoundary=".dnd-tasks-list">
+                <mat-expansion-panel hideToggle="{{ task.childs && task.childs.length ? 'false' : 'true' }}"
+                  togglePosition="before" class="mat-elevation-z0" [id]="task.id"
+                  [expanded]="task.id === selectedTask && selectedTaskFilter">
+                  <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px" prosExpansionPanelToggleHandler
+                    [routerLink]="['/home/task', task.id, 'feed']"
+                    [class.selected]="!selectedTaskFilter && task.id === selectedTask" (click)="updateTaskState(task.id)">
+                    <mat-panel-title>
+                      <lib-text-line type="base" class="expand-title" [innerHTML]="task.label | highlight: schemaSearchString"></lib-text-line>
+                      <span class="f-spacer"></span>
+                      <lib-text-line type="small" textColor="secondary" *ngIf="!task.hasNewFeeds && task.rec_cnt">{{
+                        task.rec_cnt
+                        }}</lib-text-line>
+                      <span class="f-col-spacer-half"></span>
+                      <lib-button *ngIf="task.hasNewFeeds && task.new_feed_cnt" [libBadge]="task.new_feed_cnt"
+                        matBadgePosition="below" matBadgeSize="medium" matBadgeOverlap="true" class="task-badge btn-pos">
+                      </lib-button>
+                    </mat-panel-title>
+                  </mat-expansion-panel-header>
+                  <mat-nav-list [disableRipple]="true" class="dnd-task-search-list">
+                    <div cdkDropList (cdkDropListDropped)="dropTask($event, i)">
+                      <mat-list-item *ngFor="let subTask of task.childs"
+                        [class.selected]="subTask.id === selectedTaskFilter">
+                        <div cdkDrag class="task-search-list-drag-el" cdkDragBoundary=".dnd-task-search-list"
+                          [routerLink]="['/home/task', task.id, 'feed']" [queryParams]="{ s: subTask.id }"
+                          (click)="updateTaskState(task.id, subTask.id)">
+                          <lib-text-line type="base">{{ subTask.label }}</lib-text-line>
+                          <span class="f-spacer"></span>
+                          <span *ngIf="!subTask.hasNewFeeds && subTask.rec_cnt">{{ subTask.rec_cnt }}</span>
+                          <lib-button *ngIf="subTask.hasNewFeeds && subTask.new_feed_cnt"
+                            [libBadge]="subTask.new_feed_cnt" matBadgePosition="below" matBadgeSize="medium"
+                            class="task-badge search-badge"></lib-button>
+                        </div>
+                      </mat-list-item>
+                    </div>
+                  </mat-nav-list>
+                </mat-expansion-panel>
+              </div>
+            </ng-container>
+          </div>
+          <!-- <lib-section text="Collaboration"></lib-section> -->
+        </mat-accordion>
+  
+        <!-- Tree to show when navigation is on schema -->
+        <mat-accordion *ngIf="activatedPrimaryNav === 'schema'">
+          <ng-container *ngFor="let module of searchModuleResults">
+            <mat-expansion-panel togglePosition="before" class="mat-elevation-z0"
+              [expanded]="activeMenuItemId === module.moduleId"
+              *ngIf="module.schemaLists && module.schemaLists.length > 0" [id]="module.moduleId">
+              <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px" prosExpansionPanelToggleHandler
+                [routerLink]="['schema', module.moduleId]" routerLinkActive="selected">
+                <mat-panel-title>
+                  <lib-text-line type="base" class="expand-title">{{ module.moduleDesc ? module.moduleDesc : 'Untitled' }}
+                  </lib-text-line>
+                  <span class="f-spacer"></span>
+                  <lib-text-line type="small" textColor="secondary">{{ module.schemaLists.length }}</lib-text-line>
+                  <span class="f-col-spacer-half"></span>
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <mat-nav-list role="navigation" [disableRipple]="true">
+                <mat-list-item *ngFor="let schema of module.schemaLists"
+                  [routerLink]="['schema/schema-info', schema.moduleId, schema.schemaId]"
+                  [ngClass]="{ selected: isActiveLink('schema/schema-info/' + schema.moduleId + '/' + schema.schemaId) }"
+                  [queryParams]="{ fragment: 'business-rules' }">
+                  <div mat-line class="sublist-item">
+                    <lib-text-line type="base">{{ schema.schemaDescription ? schema.schemaDescription : 'Untitled' }}
+                    </lib-text-line>
+                  </div>
+                </mat-list-item>
+              </mat-nav-list>
+            </mat-expansion-panel>
+          </ng-container>
+          <lib-empty-state *ngIf="schemaSearchInput?.control?.value && !searchModuleResults.length"
+            primaryText="No results found" icon="table" iconSize="100">
+          </lib-empty-state>
+        </mat-accordion>
+  
+        <!-- Tree to show when navigation is on report -->
+        <mat-accordion *ngIf="activatedPrimaryNav === 'report'">
+          <mat-nav-list *ngFor="let report of reportOb | async" [disableRipple]="true">
+            <mat-list-item [disabled]="report.permission && !report.permission.isViewable"
+              [routerLink]="['report/view', report.reportId]" [routerLinkActive]="'selected'">
+              <div #headingTitle class="text-line" [libTooltip]="report.reportName" matTooltipPosition="right"
+                [matTooltipDisabled]="isTooltipReady && !(headingTitle.offsetWidth < headingTitle.scrollWidth)">
+                {{ report.reportName ? report.reportName : 'Untitled' }}
+              </div>
+            </mat-list-item>
+          </mat-nav-list>
+        </mat-accordion>
+  
+        <!-- Tree to show when navigation is on list -->
+        <mat-accordion *ngIf="activatedPrimaryNav === 'list'">
+          <cdk-virtual-scroll-viewport style="height: 100%;" itemSize="50" prosInfiniteScroll
+    bufferPercentage="20" (scrollEnd)="onScrollEnd(true)">
+          <ng-container *ngIf="dataSetSearchLoader; else showResults">
+            <pros-list-item-skeleton *ngFor="let a of [].constructor(3)" type="line"></pros-list-item-skeleton>
+          </ng-container>
+          <ng-template #showResults>
+            <ng-container *ngFor="let objectType of stdObjectTypeObs | async">
+              <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" [id]="objectType.objectid"
+                hideToggle="true">
+                <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px"
+                  [class.selected]="selectedDataSet === objectType.objectid" (click)="selectDataSet(objectType.objectid)"
+                  [routerLink]="['list/datatable', objectType.objectid]">
+                  <mat-panel-title>
+                    <lib-text-line type="base" class="expand-title">{{
+                      (objectType.objectdesc ? objectType.objectdesc : 'Untitled') | slice: 0:30
+                      }}</lib-text-line>
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+              </mat-expansion-panel>
+            </ng-container>
+            <lib-section class="lib-section" text="System"></lib-section>
+            <ng-container *ngFor="let objectType of sysObjectTypeObs | async">
+              <mat-expansion-panel togglePosition="before" class="mat-elevation-z0" [id]="objectType.objectid"
+                hideToggle="true">
+                <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px"
+                  [class.selected]="selectedDataSet === objectType.objectid" (click)="selectDataSet(objectType.objectid)"
+                  [routerLink]="['list/datatable', objectType.objectid]">
+                  <mat-panel-title>
+                    <lib-text-line type="base" class="expand-title">{{
+                      (objectType.objectdesc ? objectType.objectdesc : 'Untitled') | slice: 0:30
+                      }}</lib-text-line>
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+              </mat-expansion-panel>
+            </ng-container>
+          </ng-template>
+          </cdk-virtual-scroll-viewport>
+        </mat-accordion>
+
+        <!-- Tree to show when navigation is on HOME -->
+        <!-- <mat-accordion *ngIf="activatedPrimaryNav === 'welcome'">
+          <mat-nav-list role="navigation" [disableRipple]="true">
+            <mat-list-item *ngFor="let schema of schemaList" (click)="updateSchemaBadgeInfo(schema)"
+              [routerLink]="['schema/schema-details', schema.moduleId, schema.schemaId]" [routerLinkActive]="'selected'">
+              <div mat-line class="f-col">
+                <lib-text-line type="small" textColor="primary" class="nav-heading">
+                  <span [class.unread]="!schema.viewed && !schema.running">
+                    {{schema.schemaDescription ? schema.schemaDescription : 'Untitled'}}
+                  </span>
+                </lib-text-line>
+                <lib-text-line type="xsmall" textColor="secondary">{{schema.moduleDesc}}</lib-text-line>
+              </div>
+              <span class="f-spacer"></span>
+              <div class="schema-update">
+                <lib-spinner *ngIf="schema.running" size="26" class="lib-spinner"></lib-spinner>
+                <div *ngIf="!schema.viewed && !schema.running" disabled [matBadgeOverlap]="true" [libBadge]="1"
+                  [statusBadgePosition]="{ top: 0, right: 0 }" matBadgePosition="after"></div>
+              </div>
+            </mat-list-item>
+            <lib-empty-state *ngIf="schemaSearchInput?.control?.value && !schemaList.length" primaryText="No results found" icon="table" iconSize=100>
+            </lib-empty-state>
+          </mat-nav-list>
+        </mat-accordion> -->
+      </div>
+    </ng-container>
+
+    <ng-template #secondaryNavLoader>
+      <pros-secondary-nav-skeleton></pros-secondary-nav-skeleton>
+    </ng-template>
+  </mat-card>
+
+  <div class="split-col" (click)="toggleSideBar()">
+    <div class="split-arrow">
+      <mat-icon fontSet="mdo-icons">{{ secondarySideBarOpened ? 'chevron-left' : 'chevron-right' }}</mat-icon>
+    </div>
+  </div>
+</div>

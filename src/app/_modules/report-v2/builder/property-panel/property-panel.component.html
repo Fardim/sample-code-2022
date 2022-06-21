@@ -1,0 +1,1461 @@
+<div class="root" cdkScrollable>
+  <div class="f-row-spacer-half"></div>
+  <div class="f-row">
+    <ng-container *ngIf="showReportSettings; else editDashboard">
+      <div class="f-row col-heading">
+        <lib-text-line type="leading">Edit dashboard</lib-text-line>
+      </div>
+    </ng-container>
+    <ng-template #editDashboard>
+      <lib-button (click)="closePanel()" type="plain" icon="long-arrow-left"></lib-button>
+      <span class="f-col-spacer-half"></span>
+      <lib-text-line type="leading">Edit widget</lib-text-line>
+    </ng-template>
+  </div>
+
+  <div class="f-row-spacer-half" *ngIf="showReportSettings"></div>
+
+  <div class="fields-col" *ngIf="showReportSettings" [formGroup]="reportCtrlGrp">
+    <div class="f-col">
+      <lib-input
+        label="Name"
+        [isRequired]="true"
+        (afterBlur)="reportNameTouched = true"
+        [hasError]="reportNameTouched && reportCtrlGrp.controls.reportName.invalid"
+        [hint]="getReportNameValidation(reportCtrlGrp.get('reportName'))"
+        formControlName="reportName"
+        (input)="sanitizeValue(reportCtrlGrp.get('reportName'))"
+      ></lib-input>
+    </div>
+    <!-- <div class="f-col">
+            <lib-textarea label="Description" formControlName="reportDesciption"></lib-textarea>
+        </div> -->
+  </div>
+
+  <!-- BASIC CONFIGURATION-->
+  <div class="collapsible" *ngIf="!showReportSettings">
+    <mat-accordion>
+      <mat-expansion-panel class="mat-elevation-z0" togglePosition="before" expanded="true">
+        <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+          <mat-panel-title>
+            <lib-text-line type="base" weight="strong">Basic configuration</lib-text-line>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="f-col fields-col" [formGroup]="styleCtrlGrp">
+          <div class="f-col">
+            <lib-input
+              label="Widget name *"
+              (afterBlur)="widgetNameTouched = true"
+              [hasError]="
+                widgetNameTouched &&
+                styleCtrlGrp.controls.widgetName.invalid &&
+                !(selStyleWid.widgetType === 'IMAGE' || selStyleWid.widgetType === 'HTML')
+              "
+              [hint]="getWidgetNameValidation(styleCtrlGrp.get('widgetName'))"
+              formControlName="widgetName"
+              (input)="sanitizeValue(styleCtrlGrp.get('widgetName'))"
+            ></lib-input>
+          </div>
+
+          <div class="f-col">
+            <ng-template [ngIf]="selStyleWid && !(selStyleWid.widgetType === 'IMAGE' || selStyleWid.widgetType === 'HTML')">
+              <div class="f-col mdo-field">
+                <ng-template
+                  [ngIf]="styleCtrlGrp.get('isWorkflowdataSet') && styleCtrlGrp.get('isWorkflowdataSet').value"
+                  [ngIfElse]="singleSelect"
+                >
+                  <lib-text-line
+                    type="xsmall"
+                    [ngClass]="
+                      datasetCtrl.touched && !datasetCtrl.value && !styleCtrlGrp.get('isWorkflowdataSet').value ? 'error-text' : ''
+                    "
+                    weight="strong"
+                    class="field-label required-field"
+                    >Data set ({{ workFlowDatasetCount }} selected)
+                  </lib-text-line>
+                </ng-template>
+                <ng-template #singleSelect>
+                  <lib-text-line
+                    type="xsmall"
+                    [ngClass]="
+                      datasetCtrl.touched && !datasetCtrl.value && !styleCtrlGrp.get('isWorkflowdataSet').value ? 'error-text' : ''
+                    "
+                    weight="strong"
+                    class="field-label required-field"
+                    >Data set
+                  </lib-text-line>
+                </ng-template>
+                <div
+                  class="mdo-field-input"
+                  [ngClass]="
+                    datasetCtrl.touched && !datasetCtrl.value && !styleCtrlGrp.get('isWorkflowdataSet').value ? 'error-border' : ''
+                  "
+                >
+                  <input
+                    matInput
+                    #datasetTrigger="matAutocompleteTrigger"
+                    [formControl]="datasetCtrl"
+                    [matAutocomplete]="datasetList"
+                    (click)="openAutoComplete(datasetTrigger)"
+                    (keyup)="openAutoComplete(datasetTrigger); searchDataSet($event.target.value)"
+                  />
+                  <mat-autocomplete #datasetList="matAutocomplete" [displayWith]="displayWithDataSet">
+                    <mat-optgroup label="Module">
+                      <mat-option
+                        class="mdo-option"
+                        *ngFor="let object of dataSetOb | async"
+                        [value]="object"
+                        (click)="afterDataSetSelect(object)"
+                        [libTooltip] = "getTooltip(object)" 
+                        [matTooltipDisabled]="!(datasetOption.offsetWidth < datasetOption.scrollWidth)">
+                        <div #datasetOption class='option-item' >{{ object.moduleDesc ? object.moduleDesc : 'Untitled' }}</div>
+                      </mat-option>
+                    </mat-optgroup>
+                    <!-- COMMENTED AS OF NOW -->
+                    <!-- <mat-optgroup label="Custom" *ngIf="selStyleWid.widgetType !== 'DATASET_LIST'">
+                      <mat-option
+                        class="mdo-option"
+                        *ngFor="let object of customDataSetob | async"
+                        [value]="object"
+                        (click)="afterCustomSelect(object)"
+                        [libTooltip]="getTooltip(object)"
+                        [matTooltipDisabled]="!(datasetOption.offsetWidth < datasetOption.scrollWidth)">
+                        <div #datasetOption class='option-item'>{{ object.objectdesc ? object.objectdesc : 'Untitled' }}</div>
+                      </mat-option>
+                    </mat-optgroup> -->
+                    <mat-optgroup label="DIW" *ngIf="selStyleWid.widgetType === 'FILTER' || selStyleWid.widgetType === 'COUNT'">
+                      <mat-option
+                        class="mdo-option"
+                        *ngFor="let object of DIWDatasetOb | async"
+                        [value]="object"
+                        (click)="afterDIWDatasetSelect(object)"
+                        [libTooltip] = "getTooltip(object)"
+                        [matTooltipDisabled]="!(datasetOption.offsetWidth < datasetOption.scrollWidth)">
+                      <div #datasetOption class='option-item'>{{ object.datasetDesc ? object.datasetDesc + '/' + object.desc : 'Untitled' }}</div>
+                      </mat-option>
+                    </mat-optgroup>
+                     <pros-workflow-dataset
+                      (selectedWfs)="afterWfSelect($event)"
+                      [preSelectedObj]="selStyleWid ? selStyleWid.objectType : ''"
+                      [isWorkFlow]="isWorkflowRefresh"
+                      [searchText]="searchDataSetVal"
+                    >
+                    </pros-workflow-dataset>
+                  </mat-autocomplete>
+                </div>
+                <mat-error
+                  *ngIf="datasetCtrl.touched && !datasetCtrl.value && !styleCtrlGrp.get('isWorkflowdataSet').value"
+                  i18n="@@dataset_madatory"
+                >
+                  Dataset selection is mandatory
+                </mat-error>
+                <div class="f-row"></div>
+                <!-- hint -->
+                <lib-text-line type="small" textColor="secondary" *ngIf="selStyleWid && selStyleWid.objectType && recordsCount"
+                  >Total {{ recordsCount }} record(s) found</lib-text-line
+                >
+                <lib-text-line type="small" textColor="secondary" *ngIf="selStyleWid && selStyleWid.objectType && !recordsCount"
+                  >Index not found, please sync data</lib-text-line
+                >
+              </div>
+            </ng-template>
+          </div>
+
+          <!-- <For WorkFlow Path> -->
+          <ng-template
+            [ngIf]="
+              styleCtrlGrp && styleCtrlGrp.get('isWorkflowdataSet').value === true && styleCtrlGrp.get('isCustomdataSet').value === false
+            "
+          >
+            <div class="f-col mdo-field">
+              <lib-text-line
+                type="xsmall"
+                weight="strong"
+                [ngClass]="(inValidSLA && selStyleWid.widgetType === 'TIMESERIES') ? 'error-text' : ''"
+                class="field-label"
+                i18n="@@workFlowPath"
+              >
+                Workflow path</lib-text-line
+              >
+              <div class="mdo-field-input" #workflowPathDiv [ngClass]="(inValidSLA && selStyleWid.widgetType === 'TIMESERIES') ? 'error-border' : ''">
+                <input
+                  matInput
+                  placeholder="Type to search"
+                  #optionInput
+                  formControlName="workflowPath"
+                  [matAutocomplete]="auto"
+                  disabled
+                  [value]="displayWithWorkflowDesc()"
+                  (input)="searchWorkflowPath($event.target.value)"
+                />
+                <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" (optionSelected)="selectedWorkFlow($event.option.value)">
+                  <mat-option *ngFor="let workflow of workflowPathOb | async" [value]="workflow" class="mdo-option">
+                    <lib-checkbox
+                      [label]="workflow.workflowdesc ? workflow.workflowdesc : 'Unknown path'"
+                      [checked]="isCheckedWorkflow(workflow)"
+                      (valueChange)="selectedWorkFlow(workflow)"
+                      prosClickStopPropagation
+                    >
+                    </lib-checkbox>
+                  </mat-option>
+                </mat-autocomplete>
+              </div>
+              <mat-error *ngIf="(inValidSLA && selStyleWid.widgetType === 'TIMESERIES')" i18n="@@invalid_sla">
+                Please select only one workflow path for stepwise SLA reporting
+              </mat-error>
+            </div>
+          </ng-template>
+
+          <div class="f-col">
+            <!--Modules-->
+            <ng-template
+              [ngIf]="
+                selStyleWid &&
+                (selStyleWid.widgetType === 'COUNT' ||
+                  selStyleWid.widgetType === 'BAR_CHART' ||
+                  selStyleWid.widgetType === 'PIE_CHART' ||
+                  selStyleWid.widgetType === 'STACKED_BAR_CHART' ||
+                  selStyleWid.widgetType === 'FILTER' ||
+                  selStyleWid.widgetType === 'TIMESERIES') &&
+                styleCtrlGrp &&
+                styleCtrlGrp.get('isWorkflowdataSet').value === false &&
+                !isDIWDatasetSelected
+              "
+            >
+              <pros-metadatafield-control
+                [moduleId]="selStyleWid && selStyleWid.objectType"
+                lebel="Field"
+                [selectedFldId]="selStyleWid && selStyleWid.field"
+                [isCustomdataset]="selStyleWid && selStyleWid.isCustomdataSet"
+                (selectionChange)="onFieldChange($event)"
+                (getpreSelectedFieldDataType)="getpreSelectedFieldDataType($event)"
+                [widgetType]="selStyleWid.widgetType"
+              >
+              </pros-metadatafield-control>
+              <mat-error *ngIf="isFieldError" class="err-msg" i18n="@errorMsg"> Select only numeric/decimal type field.</mat-error>
+            </ng-template>
+
+            <!--WorkflowType-->
+            <ng-template
+              [ngIf]="
+                selStyleWid &&
+                (selStyleWid.widgetType === 'COUNT' ||
+                  selStyleWid.widgetType === 'BAR_CHART' ||
+                  selStyleWid.widgetType === 'PIE_CHART' ||
+                  selStyleWid.widgetType === 'STACKED_BAR_CHART' ||
+                  selStyleWid.widgetType === 'FILTER' ||
+                  selStyleWid.widgetType === 'TIMESERIES') &&
+                styleCtrlGrp &&
+                styleCtrlGrp.get('isWorkflowdataSet').value === true &&
+                styleCtrlGrp.get('isCustomdataSet').value === false &&
+                !isDIWDatasetSelected
+              "
+            >
+              <pros-workflowfield-control
+                [controlFor]="'Field'"
+                [widgetType]="selStyleWid && selStyleWid.widgetType"
+                [objectType]="selStyleWid && selStyleWid.objectType"
+                label="Field"
+                [selectedFldId]="selStyleWid && selStyleWid.field"
+                (selectionChange)="onFieldChange($event)"
+              >
+              </pros-workflowfield-control>
+              <mat-error *ngIf="isFieldError" class="err-msg" i18n="@errorMsg"> Select only numeric/decimal type field.</mat-error>
+            </ng-template>
+            <div class="f-col" *ngIf="selStyleWid.widgetType === 'TIMESERIES' && selStyleWid.field === 'TIME_TAKEN'">
+              <div class="f-col mdo-field" [formGroup]="chartPropCtrlGrp">
+                <lib-text-line type="xsmall" i18n="@@reportType" weight="strong" class="field-label">Report type</lib-text-line>
+                <div class="mdo-field-input">
+                  <input matInput placeholder="Type to search" #optionsInput formControlName="timeTakenReportType" [matAutocomplete]="timeTakenAuto" />
+                  <mat-autocomplete class="mdo-autocomplete" #timeTakenAuto="matAutocomplete" [displayWith]="displayProperties">
+                    <mat-option [value]="option" *ngFor="let option of getValue(timeTakenOption, chartPropCtrlGrp.get('timeTaken'))">
+                      {{ option.value }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </div>
+              </div>
+            </div>
+
+            <!-- For DIW Dataset types -->
+            <ng-template [ngIf]="selStyleWid && selStyleWid.widgetType === 'COUNT' && isDIWDatasetSelected">
+              <div class="f-col mdo-field">
+                <!-- label -->
+                <mat-label class="mdo-field-label">Business rule</mat-label>
+                <!-- input container -->
+                <div class="mdo-field-input">
+                  <!-- chip list -->
+                  <lib-chip-list class="lib-chip">
+                    <ng-container *ngFor="let opt of selectedOptions; let i = index">
+                      <ng-container *ngIf="i <= limit - 1">
+                        <lib-chip
+                          [removable]="true"
+                          (removed)="remove(opt)"
+                          libTooltip="{{ opt }}"
+                          matTooltipPosition="right"
+                          [matTooltipDisabled]="!(tooltipOptions.offsetWidth < tooltipOptions.scrollWidth)"
+                        >
+                          <div #tooltipOptions class="lib-item">{{ opt }}</div>
+                        </lib-chip>
+                      </ng-container>
+                    </ng-container>
+                    <lib-chip *ngIf="hasLimit(false)">+{{ selectedOptions.length - limit }}</lib-chip>
+                    <input
+                      matInput
+                      placeholder="Type to search"
+                      id="diwDatasetOptionInput"
+                      [formControl]="businessRuleFormCtrl"
+                      [matAutocomplete]="auto"
+                    />
+                  </lib-chip-list>
+                  <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" (optionSelected)="selected($event)">
+                    <mat-option class="mdo-option" name="businessRule" *ngFor="let opt of businessRuleOptions | async" [value]="opt">
+                      {{ opt.desc || opt.brInfo }}
+                    </mat-option>
+                  </mat-autocomplete>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+
+          <!-- For Aging/range report -->
+          <div
+            class="f-col"
+            *ngIf="
+              selStyleWid.widgetType === 'BAR_CHART' ||
+              selStyleWid.widgetType === 'PIE_CHART' ||
+              selStyleWid.widgetType === 'STACKED_BAR_CHART' ||
+              selStyleWid.widgetType === 'TIMESERIES'
+            "
+          >
+            <lib-slide-toggle
+              theme="primary"
+              labelPosition="before"
+              [checked]="isEnableRange"
+              formControlName="isEnableRange"
+              i18n="@@isAgingReport"
+              label="Is aging/range report"
+            >
+            </lib-slide-toggle>
+            <div class="row-spacer"></div>
+          </div>
+
+          <div class="f-col" *ngIf="styleCtrlGrp.get('isEnableRange').value">
+            <lib-input
+              i18n="@@aging/rangeBucketSize"
+              label="Aging/range bucket size"
+              formControlName="rangeBucketSize"
+              type="number"
+            ></lib-input>
+            <lib-input
+              i18n="@@aging/rangeBucketLimit"
+              label="Aging/range bucket limit"
+              formControlName="rangeBucketLimit"
+              type="number"
+            ></lib-input>
+
+            <div class="f-col mdo-field">
+              <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@aging/rangeCalculationField"
+                >Aging/range calculation field</lib-text-line
+              >
+              <div class="mdo-field-input">
+                <input
+                  matInput
+                  placeholder="Type to search"
+                  #optionsInput
+                  formControlName="rangeCalculationFld"
+                  [matAutocomplete]="rangeCal"
+                  #columnsTriggerM="matAutocompleteTrigger"
+                  (click)="openAutoComplete(columnsTriggerM)"
+                />
+                <mat-autocomplete class="mdo-autocomplete" #rangeCal="matAutocomplete" [displayWith]="chooseColumnDisWith">
+                  <mat-optgroup label="System fileds">
+                    <mat-option *ngFor="let field of rangeSystem | async" [value]="field">
+                      {{ field.fieldDescri }}
+                    </mat-option>
+                  </mat-optgroup>
+                  <mat-optgroup label="Header fields">
+                    <mat-option *ngFor="let field of rangeHeader | async" [value]="field">
+                      {{ field.fieldDescri }}
+                    </mat-option>
+                  </mat-optgroup>
+                  <mat-optgroup label="Hierarchy fields" *ngIf="isWorkflowdataSet">
+                    <mat-option *ngFor="let field of rangeHierarchy | async" [value]="field">
+                      {{ field.fieldDescri }}
+                    </mat-option>
+                  </mat-optgroup>
+                  <mat-optgroup [label]="fld.fieldDescri" *ngFor="let fld of rangeFieldsObs | async">
+                    <mat-option *ngFor="let field of fld.childs" [value]="field">
+                      {{ field.fieldDescri }}
+                    </mat-option>
+                  </mat-optgroup>
+                </mat-autocomplete>
+              </div>
+              <span class="f-row-spacer-half"></span>
+              <mat-error i18n="@aging_validation" *ngIf="fieldDataType && fieldDataType !== 'NUMC'">
+                Please select a numeric type field or date type field under Aging/range calculation
+              </mat-error>
+            </div>
+
+            <div class="f-col mdo-field" *ngIf="styleCtrlGrp.get('rangeCalculationFld').value?.fieldId">
+              <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@dateFormatInterval"
+                >Date Format Interval</lib-text-line
+              >
+              <div class="mdo-field-input">
+                <input matInput #optionsInput formControlName="rangeDateFormatInterval" [matAutocomplete]="auto" />
+                <!-- autocomplete -->
+                <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" [displayWith]="displayProperties">
+                  <ng-container *ngFor="let opt of getValue(rangeDateFormatInterval, styleCtrlGrp.get('rangeDateFormatInterval'))">
+                    <mat-option [value]="opt" class="mdo-option">
+                      {{ opt.value }}
+                    </mat-option>
+                  </ng-container>
+                </mat-autocomplete>
+              </div>
+            </div>
+          </div>
+
+          <!-- FOR Aggregration -->
+          <ng-template
+            [ngIf]="
+              selStyleWid &&
+              (selStyleWid.widgetType === 'COUNT' ||
+                selStyleWid.widgetType === 'BAR_CHART' ||
+                selStyleWid.widgetType === 'PIE_CHART' ||
+                selStyleWid.widgetType === 'STACKED_BAR_CHART' ||
+                selStyleWid.widgetType === 'TIMESERIES')
+            "
+          >
+            <div class="f-col mdo-field">
+              <lib-text-line
+                type="xsmall"
+                [ngClass]="styleCtrlGrp.controls.aggregrationOp.touched && styleCtrlGrp.controls.aggregrationOp.invalid ? 'error-text' : ''"
+                weight="strong"
+                class="field-label required-field"
+                i18n="@@aggregrationOperator"
+                >Aggregration operator</lib-text-line
+              >
+              <div
+                class="mdo-field-input"
+                [ngClass]="
+                  styleCtrlGrp.controls.aggregrationOp.touched && styleCtrlGrp.controls.aggregrationOp.invalid ? 'error-border' : ''
+                "
+              >
+                <input matInput placeholder="Type to search" #optionsInput formControlName="aggregrationOp" [matAutocomplete]="auto1" />
+                <mat-autocomplete class="mdo-autocomplete" #auto1="matAutocomplete" [displayWith]="displayProperties">
+                  <ng-container *ngFor="let aggOp of getValue(aggregrationOp, styleCtrlGrp.get('aggregrationOp'))">
+                    <mat-option [value]="aggOp"> {{ aggOp.value }}</mat-option>
+                  </ng-container>
+                </mat-autocomplete>
+              </div>
+              <mat-error
+                *ngIf="
+                  (styleCtrlGrp.controls.aggregrationOp.touched && styleCtrlGrp.controls.aggregrationOp.invalid) ||
+                  (styleCtrlGrp.controls.aggregrationOp.value && styleCtrlGrp.controls.aggregrationOp.value.key !== 'COUNT')
+                "
+              >
+                {{ getAggregationOpValidation(styleCtrlGrp.controls.aggregrationOp) }}
+              </mat-error>
+            </div>
+          </ng-template>
+
+          <ng-template
+            [ngIf]="
+              selStyleWid &&
+              (selStyleWid.widgetType === 'BAR_CHART' ||
+                selStyleWid.widgetType === 'PIE_CHART' ||
+                selStyleWid.widgetType === 'STACKED_BAR_CHART' ||
+                selStyleWid.widgetType === 'TIMESERIES') &&
+              this.styleCtrlGrp.get('aggregrationOp').value &&
+              this.styleCtrlGrp.get('aggregrationOp').value.key !== 'COUNT' &&
+              this.styleCtrlGrp.get('aggregrationOp').value.key !== 'GROUPBY'
+            "
+          >
+            <div class="f-col mdo-field">
+              <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@aging/rangeCalculationField">Measure</lib-text-line>
+              <div class="mdo-field-input">
+                <input
+                  matInput
+                  placeholder="Type to search"
+                  #optionsInput
+                  formControlName="measureFld"
+                  [matAutocomplete]="measureCal"
+                  #columnsTriggerM="matAutocompleteTrigger"
+                />
+                <mat-autocomplete class="mdo-autocomplete" #measureCal="matAutocomplete" [displayWith]="chooseColumnDisWith">
+                  <mat-optgroup label="Header fileds">
+                    <mat-option *ngFor="let field of measureHeader | async" [value]="field">
+                      {{ field.fieldDescri }}
+                    </mat-option>
+                  </mat-optgroup>
+                  <mat-optgroup [label]="fld.fieldDescri" *ngFor="let fld of meadureFldsObs | async">
+                    <mat-option *ngFor="let field of fld.childs" [value]="field">
+                      {{ field.fieldDescri }}
+                    </mat-option>
+                  </mat-optgroup>
+                </mat-autocomplete>
+              </div>
+            </div>
+          </ng-template>
+
+          <div class="f-col">
+            <!-- FOR  Modules STACKED BAR CHART WIDGET-->
+            <ng-template
+              [ngIf]="
+                selStyleWid &&
+                (selStyleWid.widgetType === 'STACKED_BAR_CHART' || selStyleWid.widgetType === 'TIMESERIES') &&
+                styleCtrlGrp &&
+                styleCtrlGrp.get('isWorkflowdataSet').value === false
+              "
+            >
+              <pros-metadatafield-control
+                [moduleId]="selStyleWid && selStyleWid.objectType"
+                [widgetType]="selStyleWid && selStyleWid.widgetType"
+                lebel="Group(s) with"
+                [selectedFldId]="selStyleWid && selStyleWid.groupById"
+                [isCustomdataset]="selStyleWid && selStyleWid.isCustomdataSet"
+                (selectionChange)="onGroupByChange($event)"
+                [widgetType]="selStyleWid.widgetType"
+                [isGroupWith]="true"
+              >
+              </pros-metadatafield-control>
+            </ng-template>
+
+            <!-- FOR Workflow STACKED BAR CHART WIDGET-->
+            <ng-template
+              [ngIf]="
+                selStyleWid &&
+                (selStyleWid.widgetType === 'STACKED_BAR_CHART' || selStyleWid.widgetType === 'TIMESERIES') &&
+                styleCtrlGrp &&
+                styleCtrlGrp.get('isWorkflowdataSet').value === true &&
+                styleCtrlGrp.get('isCustomdataSet').value === false
+              "
+            >
+              <pros-workflowfield-control
+                [objectType]="selStyleWid && selStyleWid.objectType"
+                [widgetType]="selStyleWid && selStyleWid.widgetType"
+                label="Group(s) with"
+                [controlFor]="'GroupWith'"
+                [selectedFldId]="selStyleWid && selStyleWid.groupById"
+                (selectionChange)="onGroupByChange($event)"
+              >
+              </pros-workflowfield-control>
+            </ng-template>
+          </div>
+
+          <div class="f-col">
+            <!--TransitionalType-->
+            <ng-template
+              [ngIf]="
+                selStyleWid &&
+                selStyleWid.widgetType === 'TIMESERIES' &&
+                styleCtrlGrp &&
+                styleCtrlGrp.get('isWorkflowdataSet').value === false &&
+                selStyleWid.groupById
+              "
+            >
+              <pros-metadatafield-control
+                [moduleId]="selStyleWid && selStyleWid.objectType"
+                lebel="Distinct with"
+                [selectedFldId]="selStyleWid && selStyleWid.distictWith"
+                (selectionChange)="onDistictWithChange($event)"
+                [isCustomdataset]="selStyleWid && selStyleWid.isCustomdataSet"
+                [widgetType]="selStyleWid.widgetType"
+              >
+              </pros-metadatafield-control>
+            </ng-template>
+
+            <!--WorkflowType-->
+            <ng-template
+              [ngIf]="
+                selStyleWid &&
+                selStyleWid.widgetType === 'TIMESERIES' &&
+                styleCtrlGrp &&
+                styleCtrlGrp.get('isWorkflowdataSet').value === true &&
+                styleCtrlGrp.get('isCustomdataSet').value === false &&
+                selStyleWid.groupById
+              "
+            >
+              <pros-workflowfield-control
+                [objectType]="selStyleWid && selStyleWid.objectType"
+                label="Distinct with"
+                [selectedFldId]="selStyleWid && selStyleWid.distictWith"
+                (selectionChange)="onDistictWithChange($event)"
+              >
+              </pros-workflowfield-control>
+            </ng-template>
+          </div>
+
+          <div class="f-col" *ngIf="selStyleWid && selStyleWid.widgetType === 'COUNT'">
+            <lib-checkbox label="Include field as distinct" formControlName="isFieldDistinct"> </lib-checkbox>
+            <div class="f-row-spacer-half"></div>
+          </div>
+
+          <div class="f-col">
+            <!-- FOR FILTERs WIDGET-->
+            <ng-template [ngIf]="selStyleWid && selStyleWid.widgetType === 'FILTER'">
+              <!-- if date type field then , special config -->
+              <ng-template
+                [ngIf]="
+                  selStyleWid.fieldCtrl &&
+                  ((selStyleWid.fieldCtrl.picklist === '0' &&
+                    (selStyleWid.fieldCtrl.picklist=== '53' || selStyleWid.fieldCtrl.picklist=== '52')) ||
+                    selStyleWid.fieldCtrl.fieldId === 'REQUESTOR_DATE' ||
+                    selStyleWid.fieldCtrl.fieldId === 'DUE_DATE' ||
+                    selStyleWid.fieldCtrl.fieldId === 'DATE_STARTED' ||
+                    selStyleWid.fieldCtrl.fieldId === 'FINISHDATE')
+                "
+                [ngIfElse]="otherCtrl"
+              >
+                <div class="f-col mdo-field">
+                  <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@selectDefaultDays"
+                    >Select default days</lib-text-line
+                  >
+                  <div class="mdo-field-input">
+                    <input
+                      matInput
+                      placeholder="Type to search"
+                      #optionsInput
+                      formControlName="dateSelectionType"
+                      [matAutocomplete]="auto1"
+                    />
+                    <mat-autocomplete class="mdo-autocomplete" #auto1="matAutocomplete" [displayWith]="displayProperties">
+                      <mat-option i18n="@@noDate">No date</mat-option>
+                      <mat-option *ngFor="let opt of getValue(dateSelectionType, styleCtrlGrp.get('dateSelectionType'))" [value]="opt">
+                        {{ opt.value }}
+                      </mat-option>
+                    </mat-autocomplete>
+                  </div>
+                </div>
+                <!-- when user choose custom date then start and end date should appear -->
+                <lib-date-range-picker
+                  label="Start date"
+                  *ngIf="returnDefaultDate()"
+                  formControlName="date"
+                  [selectedDate]="styleCtrlGrp.value.date"
+                >
+                </lib-date-range-picker>
+              </ng-template>
+              <ng-template #otherCtrl>
+                <!-- <div class="f-col mdo-field">
+                                     <lib-text-line type="xsmall" weight="strong" class="field-label"
+                                        i18n="@@filterType">Filter type</lib-text-line>
+                                    <div class="mdo-field-input">
+                                        <input matInput placeholder="Type to search" #optionsInput
+                                            formControlName="filterType" [matAutocomplete]="auto1" />
+                                        <mat-autocomplete class="mdo-autocomplete" #auto1="matAutocomplete"
+                                            [displayWith]="displayProperties">
+                                            <mat-option
+                                                *ngFor="let opt of getValue(filterType,styleCtrlGrp.get('filterType'))"
+                                                [value]="opt">
+                                                {{opt.value}}
+                                            </mat-option>
+                                        </mat-autocomplete>
+                                    </div>
+                                </div> -->
+
+                <div class="f-col">
+                  <lib-checkbox formControlName="isMultiSelect" label="Is multiselect"> </lib-checkbox>
+                </div>
+                <div class="f-row-spacer-half"></div>
+
+                <div class="f-col mdo-field">
+                  <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@sortBy"> Sort by</lib-text-line>
+                  <div class="mdo-field-input">
+                    <input matInput placeholder="Type to search" #optInput formControlName="orderWith" [matAutocomplete]="auto" />
+                    <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" [displayWith]="displayProperties">
+                      <ng-container *ngFor="let sort of getValue(orderWith, styleCtrlGrp.get('orderWith'))">
+                        <mat-option *ngIf="sort.key === OrderWith.ASC || sort.key === OrderWith.DESC" [value]="sort">
+                          {{ sort.value }}
+                        </mat-option>
+                      </ng-container>
+                    </mat-autocomplete>
+                  </div>
+                </div>
+              </ng-template>
+            </ng-template>
+          </div>
+
+          <div class="f-col">
+            <!-- FOR TABLE LIST CHOOSE COLUMNS WIDGET-->
+            <!-- For Modules -->
+            <ng-template
+              [ngIf]="
+                selStyleWid &&
+                (selStyleWid.widgetType === 'TABLE_LIST') &&
+                styleCtrlGrp &&
+                styleCtrlGrp.get('isWorkflowdataSet').value === false &&
+                styleCtrlGrp.get('isCustomdataSet').value === false
+              "
+            >
+              <div class="f-col mdo-field">
+                <lib-text-line type="xsmall" weight="strong" class="field-label">Choose columns </lib-text-line>
+                <!-- input container -->
+                <div class="mdo-field-input">
+                  <input
+                    matInput
+                    [matAutocomplete]="chooseColumnM"
+                    [formControl]="fieldCtrl"
+                    #columnsTriggerM="matAutocompleteTrigger"
+                    (click)="openAutoComplete(columnsTriggerM)"
+                  />
+                  <!-- autocomplete -->
+                  <mat-autocomplete
+                    #chooseColumnM="matAutocomplete"
+                    [displayWith]="chooseColumnDisWith"
+                    (opened)="removeError('fieldCtrl')"
+                  >
+                    <mat-optgroup label="System fileds">
+                      <mat-option *ngFor="let field of systemFieldsObs | async" value="{{ field.fieldId }}">
+                        <div (click)="optionClicked($event, field)">
+                          <lib-checkbox
+                            prosClickStopPropagation
+                            (valueChange)="toggleSelection(field)"
+                            [checked]="isSelected(field)"
+                            [label]="field.fieldDescri"
+                          >
+                          </lib-checkbox>
+                        </div>
+                      </mat-option>
+                    </mat-optgroup>
+                    <mat-optgroup label="Header fileds">
+                      <mat-option *ngFor="let field of headerFields | async" value="{{ field.fieldId }}">
+                        <div (click)="optionClicked($event, field)">
+                          <lib-checkbox
+                            prosClickStopPropagation
+                            (valueChange)="toggleSelection(field)"
+                            [checked]="isSelected(field)"
+                            [label]="field.fieldDescri"
+                          >
+                          </lib-checkbox>
+                        </div>
+                      </mat-option>
+                    </mat-optgroup>
+                    <mat-optgroup [label]="fld.fieldDescri" *ngFor="let fld of fieldsObs | async">
+                      <mat-option *ngFor="let field of fld.childs" value="{{ field.fieldId }}">
+                        <div (click)="optionClicked($event, field)">
+                          <lib-checkbox
+                            prosClickStopPropagation
+                            (valueChange)="toggleSelection(field)"
+                            [checked]="isSelected(field)"
+                            [label]="field.fieldDescri"
+                          >
+                          </lib-checkbox>
+                        </div>
+                      </mat-option>
+                    </mat-optgroup>
+                  </mat-autocomplete>
+                </div>
+                <!-- hint -->
+                <lib-text-line type="small" textColor="secondary">{{ chooseColumns ? chooseColumns.length : '0' }} Selected</lib-text-line>
+              </div>
+            </ng-template>
+
+            <!-- For WorkFlow Modules -->
+            <ng-template
+              [ngIf]="
+                selStyleWid &&
+                selStyleWid.widgetType === 'TABLE_LIST' &&
+                styleCtrlGrp &&
+                styleCtrlGrp.get('isWorkflowdataSet').value === true &&
+                styleCtrlGrp.get('isCustomdataSet').value === false
+              "
+            >
+              <div class="f-col mdo-field">
+                <lib-text-line type="xsmall" weight="strong" class="field-label">Choose columns </lib-text-line>
+                <!-- input container -->
+                <div class="mdo-field-input">
+                  <input
+                    matInput
+                    [matAutocomplete]="chooseColumnWF"
+                    [formControl]="fieldCtrl"
+                    #columnsTriggerWM="matAutocompleteTrigger"
+                    (click)="openAutoComplete(columnsTriggerWM)"
+                  />
+                  <!-- autocomplete -->
+                  <mat-autocomplete
+                    #chooseColumnWF="matAutocomplete"
+                    (opened)="removeError('fieldCtrl')"
+                    [displayWith]="chooseColumnDisWith"
+                  >
+                    <mat-optgroup label="System fileds">
+                      <mat-option *ngFor="let field of (workflowFieldsObs | async).staticFields" value="{{ field.fieldId }}">
+                        <div (click)="optionClicked($event, field)">
+                          <lib-checkbox
+                            prosClickStopPropagation
+                            (valueChange)="toggleSelection(field)"
+                            [checked]="isSelected(field)"
+                            [label]="field.fieldDescri"
+                          >
+                          </lib-checkbox>
+                        </div>
+                      </mat-option>
+                    </mat-optgroup>
+
+                    <mat-optgroup label="Module fileds">
+                      <mat-option *ngFor="let field of (workflowFieldsObs | async).workflowFields" value="{{ field.fieldId }}">
+                        <div (click)="optionClicked($event, field)">
+                          <lib-checkbox
+                            prosClickStopPropagation
+                            (valueChange)="toggleSelection(field)"
+                            [checked]="isSelected(field)"
+                            [label]="field.fieldDescri"
+                          >
+                          </lib-checkbox>
+                        </div>
+                      </mat-option>
+                    </mat-optgroup>
+
+                    <mat-optgroup label="Module fileds">
+                      <mat-option *ngFor="let field of (workflowFieldsObs | async).headers" value="{{ field.fieldId }}">
+                        <div (click)="optionClicked($event, field)">
+                          <lib-checkbox
+                            prosClickStopPropagation
+                            (valueChange)="toggleSelection(field)"
+                            [checked]="isSelected(field)"
+                            [label]="field.fieldDescri"
+                          >
+                          </lib-checkbox>
+                        </div>
+                      </mat-option>
+                    </mat-optgroup>
+
+                    <mat-optgroup label="Hierarchy fileds">
+                      <mat-option *ngFor="let field of (workflowFieldsObs | async).hierarchy" value="{{ field.fieldId }}">
+                        <div (click)="optionClicked($event, field)">
+                          <lib-checkbox
+                            prosClickStopPropagation
+                            (valueChange)="toggleSelection(field)"
+                            [checked]="isSelected(field)"
+                            [label]="field.fieldDescri"
+                          >
+                          </lib-checkbox>
+                        </div>
+                      </mat-option>
+                    </mat-optgroup>
+                  </mat-autocomplete>
+                </div>
+                <!-- hint -->
+                <lib-text-line type="small" textColor="secondary">{{ chooseColumns ? chooseColumns.length : '0' }} Selected</lib-text-line>
+              </div>
+            </ng-template>
+
+            <!-- For Custom Modules -->
+            <ng-template
+              [ngIf]="
+                selStyleWid &&
+                selStyleWid.widgetType === 'TABLE_LIST' &&
+                styleCtrlGrp &&
+                styleCtrlGrp.get('isWorkflowdataSet').value === false &&
+                styleCtrlGrp.get('isCustomdataSet').value === true
+              "
+            >
+              <div class="f-col mdo-field">
+                <lib-text-line type="xsmall" weight="strong" class="field-label">Choose columns </lib-text-line>
+                <!-- input container -->
+                <div class="mdo-field-input">
+                  <input
+                    matInput
+                    [matAutocomplete]="chooseColumnCM"
+                    [formControl]="fieldCtrl"
+                    #columnsTriggerCM="matAutocompleteTrigger"
+                    (click)="openAutoComplete(columnsTriggerCM)"
+                  />
+                  <!-- autocomplete -->
+                  <mat-autocomplete
+                    #chooseColumnCM="matAutocomplete"
+                    (opened)="removeError('fieldCtrl')"
+                    [displayWith]="chooseColumnDisWith"
+                  >
+                    <mat-option *ngFor="let fld of CustomfieldsObs | async" value="{{ fld.fieldId }}">
+                      <div (click)="optionClicked($event, fld)">
+                        <lib-checkbox
+                          prosClickStopPropagation
+                          (valueChange)="toggleSelection(fld)"
+                          [checked]="isSelected(fld)"
+                          [label]="fld.fieldDescri"
+                        >
+                        </lib-checkbox>
+                      </div>
+                    </mat-option>
+                  </mat-autocomplete>
+                </div>
+                <!-- hint -->
+                <lib-text-line type="small" textColor="secondary">{{ chooseColumns ? chooseColumns.length : '0' }} Selected</lib-text-line>
+              </div>
+            </ng-template>
+          </div>
+
+          <!-- FOR TABLE LIST CHOOSE Default Page Size and Column format-->
+          <!-- For Modules -->
+          <ng-template [ngIf]="selStyleWid && selStyleWid.widgetType === 'TABLE_LIST'">
+            <div class="f-col mdo-field">
+              <lib-input
+                type="number"
+                label="Default page size"
+                (input)="checkNumLength($event.target.value)"
+                formControlName="pageDefaultSize"
+                placeholder="Default page size"
+              >
+              </lib-input>
+              <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@columnFormat"> Column format</lib-text-line>
+              <div class="mdo-field-input">
+                <input matInput placeholder="Type to search" #optionsInput formControlName="displayCriteria" [matAutocomplete]="auto1" />
+                <mat-autocomplete class="mdo-autocomplete" #auto1="matAutocomplete" [displayWith]="displayProperties">
+                  <mat-option *ngFor="let col of getValue(displayCriteria, styleCtrlGrp.get('displayCriteria'))" [value]="col">
+                    {{ col.value }}
+                  </mat-option>
+                </mat-autocomplete>
+              </div>
+            </div>
+          </ng-template>
+
+          <div class="f-col">
+            <ng-template [ngIf]="selStyleWid && !(selStyleWid.widgetType === 'IMAGE' || selStyleWid.widgetType === 'HTML' || selStyleWid.widgetType === 'DATASET_LIST')">
+              <lib-checkbox formControlName="applyDistinct" label="Apply distinct"> </lib-checkbox>
+              <div class="f-row-spacer-half"></div>
+            </ng-template>
+          </div>
+
+          <div class="f-col">
+            <ng-template [ngIf]="selStyleWid && !(selStyleWid.widgetType === 'IMAGE' || selStyleWid.widgetType === 'HTML' || selStyleWid.widgetType === 'DATASET_LIST')">
+              <lib-checkbox formControlName="isEnableGlobalFilter" label="Global Filters not applicable"> </lib-checkbox>
+              <div class="f-row-spacer-half"></div>
+            </ng-template>
+          </div>
+
+          <div class="f-col">
+            <!-- FOR IMAGE WIDGET-->
+            <ng-template [ngIf]="selStyleWid && selStyleWid.widgetType === 'IMAGE'">
+              <lib-input label="Image link" formControlName="imageUrl"></lib-input>
+              <div class="f-row image-algin">
+                <lib-button (click)="uploadFileChange()" prosClickStopPropagation icon="image"> </lib-button>
+                <input
+                  type="file"
+                  (change)="fileChange($event)"
+                  style="display: none"
+                  id="uploadFileCtrl"
+                  accept="image/png, image/jpeg"
+                  prosClickStopPropagation
+                />
+                <span class="col-spacer"></span>
+                <lib-input disabled readonly formControlName="imageName"> </lib-input>
+                <span class="col-spacer"></span>
+                <lib-button type="plain" icon="times" matSuffix (click)="removeUploadedImage()"> </lib-button>
+              </div>
+            </ng-template>
+          </div>
+
+          <div class="f-col">
+            <!-- FOR IMAGE WIDGET-->
+            <ng-template [ngIf]="selStyleWid && selStyleWid.widgetType === 'HTML'">
+              <lib-textarea label="HTML content" placeholder="Write html text.." formControlName="htmlText" [rows]="2"></lib-textarea>
+            </ng-template>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+
+  <!-- CHART PROPERTIES -->
+  <div class="collapsible">
+    <mat-accordion
+      *ngIf="
+        selStyleWid &&
+        (selStyleWid.widgetType === 'BAR_CHART' ||
+          selStyleWid.widgetType === 'PIE_CHART' ||
+          selStyleWid.widgetType === 'STACKED_BAR_CHART' ||
+          selStyleWid.widgetType === 'TIMESERIES')
+      "
+    >
+      <mat-expansion-panel class="mat-elevation-z0" togglePosition="before" expanded="true">
+        <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+          <mat-panel-title class="panel-title">
+            <lib-text-line type="base" weight="strong" i18n="@@chartProperties">Chart properties </lib-text-line>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="f-col fields-col" [formGroup]="chartPropCtrlGrp">
+          <div class="f-col mdo-field">
+            <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@chartType">Chart type </lib-text-line>
+            <div class="mdo-field-input" [disabled]="selStyleWid.widgetType === 'STACKED_BAR_CHART'">
+              <input matInput placeholder="Type to search" #optionsInput formControlName="chartType" [matAutocomplete]="auto" />
+              <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" [displayWith]="displayProperties">
+                <ng-container *ngFor="let chart of getValue(chartType, chartPropCtrlGrp.get('chartType'))">
+                  <mat-option
+                    *ngIf="(selStyleWid.widgetType === 'BAR_CHART' || selStyleWid.widgetType === 'PIE_CHART') && chart.key === 'PIE'"
+                    [value]="chart"
+                  >
+                    {{ chart.value }}
+                  </mat-option>
+                  <mat-option *ngIf="selStyleWid.widgetType === 'TIMESERIES' && chart.key === 'LINE'" [value]="chart">
+                    {{ chart.value }}
+                  </mat-option>
+                  <mat-option [value]="chart" *ngIf="chart.key === 'BAR'">
+                    {{ chart.value }}
+                  </mat-option>
+                </ng-container>
+              </mat-autocomplete>
+            </div>
+          </div>
+
+          <div class="f-col mdo-field" *ngIf="selStyleWid.widgetType !== 'TIMESERIES'">
+            <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@orientation"> Orientation</lib-text-line>
+            <div class="mdo-field-input" *ngIf="chartPropCtrlGrp && chartPropCtrlGrp.get('chartType').value?.key === 'BAR'">
+              <input matInput #optionsInput formControlName="orientation" [matAutocomplete]="auto" />
+              <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" [displayWith]="displayProperties">
+                <mat-option *ngFor="let orint of getValue(orientation, chartPropCtrlGrp.get('orientation'))" [value]="orint">
+                  {{ orint.value }}
+                </mat-option>
+              </mat-autocomplete>
+            </div>
+          </div>
+
+          <ng-template
+            [ngIf]="
+              (chartPropCtrlGrp && chartPropCtrlGrp.get('chartType').value?.key === 'BAR') ||
+              chartPropCtrlGrp.get('chartType').value?.key === 'LINE'
+            "
+          >
+            <div class="f-col">
+              <lib-input label="X-axis label" formControlName="xAxisLabel" [maxLength]="maxReportNameLength"></lib-input>
+            </div>
+
+            <div class="f-col">
+              <lib-input label="Y-axis label" formControlName="yAxisLabel" [maxLength]="maxReportNameLength"></lib-input>
+            </div>
+
+            <div class="f-col mdo-field" *ngIf="selStyleWid.widgetType !== 'TIMESERIES'">
+              <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@sortBy">Sort by </lib-text-line>
+              <div class="mdo-field-input">
+                <input matInput #optInput formControlName="orderWith" [matAutocomplete]="auto" />
+                <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" [displayWith]="displayProperties">
+                  <ng-container *ngFor="let sort of getValue(orderWith, chartPropCtrlGrp.get('orderWith'))">
+                    <mat-option *ngIf="sort.key !== OrderWith.ASC && sort.key !== OrderWith.DESC" [value]="sort">
+                      {{ sort.value }}
+                    </mat-option>
+                  </ng-container>
+                </mat-autocomplete>
+              </div>
+            </div>
+            <ng-template [ngIf]="selStyleWid">
+              <div class="f-col">
+                <div class="f-row">
+                  <div class="f-col">
+                    <lib-input label="Scale from" type="number" min="0" formControlName="scaleFrom"> </lib-input>
+                  </div>
+                  <span class="col-spacer"></span>
+                  <div class="f-col">
+                    <lib-input label="Scale to" type="number" min="0" formControlName="scaleTo"> </lib-input>
+                  </div>
+                </div>
+              </div>
+
+              <div class="f-col">
+                <div class="f-row">
+                  <div class="f-col">
+                    <lib-input label="Scale step size" type="number" min="0" formControlName="stepSize"></lib-input>
+                  </div>
+                  <span class="col-spacer"></span>
+                  <div class="f-col">
+                    <lib-input label="Max dataset number" type="number" min="0" formControlName="dataSetSize"></lib-input>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </ng-template>
+
+          <!-- Benchmark toggle -->
+          <div class="f-col"
+              *ngIf="(selStyleWid.widgetType === 'BAR_CHART' && selStyleWid.chartProperties?.chartType === 'BAR') || selStyleWid.widgetType === 'STACKED_BAR_CHART' || selStyleWid.widgetType === 'TIMESERIES'">
+            <lib-slide-toggle theme="primary" labelPosition="before"
+              [checked]="isEnableBenchMark" formControlName="isEnableBenchMark"
+              i18n="@@defineBenchmark" label="Define Benchmark">
+            </lib-slide-toggle>
+            <div class="row-spacer"></div>
+          </div>
+          <div class="f-col" *ngIf="selStyleWid.chartProperties?.chartType !== 'PIE' && chartPropCtrlGrp && chartPropCtrlGrp.get('isEnableBenchMark').value">
+            <lib-input i18n="@@benchmarkValue" label="Benchmark Value"
+              formControlName="benchMarkValue" type="number" placeholder="Value">
+            </lib-input>
+          </div>
+
+          <div class="f-col">
+            <lib-checkbox formControlName="isEnableDatalabels" label="Enable datalabels"> </lib-checkbox>
+          </div>
+
+          <div class="f-row-spacer-half"></div>
+
+          <div
+            class="f-col mdo-field"
+            *ngIf="
+              chartPropCtrlGrp && chartPropCtrlGrp.get('isEnableDatalabels').value && chartPropCtrlGrp.get('chartType').value?.key !== 'PIE'
+            "
+          >
+            <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@datalabelsPosition">
+              Datalabels position</lib-text-line
+            >
+            <div class="mdo-field-input">
+              <input matInput placeholder="Type to search" #optionsInput formControlName="datalabelsPosition" [matAutocomplete]="auto" />
+              <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" [displayWith]="displayProperties">
+                <mat-option *ngFor="let data of getValue(datalabelsPosition, chartPropCtrlGrp.get('datalabelsPosition'))" [value]="data">
+                  {{ data.value }}
+                </mat-option>
+              </mat-autocomplete>
+            </div>
+          </div>
+
+          <!-- PIE CHART PERCETAGE CONFIG -->
+          <div
+            class="f-col"
+            *ngIf="
+              chartPropCtrlGrp && chartPropCtrlGrp.get('isEnableDatalabels').value && chartPropCtrlGrp.get('chartType').value?.key === 'PIE'
+            "
+          >
+            <lib-checkbox label="Show data in %" formControlName="isEnabledBarPerc"> </lib-checkbox>
+          </div>
+          <!-- PIE CHART PERCETAGE CONFIG -->
+
+          <div class="f-col">
+            <lib-checkbox label="Show legend" formControlName="isEnableLegend"> </lib-checkbox>
+          </div>
+
+          <div class="f-row-spacer-half"></div>
+
+          <div class="f-col mdo-field" *ngIf="chartPropCtrlGrp && chartPropCtrlGrp.get('isEnableLegend').value">
+            <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@legendPosition">Legend position </lib-text-line>
+            <div class="mdo-field-input">
+              <input matInput placeholder="Type to search" #optionsInput formControlName="legendPosition" [matAutocomplete]="auto1" />
+              <mat-autocomplete class="mdo-autocomplete" #auto1="matAutocomplete" [displayWith]="displayProperties">
+                <mat-option *ngFor="let legend of getValue(legendPosition, chartPropCtrlGrp.get('legendPosition'))" [value]="legend">
+                  {{ legend.value }}
+                </mat-option>
+              </mat-autocomplete>
+            </div>
+          </div>
+
+          <div class="f-col" *ngIf="selStyleWid.widgetType !== 'TIMESERIES'">
+            <lib-input label="Default value alias" formControlName="blankValueAlias"> </lib-input>
+          </div>
+
+          <div class="f-col" *ngIf="selStyleWid.widgetType === 'TIMESERIES'">
+            <!-- SERIES WITH -->
+            <div class="f-col mdo-field">
+              <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@serieswith">Series with </lib-text-line>
+              <div class="mdo-field-input">
+                <input matInput #optionsInput formControlName="seriesWith" [matAutocomplete]="auto" />
+                <!-- autocomplete -->
+                <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" [displayWith]="displayProperties">
+                  <ng-container *ngFor="let opt of getValue(seriesWith, chartPropCtrlGrp.get('seriesWith'))">
+                    <mat-option *ngIf="opt.key === 'year' || (opt.key !== 'year' && isSriesWithVisibile)" [value]="opt" class="mdo-option">
+                      {{ opt.value }}
+                    </mat-option>
+                  </ng-container>
+                </mat-autocomplete>
+              </div>
+            </div>
+          </div>
+
+          <div class="f-col" *ngIf="selStyleWid.widgetType === 'TIMESERIES'">
+            <!-- SERIES FORMAT -->
+            <div class="f-col mdo-field">
+              <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@seriesFormat"> Series format</lib-text-line>
+              <div class="mdo-field-input">
+                <input matInput placeholder="Type to search" #optionsInput formControlName="seriesFormat" [matAutocomplete]="auto" />
+                <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete">
+                  <mat-option [value]="series" *ngFor="let series of getSeriesValue(seriesFormat, chartPropCtrlGrp.get('seriesFormat'))">
+                    {{ series }}
+                  </mat-option>
+                </mat-autocomplete>
+              </div>
+            </div>
+          </div>
+
+          <div class="f-col" *ngIf="selStyleWid.widgetType === 'TIMESERIES'">
+            <!-- DATE RANGE FOR TIME SERIES -->
+            <div class="f-col mdo-field">
+              <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@selectInterval"> Select interval</lib-text-line>
+              <div class="mdo-field-input">
+                <input matInput placeholder="Type to search" #optionsInput formControlName="timeseriesStartDate" [matAutocomplete]="auto" />
+                <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" [displayWith]="displayProperties">
+                  <mat-option
+                    [value]="interval"
+                    *ngFor="let interval of getValue(timeInterval, chartPropCtrlGrp.get('timeseriesStartDate'))"
+                  >
+                    {{ interval.value }}
+                  </mat-option>
+                </mat-autocomplete>
+              </div>
+            </div>
+          </div>
+          <div class="f-col" *ngIf="selStyleWid.widgetType === 'TIMESERIES' && selStyleWid.field === 'TIME_TAKEN'">
+            <!-- DATE RANGE FOR TIME SERIES -->
+            <div class="f-col mdo-field">
+              <lib-text-line type="xsmall" i18n="@@isStepWise" weight="strong" class="field-label">Stepwise ?</lib-text-line>
+              <div class="mdo-field-input">
+                <input matInput placeholder="Type to search" #optionsInput formControlName="isStepWiseSla" [matAutocomplete]="auto" />
+                <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" [displayWith]="displayProperties">
+                  <mat-option [value]="option" *ngFor="let option of getValue(isStepwiseSlaOption, chartPropCtrlGrp.get('isStepWiseSla'))">
+                    {{ option.value }}
+                  </mat-option>
+                </mat-autocomplete>
+              </div>
+            </div>
+          </div>
+          <div class="f-col" *ngIf="selStyleWid.field === 'TIME_TAKEN' && chartPropCtrlGrp.get('isStepWiseSla').value?.key">
+            <!-- DATE RANGE FOR TIME SERIES -->
+            <div class="f-col mdo-field">
+              <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@selectSteps">Select step(s)</lib-text-line>
+              <div class="mdo-field-input">
+                <input
+                  matInput
+                  placeholder="Type to search"
+                  #optionsInput
+                  formControlName="selectSLASteps"
+                  [matAutocomplete]="auto"
+                  (optionSelected)="stepSelection($event.option.value)"
+                />
+                <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" [displayWith]="displayProperties">
+                  <mat-option [value]="steps" *ngFor="let steps of slaStepsObs | async">
+                    <lib-checkbox
+                      [label]="steps.desc"
+                      [checked]="isCheckedSla(steps)"
+                      (valueChange)="stepSelection(steps)"
+                      prosClickStopPropagation
+                    >
+                    </lib-checkbox>
+                  </mat-option>
+                </mat-autocomplete>
+              </div>
+            </div>
+          </div>
+
+          <div class="f-col mdo-field" *ngIf="selStyleWid && selStyleWid.widgetType === 'TIMESERIES' && selStyleWid.field === 'TIME_TAKEN'">
+            <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@SLAFilter">SLA/ time spent filter</lib-text-line>
+            <div class="mdo-field-input">
+              <input matInput placeholder="Type to search" #optionsInput formControlName="bucketFilter" [matAutocomplete]="auto" />
+              <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" [displayWith]="displayProperties">
+                <mat-option
+                  class="mdo-option"
+                  *ngFor="let bucket of getValue(bucketFilter, chartPropCtrlGrp.get('bucketFilter'))"
+                  [value]="bucket"
+                >
+                  {{ bucket.value }}
+                </mat-option>
+              </mat-autocomplete>
+            </div>
+          </div>
+
+          <div
+            class="f-col"
+            *ngIf="
+              selStyleWid &&
+              selStyleWid.widgetType === 'TIMESERIES' &&
+              selStyleWid.field === 'TIME_TAKEN' &&
+              !chartPropCtrlGrp.get('hasCustomSLA').value
+            "
+          >
+            <lib-input i18n="@@defaultSLA" label="Default SLA" placeholder="24 hours" [disabled]="true"> </lib-input>
+          </div>
+          <div class="f-col" *ngIf="selStyleWid && selStyleWid.widgetType === 'TIMESERIES' && selStyleWid.field === 'TIME_TAKEN' && (chartPropCtrlGrp.get('timeTakenReportType').value && chartPropCtrlGrp.get('timeTakenReportType').value.key !== 'SLA_REPORT')">
+            <lib-slide-toggle
+              theme="primary"
+              labelPosition="before"
+              formControlName="hasCustomSLA"
+              i18n="@@useCustomSLAValue"
+              label="Use Custom value"
+              [checked]="chartPropCtrlGrp.get('hasCustomSLA')"
+            >
+            </lib-slide-toggle>
+          </div>
+
+          <div class="f-row" *ngIf="selStyleWid && chartPropCtrlGrp.get('hasCustomSLA').value === true && chartPropCtrlGrp.get('timeTakenReportType').value.key !== 'SLA_REPORT'">
+            <div class="f-col">
+              <lib-input formControlName="slaValue" placeholder="8" type="number"></lib-input>
+            </div>
+            <span class="col-spacer"></span>
+            <div class="f-col mdo-field">
+              <div class="mdo-field-input">
+                <input matInput placeholder="Type to search" #optionsInput formControlName="slaType" [matAutocomplete]="autoSLA" />
+                <mat-autocomplete class="mdo-autocomplete" #autoSLA="matAutocomplete" [displayWith]="displayProperties">
+                  <mat-option class="mdo-option" *ngFor="let type of getValue(slaMenu, chartPropCtrlGrp.get('slaType'))" [value]="type">
+                    {{ type.value }}
+                  </mat-option>
+                </mat-autocomplete>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="f-col"
+            *ngIf="
+              (selStyleWid.chartProperties &&
+                (selStyleWid.chartProperties?.chartType === 'BAR' || selStyleWid.chartProperties?.chartType === 'LINE'))"
+          >
+            <lib-checkbox formControlName="showTotal" i18n="@@showTotal" label="Show total count"> </lib-checkbox>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+  <!-- DEFAULT FILTERS -->
+  <div class="collapsible default-filters">
+    <mat-accordion
+      *ngIf="
+        selStyleWid &&
+        ((selStyleWid.widgetType === 'TABLE_LIST' && (datasetCtrl?.value || styleCtrlGrp?.get('isWorkflowdataSet')?.value )) ||
+          (selStyleWid.widgetType === 'COUNT' && isDIWDatasetSelected) ||
+          selStyleWid.field ||
+          (selStyleWid.fieldCtrl && !(selStyleWid.fieldCtrl.picklist=== '53' || selStyleWid.fieldCtrl.picklist=== '52')))
+      "
+    >
+      <mat-expansion-panel class="mat-elevation-z0" togglePosition="before" expanded="true">
+        <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+          <mat-panel-title class="panel-title">
+            <lib-text-line type="base" weight="strong">Default filters</lib-text-line>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <div class="f-col fields-col">
+          <ng-template [ngIf]="selStyleWid && selStyleWid.defaultFilters">
+            <div [formGroup]="defaultFilterCtrlGrp" class="default-filters-container">
+              <div
+                class="f-row def-algin"
+                formArrayName="filters"
+                *ngFor="let filter of defaultFilterCtrlGrp.get('filters').controls; let i = index"
+              >
+                <ng-container [formGroupName]="i">
+                  <!-- For Modules -->
+                  <div class="f-col">
+                    <ng-template [ngIf]="styleCtrlGrp && styleCtrlGrp.get('isWorkflowdataSet').value === false">
+                      <pros-metadatafield-control
+                        [moduleId]="selStyleWid && selStyleWid.objectType"
+                        lebel="Field"
+                        [selectedFldId]="selStyleWid && selStyleWid.defaultFilters && selStyleWid.defaultFilters[i].conditionFieldId"
+                        (selectionChange)="onDefaultFilterChange($event, i)"
+                        [isCustomdataset]="selStyleWid && selStyleWid.isCustomdataSet"
+                        [datasetType]="selStyleWid && selStyleWid.datasetType"
+                        class="field-divider"
+                        [widgetType]="selStyleWid.widgetType"
+                      >
+                      </pros-metadatafield-control>
+                      <span class="col-spacer"></span>
+                    </ng-template>
+
+                    <!-- For WorkFlow Modules -->
+                    <ng-template
+                      [ngIf]="
+                        styleCtrlGrp &&
+                        styleCtrlGrp.get('isWorkflowdataSet').value === true &&
+                        styleCtrlGrp.get('isCustomdataSet').value === false
+                      "
+                    >
+                      <pros-workflowfield-control
+                        [objectType]="selStyleWid && selStyleWid.objectType"
+                        label="Field"
+                        [selectedFldId]="selStyleWid && selStyleWid.defaultFilters && selStyleWid.defaultFilters[i].conditionFieldId"
+                        (selectionChange)="onDefaultFilterChange($event, i)"
+                        class="field-divider"
+                      >
+                      </pros-workflowfield-control>
+                      <span class="col-spacer"></span>
+                    </ng-template>
+                  </div>
+
+                  <span class="col-spacer"></span>
+                  <!-- select Operators -->
+                  <div class="f-col">
+                    <pros-udr-condition-operators
+                      [conditionalOperators]="conditionalOperators"
+                      [selecetedOperator]="selStyleWid && selStyleWid.defaultFilters && selStyleWid.defaultFilters[i].conditionOperator"
+                      (afterSelect)="operatorSelectionChng($event, i)"
+                      class="field-divider"
+                    >
+                    </pros-udr-condition-operators>
+                  </div>
+
+                  <span class="col-spacer"></span>
+                  <div class="f-col">
+                    <ng-template
+                      [ngIf]="
+                        (selStyleWid &&
+                          selStyleWid.defaultFilters &&
+                          selStyleWid.defaultFilters[i].conditionOperator === 'FIELD2FIELD_EQUAL') ||
+                        selStyleWid.defaultFilters[i].conditionOperator === 'FIELD2FIELD' ||
+                        selStyleWid.defaultFilters[i].conditionOperator === 'FIELD2FIELD_GREATETHENEQUAL' ||
+                        selStyleWid.defaultFilters[i].conditionOperator === 'FIELD2FIELD_GREATETHAN' ||
+                        selStyleWid.defaultFilters[i].conditionOperator === 'FIELD2FIELD_LESSTHEN' ||
+                        selStyleWid.defaultFilters[i].conditionOperator === 'FIELD2FIELD_LESSTHENEQUALTO'
+                      "
+                      [ngIfElse]="fieldvalue"
+                    >
+                      <ng-template [ngIf]="styleCtrlGrp && styleCtrlGrp.get('isWorkflowdataSet').value === false">
+                        <pros-metadatafield-control
+                          [moduleId]="selStyleWid && selStyleWid.objectType"
+                          lebel="Field"
+                          [selectedFldId]="
+                            selStyleWid && selStyleWid.defaultFilters && selStyleWid.defaultFilters[i].conditionFieldEndValue
+                          "
+                          (selectionChange)="onDefaultFilterEndValChange($event, i)"
+                          [isCustomdataset]="selStyleWid && selStyleWid.isCustomdataSet"
+                          [widgetType]="selStyleWid.widgetType"
+                          class="field-divider"
+                        >
+                        </pros-metadatafield-control>
+                        <span class="col-spacer"></span>
+                      </ng-template>
+
+                      <ng-template
+                        [ngIf]="
+                          styleCtrlGrp &&
+                          styleCtrlGrp.get('isWorkflowdataSet').value === true &&
+                          styleCtrlGrp.get('isCustomdataSet').value === false
+                        "
+                      >
+                        <pros-workflowfield-control
+                          [objectType]="selStyleWid && selStyleWid.objectType"
+                          label="Field "
+                          [selectedFldId]="
+                            selStyleWid && selStyleWid.defaultFilters && selStyleWid.defaultFilters[i].conditionFieldEndValue
+                          "
+                          (selectionChange)="onDefaultFilterEndValChange($event, i)"
+                          class="field-divider"
+                        >
+                        </pros-workflowfield-control>
+                      </ng-template>
+                    </ng-template>
+
+                    <ng-template #fieldvalue>
+                      <div class="f-col value-set">
+                        <lib-input
+                          label="Value"
+                          formControlName="conditionFieldValue"
+                          matTooltip="{{
+                            selStyleWid.defaultFilters[i].conditionFieldValue ? selStyleWid.defaultFilters[i].conditionFieldValue : ''
+                          }}"
+                          matTooltipPosition="right"
+                        >
+                        </lib-input>
+                      </div>
+                    </ng-template>
+                  </div>
+                  <span class="col-spacer"></span>
+                  <div class="f-col default-col">
+                    <lib-button
+                      type="plain"
+                      icon="minus-circle"
+                      (click)="removeFilter(i)"
+                      matTooltip="Remove"
+                      matTooltipPosition="right"
+                    ></lib-button>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </ng-template>
+
+          <div class="f-row add-button">
+            <lib-button (click)="addMoreDefaultFilter()" type="minor">Add</lib-button>
+          </div>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</div>

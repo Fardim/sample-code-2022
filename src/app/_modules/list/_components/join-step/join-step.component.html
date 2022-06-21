@@ -1,0 +1,14 @@
+<div class="f-row join-mapping">
+  <div class="table-left">
+    <pros-table-columns *ngIf="leftTable" [table]="leftTable" [columns]="leftColumns" [filterCount]="leftFilterCount" (deleteTable)="removeTable(0, leftTable)" (filterClicked)="onFilterClick(0, $event)"></pros-table-columns>
+  </div>
+  <div class="table-connector">
+    <div class="f-col mapping-division" *ngIf="leftTable && rightTable">
+      <lib-button rounded="true" type="plain" class="mapconnect-button" icon="pencil" (click)="editJoinProperties()" matBadge libStatusBadge badgeIcon="exclamation" boxShadow="unset" badgeIconFont="solid" [statusBadgePosition]="{ top: -10, right: -7 }" backgroundColor="#FD7E14" badgeClass="badge-color"></lib-button>
+      <div class="connections"></div>
+    </div>
+  </div>
+  <div class="table-right">
+    <pros-table-columns *ngIf="rightTable" [table]="rightTable" [columns]="rightColumns" [filterCount]="rightFilterCount" (deleteTable)="removeTable(1, rightTable)" (filterClicked)="onFilterClick(1, $event)"></pros-table-columns>
+  </div>
+</div>

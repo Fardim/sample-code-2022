@@ -1,0 +1,83 @@
+<mat-card class="mat-elevation-z0 general-container" *ngIf="dataAllSet">
+  <div class="collapsible">
+    <mat-accordion *ngIf="dataAllSet">
+      <mat-expansion-panel expanded="true" togglePosition="before" (opened)="panelOpenState = true"
+        (closed)="panelOpenState = false" class="mat-elevation-z0">
+        <mat-expansion-panel-header expandedHeight="48px" collapsedHeight="48px">
+          {{metadata.tabDesc}}
+        </mat-expansion-panel-header>
+
+        <div class="summary-tile">
+
+          <div class="item-grid-list">
+            <div *ngFor="let fieldData of metadata.fieldsList" class="grid-tile">
+              <ng-template [ngIf]="!fieldData.hidden">
+                <div
+                  *ngIf="fieldData && fieldData.picklist !== 2 && fieldData.picklist !== 28 && fieldData.picklist !== 31 && fieldData.dataType !== 'DTMS' && fieldData.dataType !== 'DATS'">
+                  <div class="f-row item-tile">
+                    <lib-text-line type="small" textColor="secondary" class="lib-line">{{fieldData.fieldDescri}}</lib-text-line>
+                    <lib-text-line type="base" *ngIf="!fieldData.showMore; else withoutTruncate">
+                      {{fieldData.value !== 'null' ? truncateText(fieldData.value, 60) : ''}}
+                      <button mat-stroked-button color="primary" *ngIf="fieldData.value.length > 60"
+                        (click)="fieldData.showMore = !fieldData.showMore">
+                        {{ fieldData.showMore ? 'less' : 'more'}}
+                      </button>
+                    </lib-text-line>
+                    <ng-template #withoutTruncate>
+                      <lib-text-line type="base">{{fieldData.value !== 'null' ? fieldData.value : ''}}
+                        <button mat-stroked-button color="primary" *ngIf="fieldData.value.length > 60"
+                          (click)="fieldData.showMore = !fieldData.showMore">
+                          {{ fieldData.showMore ? 'less' : 'more'}}
+                        </button>
+                      </lib-text-line>
+                    </ng-template>
+                  </div>
+                </div>
+
+                <!-- ----------------------- Check-Box Case ------------------------------------- -->
+                <div *ngIf="fieldData && fieldData.picklist === 2">
+                  <div class="f-row item-tile">
+                   
+                    <lib-checkbox label="{{fieldData.fieldDescri}}" disabled="true" checked="{{fieldData.value}}"></lib-checkbox>
+                  </div>
+                </div>
+
+                <!-- ----------------------- Attachment Case ------------------------------------- -->
+                <div *ngIf="fieldData && fieldData.picklist === 28">
+                  <div class="f-row item-tile">
+                    <lib-text-line type="small" textColor="secondary" class="lib-line">{{fieldData.fieldDescri}}</lib-text-line>
+                    <lib-text-line type="base" textcolor="link" (click)="downloadAttachment(fieldData);">
+                      {{fieldData.value !== 'null' ? fieldData.value : ''}}
+                    </lib-text-line>
+                  </div>
+                </div>
+
+                <!-- ------------------------------ Date and Time Case------------------------------------ -->
+                <div *ngIf="fieldData && fieldData.picklist === 0 && fieldData.dataType === 'DTMS'">
+                  <div class="f-row item-tile">
+                    <lib-text-line type="small" textColor="secondary" class="lib-line">{{fieldData.fieldDescri}}</lib-text-line>
+                    <lib-text-line type="base">
+                      {{fieldData.value | dateFormatPipe:dateFormat}}
+                    </lib-text-line>
+                  </div>
+                </div>
+
+                <!-- ------------------------------ Date Case------------------------------------ -->
+                <div *ngIf="fieldData && fieldData.picklist === 0 && fieldData.dataType === 'DATS'">
+                  <div class="f-row item-tile">
+                    <lib-text-line type="small" textColor="secondary" class="lib-line">{{fieldData.fieldDescri}}</lib-text-line>
+                    <lib-text-line type="base">
+                      {{fieldData.value | dateFormatPipe:dateFormat}}
+                    </lib-text-line>
+                  </div>
+                </div>
+              </ng-template>
+
+            </div>
+          </div>
+
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+</mat-card>

@@ -1,0 +1,25 @@
+<div class="f-col wrapper-container">
+    <div class="chat-outside-wrapper">
+        <!-- <pros-chat-members class="chat-members-outer" [users]="activeUsers$ | async"></pros-chat-members> -->
+        <div class="inside-container">
+            <pros-scrollable-messages-container
+                [messages]="messages"
+                [currentUser]="currentUser"
+                [channelId]="currentChannelId"
+                class="scrollable-messages-container-outer">
+            </pros-scrollable-messages-container>
+            <div class="chat-editor-container-outer">
+                <div class="typing-indicator">
+                    <!-- <lib-text-line type="xsmall" textColor="secondary">Rick Wood is typing</lib-text-line> -->
+                </div>
+
+                <pros-chat-editor
+                    [currentChannelId]="currentChannelId"
+                    [currentUser]="currentUser"
+                    editorId="mdoChat"
+                    class="chat-editor-outer">
+                </pros-chat-editor>
+            </div>
+        </div>
+    </div>
+</div>

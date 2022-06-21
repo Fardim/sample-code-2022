@@ -1,0 +1,180 @@
+<mat-card class="mat-elevation-z0 widget">
+    <div [ngClass]="{'hide': !isFetchingData}">
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line"></lib-skeleton>
+        <lib-skeleton type="line"></lib-skeleton>
+    </div>
+    <div [ngClass]="{'hide':isFetchingData}" class="view-table">
+        <div class="f-row">
+            <lib-text-line type="base" #displayHeading [libTooltip]="widgetInfo.widgetTitle" matTooltipPosition="right" [matTooltipDisabled]="false">{{ widgetInfo.widgetTitle }}</lib-text-line>
+            <div class="f-spacer"></div>
+            <lib-button type="plain" icon="pencil-alt" *ngIf="editedMode" (click)="openPanel.emit()"></lib-button>
+            <lib-button [matMenuTriggerFor]="menu" type="plain" icon="ellipsis-h"></lib-button>
+            <mat-menu #menu="matMenu" class="navigation-menu">
+                <button mat-menu-item *ngIf="editedMode" (click)="deleteWidget.emit()">Delete</button>
+                <button mat-menu-item *ngIf="!editedMode" (click)="downloadCSV()">Data download (.csv)</button>
+                <button mat-menu-item *ngIf="!editedMode" (click)="clearFilter(true)" i18n="@@resetFilters">Reset all filters</button>
+                <button mat-menu-item *ngIf="!editedMode" (click)="configureFilters()" i18n="@@configureFilters">Configure filters</button>
+            </mat-menu>
+        </div>
+
+        <mat-card-content cdkScrollable>
+            <div class="root-table" [formGroup]="reportingListFilterForm">
+                <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortTable($event)">
+                    <ng-container matColumnDef="action">
+                        <!-- <th mat-header-cell *matHeaderCellDef></th> -->
+                        <th mat-header-cell *matHeaderCellDef>
+                            <lib-button *ngIf="!editedMode" (afterClick)="openTableColumnSideSheet()" type="plain" icon="cog"></lib-button>
+                        </th>
+                        <td mat-cell *matCellDef="let element">
+                            <lib-button icon="ellipsis-h" 
+                                        [matMenuTriggerFor]="flowNavigationList" 
+                                        [matMenuTriggerData]="{triggerFrom: 'view', docId: element['OBJECTNUMBER']?.fieldData}"
+                                        (menuOpened)="getFlowListOptions('3')">
+                            </lib-button>
+
+                            <mat-menu #flowNavigationList="matMenu" xPosition="after" class="navigation-menu">
+                                <ng-template matMenuContent let-triggerFrom="triggerFrom" let-docId="docId">
+                                    <ng-template [ngIf]="triggerFrom === 'create'">
+                                        <div class="search-container">
+                                            <lib-search placeholder="Search" prosClickStopPropagation [formControl]="flowSearchControl">
+                                            </lib-search>
+                                        </div>
+                                    </ng-template>
+                                    <div class="flow-list-section" *ngIf="flowList | async as flowL">
+                                        <ng-container *ngFor="let form of flowL.forms">
+                                            <button mat-menu-item [focus]="false" [ngClass]="{'no-data-text': form.isNoFlows}"
+                                                (click)="openTransaction('', form?.formId, triggerFrom, element.objectNumber, form.isNoFlows)">
+                                                {{form.formDesc || form.formId}}
+                                            </button>
+                                        </ng-container>
+                                    </div>
+                                </ng-template>
+                             </mat-menu>
+                        </td>
+                    </ng-container>
+
+                    <!-- Module Column -->
+                    <ng-container *ngFor="let column of displayedColumnsId">
+                        <ng-container *ngIf="column !== 'action'" matColumnDef="{{column}}">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header [disabled]="!columnDescs[column]"> {{columnDescs[column]}}</th>
+                            <td mat-cell *matCellDef="let element">
+                                <ng-template [ngIf]="isDateType(column)" [ngIfElse]="normalText">
+                                    {{ element[column] ? (getDateTypeValue(element[column]) | dateFormatPipe:dateFormat ): '' }}
+                                </ng-template>
+                                <ng-template #normalText>
+                                    {{element[column]}}
+                                </ng-template>
+                            </td>
+                        </ng-container>
+                    </ng-container>
+                    <!--Second header of table-->
+                    <ng-container *ngFor="let column of displayedColumnsFilterId; let i = index">
+                        <ng-container matColumnDef="{{column}}">
+                            <th mat-header-cell *matHeaderCellDef [style.text-align]="center">
+                                <!-- For input text -->
+                                <ng-template [ngIf]="getFormFieldType(displayedColumnsId[i]) === 'text' || (getFormFieldType(displayedColumnsId[i]) === false && displayedColumnsId[i] !== 'action')">
+                                    <div class="lib-input">
+                                        <lib-input [formControlName]="displayedColumnsId[i]" [placeholder]="'Enter '+columnDescs[displayedColumnsId[i]] ? columnDescs[displayedColumnsId[i]] : ''">
+                                        </lib-input>
+                                    </div>
+                                </ng-template>
+
+                                <!--for slider range picker-->
+                                <ng-template [ngIf]="getFormFieldType(displayedColumnsId[i]) === 'number'">
+                                    <pros-form-range-slider [control]="reportingListFilterForm.get(displayedColumnsId[i])" placeholder="X-XX" (valueChange)="setFilter($event)" [formFieldId]="displayedColumnsId[i]" [preSelectedValue]="getPreSelectedRangeValue(displayedColumnsId[i])">
+                                    </pros-form-range-slider>
+                                </ng-template>
+                                <!-- Single select drop down -->
+                                <ng-template [ngIf]="getFormFieldType(displayedColumnsId[i]) === 'dropdown'">
+                                    <pros-form-single-select [formControlName]="reportingListFilterForm.get(displayedColumnsId[i])"
+                                        [placeholder]="'Enter '+columnDescs[displayedColumnsId[i]] ? columnDescs[displayedColumnsId[i]] : ''"
+                                        [displayCriteria]="getColumnDisplayCriteria(displayedColumnsId[i])"
+                                        (valueChange)="setFilter($event)" [formFieldInfo]="getSelectedFieldMetaData(displayedColumnsId[i])"
+                                        [value]="reportingListFilterForm.controls[displayedColumnsId[i]]?.value"
+                                        isTableFilter="true">
+                                    </pros-form-single-select>
+                                </ng-template>
+
+                                <!-- For multi select drop down-->
+                                <ng-template [ngIf]="getFormFieldType(displayedColumnsId[i]) === 'multiselectDropdown'">
+                                    <pros-form-multiselect [control]="reportingListFilterForm.get(displayedColumnsId[i])"
+                                        [placeholder]="'Enter '+columnDescs[displayedColumnsId[i]] ? columnDescs[displayedColumnsId[i]] : ''"
+                                        [displayCriteria]="getColumnDisplayCriteria(displayedColumnsId[i])"
+                                        (valueChange)="setFilter($event)" [formFieldInfo]="getSelectedFieldMetaData(displayedColumnsId[i])"
+                                        isTableFilter="true" [value]="selectedMultiSelectData[displayedColumnsId[i]]">
+                                    </pros-form-multiselect>
+                                </ng-template>
+                                <!-- For checkbox-->
+                                <ng-template [ngIf]="getFormFieldType(displayedColumnsId[i]) === 'checkbox'">
+                                    <pros-form-checkbox [control]="reportingListFilterForm.get(displayedColumnsId[i])" [placeholder]="'Enter '+columnDescs[displayedColumnsId[i]]" (valueChange)="setFilter($event)" [formFieldId]="displayedColumnsId[i]" isTableFilter="true" [label]="columnDescs[displayedColumnsId[i]]">
+                                    </pros-form-checkbox>
+                                </ng-template>
+
+                                <!-- radio button group -->
+                                <ng-template [ngIf]="getFormFieldType(displayedColumnsId[i]) === 'radio'">
+                                    <pros-form-radio-button-group
+                                        [control]="reportingListFilterForm.get(displayedColumnsId[i])"
+                                        [placeholder]="'Enter '+columnDescs[displayedColumnsId[i]] ? columnDescs[displayedColumnsId[i]] : ''"
+                                        [displayCriteria]="getColumnDisplayCriteria(displayedColumnsId[i])"
+                                        (valueChange)="setFilter($event)" [formFieldInfo]="getSelectedFieldMetaData(displayedColumnsId[i])"
+                                        isTableFilter="true"  [value]="getPreSelectedDropdownValue(displayedColumnsId[i])">
+                                    </pros-form-radio-button-group>
+                                </ng-template>
+
+                                <!-- For text area -->
+                                <ng-template [ngIf]="getFormFieldType(displayedColumnsId[i]) === 'textarea'">
+                                    <pros-form-textarea [control]="reportingListFilterForm.get(displayedColumnsId[i])" [placeholder]="'Enter '+columnDescs[displayedColumnsId[i]] ? columnDescs[displayedColumnsId[i]] : ''" (valueChange)="setFilter($event)" [formFieldId]="displayedColumnsId[i]" isTableFilter="true" [title]="columnDescs[displayedColumnsId[i]]"
+                                        [value]="reportingListFilterForm.get(displayedColumnsId[i]).value">
+                                    </pros-form-textarea>
+                                </ng-template>
+
+                                <!-- For date type -->
+                                <ng-template [ngIf]="getFormFieldType(displayedColumnsId[i]) === 'date'">
+                                    <div class="lib-input">
+                                        <lib-date-range-picker [formControlName]="displayedColumnsId[i]" [emitDateOnSave]="true" (valueChange)="setFilter({formFieldId : displayedColumnsId[i] , value : $event})" [placeholder]="'Enter '+columnDescs[displayedColumnsId[i]] ? columnDescs[displayedColumnsId[i]] : ''" [selectedDate]="getSelectedDateValue(displayedColumnsId[i])">
+                                        </lib-date-range-picker>
+                                    </div>
+                                </ng-template>
+
+                            <!-- For time picker -->
+                            <!-- <ng-template [ngIf]="getFormFieldType(displayedColumnsId[i]) === 'time'">
+                                <lib-time-range-picker [enableTimeInput]="true" [formControlName]="displayedColumnsId[i]" [placeholder]="'Enter ' + columnDescs[displayedColumnsId[i]]" [emitDateOnSave]="true" (valueChange)="setFilter({ formFieldId: displayedColumnsId[i], value: $event })"
+                                    [selected]="getSelectedTimeValue(displayedColumnsId[i])"></lib-time-range-picker>
+                            </ng-template> -->
+
+                            <!-- For hierarchy -->
+                            <ng-template [ngIf]="getFormFieldType(displayedColumnsId[i]) === 'hierarchy'">
+                                <pros-hierarchy-filter-v2 [control]="reportingListFilterForm.get(displayedColumnsId[i])" 
+                                    [placeholder]="'Enter '+columnDescs[displayedColumnsId[i]] ? columnDescs[displayedColumnsId[i]] : ''" (valueChange)="setFilter($event)" 
+                                    [value]="selectedMultiSelectData[displayedColumnsId[i]]" [fieldId]="displayedColumnsId[i]" 
+                                    isTableFilter="true" [displayCriteria]="getColumnDisplayCriteria(displayedColumnsId[i])">
+                                </pros-hierarchy-filter-v2>
+                            </ng-template>
+                        <!-- </th> -->
+                                <!-- For date time picker -->
+                                <ng-template [ngIf]="getFormFieldType(displayedColumnsId[i]) === 'dateTime'">
+                                    <lib-date-time-range-picker [formControlName]="displayedColumnsId[i]" class="lib-input" [emitDateOnSave]="true" (valueChange)="setFilter({formFieldId : displayedColumnsId[i] , value : $event})" [placeholder]="'Enter '+columnDescs[displayedColumnsId[i]] ? columnDescs[displayedColumnsId[i]] : ''"
+                                        [selectedDate]="getSelectedDateValue(displayedColumnsId[i])">
+                                    </lib-date-time-range-picker>
+                                </ng-template>
+
+                                <!-- For time picker -->
+                                <ng-template [ngIf]="getFormFieldType(displayedColumnsId[i]) === 'time'">
+                                    <lib-time-range-picker [enableTimeInput]="true" [formControlName]="displayedColumnsId[i]" [placeholder]="'Enter '+columnDescs[displayedColumnsId[i]] ? columnDescs[displayedColumnsId[i]] : ''" [emitDateOnSave]="true" (valueChange)="setFilter({formFieldId : displayedColumnsId[i] , value : $event})"
+                                        [selected]="getSelectedTimeValue(displayedColumnsId[i])"></lib-time-range-picker>
+                                </ng-template>
+                            </th>
+                        </ng-container>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsId; sticky: true"></tr>
+                    <tr mat-header-row *matHeaderRowDef="displayedColumnsFilterId; sticky:true"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumnsId;"></tr>
+                </table>
+            </div>
+            <mat-paginator [pageSize]="pageSize" [length]="resultsLength" [pageSizeOptions]="pageSizeOption" (page)="getServerData($event)">
+            </mat-paginator>
+            <!-- <lib-pagination class="mat-paginator" [pageSize]="pageSize" [totalCount]="3200" (page)="getServerData($event)"></lib-pagination> -->
+    </mat-card-content>
+</div>
+</mat-card>

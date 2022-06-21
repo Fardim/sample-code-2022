@@ -1,0 +1,80 @@
+<div class="overlay-content-container">
+    <div class="f-col inner-content-wrapper">
+        <div class="search-container">
+            <lib-search [formControl]="searchControl" placeholder="Type to search"></lib-search>
+        </div>
+        <div class="content-container">
+            <div class="table-loader" *ngIf="dataSourceLoader; else showTable">
+                <table width="100%">
+                    <tr>
+                        <td>
+                            <lib-skeleton type="line-half"></lib-skeleton>
+                        </td>
+                        <td>
+                            <lib-skeleton type="line-half"></lib-skeleton>
+                        </td>
+                        <td>
+                            <lib-skeleton type="line-half"></lib-skeleton>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <lib-skeleton type="line-half"></lib-skeleton>
+                        </td>
+                        <td>
+                            <lib-skeleton type="line-half"></lib-skeleton>
+                        </td>
+                        <td>
+                            <lib-skeleton type="line-half"></lib-skeleton>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <lib-skeleton type="line-half"></lib-skeleton>
+                        </td>
+                        <td>
+                            <lib-skeleton type="line-half"></lib-skeleton>
+                        </td>
+                        <td>
+                            <lib-skeleton type="line-half"></lib-skeleton>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <lib-skeleton type="line-half"></lib-skeleton>
+                        </td>
+                        <td>
+                            <lib-skeleton type="line-half"></lib-skeleton>
+                        </td>
+                        <td>
+                            <lib-skeleton type="line-half"></lib-skeleton>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!-- <lib-tab-group>
+                <lib-tab label="Material(2)"> -->
+                    <ng-template #showTable>
+                        <table mat-table [dataSource]="dataSource" class="object-table">
+                            <ng-container matColumnDef="OBJECTNUMBER">
+                                <td mat-cell *matCellDef="let element">
+                                    <lib-text-line class="link" (click)="select(element?.OBJECTNUMBER)" type="base" textColor="info" weight="strong">{{element?.OBJECTNUMBER?.fieldData}}</lib-text-line>
+                                </td>
+                            </ng-container>
+                            <ng-container matColumnDef="DESCRIPTION">
+                                <td mat-cell *matCellDef="let element">
+                                    <lib-text-line class="link" (click)="select(element?.OBJECTNUMBER)" type="base" weight="strong">{{element?.OBJECTNUMBER?.fieldDesc}}</lib-text-line>
+                                </td>
+                            </ng-container>
+                            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        </table>
+                    </ng-template>
+                <!-- </lib-tab>
+                <lib-tab label="PO Text(1)">
+                </lib-tab>
+                <lib-tab label="Files(1)">
+                </lib-tab>
+            </lib-tab-group> -->
+        </div>
+    </div>
+</div>

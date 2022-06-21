@@ -1,0 +1,26 @@
+<ng-container [ngSwitch]="controlType">
+    <!-- Input type single select -->
+
+    <mat-form-field *ngSwitchCase="'inputText'" appearance="outline" prosClickStopPropagation class="edit-cell">
+        <input matInput #input [formControl]="searchControl" placeholder="Attribute value" (blur)="emitInputBlur($event.target.value)">
+    </mat-form-field>
+    
+
+    <mat-form-field *ngSwitchCase="'dropdown'"  appearance="outline" prosClickStopPropagation class="edit-cell">
+        <input matInput class="mat-input" [matAutocomplete]="auto" #input [formControl]="searchControl"
+            placeholder="Search" (blur)="emitChngSelectValue($event)" #trigger="matAutocompleteTrigger">
+            <div class="f-row input-actions">
+                <mat-icon fontSet="mdo-icons">search</mat-icon>
+            </div>
+        <mat-autocomplete [displayWith]="displayFn.bind(this)" #auto="matAutocomplete" (optionSelected)="emitChngSelectValue($event)">
+            <mat-option class="mat-result-option" *ngFor="let option of filterdOptionsObs | async" [value]="option.CODE"
+                [ngStyle]="{'color': option.isSugested ? 'primary' : null }" libTooltip="{{ option.TEXT }}" matTooltipPosition="right"> {{ option.TEXT }} </mat-option>
+            <mat-option class="no-result" disabled>No results found</mat-option>
+        </mat-autocomplete>
+    </mat-form-field>
+
+
+    <mat-form-field *ngSwitchDefault appearance="outline" prosClickStopPropagation class="edit-cell">
+        <input matInput #input [formControl]="searchControl" placeholder="Attribute value" (blur)="emitInputBlur($event.target.value)">
+    </mat-form-field>
+</ng-container>

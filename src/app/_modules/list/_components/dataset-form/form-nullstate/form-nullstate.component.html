@@ -1,0 +1,16 @@
+<lib-empty-state
+  class="f-col load-empty"
+  primaryText="Nothing to see here"
+  icon="order"
+  iconSize="200"
+  secondaryText="You don't have any forms. Would you like to create one?"
+>
+  <lib-button-group>
+    <lib-button type="minor" (click)="formTypeSelected({id: '2', name: 'Flow'})">New form </lib-button>
+  </lib-button-group>
+  <!-- <mat-menu #typesMenu="matMenu" class="navigation-menu">
+    <button mat-menu-item (click)="formTypeSelected(type)" formTypes *ngFor="let type of formTypes">
+      {{ type?.name }}
+    </button>
+  </mat-menu> -->
+</lib-empty-state>

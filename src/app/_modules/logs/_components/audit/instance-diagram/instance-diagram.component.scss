@@ -1,0 +1,41 @@
+div.root {
+  user-select: text;
+  height: 100%;
+  overflow: auto;
+  margin: 0;
+  position: relative;
+  width: 600px;
+
+  .breadcrum-toolbar {
+    padding: 8px 12px;
+
+    .mdo-constrained-right {
+      align-items: center;
+      width: 100%;
+      margin-right: 0;
+
+      .breadcrum-head {
+        width: 100%;
+      }
+    }
+  }
+
+  .notification-listing {
+    width: 100%;
+
+    .notify-row {
+      padding: 0 12px;
+      width: 100%;
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+  }
+}

@@ -1,0 +1,151 @@
+<div class="f-row nav-root">
+  <div class="f-col primarynav-logo">
+    <img src="assets\images\mdo-reverse.svg" height="24" (click)="sendToParent('welcome')" class="cursor">
+    <!-- <pros-svg-icon size="70" icon="MDO_LOGO" class="primary-nav"></pros-svg-icon> -->
+  </div>
+
+  <div class="f-row">
+    <mat-nav-list class="primary-nav-list">
+      <mat-list-item class="link-items" [class.selected]="isNavSelected === 'welcome'" (click)="sendToParent('welcome')"
+        i18n="@@home"> Home </mat-list-item>
+      <mat-list-item class="link-items" [class.selected]="isNavSelected === 'list'" (click)="sendToParent('list')"
+        i18n="@@data">Data</mat-list-item>
+      <mat-list-item class="link-items" [class.selected]="isNavSelected === 'schema'" (click)="sendToParent('schema')">
+        DIW</mat-list-item>
+      <mat-list-item class="link-items" [class.selected]="isNavSelected === 'flows'" (click)="sendToParent('flows')">
+        Flows</mat-list-item>
+      <mat-list-item class="link-items" [class.selected]="isNavSelected === 'report'" (click)="sendToParent('report')"
+        i18n="@@analytics">Dashboards</mat-list-item>
+      <!-- <mat-list-item class="link-items" [class.selected]="isNavSelected==='schema'"
+            (click)="sendToParent('schema')" i18n="@@schema">Schema</mat-list-item> -->
+    </mat-nav-list>
+  </div>
+
+  <div class="f-spacer"></div>
+
+  <div class="f-row global-menu">
+    <!-- <lib-button type="minor" class="lib-button check-data" [matMenuTriggerFor]="navigation" iconFontType="solid"
+            icon="caret-down">Check data</lib-button>
+
+        <div [matMenuTriggerFor]="navigation">
+            <button mat-mini-fab class="create-new">
+                <mat-icon fontSet="mdo-icons-light">plus</mat-icon>
+            </button>
+            <mat-menu #navigation="matMenu" xPosition="before" class="navigation-menu">
+                <pros-navigation-dropdown (selectedModule)="selectedModule($event)" (_importSchema)="importSchema($event)">
+                </pros-navigation-dropdown>
+            </mat-menu>
+        </div> -->
+    <lib-button type="minor" icon="plus" iconFontType="light" rounded="true" [matMenuTriggerFor]="navigation"
+      class="create-new">
+    </lib-button>
+    <mat-menu #navigation="matMenu" xPosition="before" class="navigation-menu">
+        <div class="dropdown-search-wrapper">
+          <lib-search prosClickStopPropagation placeholder="Search" (valueChange)="searchModuleSub.next($event)"></lib-search>
+        </div>
+        <div class="f-col">
+          <div class="scroll-height" prosInfiniteScroll bufferPercentage="20" (scrollEnd)="onScrollEndModule()">
+              <ng-container *ngIf="moduleList.length>0; else emptyModuleList">
+                <button mat-menu-item *ngFor="let module of moduleList" [matMenuTriggerFor]="formsMenu" (mouseenter) ="fetchForms(module.moduleId, true)">
+                  {{module?.moduleDesc}}
+                </button>
+              </ng-container>
+              <!-- <ng-container *ngIf="moduleLoading">
+                <div class="f-col dropdown-spacing-wrapper">
+                  <lib-skeleton-listmenu></lib-skeleton-listmenu>
+                </div>
+              </ng-container> -->
+              <ng-template #emptyModuleList>
+                <div class="f-col dropdown-spacing-wrapper">
+                  <lib-text-line type="base" enableWrap="true">No dataset available</lib-text-line>
+                </div>
+              </ng-template>
+          </div>
+          
+          <mat-divider></mat-divider>
+          <lib-filter-option (click)="openDatasetDialog()">
+            New dataset
+          </lib-filter-option>
+          <lib-filter-option (click)="openConnektHubSidesheet()">
+            Explore ConnektHub
+          </lib-filter-option>
+        </div>
+    </mat-menu>
+
+    <mat-menu #formsMenu="matMenu" xPosition="after" class="navigation-menu">
+      <div class="dropdown-search-wrapper">
+        <lib-search prosClickStopPropagation placeholder="Search" (valueChange)="searchFormSub.next($event)"></lib-search>
+      </div>
+      <div class="f-col">
+        <div class="scroll-height" prosInfiniteScroll bufferPercentage="20" (scrollEnd)="onScrollEndForm()">
+          <ng-container *ngIf="formList.length>0; else emptyFormList">
+            <lib-filter-option *ngFor="let form of formList">
+              {{form?.description}}
+            </lib-filter-option>
+          </ng-container>
+          <ng-container *ngIf="formLoading">
+            <div class="f-col dropdown-spacing-wrapper">
+            <lib-skeleton-listmenu></lib-skeleton-listmenu>
+          </div>
+          </ng-container>
+          <ng-template #emptyFormList>
+            <div class="f-col dropdown-spacing-wrapper">
+              <lib-text-line type="base" enableWrap="true">No form available</lib-text-line>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </mat-menu>
+
+    <!-- <lib-search placeholder="Search anything" #schemaSearchInput value="" class="lib-search"></lib-search> -->
+
+    <div class="f-row admin-badge">
+      <mat-icon (click)="openSystemTray('jobs')" fontSet="mdo-icons-solid" [libBadge]="notificationsCount>0? notificationsCount: null"
+        matBadgeOverlap="true" matBadgeColor="primary" matBadgeSize="small" matBadgePosition="after"
+        class="cursor updates">archive</mat-icon>
+
+      <mat-icon (click)="openSystemTray('notifications')" fontSet="mdo-icons-solid" [libBadge]="notificationsCount>0? notificationsCount: null"
+        matBadgeOverlap="true" matBadgeColor="primary" matBadgeSize="small" matBadgePosition="after"
+        class="cursor updates">bell</mat-icon>
+    </div>
+
+    <lib-avatar size="small" avatarSize="small"
+      *ngIf="userDetails.firstName || userDetails.lastName || userDetails.email" [initials]="getInitials()"
+      [matMenuTriggerFor]="profile_navigation" class="bar-avatar cursor"></lib-avatar>
+
+    <mat-menu #profile_navigation="matMenu" xPosition="before" class="navigation-menu">
+      <lib-button class="menu-btn" (afterClick)="openSettings()" i18n="@@settings">Settings</lib-button>
+      <mat-divider></mat-divider>
+      <lib-button class="menu-btn" (afterClick)="signOut()" i18n="@@sign_out">Sign out</lib-button>
+    </mat-menu>
+  </div>
+</div>
+<mat-sidenav-content id="primaryContent" class="body-sidecontent">
+  <pros-overlay-loader></pros-overlay-loader>
+  <ng-template [ngIf]="toShowSecondaryNavBar" [ngIfElse]="skippedSecondaryNav">
+    <mat-sidenav-container autosize>
+      <mat-sidenav mode="side" opened [disableClose]="true" id="secondarySidenav" #secondarySidenav
+        [ngStyle]="{ 'width.px': (this.secondarySideBarOpened$ | async) ? '220' : '16', cursor: grabCursor }">
+        <!-- secondary side nav -->
+        <pros-secondary-navbar [activatedPrimaryNav]="isNavSelected"
+          [secondarySideBarOpened]="secondarySideBarOpened$ | async" (toggleEmitter)="toggleSecondarySideBar()">
+        </pros-secondary-navbar>
+      </mat-sidenav>
+      <mat-sidenav-content id="secondaryContent" #secondaryContent
+        [ngStyle]="{ 'marginLeft.px': (this.secondarySideBarOpened$ | async) ? '220' : '73' }">
+        <div #grabberElement class="resizable-grabber" (mousedown)="resizableMousedown($event)"></div>
+        <router-outlet></router-outlet>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </ng-template>
+  <ng-template #skippedSecondaryNav>
+    <mat-sidenav-container autosize>
+      <mat-sidenav-content id="secondaryContent" #secondaryContent>
+        <router-outlet></router-outlet>
+      </mat-sidenav-content>
+    </mat-sidenav-container>
+  </ng-template>
+</mat-sidenav-content>
+
+<div *ngIf="grab" class="resizable-overlay" (mouseup)="resizableMouseup($event)" (mouseout)="resizableMouseup($event)"
+  (mousemove)="resizableMousemove($event)"></div>

@@ -1,0 +1,12 @@
+<mat-card class="mat-elevation-z0 widget">
+    <div class="f-row" *ngIf="editedMode">
+        <div class="f-spacer"></div>
+        <lib-button type="plain" icon="pencil-alt" (click)="openPanel.emit()"></lib-button>
+        <lib-button [matMenuTriggerFor]="menu" type="plain" icon="ellipsis-h"></lib-button>
+        <mat-menu #menu="matMenu" class="navigation-menu">
+            <lib-filter-option (click)="deleteWidget.emit()">Delete</lib-filter-option>
+        </mat-menu>
+    </div>
+    <lib-text-line type="base" enableWrap="true" [innerHtml]="htmltext"
+        [ngStyle]="{'height.px':height, 'overflow':'auto'}"></lib-text-line>
+</mat-card>

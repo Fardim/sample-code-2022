@@ -1,0 +1,37 @@
+<div *ngIf="form" class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" (click)="closeDialogComponent()" iconFontType="light" icon="times"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading">New check code</lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="major" i18n="@@save" (click)="save();$event.stopPropagation()">Save</lib-button>
+      </div>
+    </div>
+  </div>
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <lib-banner status="error" *ngIf="validationError.status" [text]="validationError.message">
+      </lib-banner>
+      <form [formGroup]="form">
+        <div class="f-col">
+          <lib-input [isRequired]="true" label="Check code" formControlName="code"
+            [hint]="submitted && form.controls.code.errors?.maxlength ? 'Please enter maximum 10 character' : (submitted && form.controls.code.errors?.required ? 'Please enter code' : '')"
+            [hasError]="submitted && form.controls.code.errors">
+          </lib-input>
+        </div>
+        <div class="f-col">
+          <lib-textarea [isRequired]="true" label="Short Description" formControlName="shortDesc"
+            [hint]="submitted && form.controls.shortDesc.errors?.maxlength ? 'Please enter maximum 40 character' : (submitted && form.controls.shortDesc.errors ? 'Please enter short description' : '')"
+            [hasError]="submitted && form.controls.shortDesc.errors">
+          </lib-textarea>
+        </div>
+        <div class="f-col">
+          <lib-textarea [isRequired]="false" label="Additional Info" formControlName="additionalInfo">
+          </lib-textarea>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

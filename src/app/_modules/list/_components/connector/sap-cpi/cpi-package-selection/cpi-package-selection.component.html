@@ -1,0 +1,83 @@
+<mat-card class="root mat-elevation-z0">
+  <div class="modal-wrapper">
+    <div class="f-row modal-header">
+      <lib-text-line type="leading">New SAP BTP instance/Packages</lib-text-line>
+      <lib-button icon="times"  iconFontType="light" (click)="onCancelClick()"></lib-button>
+    </div>
+
+    <div class="modal-body">
+      <div class="f-col manually-dataset">
+        <form class="f-col dataset-form">
+          <div class="f-col mdo-field">
+            <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@service_structure">Service structure </lib-text-line>
+            <lib-segment [optionsList]="serviceStructureOptions" labelKey="label" valueKey="value" [formControl]="packageOptionControl" (valueChange)="selectedOption($event)"> </lib-segment>
+          </div>
+
+          <div class="f-col mdo-field" *ngIf="packageOptionControl.value === 'STANDARD_PACKAGE'">
+            <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@standard_package">Standard package </lib-text-line>
+              <div class="mdo-field-input">
+                <input matInput placeholder="Select data type" #stdpkgInput [matAutocomplete]="standardPackageAuto" [formControl]="stdpkgOptionCtrl" />
+                <mat-icon fontSet="mdo-icons-light" class="autocomplete-icon" matSuffix>{{standardPackageOptions?.length && !packageLoader? 'chevron-up': 'chevron-down'}}</mat-icon>
+                <mat-autocomplete class="mdo-autocomplete" #standardPackageAuto="matAutocomplete" (optionSelected)="standardPkgSelectionChng($event)" [displayWith]="displayFn">
+                  <mat-option class="mdo-option" *ngFor="let data of standardPackageOptions" [value]="data">
+                    {{ data?.name || 'Untitled' }}
+                  </mat-option>
+                  <mat-option class="mdo-option" [disabled]="true" *ngIf="packageLoader && standardPackageOptions?.length === 0">
+                    Searching...
+                  </mat-option>
+                  <mat-option class="mdo-option" [disabled]="true" *ngIf="!packageLoader && standardPackageOptions?.length === 0">
+                    No data found
+                  </mat-option>
+                </mat-autocomplete>
+              </div>
+          </div>
+
+          <div class="f-col mdo-field" *ngIf="packageOptionControl.value === 'SAP_TABLE'">
+            <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@sap_table">SAP table </lib-text-line>
+            <div class="mdo-field-input">
+              <input matInput placeholder="Select data type" #optionsInput [matAutocomplete]="sapTableAuto" [formControl]="sapTableOptionCtrl"  />
+              <mat-icon fontSet="mdo-icons-light" class="autocomplete-icon" matSuffix>{{filteredSapTableOptions?.length && !sapTableLoader? 'chevron-up': 'chevron-down'}}</mat-icon>
+              <mat-autocomplete class="mdo-autocomplete" #sapTableAuto="matAutocomplete" (optionSelected)="saptableSelectionChng($event)">
+                  <ng-container *ngIf="!sapTableLoader">
+                    <mat-option class="mdo-option" *ngFor="let data of filteredSapTableOptions" [value]="data">
+                      {{ data }}
+                    </mat-option>
+                    <mat-option *ngIf="!searchTerm && !filteredSapTableOptions?.length" class="mdo-option f-row">
+                      <lib-text-line type="base" textColor="primary">No tables found</lib-text-line>
+                    </mat-option>
+                    <mat-option *ngIf="searchTerm && !sapTableOptions?.length" class="mdo-option f-row">
+                      <lib-text-line type="base" textColor="primary">No data found for "<b>{{searchTerm}}</b>"</lib-text-line>
+                    </mat-option>
+                  </ng-container>
+
+                  <mat-option *ngIf="sapTableLoader" class="mdo-option f-col">
+                    <lib-text-line type="base" textColor="secondary">Loading...</lib-text-line>
+                  </mat-option>
+              </mat-autocomplete>
+            </div>
+          </div>
+
+          <div class="f-row" *ngIf="packageOptionControl.value === 'SAP_TABLE'">
+            <lib-slide-toggle theme="primary" class="toggle-col" [checked]="syncData" (toggleChange)="setSyncValue($event)">
+            </lib-slide-toggle>
+            <lib-text-line type="xsmall" weight="strong">Sync data <mat-icon fontSet="mdo-icons-light" class="label-icon" libTooltip="Whether data needs to be synced">
+              question-circle
+            </mat-icon></lib-text-line>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="f-row modal-footer space-between">
+      <lib-button type="plain" width="80px" (click)="onCancelClick()" i18n="@@cancel">Cancel</lib-button>
+      <span class="f-spacer"></span>
+      <div class="f-row">
+        <lib-button type="plain" width="80px" i18n="@@back" (click)="back()">Back</lib-button>
+        &nbsp;
+        <lib-button type="major" width="80px" i18n="@@next" (afterClick)="next()"
+      [disabled]="(packageOptionControl.value === 'STANDARD_PACKAGE' && selectedSTDPkg==null) || ((packageOptionControl.value === 'SAP_TABLE' && !selectedSAPTable)) ">
+      Next </lib-button>
+      </div>
+    </div>
+  </div>
+</mat-card>

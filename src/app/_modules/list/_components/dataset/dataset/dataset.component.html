@@ -1,0 +1,100 @@
+<mat-card class="root mat-elevation-z0" *ngIf="!showConnectDatasetTab && false">
+  <div class="f-row breadcrum-toolbar">
+    <lib-text-line type="leading" *ngIf="selectedDatasetId === 0" i18n="@@new_dataset">New dataset
+    </lib-text-line>
+    <lib-text-line type="leading" *ngIf="selectedDatasetId !== 0" i18n="@@update_dataset">Update dataset
+    </lib-text-line>
+    <span class="f-spacer"></span>
+    <lib-button icon="times" iconFontType="light" (click)="onCancelClick({toRefreshApis: false, moduleId: null})">
+    </lib-button>
+  </div>
+
+  <div class="f-col dataset-list" *ngIf="false">
+    <div class="f-col" *ngIf="!showManualDatabaseForm">
+      <div class="f-row dataset-palette">
+        <mat-card class="f-col mat-elevation-z0">
+          <lib-text-line type="base" weight="strong" textColor="primary" enableWrap="true" i18n="@@connect_to">Connect
+            to
+          </lib-text-line>
+          <pros-svg-icon size="70" height="80" [viewBox]="'0 0 16.931946 12.718346'" icon="CONNECT_TO"></pros-svg-icon>
+          <div class="row-spacer"></div>
+          <lib-text-line type="base" textColor="secondary" enableWrap="true" i18n="@@connect_to_details">Bring your data
+            accross from another system</lib-text-line>
+          <div class="row-spacer"></div>
+          <lib-text-line class="cursor" type="base" textColor="link" i18n="@@select">Select</lib-text-line>
+        </mat-card>
+
+        <mat-card class="f-col mat-elevation-z0">
+          <lib-text-line type="base" weight="strong" textColor="primary" enableWrap="true" i18n="@@load_from_file">Load
+            from file
+          </lib-text-line>
+          <pros-svg-icon size="70" height="80" [viewBox]="'0 0 16.931946 12.718346'" icon="LOAD_FROM_FILE">
+          </pros-svg-icon>
+          <div class="row-spacer"></div>
+          <lib-text-line type="base" textColor="secondary" enableWrap="true" i18n="@@load_from_file_details">Create a
+            dataset by uploading a file with data</lib-text-line>
+          <div class="row-spacer"></div>
+          <lib-text-line class="cursor" type="base" textColor="link" i18n="@@select" [matMenuTriggerFor]="importDatasetOption">
+            Select <mat-icon fontSet="mdo-icons-solid">caret-down</mat-icon>
+          </lib-text-line>
+
+          <mat-menu #importDatasetOption="matMenu" class="navigation-menu">
+            <button mat-menu-item>
+              Import data file 
+            </button>
+            <button mat-menu-item>
+              Import dataset
+            </button>
+          </mat-menu>
+        </mat-card>
+      </div>
+
+      <div class="f-row dataset-palette">
+        <mat-card class="f-col mat-elevation-z0">
+          <lib-text-line type="base" weight="strong" textColor="primary" enableWrap="true" i18n="@@create_manually">
+            Create manually</lib-text-line>
+          <pros-svg-icon size="70" height="80" [viewBox]="'0 0 16.931946 12.718346'" icon="CREATE_MANUALLY">
+          </pros-svg-icon>
+          <div class="row-spacer"></div>
+          <lib-text-line type="base" textColor="secondary" enableWrap="true" i18n="@@create_manually_details">Create a
+            dataset by defining its content manually</lib-text-line>
+          <div class="row-spacer"></div>
+          
+          <lib-text-line class="cursor" type="base" textColor="link" i18n="@@select" [matMenuTriggerFor]="typesMenu">
+            Select <mat-icon fontSet="mdo-icons-solid">caret-down</mat-icon>
+          </lib-text-line>
+
+          <mat-menu #typesMenu="matMenu" class="navigation-menu">
+            <button mat-menu-item (click)="selectedDatasetType = type.value; showManualDatabaseForm = true;" formTypes
+              *ngFor="let type of datasetTypes">
+              {{ type?.key }}
+            </button>
+          </mat-menu>
+        </mat-card>
+      </div>
+    </div>
+
+    <div class="f-col manually-dataset" *ngIf="showManualDatabaseForm">
+      <pros-manually-datasets (cancelClick)="onCancelClick($event)" (backClick)="back()"
+        [selectedDatasetType]="selectedDatasetType" [selectedDatasetId]="selectedDatasetId">
+      </pros-manually-datasets>
+    </div>
+  </div>
+
+  <div class="row-spacer"></div>
+
+  <div class="f-row" *ngIf="!showManualDatabaseForm">
+    <lib-button type="plain" (click)="onCancelClick({toRefreshApis: false, moduleId: null})" i18n="@@cancel">Cancel
+    </lib-button>
+  </div>
+</mat-card>
+
+<mat-card class="root mat-elevation-z0" *ngIf="showConnectDatasetTab && false">
+  <pros-connect-to-dataset (backClick)="back()" (cancelClick)="onCancelClick({toRefreshApis: false, moduleId: null})"></pros-connect-to-dataset>
+</mat-card>
+
+<ng-container>
+  <ng-template prosConnectorContainer>
+
+  </ng-template>
+</ng-container>

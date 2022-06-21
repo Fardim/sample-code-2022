@@ -1,0 +1,40 @@
+.root {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  align-content: flex-start;
+
+  .breadcrumb-wrapper {
+    flex: 1 100%;
+  }
+
+  .reportlist-container {
+    width: 100%;
+
+    mat-form-field {
+      width: 100%;
+    }
+
+    .reportlisting {
+      border-radius: 6px;
+      margin-bottom: 16px;
+      padding: 0;
+
+      mat-toolbar-row {
+        .mat-h3 {
+          display: -webkit-box;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: pre-line;
+          word-break: break-word;
+          font-weight: 400;
+          font-size: 16px;
+          margin: 0;
+        }
+      }
+    }
+  }
+}

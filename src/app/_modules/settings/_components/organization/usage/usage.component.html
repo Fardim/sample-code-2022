@@ -1,0 +1,113 @@
+<lib-banner status="info" text="Fetching Usage Data...." [hidden]="(dataSetSizes$|async)&&(roleCounts$|async)">
+</lib-banner>
+
+<div class="usage-dashboard-grid">
+  <mat-card class="mat-elevation-z0 dashboard-item col-1">
+    <div class="f-row">
+      <lib-text-line type="leading" i18n="@@usage-data-storage-title"> Data storage </lib-text-line>
+    </div>
+    <mat-card-content class="f-row usage-conatiner">
+      <lib-text-line type="display" weight="strong" *ngIf="(dataSetSizes$ | async) as dataSetSizes; else postgresSkeleton"> {{ dataSetSizes.postgres ||'N/A' }}</lib-text-line>
+      <ng-template #postgresSkeleton>
+        <lib-skeleton type="button"></lib-skeleton>
+      </ng-template>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="mat-elevation-z0 dashboard-item col-1">
+    <div class="f-row">
+      <lib-text-line type="leading" i18n="@@usage-user-roles-title"> User roles </lib-text-line>
+    </div>
+    <mat-card-content class="usage-conatiner">
+      <table mat-table *ngIf="roleCounts$|async as roleCounts; else verticaltableSkeleton" [dataSource]="roleCounts" class="mat-elevation-z0">
+        <!-- Roles Column -->
+        <ng-container matColumnDef="roleName">
+          <th mat-header-cell *matHeaderCellDef i18n="@@usage-role-name-column-header">Role Name</th>
+          <td mat-cell *matCellDef="let element">{{ element.roleName }}</td>
+        </ng-container>
+
+        <!-- Number of users Column-->
+        <ng-container matColumnDef="countOfUsers">
+          <th mat-header-cell *matHeaderCellDef i18n="usage-role-count-column-header">Number of Users</th>
+          <td mat-cell *matCellDef="let element">{{ element.countOfUsers }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="roleCountColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: roleCountColumns"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="mat-elevation-z0 dashboard-item col-1">
+    <div class="f-row">
+      <lib-text-line type="leading" i18n="@@usage-dataset-sizes-title"> Dataset sizes </lib-text-line>
+    </div>
+    <mat-card-content class="usage-conatiner">
+      <table mat-table *ngIf="dataSetSizes$|async as dataSetSizes; else verticaltableSkeleton" [dataSource]="dataSetSizes.indices" class="mat-elevation-z0">
+        <!-- Index Name-->
+        <ng-container matColumnDef="dataSetName">
+          <th mat-header-cell *matHeaderCellDef i18n="@@usage-dataset-name-column-header">Dataset Name</th>
+          <td mat-cell *matCellDef="let element">{{ element.dataSetName }}</td>
+        </ng-container>
+
+        <!-- Index Size -->
+        <ng-container matColumnDef="size">
+          <th mat-header-cell *matHeaderCellDef i18n="@@usage-dataset-size-column-header">Size</th>
+          <td mat-cell *matCellDef="let element">{{ element.size| dataSize: dataSetSizes.postgres }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="dataSetUsageColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: dataSetUsageColumns"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="mat-elevation-z0 dashboard-item col-1">
+    <div class="f-row">
+      <lib-text-line type="leading" i18n="@@usage-data-pie-title"> Data usage </lib-text-line>
+    </div>
+
+    <mat-card-content class="usage-conatiner">
+      <div class="f-row pie">
+        <canvas baseChart colors [type]="'pie'" [datasets]="pieChartDataSets$|async" [labels]="pieChartLabels$|async"
+          [options]="pieChartOptions"> </canvas>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="mat-elevation-z0 dashboard-item col-2">
+    <div class="f-row">
+      <lib-text-line type="leading" i18n="@@usage-business-rules-title"> Business rules </lib-text-line>
+    </div>
+
+    <mat-card-content class="usage-conatiner">
+      <table mat-table *ngIf="businessRulesDetails$|async as businessRulesDetails; else verticaltableSkeleton" [dataSource]="businessRulesDetails" class="mat-elevation-z0">
+        <!-- Business Rule name Column -->
+        <ng-container matColumnDef="ruleName">
+          <th mat-header-cell *matHeaderCellDef i18n="@@usage-business-rule-name-column-header">Business Rule Name
+          </th>
+          <td mat-cell *matCellDef="let element">{{ element.ruleName }}</td>
+        </ng-container>
+
+        <!-- Dataset Column-->
+        <ng-container matColumnDef="dataset">
+          <th mat-header-cell *matHeaderCellDef i18n="usage-business-rule-dataset-name-column-header">Dataset Name
+          </th>
+          <td mat-cell *matCellDef="let element">{{ element.dataset }}</td>
+        </ng-container>
+
+        <!-- Run count Column-->
+        <ng-container matColumnDef="runCount">
+          <th mat-header-cell *matHeaderCellDef i18n="usage-business-rule-run-count-column-header">Run Count</th>
+          <td mat-cell *matCellDef="let element">{{ element.runCount }}</td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedBusinessRulesExecutedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedBusinessRulesExecutedColumns"></tr>
+      </table>
+    </mat-card-content>
+  </mat-card>
+</div>
+<ng-template #verticaltableSkeleton>
+  <lib-skeleton-vertical-table class="f-spacer" ></lib-skeleton-vertical-table>
+</ng-template>

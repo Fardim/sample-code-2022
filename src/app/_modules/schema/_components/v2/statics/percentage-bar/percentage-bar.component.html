@@ -1,0 +1,4 @@
+<ng-container *ngFor="let row of data">
+    <div class="progress-div" *ngIf="row.value>0" [ngStyle]="{background:row.color, flex: row.value}">
+    </div>
+</ng-container>

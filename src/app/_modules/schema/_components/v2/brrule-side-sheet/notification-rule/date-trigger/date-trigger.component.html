@@ -1,0 +1,20 @@
+<form [formGroup]="dateTriggerFormGroup">
+    <div class="f-col mdo-field"
+        [class.mdo-form-error]="submitted && (dateTriggerFormGroup.controls.date.invalid || dateTriggerFormGroup.controls?.date?.value && !dateTriggerFormGroup.controls?.date?.value?.includes('FLD_')) ">
+        <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@date">Date<span class="mandatory">*</span></lib-text-line>
+        <pros-option-filter [availableOptions]="dateFieldList" (selectionChange)="setDateField($event)"
+            [value]="getDateFieldValue()" class="w-100" placeholder="Type to select a date field...">
+        </pros-option-filter>
+        <mat-error class="mdo-field-hint" *ngIf="submitted && dateTriggerFormGroup.get('date').errors?.required">
+            <lib-text-line type="small">This is a required field</lib-text-line>
+        </mat-error>
+        <mat-error class="mdo-field-hint"
+            *ngIf="submitted && dateTriggerFormGroup.get('date').value && !dateTriggerFormGroup.get('date').value.includes('FLD_')">
+            <lib-text-line type="small">Please select Value from Field List</lib-text-line>
+        </mat-error>
+    </div>
+
+    <div class="f-row-spacer-half"></div>
+
+    <pros-schedule-sync-value [scheduleSyncValues]="dateTriggerFormGroup.get('dateRepeat')?.value" (valueChange)="repeatValueChanges($event)"></pros-schedule-sync-value>
+</form>

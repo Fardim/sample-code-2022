@@ -1,0 +1,41 @@
+<mat-card class="mat-elevation-z0 widget">
+  <div class="f-row">
+    <div #displayHeading [libTooltip]="widgetHeader.desc" matTooltipPosition="right" [matTooltipDisabled]="false">
+      <lib-text-line type="leading" enableWrap="true">{{ widgetHeader.desc }}</lib-text-line>
+    </div>
+    <div class="f-spacer"></div>
+    <lib-button [matMenuTriggerFor]="menu" type="plain" icon="ellipsis-h"></lib-button>
+    <mat-menu #menu="matMenu" class="navigation-menu">
+      <lib-filter-option (click)="downloadImage()">Image download (.png)</lib-filter-option>
+      <lib-filter-option (click)="downloadCSV()">Data download (.csv)</lib-filter-option>
+      <button mat-menu-item [matMenuTriggerFor]="tcOptionMenu" i18n="@@viewAs">View as...</button>
+      <mat-menu #tcOptionMenu="matMenu" class="mat-elevation-z0 tooltip-fields-menu">
+        <lib-radio-group layout="vertical" [(value)]="displayCriteriaOption" [options]="displayCriteriaOptions"
+          (valueChange)="saveDisplayCriteria()" name="displayCriteria{{widgetId}}"></lib-radio-group>
+      </mat-menu>
+      <ng-template [ngIf]="permissons && permissons.isAdmin">
+        <button mat-menu-item (click)="openColorPalette()">Color palette</button>
+      </ng-template>
+      <lib-filter-option>
+        <lib-slide-toggle labelPosition="before" label="Table View" (toggleChange)="viewChange($event)" theme="primary"
+          prosClickStopPropagation [checked]="isTableView"></lib-slide-toggle>
+      </lib-filter-option>
+    </mat-menu>
+  </div>
+  <div class="row-spacer"></div>
+  <mat-card-content>
+    <div [ngStyle]="{'width.px' : (widgetInfo.width * boxSize - 20)}" class="bar-height">
+      <div [ngStyle]="{'width' : '100%', 'position' : 'relative'}" class="bar-height">
+        <ng-template [ngIf]="!isTableView">
+          <canvas class="bar-height" baseChart
+          [datasets]="barChartData" [labels]="barChartLabels" [options]="barChartOptions">
+        </canvas>
+        </ng-template>
+        <ng-template [ngIf]="isTableView">
+          <pros-table-view [displayedColumnsId]="displayedColumnsId" [tableDataSource]="dataSource">
+          </pros-table-view>
+        </ng-template>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

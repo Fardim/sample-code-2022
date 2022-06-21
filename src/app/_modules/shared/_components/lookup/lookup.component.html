@@ -1,0 +1,90 @@
+<div class="root">
+    <div class="f-col colunm-listing">
+        <div class="f-row colunm-box rule-border-row">
+            <div class="col col-x8">
+                <lib-text-line type="small" weight="strong">Fields&nbsp;<mat-icon fontSet="mdo-icons" iconFontType="solid" i18n-libTooltip="@@fields_tooltip" libTooltip="Select source fields">question-circle</mat-icon></lib-text-line>
+            </div>
+            <div class="col col-x8">
+                <lib-text-line type="small" weight="strong">Rule&nbsp;<mat-icon fontSet="mdo-icons" iconFontType="solid" i18n-libTooltip="@@rule_tooltip" libTooltip="Select source fields">question-circle</mat-icon></lib-text-line>
+            </div>
+            <div class="col col-x2"></div>
+            <div class="col col-x16">
+                <lib-text-line type="small" weight="strong">Show result in&nbsp;<mat-icon fontSet="mdo-icons" iconFontType="solid" i18n-libTooltip="@@resultin_tooltip" libTooltip="Select the target field to display results">question-circle</mat-icon></lib-text-line>
+            </div>
+            <div class="col"></div>
+        </div>
+        <span class="f-row-spacer-half"></span>
+        <div class="f-col">
+            <mat-form-field appearance="outline">
+                <input matInput class="mat-input" [formControl]="availableField" placeholder="Type field name to add"
+                    [matAutocomplete]="autoTarget" />
+                <mat-autocomplete #autoTarget="matAutocomplete" [displayWith]="displayFn.bind(this)"
+                    (optionSelected)="selectCurrentField($event)">
+                    <mat-option *ngFor="let fieldItem of filteredFields | async" [value]="fieldItem.fieldId">
+                        {{fieldItem.fieldDescri}}
+                    </mat-option>
+                    <mat-tree [dataSource]="dataSource" [treeControl]="treeControl" #tree>
+                        <!-- This is the tree node template for leaf nodes -->
+                        <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding style="cursor: pointer;"
+                            (click)="clickTreeNode(node)">
+                            <!-- use a disabled button to provide padding for tree leaf -->
+                            <lib-button disabled="true"></lib-button>
+                            {{node.name}}
+                        </mat-tree-node>
+                        <!-- This is the tree node template for expandable nodes -->
+                        <mat-tree-node *matTreeNodeDef="let node;when: hasChild" matTreeNodePadding>
+                            <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
+                                <mat-icon class="mat-icon-rtl-mirror">
+                                    {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                                </mat-icon>
+                            </button>
+                            {{node.name}}
+                        </mat-tree-node>
+                    </mat-tree>
+                </mat-autocomplete>
+            </mat-form-field>
+        </div>
+        <span class="f-row-spacer-half"></span>
+        <div>
+            <pros-null-state [button]="null" [message]="'No fields selected, please select a field to continue'"
+                *ngIf="selectedFields.length === 0"></pros-null-state>
+            <div class="f-row colunm-box rule-border-row" *ngFor="let field of selectedFields;let i = index">
+                <div class="col col-x8">
+                    <lib-text-line type="base" enableWrap="true">{{getFieldLabel(field)}}</lib-text-line>
+                </div>
+
+                <div class="col col-x8">
+                    <pros-form-input [value]="getInputValue(getValue(i))" [type]="'text'" [placeholder]="'Parameter...'"
+                        [matMenuTriggerFor]="parameter" (menuOpened)="reload = !reload"></pros-form-input>
+                    <mat-menu #parameter="matMenu" direction="center" class="mat-elevation-z0 tooltip-fields-menu">
+                        <!-- <div class="top-tiparrow"></div> -->
+                        <pros-lookup-config [reload]="reload" [availableModules]="modulesList"
+                            [initialData]="getValue(i)" (saveData)="setLookupConfig($event, i)"></pros-lookup-config>
+                    </mat-menu>
+                </div>
+
+                <div class="col col-x2 mat-item-center">
+                    <mat-icon fontSet="mdo-icons">arrow-right</mat-icon>
+                </div>
+
+                <div class="col col-x16">
+                    <pros-option-filter (selectionChange)="setLookupTargetField($event, i)" 
+                        [availableOptions]="fieldsObject.list" 
+                        [value]="getValue(i, 'lookupTargetField')">
+                    </pros-option-filter>
+
+                    <span class="col-spacer"></span>
+
+                    <pros-form-input *ngIf="isEnabled(i) === true" (valueChange)="setLookupTargetField($event, i, true)"
+                        [value]="getValue(i, 'lookupTargetText')" [type]="'text'" [placeholder]="'Field name'"
+                        class="divided-matfield"></pros-form-input>
+                </div>
+
+                <div class="col mat-item-end">
+                    <lib-button (click)="removeField(i)" type="plain" icon="trash-alt"></lib-button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row-spacer"></div>
+</div>

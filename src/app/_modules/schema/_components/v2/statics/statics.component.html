@@ -1,0 +1,112 @@
+<div class="root">
+    <div class="f-row">
+        <div *ngIf="schemaInfo" class="schema-details">
+            <pros-percentage-bar [data]="chartData"></pros-percentage-bar>
+            <div class="f-col">
+                <div class="f-row errors">
+                    <div class="f-col label">
+                        Errors
+                    </div>
+                    <div class="f-col value">
+                        {{schemaInfo.errorValue || 0}}
+                    </div>
+                </div>
+                <div class="f-row warnings">
+                    <div class="f-col label">
+                        Warnings
+                    </div>
+                    <div class="f-col value">
+                        {{schemaInfo.warningValue || 0}}
+                    </div>
+                </div>
+                <div class="f-row duplicates">
+                    <div class="f-col label">
+                        Duplicates
+                    </div>
+                    <div class="f-col value">
+                        {{schemaInfo.duplicateValue || 0}}
+                    </div>
+                </div>
+                <div class="f-row skipped">
+                    <div class="f-col label">
+                        Skipped
+                    </div>
+                    <div class="f-col value">
+                        {{schemaInfo.skippedValue || 0}}
+                    </div>
+                </div>
+                <div class="f-row">
+                    <div class="f-col label">
+                        Dataset
+                    </div>
+                    <div class="f-col value">
+                        {{moduleInfo?.moduleDesc || ''}}
+                    </div>
+                </div>
+                <div class="f-row">
+                    <div class="f-col label">
+                        Scope
+                    </div>
+                    <div class="f-col value">
+                        {{variantName || ''}}
+                    </div>
+                </div>
+                <div class="f-row">
+                    <div class="f-col label">
+                        Records Processed
+                    </div>
+                    <div class="f-col value">
+                        {{schemaInfo.totalValue}}
+                    </div>
+                </div>
+                <div class="f-row">
+                    <div class="f-col label">
+                        Business rules
+                    </div>
+                    <div class="f-col value">
+                        <lib-chip-list *ngIf="brList?.length">
+                            <lib-chip *ngFor="let br of brList">{{br.brInfo}}</lib-chip>
+                        </lib-chip-list>
+                    </div>
+                </div>
+                <div class="f-row">
+                    <div class="f-col label">
+                        Threshold
+                    </div>
+                    <div class="f-col value">
+                        {{schemaInfo.schemaThreshold || 0}}%
+                    </div>
+                </div>
+                <div class="f-row">
+                    <div class="f-col label">
+                        Executed by
+                    </div>
+                    <div class="f-col value">
+                        {{schemaInfo.createdBy}}
+                    </div>
+                </div>
+                <div class="f-row">
+                    <div class="f-col label">
+                        Started
+                    </div>
+                    <div class="f-col value">
+                        {{startDate}}
+                    </div>
+                </div>
+                <div class="f-row">
+                    <div class="f-col label">
+                        Duration
+                    </div>
+                    <div class="f-col value">
+                        {{exeTime}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="schema-trends">
+            <pros-schema-execution-trend [hideLabel]="true" [moduleId]="moduleId" [schemaId]="schemaId"
+                [filter]="statsFilterParams" [unit]="statsFilterParams.unit">
+            </pros-schema-execution-trend>
+        </div>
+    </div>
+</div>

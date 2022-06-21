@@ -1,0 +1,44 @@
+<div class="chat-editor-inner">
+  <div [id]="editorId" #richTextEditor>
+  </div>
+  <pros-users-list class="overlay-content-wrapper" *ngIf="!!suggestedUserObject"
+    [users]="suggestedUserObject"
+    (userSelected)="userSelected($event)">
+  </pros-users-list>
+
+  <pros-object-selector class="overlay-content-wrapper" *ngIf="!!showObjectSelector"
+    [moduleId]="moduleId"
+    (objectSelected)="objectSelected($event)"
+  ></pros-object-selector>
+
+  <pros-attachment-section *ngIf="attachments?.length" [attachments]="attachments" [removable]="true"></pros-attachment-section>
+
+  <lib-section></lib-section>
+  <div class="f-row toolbar-outer">
+    <div class="inner-toolbar" [id]="innerToolbarId">
+      <button class="ql-bold"></button>
+      <button class="ql-italic"></button>
+      <button class="ql-strike"></button>
+      <button class="ql-underline"></button>
+      <button class="ql-list" value="ordered"></button>
+      <button class="ql-list" value="bullet"></button>
+      <button class="ql-attachment" *ngIf="!attachmentMode" (click)="openAttachmentDialog()">
+        <i class="mdo-icons">paperclip</i>
+      </button>
+    </div>
+
+    <div class="f-spacer"></div>
+
+    <lib-button *ngIf="!attachmentMode" class="editor-send-btn" type="plain" (afterClick)="sendMessage()" [disabled]="!editorState?.sendButtonActive">
+      <mat-icon>send</mat-icon>
+    </lib-button>
+  </div>
+</div>
+
+<div class="f-row info-text">
+  <lib-text-line type="small" textColor="secondary" #enterHint i18n="@@enter_to_send">Hit <b>Enter</b> to send your message</lib-text-line>
+  <span class="f-spacer"></span>
+  <lib-text-line *ngIf="editorState?.lengthWarning" type="small" [textColor]="editorState?.lengthWarningType">
+    <span>{{editorState?.characterLength}}</span>/{{msgCharLimit}}
+  </lib-text-line>
+</div>

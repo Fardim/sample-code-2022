@@ -1,0 +1,56 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconfonttype="light" (click)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@team_title">Translation Rule</lib-text-line>
+        <div class="f-spacer"></div>
+        <lib-button i18n="@@discard" type="plain" iconFontType="light" [disabled]="saving"> Discard </lib-button>
+        <lib-button-group>
+          <lib-button i18n="@@save" type="major" [disabled]="saving"> Save </lib-button>
+          <lib-button type="major" [matMenuTriggerFor]="moreactionfile" icon="ellipsis-h"></lib-button>
+        </lib-button-group>
+        <mat-menu #moreactionfile="matMenu" class="navigation-menu">
+          <button mat-menu-item i18n="@@export_to_csv">Export to CSV</button>
+          <button mat-menu-item i18n="@@import_from_csv">Import from CSV</button>
+        </mat-menu>
+      </div>
+    </div>
+  </div>
+  <div class="f-row-spacer-half"></div>
+  <div class="f-row-spacer-half"></div>
+  <div class="f-row-spacer-half"></div>
+  <div class="f-col sidesheetcontent-listing">
+    <form>
+      <div class="f-col mdo-justify">
+        <div class="f-col mdo-field">
+          <lib-input matInput type="text" i18n-label="@@rule_name" label="Rule name" placeholder="New Rule" i18n-placeholder="@@new_rule">
+          </lib-input>
+        </div>
+
+        <div class="f-col mdo-field">
+          <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@select_data_type">Condition </lib-text-line>
+          <div class="rule-condition">
+            <mat-grid-list cols="11" gutterSize="8">
+              <mat-grid-tile colspan="1" rowspan="1">When</mat-grid-tile>
+              <mat-grid-tile colspan="4" rowspan="1">
+                <lib-input matInput type="text" placeholder="Value"></lib-input>
+              </mat-grid-tile>
+              <mat-grid-tile colspan="1" rowspan="1">Translate to</mat-grid-tile>
+              <mat-grid-tile colspan="4" rowspan="1">
+                <lib-input matInput type="text" placeholder="Value"></lib-input>
+              </mat-grid-tile>
+              <mat-grid-tile colspan="1" rowspan="1">
+                <lib-button type="minor" icon="trash-alt"></lib-button>
+              </mat-grid-tile>
+            </mat-grid-list>
+          </div>
+          <div class="add-more">
+            <lib-button icon="plus" rounded="rounded" type="minor"></lib-button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

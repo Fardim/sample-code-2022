@@ -1,0 +1,70 @@
+<mat-card class="mat-elevation-z0 root">
+  <div class="root">
+    <div class="f-row breadcrum-toolbar">
+      <lib-text-line type="leading">New dataset/Bring over/SAP CPI/Standard package/Data scope</lib-text-line>
+      <span class="f-spacer"></span>
+      <lib-button icon="times" (click)="onCancelClick()"></lib-button>
+    </div>
+
+    <div class="manually-dataset">
+      <form [formGroup]="standardPackageForm" *ngIf="standardPackageForm" class="f-col dataset-form">
+        <lib-banner status="error" *ngIf="errorText" [text]="errorText"></lib-banner>
+        <div class="row-spacer"></div>
+        <div class="f-col mdo-field">
+          <lib-textarea label="Record number"
+            [hasError]="isValidRecordNumber"
+            i18n-label="@@record_number" type="text"
+            formControlName="recordNumber"
+            labelIcon="question-circle"
+            [isRequired]="true"
+            placeholder="A101, A102, A103, A105, A106"
+            hint="Add multiple records number seperated by a comma"
+            suffixIcon="external-link-alt"
+            (afterSuffixBtnClick)="openExpandedRecordView()"
+            i18n-placeholder="@@value">
+          </lib-textarea>
+        </div>
+
+        <div class="f-col">
+          <lib-text-line weight="strong" type="xsmall" labelIcon="question-circle" class="field-label" i18n="@@date_created">Date created
+          </lib-text-line>
+          <lib-date-picker (valueChange)="setCreateDate($event)" formControlName="dateCreated" placeholder="Value">
+          </lib-date-picker>
+        </div>
+
+        <div class="f-col">
+          <lib-text-line weight="strong" type="xsmall" labelIcon="question-circle" class="field-label" i18n="@@date_modified">Date modified
+          </lib-text-line>
+          <lib-date-picker (valueChange)="setModifiedDate($event)" formControlName="dateModified" placeholder="Value">
+          </lib-date-picker>
+        </div>
+
+        <!-- HIERARCHY -->
+        <!-- <div class="f-col">
+          <pros-cpi-hierarchy></pros-cpi-hierarchy>
+        </div> -->
+
+        <div class="f-col mdo-field">
+          <lib-slide-toggle i18n-label="@@update_data_system" label="Update data in the system" theme="primary"
+            formControlName="updateDataInSystem" labelPosition="before">
+          </lib-slide-toggle>
+        </div>
+
+        <div class="f-col mdo-field">
+          <lib-slide-toggle i18n-label="@@sync_data" label="Sync data" theme="primary" formControlName="syncData"
+            labelPosition="before"> </lib-slide-toggle>
+        </div>
+
+        <!-- <pre>{{standardPackageForm.value | json}}</pre> -->
+      </form>
+    </div>
+  </div>
+
+  <div class="f-row dataset-button">
+    <lib-button type="plain" width="80px" (click)="onCancelClick()" i18n="@@cancel">Cancel</lib-button>
+    <span class="f-spacer"></span>
+    <lib-button type="plain" width="80px" i18n="@@back" (click)="back()">Back</lib-button>
+    &nbsp;
+    <lib-button type="major" width="80px" i18n="@@next" (click)="import()">Done </lib-button>
+  </div>
+</mat-card>

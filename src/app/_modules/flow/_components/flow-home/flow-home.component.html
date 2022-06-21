@@ -1,0 +1,28 @@
+<div class="root">
+    <div class="f-row empty-block" *ngIf="!dataLoaders?.loadTable && !dataLoaders?.tableHasData">
+        <lib-empty-state primaryText="Nothing to see here"
+            secondaryText="You don't have any flows. Would you like to create one?" icon="flow">
+            <pros-new-flow-btn></pros-new-flow-btn>
+        </lib-empty-state>
+    </div>
+
+    <div class="f-row breadcrum-toolbar" *ngIf="dataLoaders?.tableHasData">
+            <lib-text-line type="leading">Flows</lib-text-line>
+            <span class="f-spacer"></span>
+            <pros-new-flow-btn></pros-new-flow-btn>
+    </div>
+
+    <ng-template [ngIf]="dataLoaders?.loadTable && !dataLoaders?.tableHasData">
+        <div class="f-col">
+            <pros-nav-title-skeleton></pros-nav-title-skeleton>
+        </div>
+    </ng-template>
+
+    <ng-container *ngIf="dataLoaders?.loadTable;">
+        <lib-skeleton-table></lib-skeleton-table>
+    </ng-container>
+    <pros-flow-list [class.d-none]="!dataLoaders?.loadTable && flowListComponent?.dataSource?.length === 0 && !flowListComponent?.search.value"></pros-flow-list>
+</div>
+
+
+

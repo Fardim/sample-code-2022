@@ -1,0 +1,19 @@
+<div class="f-col mdo-field">
+    <!-- label -->
+    <mat-label class="mdo-field-label">{{label}}</mat-label>
+    <!-- input container -->
+    <div class="mdo-field-input">
+        <input matInput #optionsInput [formControl]="fieldFrmCtrl" [matAutocomplete]="fieldsCtrl"
+            matTooltipPosition="right" [value]="preSelectedCtrl ? preSelectedCtrl.fieldDescri: ''"
+            matTooltip="{{preSelectedCtrl ? preSelectedCtrl.fieldDescri: ''}}" />
+        <!-- autocomplete -->
+        <mat-autocomplete class="mdo-autocomplete" #fieldsCtrl="matAutocomplete" (optionSelected)="selected($event)">
+            <mat-optgroup *ngFor="let object of fieldsObs | async" [label]="object.fieldDescri">
+                <mat-option class="mdo-option" *ngFor="let fld of object.childs" [value]="fld" matTooltip="{{fld.fieldDescri}}"
+                matTooltipPosition="right">
+                  {{fld.fieldDescri}}
+                </mat-option>
+            </mat-optgroup>
+        </mat-autocomplete>
+    </div>
+</div>

@@ -1,0 +1,144 @@
+<ng-container *ngIf="!editedMode">
+  <div class="lib-chip">
+    <!-- <lib-chip type="info" class="mdo-filter-matchip" disableRipple="true" [matMenuTriggerFor]="appliedfiltermenu"
+      [removable]="widgetSelectedValue" (removed)="removeAppliedFilter(widgetInfo.field)" #trigger="matMenuTrigger"
+      (click)="openMenu()" [libTooltip]="prepareTextToShow !== 'All' ? getWidgetName + prepareTextToShow : getWidgetName" matTooltipPosition="below" [label]="getWidgetName">
+      <span class="chip-text-correct">
+        {{ prepareTextToShow }}
+      </span>
+    </lib-chip> -->
+    <lib-chip type="info" class="mdo-filter-matchip" disableRipple="true" [matMenuTriggerFor]="appliedfiltermenu"
+      [removable]="widgetSelectedValue" (removed)="removeAppliedFilter(widgetInfo.field)" #trigger="matMenuTrigger"
+      (click)="openMenu($event)" [libTooltip]="prepareTextToShow !== 'All' ? getWidgetName + ' : ' + prepareTextToShow : getWidgetName" matTooltipPosition="below" >
+      <div class="f-row">
+
+        <lib-text-line enableWrap="true" class="filter-text">
+
+          {{ getWidgetName }}
+
+        </lib-text-line>
+
+        <lib-text-line class="col-text">
+
+          :
+
+        </lib-text-line>
+
+        <lib-text-line textColor="link" class="filter-field" enableWrap="true">
+
+          {{ prepareTextToShow }}
+
+        </lib-text-line>      
+
+      </div>    
+    </lib-chip>
+    <!-- Append dynamic filter MatMenu -->
+    <mat-menu #appliedfiltermenu="matMenu" (closed)="menuClosed()" class="date-field-menu">
+      <!-- for multi select drop down-->
+      <ng-template [ngIf]="getWidgetType() === 'multiselectDropdown'">
+        <pros-form-multiselect [widgetId]="widgetId" isFilterWidget="true"
+          [displayCriteria]="this.displayCriteriaOption"
+          (valueChange)="trigger.closeMenu();updateFilterCriteria($event.value)" [widgetInfo]="this.widgetInfo"
+          [filterCriteria]="filterCriteria" [value]="widgetSelectedValue"
+          [isEnableGlobalFilter]="widgetInfo?.isEnableGlobalFilter" [isMenuClosed]="isMenuClosed">
+        </pros-form-multiselect>
+      </ng-template>
+
+      <!-- for single select drop down-->
+      <ng-template [ngIf]="getWidgetType() === 'dropdown'">
+        <pros-form-single-select [placeholder]="'Please search here'" isFilterWidget="true" [widgetId]="widgetId"
+          [displayCriteria]="this.displayCriteriaOption"
+          (valueChange)="trigger.closeMenu();updateFilterCriteria($event.value)" [widgetInfo]="this.widgetInfo"
+          [filterCriteria]="filterCriteria" [value]="widgetSelectedValue"
+          [isEnableGlobalFilter]="widgetInfo?.isEnableGlobalFilter" [isMenuClosed]="isMenuClosed">
+        </pros-form-single-select>
+      </ng-template>
+
+      <!--Numeric filter component-->
+      <ng-template [ngIf]="getWidgetType() === 'number'">
+        <pros-form-range-slider placeholder="X-XX"
+          (valueChange)="trigger.closeMenu();updateFilterCriteria($event.value)"
+          [preSelectedValue]="this.widgetSelectedValue" isFilterWidget="true">
+        </pros-form-range-slider>
+      </ng-template>
+
+      <!-- for text area-->
+      <ng-template [ngIf]="getWidgetType() === 'textarea' || getWidgetType() === 'text'">
+        <pros-form-textarea placeholder="Write Here" [widgetId]="widgetId"
+          (valueChange)="trigger.closeMenu();updateFilterCriteria($event.value)" [value]="this.widgetSelectedValue"
+          isFilterWidget="true">
+        </pros-form-textarea>
+      </ng-template>
+
+      <!-- For check box-->
+      <ng-template [ngIf]="getWidgetType() === 'checkbox'">
+        <pros-form-checkbox (valueChange)="trigger.closeMenu();updateFilterCriteria($event.value)" isFilterWidget="true"
+          [value]="this.widgetSelectedValue" [widgetId]="widgetId" [label]="widgetInfo?.fieldCtrl?.fieldDescri">
+        </pros-form-checkbox>
+      </ng-template>
+
+      <!--For radio button group-->
+      <ng-template [ngIf]="getWidgetType() === 'radio'">
+        <pros-form-radio-button-group isFilterWidget="true" [widgetId]="widgetId"
+          [displayCriteria]="this.displayCriteriaOption"
+          (valueChange)="trigger.closeMenu();updateFilterCriteria($event.value)" [widgetInfo]="widgetInfo"
+          [filterCriteria]="filterCriteria" [value]="widgetSelectedValue"
+          [isEnableGlobalFilter]="widgetInfo?.isEnableGlobalFilter" [isMenuClosed]="isMenuClosed">
+        </pros-form-radio-button-group>
+      </ng-template>
+
+      <!-- For time picker -->
+      <ng-template [ngIf]="getWidgetType() === 'time'">
+        <!-- <h1>{{widgetSelectedValue[ind]}} abcsd</h1> -->
+        <div class="f-col" prosClickStopPropagation>
+          <lib-time-range-picker [enableTimeInput]="true" [emitDateOnSave]="true" [selected]="widgetSelectedValue" (valueChange) = "trigger.closeMenu();updateFilterCriteria($event)">
+          </lib-time-range-picker>
+        </div>
+      </ng-template>
+
+      <!-- For date type -->
+      <ng-template [ngIf]="getWidgetType() === 'date'">
+        <pros-form-date (valueChange)="trigger.closeMenu();updateFilterCriteria($event)" [widgetId]="widgetId"
+          [selectedDate]="widgetSelectedValue" [filterControlType]="picker_date" [placeholder]="'Enter '+ getWidgetName"
+          isFilterWidget="true" >
+        </pros-form-date>
+      </ng-template>
+
+      <!-- For date time picker -->
+      <ng-template [ngIf]="getWidgetType() === 'dateTime'">
+        <div class="f-col">
+          <pros-form-date-time (valueChange)="trigger.closeMenu();updateFilterCriteria($event)" [widgetId]="widgetId"
+            [selectedDate]="getSelectedDateValue" [filterControlType]="picker_date" isFilterWidget="true">
+          </pros-form-date-time>
+        </div>
+      </ng-template>
+
+      <!-- Hierarchy filter component-->
+      <ng-template [ngIf]="getWidgetType() === 'hierarchy'">
+        <pros-hierarchy-filter-v2 (valueChange)="updateFilterCriteria($event)" 
+          [clearFilterClicked]="isClearFilter" [displayCriteria]="this.displayCriteriaOption"
+          [value]="widgetSelectedValue" isFilterWidget="true" [isMenuClosed]="isMenuClosed">
+        </pros-hierarchy-filter-v2>
+      </ng-template>
+    </mat-menu>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="editedMode">
+  <div class="lib-chip">
+    <lib-chip type="info" disableRipple="true" [removable]="true"
+      (removed)="deleteFilter()" (click)="openPanel.emit()"
+      [libTooltip]="widgetSelectedValue ? getWidgetName + ' : ' + prepareTextToShow : getWidgetName" [label]="getWidgetName">
+      <ng-template [ngIf]="widgetSelectedValue" [ngIfElse]="showText">
+        <span class="chip-text-correct"  matTooltipPosition="below">
+          {{ prepareTextToShow }}
+        </span>
+      </ng-template>
+      <ng-template #showText>
+        <span class="chip-text-correct">
+          All
+        </span>
+      </ng-template>
+    </lib-chip>
+  </div>
+</ng-container>

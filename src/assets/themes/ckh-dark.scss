@@ -1,0 +1,12 @@
+// Light theme
+$ckh-dark-primary: mat-palette($mat-green);
+$ckh-dark-accent: mat-palette($mat-amber);
+$ckh-dark-warn: mat-palette($mat-deep-orange);
+
+$ckh-dark: mat-dark-theme($ckh-dark-primary, $ckh-dark-accent, $ckh-dark-warn);
+
+.ckh-dark {
+  @include angular-material-theme($ckh-dark);
+  @include pros-cmp-theme($ckh-dark);
+  @include pros-cmp-typography(mat-typography-config());
+}

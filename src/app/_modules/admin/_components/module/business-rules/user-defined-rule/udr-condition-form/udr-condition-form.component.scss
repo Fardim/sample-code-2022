@@ -1,0 +1,19 @@
+.condition-listing {
+  height: 460px;
+  overflow: auto;
+
+  .condition-flex {
+    mat-form-field {
+      flex: 1;
+    }
+
+    .mat-icon-button {
+      margin-top: 8px;
+    }
+  }
+}
+
+mat-card-actions {
+  text-align: right;
+  margin: 0;
+}

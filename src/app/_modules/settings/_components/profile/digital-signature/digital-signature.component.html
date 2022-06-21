@@ -1,0 +1,28 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button iconFontType="light" icon="times" (afterClick)="close()"></lib-button>
+    <div class="col-spacer"></div>
+    <div class="f-col mdo-constrained-right">
+      <div class="f-row breadcrum-head">
+        <lib-text-line type="leading" i18n="@@digital_signature">Digital signature</lib-text-line>
+        <span class="f-spacer"></span>
+        <lib-button type="major" i18n="@@save" width="80px" (afterClick)="save()" [disabled]="signaturePad && signaturePad.isEmpty()">Save</lib-button>
+      </div>
+    </div>
+  </div>
+  <div class="f-col sidesheetcontent-listing">
+    <div class="f-col mdo-justify">
+      <lib-banner *ngIf="((isSignatureEmpty && signaturePad && signaturePad.isEmpty()) || showErrorBanner)" i18n="@@save" [text]="bannerMsg" status="error">
+      </lib-banner>
+
+      <div class="canvas-container">
+        <lib-button iconFontType="light" icon="trash" class="clear-icon" (afterClick)="clearSignature()"
+          *ngIf="signaturePad && !signaturePad.isEmpty()"></lib-button>
+        <canvas #sPad width="454" height="300" class="sign-pad" name="signature"></canvas>
+        <div class="canvas-overlay" *ngIf="signaturePad && signaturePad.isEmpty()">
+          <lib-text-line type="base" i18n="@@sign_here_using_mouse">Sign here using your mouse</lib-text-line>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

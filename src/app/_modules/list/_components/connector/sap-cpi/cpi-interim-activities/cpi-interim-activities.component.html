@@ -1,0 +1,48 @@
+<mat-card class="root mat-elevation-z0">
+  <div class="modal-wrapper">
+    <div class="f-row modal-header">
+      <lib-text-line type="leading">Next steps</lib-text-line>
+      <lib-button icon="times" iconFontType="light" (click)="onCancelClick()"></lib-button>
+    </div>
+
+    <div class="modal-body">
+      <div class="f-col manually-dataset">
+        <div class="f-col dataset-form">
+          <mat-vertical-stepper #stepper>
+            <mat-step>
+              <ng-template matStepLabel>
+                <lib-text-line type="base" class="text-line-wrap">We are currently setting up your system and this could take a few days.
+                </lib-text-line>
+              </ng-template>
+            </mat-step>
+            <mat-step>
+              <ng-template matStepLabel>
+                <lib-text-line type="base" class="text-line-wrap">After the setup is complete, we will send you an email with credentials
+                </lib-text-line>
+              </ng-template>
+            </mat-step>
+            <mat-step>
+              <ng-template matStepLabel>
+                <lib-text-line type="base" enableWrap="true" class="text-line-wrap">You must set up your adaptor using the details provided in
+                  the email. <a href="#" class="linktext">Click here</a> to read the adaptor set up guide.</lib-text-line>
+              </ng-template>
+            </mat-step>
+            <ng-template matStepperIcon="edit">
+              <mat-icon>done</mat-icon>
+            </ng-template>
+          </mat-vertical-stepper>
+        </div>
+      </div>
+    </div>
+
+    <div class="f-row modal-footer space-between">
+      <lib-button type="plain" width="80px" (click)="onCancelClick()" i18n="@@cancel">Cancel</lib-button>
+      <span class="f-spacer"></span>
+      <div class="f-row">
+        <lib-button type="plain" width="80px" i18n="@@back" (click)="back()">Back</lib-button>
+        &nbsp;
+        <lib-button type="major" width="80px" i18n="@@next" (click)="next()">Next</lib-button>
+      </div>
+    </div>
+  </div>
+</mat-card>

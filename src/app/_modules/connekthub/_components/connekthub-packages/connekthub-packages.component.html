@@ -1,0 +1,82 @@
+<div class="root f-col {{rootClass}}" [class.dashboard]="importType === 'DASHBOARD'">
+    <div class="f-row filter-search" *ngIf="packages?.length">
+        <lib-search class="lib-search" placeholder="Search" [formControl]="searchInput"></lib-search>
+    </div>
+    <div class="f-col content"  *ngFor="let record of packages">
+        <div class="row-spacer"></div>
+        <mat-card class="dataset-cards">
+            <div class="f-row">
+                <div class="f-col">
+                    <lib-text-line type="base" weight="strong" enableWrap="true">
+                        {{ record?.name }}
+                    </lib-text-line>
+                    <lib-text-line type="base" enableWrap="true" textColor="secondary">
+                        {{ record?.origin }} | {{ record?.createdDate | date:'MMM.d.y' }}
+                    </lib-text-line>
+                </div>
+                <span class="f-spacer"></span>
+                <div class="f-row">
+                    <lib-text-line type="base" [disabled]="true" [hasDropdown]="false" textColor="secondary"> {{
+                        record?.downloads || 0 }} Downloads
+                    </lib-text-line>
+                    <span class="col-spacer"></span>
+                    <ng-container *ngIf="record.id !== selected && record.availableOption !== 'INSTALLED' ; else tickButtonTemplate">
+                        <lib-button *ngIf="getOption" width="100px" type="minor" [disabled]="false"
+                            [hasDropdown]="false" (afterClick)="getPackage(record)">
+                            {{record.availableOption === 'UPDATE' ? 'Update' : 'Get'}}
+                        </lib-button>
+                        <lib-button *ngIf="selectOption" width="100px" type="minor" [disabled]="false"
+                            [hasDropdown]="false" (afterClick)="getPackage(record)">
+                            Select
+                        </lib-button>
+                    </ng-container>
+                    <ng-template #tickButtonTemplate>
+                        <lib-button type="minor" icon="check" width="100px" type="minor" [disabled]="false" [hasDropdown]="false">
+                        </lib-button>
+                    </ng-template>
+                </div>
+            </div>
+            <div class="f-row-spacer-half"></div>
+            <div class="f-col">
+                <lib-text-line type="base" enableWrap="true">
+                    {{ record?.brief }}
+                </lib-text-line>
+            </div>
+            <div class="f-row-spacer-half"></div>
+            <div class="f-row img-row" *ngIf="record?.imageUrls?.length">
+                <img *ngFor="let item of record?.imageUrls" [src]="item" alt="Package image" height="34px" width="70px">
+            </div>
+            <div class="f-row space-container">
+                <div class="f-row" *ngIf="record?.tags?.length">
+                    <lib-label class="label-tag" text="{{ tag }}" appearance="solid" status=""
+                        *ngFor="let tag of record?.tags"></lib-label>
+                </div>
+
+                <!-- <div class="f-row">
+                    <mat-icon>star</mat-icon>
+                    <mat-icon>star</mat-icon>
+                    <mat-icon>star</mat-icon>
+                    <mat-icon>star</mat-icon>
+                    <mat-icon>star_half</mat-icon>
+                </div> -->
+            </div>
+        </mat-card>
+    </div>
+
+    <div class="f-row empty-block" *ngIf="!packages?.length">
+        <lib-empty-state primaryText="Nothing to see here"
+            secondaryText="No results found for your search. Try other keyword" icon="search">
+    </lib-empty-state>
+    </div>
+
+    
+    <!-- <div class="f-row" *ngIf="totalCount">
+        <lib-pagination [currentPageIndex]="recordsPageIndex" [totalCount]="totalCount" [pageSize]="recordsPageSize"
+            (pageChangeEvent)="onPageChange($event)">
+        </lib-pagination>
+        <span class="f-col-spacer-half"></span>
+        <lib-text-line type="base" enableWrap="true">
+            {{ displayedRecordsRange }}
+        </lib-text-line>
+    </div> -->
+</div>

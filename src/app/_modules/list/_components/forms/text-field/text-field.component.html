@@ -1,0 +1,173 @@
+<div class="root">
+  <div class="f-row breadcrum-toolbar">
+    <lib-button type="plain" icon="times" iconFontType="light" (click)="closePropertyPanel()"></lib-button>
+    <div class="f-col-spacer-half"></div>
+    <lib-text-line type="leading" i18n="@@field_properties">Field properties</lib-text-line>
+  </div>
+  <div class="f-col sidesheetcontent-listing" [ngStyle]="{'pointer-events': isReadOnlyMode ? 'none' : 'inherit'}">
+    <form [formGroup]="formGroup" *ngIf="formGroup">
+      <div class="f-col mdo-justify">
+        <div class="f-col" formGroupName="shortText">
+          <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@name">Name</lib-text-line>
+          <div formGroupName="en" *ngIf="locale == 'en'">
+            <lib-input placeholder="Description of Field" formControlName="description" class="lib-input" type="text"
+              (afterBlur)="fireValidationStatus($event)" i18n-placeholder="@@description" [hasError]="
+                formGroup.get('shortText').get('en').controls.description?.errors &&
+                (formGroup.get('shortText').get('en').controls.description?.errors?.required ||
+                formGroup.get('shortText').get('en').controls.description?.errors?.whitespace)"
+                [hint]="(formGroup.get('shortText').get('en').controls.description?.errors &&
+                  (formGroup.get('shortText').get('en').controls.description?.errors?.required ||
+                  formGroup.get('shortText').get('en').controls.description?.errors?.whitespace)) ? 'Name is required': ''"></lib-input>
+          </div>
+          <div formGroupName="fr" *ngIf="locale == 'fr'">
+            <lib-input placeholder="Description of Field" formControlName="description" class="lib-input" type="text"
+              (afterBlur)="fireValidationStatus($event)" i18n-placeholder="@@description" [hasError]="
+                formGroup.get('shortText').get('fr').controls.description?.errors &&
+                (formGroup.get('shortText').get('fr').controls.description?.errors?.required ||
+                formGroup.get('shortText').get('fr').controls.description?.errors?.whitespace)"
+                [hint]="(formGroup.get('shortText').get('fr').controls.description?.errors &&
+                  (formGroup.get('shortText').get('fr').controls.description?.errors?.required ||
+                  formGroup.get('shortText').get('fr').controls.description?.errors?.whitespace)) ? 'Name is required' : ''"></lib-input>
+          </div>
+        </div>
+
+        <div class="f-col mdo-field" [class.mdo-form-error]="formGroup.controls?.maxChar.invalid"
+        [class.has-error]="formGroup.controls?.maxChar.invalid">
+          <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@length">Length
+          </lib-text-line>
+          <div class="mdo-field-input">
+            <input matInput placeholder="Maximum allowed length" formControlName="maxChar" type="number" min="1"
+              step="1" (blur)="fireValidationStatus($event)" />
+          </div>
+          <mat-hint *ngIf="formGroup.controls.maxChar.errors?.required" class="mdo-field-hint">This is required</mat-hint>
+          <mat-hint  *ngIf="formGroup.controls.maxChar.errors?.min" class="mdo-field-hint">Minimum is 1</mat-hint>
+          <!-- <mat-error>
+            <mat-error *ngIf="formGroup.controls.maxChar.errors?.required">
+              <lib-text-line type="small"> This is required</lib-text-line>
+            </mat-error>
+            <mat-error *ngIf="formGroup.controls.maxChar.errors?.min">
+              <lib-text-line type="small">Minimum is 1</lib-text-line>
+            </mat-error>
+          </mat-error> -->
+        </div>
+
+        <div class="f-col mdo-field" [class.mdo-form-error]="formGroup.controls?.dataType.invalid">
+
+          <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@select_data_type">Data type
+          </lib-text-line>
+          <div class="mdo-field-input">
+            <input matInput placeholder="Select data type" #optionsInput [formControl]="dataTypeOptionCtrl" [matAutocomplete]="dataTypeAuto"
+            />
+            <mat-icon matSuffix fontSet="mdo-icons-light" class="autocomplete-icon">chevron-down</mat-icon>
+            <mat-autocomplete class="mdo-autocomplete" #dataTypeAuto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="isDataTypeValid=true; onSelectDataType($event)">
+                <mat-option class="mdo-option" *ngFor="let data of filteredfieldDataTypeOptions" [value]="data" [libTooltip]="data?.tooltip">
+                  {{ data.value }}
+                </mat-option>
+            </mat-autocomplete>
+          </div>
+          <mat-error>
+            <mat-error *ngIf="formGroup.controls.dataType.errors?.required">
+              <lib-text-line type="small"> This is required </lib-text-line>
+            </mat-error>
+            <mat-error *ngIf="formGroup.controls.dataType.errors?.dataTypeError">
+              <lib-text-line type="small"> Select a valid option </lib-text-line>
+            </mat-error>
+          </mat-error>
+          
+        </div>
+        
+
+        <div class="f-col" *ngIf="['DEC'].indexOf(formGroup.get('dataType').value) >= 0">
+          <lib-input matInput type="number" formControlName="decimalValue" class="lib-input"
+            i18n-label="@@decimal_places" label="Decimal Places" placeholder="Allowed decimal places"
+            i18n-placeholder="@@allowed_decimal_places" (afterBlur)="fireValidationStatus($event)">
+          </lib-input>
+        </div>
+
+        <div class="f-col mdo-field" *ngIf="['CHAR'].indexOf(formGroup.get('dataType').value) >= 0">
+          <lib-text-line type="xsmall" weight="strong" class="field-label" i18n="@@select_text_case">Text case
+          </lib-text-line>
+          <div class="mdo-field-input">
+            <input matInput placeholder="Select text case" #optionsInput [formControl]="textCaseOptionCtrl" [matAutocomplete]="textCaseFilterAuto"
+            />
+            <mat-icon matSuffix fontSet="mdo-icons-light" class="autocomplete-icon">chevron-down</mat-icon>
+            <mat-autocomplete class="mdo-autocomplete" #textCaseFilterAuto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onSelectTextCase($event)">
+                <mat-option class="mdo-option" *ngFor="let data of filteredtextCasesOptions" [value]="data" [libTooltip]="data?.tooltip">
+                  {{ data.value }}
+                </mat-option>
+            </mat-autocomplete>
+          </div>
+        </div>
+
+        <div class="mdo-field">
+          <lib-slide-toggle formControlName='isReference' labelposition="after" label="Data referencing"
+             (toggleChange)="fireValidationStatus($event)"
+             i18n-label="@@Data_referencing" theme="primary"></lib-slide-toggle>
+             &nbsp;
+          <mat-icon fontSet="mdo-icons-light"
+            libTooltip="Selecting this property will allow to define the field to reference the values from other field of same or other dataset, thus allowing to refer the values from referenced field without having to maintain them again. This will also allow user to further default data from referenced superior dataset record while performing transactions.">
+            question-circle </mat-icon>
+        </div>
+
+        <div class="mdo-field" *ngIf="formGroup.value.isReference">
+          <lib-button (click)="openDataReferencing()" class="f-col" type="minor" icon="external-link-alt"
+             iconPosition="after" iconFontType="light">Reference rules
+          </lib-button>
+        </div>
+
+        <div class="f-row mdo-field" *ngIf="['CHAR'].indexOf(formGroup.get('dataType').value) >= 0">
+          <lib-slide-toggle formControlName="isDescription" labelPosition="after" label="Description type"
+            (toggleChange)="onChangeDescriptionType($event)" i18n-label="@@description_field" theme="primary">
+          </lib-slide-toggle>
+          &nbsp;
+          <mat-icon fontSet="mdo-icons-light"
+          libTooltip="Selecting this property makes the field, a textual identifier for a record and gets displayed in the header along with record number, while accessing record data for display or editing the record. There can be only one Description Type field for a data set.">
+            question-circle </mat-icon>
+        </div>
+
+        <div class="f-row mdo-field"
+          *ngIf="['CHAR', 'NUMC', 'DEC', 'ALTN', 'ISCN'].indexOf(formGroup.get('dataType').value) >= 0">
+          <lib-slide-toggle formControlName="isSearchEngine" labelPosition="after" label="Search enabled"
+            (toggleChange)="fireValidationStatus($event)" i18n-label="@@search_list_page" theme="primary">
+          </lib-slide-toggle>
+          &nbsp;
+          <mat-icon fontSet="mdo-icons-light"
+            libTooltip="Selecting this property will allow you to search for existing records based on the data stored in this field. It is not recommended for all fields in a module.">
+            question-circle </mat-icon>
+        </div>
+
+        <div class="f-row mdo-field"
+          *ngIf="['CHAR', 'NUMC', 'DEC', 'ALTN', 'ISCN'].indexOf(formGroup.get('dataType').value) >= 0">
+          <lib-slide-toggle formControlName="isTransient" labelPosition="after" label="Transient"
+            (toggleChange)="fireValidationStatus($event)" i18n-label="@@transient" theme="primary">
+          </lib-slide-toggle>
+          &nbsp;
+          <mat-icon fontSet="mdo-icons-light"
+          libTooltip="Selecting this property will allow you to control what data gets copied to a record when you are creating a new record by selecting a Duplicate option. Fields marked as “Transient” won't be copied into the new record.">
+            question-circle </mat-icon>
+        </div>
+
+        <div class="f-row mdo-field"
+          *ngIf="['CHAR', 'NUMC', 'DEC', 'ALTN', 'ISCN'].indexOf(formGroup.get('dataType').value) >= 0">
+          <lib-slide-toggle formControlName="isWorkFlow" labelPosition="after" label="Workflow reference"
+            (toggleChange)="fireValidationStatus($event)" i18n-label="@@workflow_reference" theme="primary">
+          </lib-slide-toggle>
+          &nbsp;
+          <mat-icon fontSet="mdo-icons-light"
+          libTooltip="Selecting the property will allow the field to be used for deriving the right approvers for different values in the field, while maintaining a flow. Further, fields marked as “Workflow Reference” can be used for designing Email Templates and will be available in the record history logs.">
+            question-circle </mat-icon>
+        </div>
+
+        <div class="f-col mdo-field" formGroupName="longtexts">
+          <lib-text-line class="field-label" type="xsmall" weight="strong">
+            <span i18n="@@field_help">Field help</span>&nbsp;<mat-icon fontSet="mdo-icons-light"  libTooltip="This is to maintain additional information in relation to a field. It will get displayed on the form when user clicks on the Eye icon against the field.">question-circle</mat-icon>
+        </lib-text-line>
+          <pros-quill-editor *ngIf="locale == 'en'" [fieldid]="getQuillEditorId()" formControlName="en"
+            [editorConfig]="editorConfig" (afterBlur)="fireValidationStatus($event)"></pros-quill-editor>
+          <pros-quill-editor *ngIf="locale == 'fr'" [fieldid]="getQuillEditorId()" formControlName="fr"
+            [editorConfig]="editorConfig" (afterBlur)="fireValidationStatus($event)"></pros-quill-editor>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

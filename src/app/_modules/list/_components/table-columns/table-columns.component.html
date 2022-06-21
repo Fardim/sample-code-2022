@@ -1,0 +1,46 @@
+<div class="f-col mapping-card">
+  <lib-text-line type="leading">{{ table?.name || '' }}</lib-text-line>
+  <div class="f-row map-filters">
+    <lib-search placeholder="Search" class="lib-search" (valueChange)="searchSub.next($event)"></lib-search>
+    <div class="f-row filter-actions">
+      <lib-button type="plain" rounded="true" icon="filter" [matBadge]="filterCount" libStatusBadge [badgeText]="filterCount" boxShadow="unset" [statusBadgePosition]="{ top: -4, right: -4 }" backgroundColor="#4A5B75" matBadgeColor="accent" badgeClass="badge-color" (afterClick)="onFilterClick()">
+      </lib-button>
+      <span class="f-col-spacer-half"></span>
+      <lib-button type="plain" icon="ellipsis-h" class="ellipsis-icon" rounded="true" [matMenuTriggerFor]="moreMenu"></lib-button>
+      <mat-menu #moreMenu="matMenu" class="navigation-menu">
+        <lib-filter-option (click)="removeTable()">Delete</lib-filter-option>
+      </mat-menu>
+    </div>
+  </div>
+  <div class="f-col mapping-data">
+    <div class="f-col mapping-data">
+      <div class="f-row column-box column-box-head">
+        <div class="col"></div>
+        <div class="col col-x3">
+          <lib-text-line type="base" weight="strong">Field name</lib-text-line>
+        </div>
+        <div class="col col-x3">
+          <lib-text-line type="base" weight="strong">Type</lib-text-line>
+        </div>
+        <div class="col col-x3">
+          <lib-text-line type="base" weight="strong">Id</lib-text-line>
+        </div>
+      </div>
+      <div class="f-row column-box" *ngFor="let column of filteredColumns | async;">
+        <div class="col">
+          <!-- <span style="display: none;">{{ setSelectedColumn(column) }}</span> -->
+          <lib-button type="plain" [icon]="column.selected ? 'eye' : 'eye-slash'" (click)="onColumnSelection(column)"></lib-button>
+        </div>
+        <div class="col col-x3" [ngClass]="{ disabled: !column.selected }">
+          <lib-text-line type="base" weight="strong" enableWrap="true" class="line-wrap">{{ column.name }}</lib-text-line>
+        </div>
+        <div class="col col-x3" [ngClass]="{ disabled: !column.selected }">
+          <lib-text-line type="base" enableWrap="true">{{ column.dataType }}</lib-text-line>
+        </div>
+        <div class="col col-x3" [ngClass]="{ disabled: !column.selected }">
+          <lib-text-line type="base" enableWrap="true" class="line-wrap">{{ column.id }}</lib-text-line>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

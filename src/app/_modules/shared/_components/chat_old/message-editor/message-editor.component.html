@@ -1,0 +1,67 @@
+<div class="root" [ngClass]="{'editor-outer': (componentName === 'message-list')}">
+  <div id="{{textEditorId}}" #textareaEditor></div>
+  <div class="f-row upload-container">
+
+    <div class="f-col attachment-section" *ngFor="let attachment of attachments; let index=index">
+        <!-- <div class="attachment" [ngClass]="{'hasError' : attachment.uploadError}">
+            <img [src]="getAttachmentIcon(attachment.file?.name)" class="attachment-icon" />
+            <span class="attachment-name" [libTooltip]="attachment.file?.name.length > 25 ? attachment.file?.name : ''">
+               {{ truncateAttachmentName(attachment.file?.name) }}</span>
+            <lib-button class="lib-button" (click)="removeAttachment(index)" icon="times" type="plain"></lib-button>
+        </div>
+        <mat-progress-bar *ngIf="!attachment.uploadError && !attachment.uploaded" mode="indeterminate"></mat-progress-bar> -->
+
+        <pros-file-item
+          [name]="attachment.file?.name"
+          [removable]="true"
+          [tooltip]="attachment.file?.name.length > 25 ? attachment.file?.name : ''"
+          [hasError]="attachment.uploadError"
+          [showProgressBar]="!attachment.uploadError && !attachment.uploaded"
+          (removed)="removeAttachment(index)"
+          >
+        </pros-file-item>
+    </div>
+
+    <div class="col-spacer"></div>
+    <input type="file" style="display: none;" #fileInput id="ql-file-input" multiple
+        (change)="uploadAttachements($event.target.files)" (click)="$event.target.value=''"/>
+  </div>
+
+  <div class="f-row toolbar-outer">
+    <div class="inner-toolbar" id="{{innerToolbarId}}">
+      <!-- Add a bold button -->
+      <button class="ql-bold"></button>
+      <button class="ql-italic"></button>
+      <button class="ql-strike"></button>
+      <button class="ql-underline"></button>
+      <button class="ql-list" value="ordered"></button>
+      <button class="ql-list" value="bullet"></button>
+      <button class="ql-attachment" (click)="fileInput.click()">
+        <i class="mdo-icons">paperclip</i>
+      </button>
+    </div>
+
+    <div class="f-spacer"></div>
+    <lib-button class="editor-send-btn" *ngIf="componentName === 'chat'" type="plain" (click)="sendMessage()"
+      [disabled]="invalidMessage">
+      <mat-icon>send</mat-icon>
+    </lib-button>
+
+    <div class="f-row" *ngIf="componentName === 'message-list'">
+      <lib-button type="plain" (click)="messageDetail.isEdit = false" icon="times" iconFontType="light">
+      </lib-button>
+      <lib-button type="plain" (click)="sendMessage()" [disabled]="invalidMessage" iconFontType="light" icon="check">
+      </lib-button>
+    </div>
+  </div>
+
+  <div class="f-row">
+    <span class="f-spacer"></span>
+    <lib-text-line type="base" [textColor]="lengthIndicatorColor" class="display-none" #lengthIndicator>
+      <span #currentLength class=""></span>/1024
+    </lib-text-line>
+  </div>
+
+  <lib-text-line type="base" *ngIf="!invalidMessage" textColor="secondary" #enterHint
+    i18n="@@enter_to_send">Hit <b>Enter</b> to send your message</lib-text-line>
+</div>

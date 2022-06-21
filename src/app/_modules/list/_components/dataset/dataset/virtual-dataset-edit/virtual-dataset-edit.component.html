@@ -1,0 +1,59 @@
+<div class="root">
+  <div class="f-row-spacer-half"></div>
+  <div class="f-row">
+    <lib-text-line type="leading">{{virtualDatasetDetails?.vdName || 'My Virtual Dataset'}}</lib-text-line>
+    <span class="f-spacer"></span>
+  </div>
+
+  <div class="row-spacer"></div>
+
+  <!-- Banner *ng-template -->
+  <ng-template>
+    <lib-banner status="warning">
+      Data syncing has not been scheduled -&nbsp;<lib-text-line textColor="link" class="cursor">Schedule now
+      </lib-text-line>
+    </lib-banner>
+
+    <lib-banner status="error">
+      Data sync could not be completed -&nbsp;<lib-text-line textColor="link" class="cursor">Try again
+      </lib-text-line>
+    </lib-banner>
+
+    <lib-banner status="info">
+      <div class="f-row banner-row">
+        Data syncing in progress <span class="f-spacer"></span>
+        <lib-spinner size="16" class="lib-spnner"></lib-spinner>
+      </div>
+    </lib-banner>
+
+    <lib-banner status="success">
+      <div class="f-row banner-row">
+        Data successfully synced <span class="f-spacer"></span>
+        <mat-icon fontSet="mdo-icons-light" class="cursor">times</mat-icon>
+      </div>
+    </lib-banner>
+  </ng-template>
+
+  <!-- Empty state *ng-template -->
+  <ng-template>
+    <div class="f-col empty-state">
+      <lib-empty-state primaryText="Nothing to see here" secondaryText="Your dataset doesn’t have any fields. Would you like to add fields by editing the dataset?" icon="table" iconSize="100">
+        <lib-button type="minor">Edit dataset</lib-button>
+      </lib-empty-state>
+    </div>
+  </ng-template>
+
+  <!-- Steps tabs *ng-template -->
+
+  <div class="f-row f-justify-center add-button-container">
+    <lib-button icon="plus" [rounded]="true" type="major" [matMenuTriggerFor]="seriesMenu" class="add-button">
+    </lib-button>
+    <mat-menu #seriesMenu="matMenu" class="navigation-menu">
+      <ng-container *ngFor="let dmlType of dmlTypes">
+        <!-- <lib-filter-option (click)="seriesMenuClick(dmlType)">{{dmlType}}</lib-filter-option> -->
+        <button mat-menu-item (click)="seriesMenuClick(dmlType)">{{dmlType}}</button>
+      </ng-container>
+    </mat-menu>
+  </div>
+
+</div>

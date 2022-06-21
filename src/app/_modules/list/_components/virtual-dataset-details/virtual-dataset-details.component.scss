@@ -1,0 +1,40 @@
+:host {
+  .root {
+    margin: 15px 0 0 10px !important;
+  }
+
+  mat-panel-title.mat-expansion-panel-header-title {
+    width: 100%;
+    float: left;
+  }
+
+  .empty-state {
+    float: left;
+    width: 100%;
+    white-space: pre;
+  }
+
+  .cog-icon {
+    background: #e4ebf3;
+    position: absolute;
+    right: 49px;
+    top: 10px;
+  }
+
+  .mat-menu-trigger.ellipsis-icon {
+    background: #e4ebf3;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+  }
+}
+
+.existed-group-details {
+  height: calc(100% - 15px);
+
+  .centered-text {
+    align-self: center;
+    margin-bottom: auto;
+    margin-top: auto;
+  }
+}

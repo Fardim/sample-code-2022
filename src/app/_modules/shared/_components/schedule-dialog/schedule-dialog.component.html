@@ -1,0 +1,126 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button iconFontType="light" icon="times" (afterClick)="close()"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading">Schedule</lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button type="major" (afterClick)="submit()" i18n="@@save" width="80px">Save</lib-button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <form [formGroup]="form">
+                <!-- sidesheet content start here -->
+                <div class="f-row">
+                    <div class="f-col mdo-field">
+                        <lib-text-line type="xsmall" weight="strong" class="field-label">Repeat</lib-text-line>
+                        <lib-segment formControlName="schemaSchedulerRepeat" [optionsList]="repeatInterval"
+                            labelKey="label" valueKey="value"></lib-segment>
+                        <mat-error
+                            *ngIf="formSubmitted && form.controls.schemaSchedulerRepeat.errors && form.controls.schemaSchedulerRepeat.errors.required">
+                            This is a required field
+                        </mat-error>
+                    </div>
+                </div>
+                <mat-divider class="divider-dashed"></mat-divider>
+                <div class="f-row every-field mdo-field">
+                    <lib-input class="mdo-scheduler-input" formControlName="repeatValue" type="number" [maxLength]='2'
+                        [value]='form.value.repeatValue' i18n-placeholder="@@enter" placeholder="Enter"
+                        i18n-label="@@every" label="Every" [minimum]='1'>
+                    </lib-input>
+                    <div class="col-spacer"></div>
+                    <lib-text-line type="base" class="week-label">{{getMetricHours}}</lib-text-line>
+                    <mat-error
+                        *ngIf="formSubmitted && form.controls.repeatValue.errors && form.controls.repeatValue.errors.required">
+                        This is a required field
+                    </mat-error>
+                </div>
+                <!-- weekly repeat on -->
+                <div *ngIf="form.controls.schemaSchedulerRepeat.value === 'WEEKLY'">
+                    <div class="f-col mdo-field">
+                        <lib-text-line type="xsmall" weight="strong" class="field-label">Repeat on</lib-text-line>
+                        <lib-radio-group class="mdo-schedule-segment" formControlName="weeklyOn" [options]="weekDays"
+                            [aria-label]="'Select an option'" [theme]="'primary'" [labelPosition]="'after'"
+                            [layout]="'horizontal'"></lib-radio-group>
+                    </div>
+                    <mat-error
+                        *ngIf="formSubmitted && form.controls.weeklyOn.errors && form.controls.weeklyOn.errors.required">
+                        This is a required field when occuring cycle is weekly
+                    </mat-error>
+                </div>
+
+                <!-- monthly repeat on -->
+                <div *ngIf="form.controls.schemaSchedulerRepeat.value === 'MONTHLY'">
+                    <div class="f-col mdo-field">
+                        <lib-text-line type="xsmall" weight="strong" class="field-label">Repeat by</lib-text-line>
+                        <lib-radio-group class="mdo-schedule-segment" formControlName="monthOn" [options]="repeatBys"
+                            [aria-label]="'Select an option'" [theme]="'primary'" [labelPosition]="'after'"
+                            [layout]="'horizontal'"></lib-radio-group>
+                        <mat-error
+                            *ngIf="formSubmitted && form.controls.monthOn.errors && form.controls.monthOn.errors.required">
+                            This is a required field when occuring cycle is monthly
+                        </mat-error>
+                    </div>
+                </div>
+                <mat-divider class="divider-dashed"></mat-divider>
+                <!-- monthly repeat by -->
+
+                <div class="f-row mdo-field every-field">
+                    <div class="f-col">
+                        <lib-text-line type="xsmall" weight="strong" class="field-label">Starts on</lib-text-line>
+                        <pros-date-picker-field [showRangeFld]="false" [preSelectedFld]="form.controls.startOn.value"
+                            (strtValueSelected)="setValue('startOn',$event)" [minimumValidDate]="today"
+                            [showFutureDates]="true">
+                        </pros-date-picker-field>
+                        <mat-error
+                            *ngIf="formSubmitted && form.controls.startOn.errors && form.controls.startOn.errors.required">
+                            This is a required field
+                        </mat-error>
+                    </div>
+                </div>
+                <div class="f-row mdo-field">
+                    <div class="f-col">
+                        <lib-text-line type="xsmall" weight="strong" class="field-label">Ends</lib-text-line>
+                        <lib-segment formControlName="end" [optionsList]="schedulerEndOptions"
+                            labelKey="label" valueKey="value"></lib-segment>
+                        <mat-error
+                            *ngIf="formSubmitted && form.controls.end.errors && form.controls.end.errors.required">
+                            This is a required field
+                        </mat-error>
+                    </div>
+                </div>
+                <div class="f-row mdo-field every-field" *ngIf="form.controls.end.value === 'AFTER'">
+                    <lib-input class="mdo-scheduler-input" formControlName="occurrenceVal" [type]="'number'"
+                        i18n-label="@@occurences" label="Occurences" [value]="form.controls.occurrenceVal.value"
+                        [maxLength]='2' [minimum]='1'></lib-input>
+                    <mat-error
+                        *ngIf="formSubmitted && form.controls.occurrenceVal.errors && form.controls.occurrenceVal.errors.required">
+                        This is a required field when cycle ends is After
+                    </mat-error>
+                </div>
+                <div class="f-row mdo-field every-field" *ngIf="form.controls.end.value === 'ON'">
+                    <div class="f-col">
+                        <lib-text-line type="xsmall" weight="strong" class="field-label">Date</lib-text-line>
+                        <pros-date-picker-field [preSelectedFld]="form.controls.endOn.value"
+                            (strtValueSelected)="setValue('endOn',$event)"
+                            [minimumValidDate]="form.controls.startOn.value" [showFutureDates]="true">
+                        </pros-date-picker-field>
+                        <mat-error
+                            *ngIf="formSubmitted && form.controls.endOn.errors && form.controls.endOn.errors.required">
+                            This is a required field when cycle ends is ON
+                        </mat-error>
+                    </div>
+                </div>
+                <mat-divider></mat-divider>
+            </form>
+            <lib-text-line type="small" weight="strong">{{getReferenceString}}</lib-text-line>
+            <!-- sidesheet content End here -->
+            <!-- <button mat-flat-button (click)='submit()' color="primary" [disabled]="form.invalid">submit</button> -->
+        </div>
+    </div>
+</div>

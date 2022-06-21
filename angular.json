@@ -1,0 +1,314 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "ngx-mdo": {
+      "root": "",
+      "sourceRoot": "src",
+      "projectType": "application",
+      "prefix": "pros",
+      "i18n": {
+        "sourceLocale": {
+          "baseHref": "",
+          "code": "en"
+        },
+        "locales": {
+          "ar": {
+            "translation": "src/locale/messages.ar.xlf",
+            "baseHref": ""
+          },
+          "es": {
+            "translation": "src/locale/messages.es.xlf",
+            "baseHref": ""
+          },
+          "id": {
+            "translation": "src/locale/messages.id.xlf",
+            "baseHref": ""
+          },
+          "it": {
+            "translation": "src/locale/messages.it.xlf",
+            "baseHref": ""
+          },
+          "ko": {
+            "translation": "src/locale/messages.ko.xlf",
+            "baseHref": ""
+          },
+          "nl": {
+            "translation": "src/locale/messages.nl.xlf",
+            "baseHref": ""
+          },
+          "pt": {
+            "translation": "src/locale/messages.pt.xlf",
+            "baseHref": ""
+          },
+          "ru": {
+            "translation": "src/locale/messages.ru.xlf",
+            "baseHref": ""
+          },
+          "sv": {
+            "translation": "src/locale/messages.sv.xlf",
+            "baseHref": ""
+          },
+          "th": {
+            "translation": "src/locale/messages.th.xlf",
+            "baseHref": ""
+          },
+          "vi": {
+            "translation": "src/locale/messages.vi.xlf",
+            "baseHref": ""
+          },
+          "zf": {
+            "translation": "src/locale/messages.zf.xlf",
+            "baseHref": ""
+          },
+          "fr": {
+            "translation": "src/locale/messages.fr.xlf",
+            "baseHref": ""
+          },
+          "de": {
+            "translation": "src/locale/messages.de.xlf",
+            "baseHref": ""
+          },
+          "ja": {
+            "translation": "src/locale/messages.ja.xlf",
+            "baseHref": ""
+          }
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "localize": true,
+            "allowedCommonJsDependencies": [
+              "chartjs-plugin-zoom",
+              "bpmnlint",
+              "object-refs",
+              "jwt-decode",
+              "chart.js",
+              "xlsx",
+              "chartjs-plugin-datalabels"
+            ],
+            "outputPath": "dist/ngx-mdo",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.app.json",
+            "assets": ["src/favicon.ico", "src/assets", "src/prod-env.js", {"glob": "**/*", "input": "node_modules/monaco-editor", "output": "assets/monaco-editor"}],
+            "styles": ["src/styles.scss"],
+            "scripts": ["./node_modules/leader-line/leader-line.min.js"],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "bundle",
+                  "name": "main",
+                  "maximumWarning": "3mb",
+                  "maximumError": "6mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb"
+                }
+              ]
+            },
+            "ar": {
+              "localize": ["ar"],
+              "outputPath": "dist/ngx-mdo/ar",
+              "i18nMissingTranslation": "warning"
+            },
+            "de": {
+              "localize": ["de"],
+              "outputPath": "dist/ngx-mdo/de",
+              "i18nMissingTranslation": "warning"
+            },
+            "es": {
+              "localize": ["es"],
+              "outputPath": "dist/ngx-mdo/es",
+              "i18nMissingTranslation": "warning"
+            },
+            "fr": {
+              "localize": ["fr"],
+              "outputPath": "dist/ngx-mdo/fr",
+              "i18nMissingTranslation": "warning"
+            },
+            "id": {
+              "localize": ["id"],
+              "outputPath": "dist/ngx-mdo/id",
+              "i18nMissingTranslation": "warning"
+            },
+            "it": {
+              "localize": ["it"],
+              "outputPath": "dist/ngx-mdo/it",
+              "i18nMissingTranslation": "warning"
+            },
+            "ja": {
+              "localize": ["ja"],
+              "outputPath": "dist/ngx-mdo/ja",
+              "i18nMissingTranslation": "warning"
+            },
+            "ko": {
+              "localize": ["ko"],
+              "outputPath": "dist/ngx-mdo/ko",
+              "i18nMissingTranslation": "warning"
+            },
+            "nl": {
+              "localize": ["nl"],
+              "outputPath": "dist/ngx-mdo/nl",
+              "i18nMissingTranslation": "warning"
+            },
+            "pt": {
+              "localize": ["pt"],
+              "outputPath": "dist/ngx-mdo/pt",
+              "i18nMissingTranslation": "warning"
+            },
+            "ru": {
+              "localize": ["ru"],
+              "outputPath": "dist/ngx-mdo/ru",
+              "i18nMissingTranslation": "warning"
+            },
+            "sv": {
+              "localize": ["sv"],
+              "outputPath": "dist/ngx-mdo/sv",
+              "i18nMissingTranslation": "warning"
+            },
+            "th": {
+              "localize": ["th"],
+              "outputPath": "dist/ngx-mdo/th",
+              "i18nMissingTranslation": "warning"
+            },
+            "vi": {
+              "localize": ["vi"],
+              "outputPath": "dist/ngx-mdo/vi",
+              "i18nMissingTranslation": "warning"
+            },
+            "zf": {
+              "localize": ["zf"],
+              "outputPath": "dist/ngx-mdo/zf",
+              "i18nMissingTranslation": "warning"
+            },
+            "en": {
+              "localize": ["en"],
+              "outputPath": "dist/ngx-mdo/en",
+              "i18nMissingTranslation": "warning"
+            }
+          },
+          "defaultConfiguration": "en"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "ngx-mdo:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "ngx-mdo:build:production"
+            },
+            "ar": {
+              "browserTarget": "ngx-mdo:build:ar"
+            },
+            "de": {
+              "browserTarget": "ngx-mdo:build:de"
+            },
+            "es": {
+              "browserTarget": "ngx-mdo:build:es"
+            },
+            "fr": {
+              "browserTarget": "ngx-mdo:build:fr"
+            },
+            "id": {
+              "browserTarget": "ngx-mdo:build:id"
+            },
+            "it": {
+              "browserTarget": "ngx-mdo:build:it"
+            },
+            "ja": {
+              "browserTarget": "ngx-mdo:build:ja"
+            },
+            "ko": {
+              "browserTarget": "ngx-mdo:build:ko"
+            },
+            "nl": {
+              "browserTarget": "ngx-mdo:build:nl"
+            },
+            "pt": {
+              "browserTarget": "ngx-mdo:build:pt"
+            },
+            "ru": {
+              "browserTarget": "ngx-mdo:build:ru"
+            },
+            "sv": {
+              "browserTarget": "ngx-mdo:build:sv"
+            },
+            "th": {
+              "browserTarget": "ngx-mdo:build:th"
+            },
+            "vi": {
+              "browserTarget": "ngx-mdo:build:vi"
+            },
+            "zf": {
+              "browserTarget": "ngx-mdo:build:zf"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "ngx-mdo:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "src/test.ts",
+            "polyfills": "src/polyfills.ts",
+            "tsConfig": "src/tsconfig.spec.json",
+            "karmaConfig": "src/karma.conf.js",
+            "codeCoverage": true,
+            "styles": ["src/styles.scss"],
+            "scripts": [],
+            "assets": ["src/favicon.ico", "src/assets"]
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": ["src/**/*.ts", "src/**/*.html"]
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "ngx-mdo",
+  "cli": {
+    "analytics": false,
+    "defaultCollection": "@angular-eslint/schematics"
+  }
+}

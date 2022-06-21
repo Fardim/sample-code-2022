@@ -1,0 +1,251 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-col mdo-constrained-right">
+            <div class="f-row breadcrum-head">
+                <lib-text-line type="leading" i18n="@@configure_view">Configure view</lib-text-line>
+                <span class="f-spacer"></span>
+                <lib-button i18n="@@save" (click)="save(configTabSelectedIndex)" type="major" width="80px">Save</lib-button>
+            </div>
+        </div>
+    </div>
+
+    <div class="f-col sidesheetcontent-listing" prosInfiniteScroll bufferPercentage="10" (scrollEnd)="keepScrolling()">
+        <div class="f-col mdo-justify">
+            <div *ngIf="isActionConfigAllowed" class="f-col">
+                <ng-container *ngTemplateOutlet="SideSheetTabs;context:{$implicit: true}"></ng-container>
+            </div>
+            <div *ngIf="!isActionConfigAllowed" class="f-col">
+                <ng-container *ngTemplateOutlet="SideSheetTabs;context:{$implicit: false}"></ng-container>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #SideSheetTabs let-action>
+    <lib-tab-group (selectedIndexChange)="configTabSelectedIndex=$event">
+        <lib-tab i18n-label="@@columns" label="Columns">
+            <div class="f-col">
+                <lib-search i18n-placeholder="@@search_columns" placeholder="Search columns"
+                    (valueChange)="searchFld($event)"></lib-search>
+                <div class="row-spacer"></div>
+                <div class="check-list">
+                    <!-- <mat-checkbox class="checkedall" color="primary" (change)="selectAll()" [(ngModel)]="allChecked"
+                        [indeterminate]="allIndeterminate"> <span class="checkboxlabel">All</span></mat-checkbox> -->
+                    <div class="f-row colunm-box">
+                        <div class="col"></div>
+                        <div class="col col-x4">
+                            <lib-text-line type="small" weight="strong" i18n="@@Column">Column</lib-text-line>
+                        </div>
+                        <span class="f-spacer"></span>
+                        <div class="col">
+                            <lib-text-line type="small" weight="strong" i18n="@@Visible">Visible</lib-text-line>
+                        </div>
+                        <span class="f-col-spacer-half"></span>
+                        <!-- <div class="col">
+                            <lib-text-line type="small" weight="strong" i18n="@@editable">Editable</lib-text-line>
+                        </div> -->
+                    </div>
+                    <div cdkDropList [cdkDropListData]="fields" (cdkDropListDropped)="drop($event)"
+                        #scrollableContainer>
+                        <div *ngFor="let fld of fieldsObs | async; trackBy: fldTrackBy" id="{{ fld.fieldId }}" cdkDrag
+                            class="colunm-list">
+                            <div class="f-row colunm-box">
+                                <div class="col">
+                                    <lib-button cdkDragHandle type="plain" iconFontType="light" icon="grip-lines">
+                                    </lib-button>
+                                </div>
+
+                                <div class="col col-x4">
+                                    <lib-text-line type="base">{{ fld.metadataCreateModel ?
+                                        fld.metadataCreateModel.fieldDescri : 'Untitled' }}</lib-text-line>
+                                </div>
+
+                                <div class="f-spacer"></div>
+
+                                <div class="col">
+                                    <lib-checkbox (valueChange)="selectionChange($event, fld)"
+                                        [checked]="isChecked(fld)">
+                                    </lib-checkbox>
+                                </div>
+                                <span class="f-col-spacer-half"></span>
+
+                                <!-- <div class="col">
+                                    <lib-checkbox (valueChange)="editableChange(fld)" [disabled]="!isChecked(fld)"
+                                        [checked]="isEditEnabled(fld)"></lib-checkbox>
+                                </div> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </lib-tab>
+        <lib-tab *ngIf="action" label="Actions">
+            <div class="f-col mdo-field">
+                <lib-text-line type="xsmall" weight="strong" i18n="@@preview" class="field-label">Preview
+                </lib-text-line>
+                <div class="f-row">
+                    <!-- Secondary actions
+                        <button mat-fab color="accent" *ngIf="secondaryActions.length"
+                            [matMenuTriggerFor]="secondaryActionsMenu">
+                            <mat-icon fontSet="mdo-icons">ellipsis-h</mat-icon>
+                        </button>
+                        <mat-menu #secondaryActionsMenu="matMenu" class="navigation-menu">
+                            <button mat-menu-item *ngFor="let sAction of secondaryActions">
+                                <mat-icon
+                                    *ngIf="!sAction.isCustomAction && (sAction.actionViewType=== TableActionViewType.ICON || sAction.actionViewType=== TableActionViewType.ICON_TEXT)"
+                                    fontSet="mdo-icons" class="mat-menu-icon">
+                                    {{ sAction.actionIconLigature }}
+                                </mat-icon>
+                                <ng-template
+                                    [ngIf]="(sAction.actionViewType === TableActionViewType.TEXT) || (sAction.actionViewType === TableActionViewType.ICON_TEXT)">
+                                    {{ sAction.actionText }}
+                                </ng-template>
+                            </button>
+                        </mat-menu> -->
+                    <!-- Primary actions -->
+                    <!-- <button *ngFor="let pAction of primaryActions" mat-flat-button color="accent">
+                            <mat-icon
+                                *ngIf="!pAction.isCustomAction && (pAction.actionViewType=== TableActionViewType.ICON || pAction.actionViewType=== TableActionViewType.ICON_TEXT)"
+                                fontSet="mdo-icons">
+                                {{ pAction.actionIconLigature }}
+                            </mat-icon>
+                            <ng-template
+                                [ngIf]="pAction.actionViewType=== TableActionViewType.TEXT || pAction.actionViewType=== TableActionViewType.ICON_TEXT">
+                                {{ pAction.actionText }}
+                            </ng-template>
+                        </button> -->
+                    <!-- Primary actions -->
+                    <lib-button-group>
+                        <lib-button *ngIf="secondaryActions.length" [matMenuTriggerFor]="secondaryActionsMenu"
+                            type="minor" icon="ellipsis-h">
+                        </lib-button>
+                        <mat-menu #secondaryActionsMenu="matMenu" class="navigation-menu">
+                            <button mat-menu-item *ngFor="let sAction of secondaryActions">
+                                <mat-icon
+                                    *ngIf="!sAction.isCustomAction && (sAction.actionViewType === TableActionViewType.ICON || sAction.actionViewType === TableActionViewType.ICON_TEXT)"
+                                    fontSet="mdo-icons" class="mat-menu-icon">
+                                    {{ sAction.actionIconLigature }}
+                                </mat-icon>
+                                <ng-template
+                                    [ngIf]="(sAction.actionViewType === TableActionViewType.TEXT) || (sAction.actionViewType === TableActionViewType.ICON_TEXT)">
+                                    {{ sAction.actionText }}
+                                </ng-template>
+                            </button>
+                        </mat-menu>
+                        <ng-container *ngFor="let pAction of primaryActions">
+                            <ng-container>
+                                <lib-button type="minor" iconPosition="before" [icon]="pAction.actionIconLigature">
+                                    <ng-container
+                                        *ngIf="pAction.actionViewType=== TableActionViewType.TEXT || pAction.actionViewType=== TableActionViewType.ICON_TEXT">
+                                        {{ pAction.actionText }}
+                                    </ng-container>
+                                </lib-button>
+                            </ng-container>
+                        </ng-container>
+                    </lib-button-group>
+                </div>
+            </div>
+            <div class="row-spacer"></div>
+            <!-- Action code start here-->
+            <div class="colunm-listing">
+                <div class="f-row colunm-box rule-border-row">
+                    <div class="col col-x4"></div>
+                    <div class="col col-x8">
+                        <lib-text-line type="small" weight="strong" i18n="@@action">Action</lib-text-line>
+                    </div>
+                    <div class="col col-x4">
+                        <lib-text-line type="small" weight="strong" i18n="@@display">Display</lib-text-line>
+                        <mat-icon libTooltip="Display" i18n-libTooltip="@@display" fontSet="mdo-icons-light" class="mat-head-icon">
+                            question-circle
+                        </mat-icon>
+                    </div>
+                    <div class="col col-x4"></div>
+                    <div class="col col-x4 mat-item-end"></div>
+                </div>
+                <div class="f-row colunm-box rule-border-row">
+                    <div class="col col-x4"></div>
+                    <div class="col col-x8">
+                        <lib-text-line type="base" textColor="link" (click)="addCustomAction()" class="cursor"
+                            i18n="@@new_custom_action" enableWrap="true"> New custom action</lib-text-line>
+                    </div>
+                    <div class="col col-x4"></div>
+                    <div class="col col-x4"></div>
+                    <div class="col col-x4 mat-item-end"></div>
+                </div>
+                <div cdkDropList [cdkDropListData]="actionsList" (cdkDropListDropped)="drop($event)">
+                    <div *ngFor="let action of actionsList; let index=index" class="f-row colunm-box rule-border-row"
+                        cdkDrag>
+                        <div class="col col-x4">
+                            <lib-button cdkDragHandle type="plain" iconFontType="light" icon="grip-lines">
+                            </lib-button>
+                        </div>
+                        <div class="col col-x8">
+                            <div mat-line (click)="editActionText(index)">
+                                <span id="viewctrl_{{ index }}" [ngClass]="{'editablevalue' : action.isCustomAction}">
+                                    {{
+                                    action.actionText }} </span>
+                                <div id="inpctrl_{{ index }}" style="display: none;">
+                                    <pros-form-input type="text" [value]="action.actionText"
+                                        (emitBlurEvent)="emitActionTextBlur(index, $event)">
+                                    </pros-form-input>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col col-x4">
+                            <lib-checkbox [disabled]="!action.isPrimaryAction && primaryActions.length === 3"
+                                [checked]="action.isPrimaryAction"
+                                (valueChange)="actionChanged(index, 'isPrimaryAction', $event)">
+                            </lib-checkbox>
+                        </div>
+
+                        <div class="col col-x4">
+                            <ng-template [ngIf]="action.isCustomAction" [ngIfElse]="commonAction">
+                                {{ getActionViewTypeDesc(action.actionViewType) }}
+                            </ng-template>
+                            <ng-template #commonAction>
+                                <lib-button [matMenuTriggerFor]="displayMenu" type="minor" icon="caret-down"
+                                    iconFontType="solid">
+                                    {{ getActionViewTypeDesc(action.actionViewType) }}
+                                </lib-button>
+                                <mat-menu #displayMenu="matMenu" class="navigation-menu">
+                                    <button (click)="actionChanged(index, 'actionViewType', TableActionViewType.ICON)"
+                                        mat-menu-item> Icon only </button>
+                                    <button
+                                        (click)="actionChanged(index, 'actionViewType', TableActionViewType.ICON_TEXT)"
+                                        mat-menu-item> Icon and text </button>
+                                    <button (click)="actionChanged(index, 'actionViewType', TableActionViewType.TEXT)"
+                                        mat-menu-item> Text only </button>
+
+                                </mat-menu>
+                            </ng-template>
+                        </div>
+                        <div class="col col-x4 mat-item-end">
+                            <!-- <button mat-button [matMenuTriggerFor]="mappingMenu"
+                                    *ngIf="action.isCustomAction">
+                                    <mat-icon fontSet="mdo-icons" [matBadge]="action.refBrId ? '1' : '?'"
+                                        matBadgeOverlap="false" matBadgeColor="accent" class="badge-background"
+                                        [ngClass]="{'badge-error-value' : !action.refBrId}">link</mat-icon>
+                                </button> -->
+                            <lib-button [matMenuTriggerFor]="mappingMenu" *ngIf="action.isCustomAction" type="plain"
+                                icon="link" iconFontType="light"></lib-button>
+                            <mat-menu #mappingMenu="matMenu" class="navigation-menu">
+                                <button mat-menu-item *ngFor="let rule of crossMappingRules"
+                                    (click)="actionChanged(index, 'refBrId', rule.sno)">
+                                    <mat-icon *ngIf="rule.sno === action.refBrId" fontSet="mdo-icons-light">
+                                        check</mat-icon>
+                                    {{ rule.desc }}
+                                </button>
+                            </mat-menu>
+                            <lib-button type="plain" *ngIf="action.isCustomAction" (click)="removeCustomAction(index)"
+                               icon="trash-alt" iconFontType="light"></lib-button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Action code end here-->
+        </lib-tab>
+    </lib-tab-group>
+</ng-template>

@@ -1,0 +1,75 @@
+<!-- FILTER WIDGET -->
+<div class="filters" #filter>
+    <ng-container *ngFor="let widget of filteredWidgetList">
+        <!-- {{widget | json}} -->
+        <pros-filter-facet [reportId]="reportId" [filterCriteria]="filterCriteria" [hasFilterCriteria]="emitClearBtnEvent" [widgetId]="widget.widgetId" (evtFilterCriteria)="changeFilterCriteria($event)" [editedMode]="editedMode" [widgetInfo]="widget" (openPanel)="setActiveWidget(widget); setPanel(true)"
+            (deleteWidget)="deleteWidgetDraft(widget.widgetId)">
+        </pros-filter-facet>
+    </ng-container>
+    <div class="mdo-filter-matchip filter-pill" *ngIf="!editedMode && filteredWidgetList.length > 0" matBadgePosition="above after" [libBadge]="additionalFilterWidgetCount" matBadgeOverlap="true" matBadgeColor="primary" matBadgeSize="small">
+        <lib-chip class="mdo-filter-matbutton" disableRipple="true" (click)="openFilterSideSheet()">
+            <mat-icon fontSet="mdo-icons">filter</mat-icon>
+        </lib-chip>
+    </div>
+</div>
+
+<div class="root f-col" #rootContainer cdkScrollable [ngStyle]="{ height: 'calc(100% - ' + maxFilterHeight + 'px)' }">
+    <lib-button *ngIf="editedMode && widgetList" class="add-widget" [ngClass]="{ 'center-align': widgetList.length === 0, 'left-align': widgetList.length > 0 }" icon="plus" [rounded]="true" type="major" [matMenuTriggerFor]="widgetMenu"></lib-button>
+    <div style="flex: 1">
+        <gridster [options]="options" class="gridster">
+            <gridster-item [item]="widget" *ngFor="let widget of widgetList; trackBy: trackByfn">
+                <!-- COUNT WIDGET -->
+                <pros-count *ngIf="widget.widgetType === 'COUNT'" [widgetInfo]="widget" [boxSize]="boxSize" [ngClass]="{ 'active-widget': widget.widgetId === activeWidget?.widgetId }" [widgetId]="widget.widgetId" [reportId]="reportId" [filterCriteria]="filterCriteria"
+                    (evtFilterCriteria)="changeFilterCriteria($event)" [editedMode]="editedMode" (openPanel)="setActiveWidget(widget); setPanel(true)" (deleteWidget)="deleteWidgetDraft(widget.widgetId)"></pros-count>
+
+                <!-- BARCHART WIDGET -->
+                <pros-bar-chart *ngIf="widget.widgetType === 'BAR_CHART'" [widgetInfo]="widget" [boxSize]="boxSize" [ngClass]="{ 'active-widget': widget.widgetId === activeWidget?.widgetId }" [widgetId]="widget.widgetId" [reportId]="reportId" [filterCriteria]="filterCriteria"
+                    [permissons]="report.permissons" (evtFilterCriteria)="changeFilterCriteria($event)" [editedMode]="editedMode" (openPanel)="setActiveWidget(widget); setPanel(true)" (deleteWidget)="deleteWidgetDraft(widget.widgetId)"></pros-bar-chart>
+
+                <!-- STACKBARCHART WIDGET -->
+                <pros-stackedbar-chart *ngIf="widget.widgetType === 'STACKED_BAR_CHART'" [widgetInfo]="widget" [ngClass]="{ 'active-widget': widget.widgetId === activeWidget?.widgetId }" [boxSize]="boxSize" [widgetId]="widget.widgetId" [reportId]="reportId" [filterCriteria]="filterCriteria"
+                    [permissons]="report.permissons" (evtFilterCriteria)="changeFilterCriteria($event)" [editedMode]="editedMode" (openPanel)="setActiveWidget(widget); setPanel(true)" (deleteWidget)="deleteWidgetDraft(widget.widgetId)"></pros-stackedbar-chart>
+
+                <!-- PIEBARCHART WIDGET -->
+                <pros-pie-chart #pieChart *ngIf="widget.widgetType === 'PIE_CHART'" [widgetInfo]="widget" [boxSize]="boxSize" [ngClass]="{ 'active-widget': widget.widgetId === activeWidget?.widgetId }" [widgetId]="widget.widgetId" [reportId]="reportId" [filterCriteria]="filterCriteria"
+                    [permissons]="report.permissons" (evtFilterCriteria)="changeFilterCriteria($event)" [editedMode]="editedMode" (openPanel)="setActiveWidget(widget); setPanel(true)" (deleteWidget)="deleteWidgetDraft(widget.widgetId)"></pros-pie-chart>
+
+                <!-- DATATABLE WIDGET -->
+                <pros-reporting-list *ngIf="widget.widgetType === 'TABLE_LIST'" [widgetInfo]="widget" [boxSize]="boxSize" [ngClass]="{ 'active-widget': widget.widgetId === activeWidget?.widgetId }" [widgetId]="widget.widgetId" [reportId]="reportId" [filterCriteria]="filterCriteria"
+                    (evtFilterCriteria)="changeFilterCriteria($event)" [hasFilterCriteria]="emtClearBtnClickedEvent" [editedMode]="editedMode" (openPanel)="setActiveWidget(widget); setPanel(true)" (deleteWidget)="deleteWidgetDraft(widget.widgetId)" [moduleId]="widget.objectType">
+                </pros-reporting-list>
+
+                <!-- TIMESERIES WIDGET -->
+                <pros-timseries-widget-v2 *ngIf="widget.widgetType === 'TIMESERIES'" [widgetInfo]="widget" [boxSize]="boxSize" [ngClass]="{ 'active-widget': widget.widgetId === activeWidget?.widgetId }" [widgetId]="widget.widgetId" [reportId]="reportId" [filterCriteria]="filterCriteria"
+                    [hasFilterCriteria]="emitClearBtnEvent" (evtFilterCriteria)="changeFilterCriteria($event)" [editedMode]="editedMode" (openPanel)="setActiveWidget(widget); setPanel(true)" (deleteWidget)="deleteWidgetDraft(widget.widgetId)">
+                </pros-timseries-widget-v2>
+
+                <!-- IMAGE WIDGET -->
+                <pros-image *ngIf="widget.widgetType === 'IMAGE'" [widgetInfo]="widget" [boxSize]="boxSize" [ngClass]="{ 'active-widget': widget.widgetId === activeWidget?.widgetId }" [widgetId]="widget.widgetId" [reportId]="reportId" [editedMode]="editedMode" (openPanel)="setActiveWidget(widget); setPanel(true)"
+                    (deleteWidget)="deleteWidgetDraft(widget.widgetId)"></pros-image>
+
+                <!-- HTML-EDiTOR WIDGET -->
+                <pros-html-editor *ngIf="widget.widgetType === 'HTML'" [widgetId]="widget.widgetId" [reportId]="reportId" [ngClass]="{ 'active-widget': widget.widgetId === activeWidget?.widgetId }" [height]="widget.height * boxSize" [editedMode]="editedMode" (openPanel)="setActiveWidget(widget); setPanel(true)"
+                    [widgetInfo]="widget" (deleteWidget)="deleteWidgetDraft(widget.widgetId)"></pros-html-editor>
+
+                <!-- LIST WIDGET -->
+                <pros-dataset-list *ngIf="widget.widgetType === 'DATASET_LIST'" [moduleId]="widget.objectType" [isReport]="true" [boxSize]="boxSize" [widgetId]="widget.widgetId" [reportId]="reportId" [ngClass]="{ 'active-widget': widget.widgetId === activeWidget?.widgetId }" [height]="widget.height * boxSize" [editedMode]="editedMode" (openPanel)="setActiveWidget(widget); setPanel(true)"
+                    [widgetInfo]="widget" (deleteWidget)="deleteWidgetDraft(widget.widgetId)"></pros-dataset-list>
+            </gridster-item>
+        </gridster>
+    </div>
+</div>
+
+<mat-menu #widgetMenu="matMenu" (closed)="searchInput.clearSearch()">
+    <lib-filter-dropdown class="mix-filter-dropdown">
+        <div class="dropdown-search-wrapper" libClickStopPropagation>
+            <lib-search #searchInput placeholder="Search widgets" (valueChange)="searchWidget($event)" suffixIcon="times"> </lib-search>
+        </div>
+        <div class="dropdown-options-wrapper f-col">
+            <!-- When using virtual scroll this DIV can be replaced by cdk-virtual-scroll-viewport -->
+            <div class="dropdown-options-inner-container">
+                <lib-filter-option *ngFor="let item of searchWidgetList" (click)="addWidget(item.key)">{{ item.value }} </lib-filter-option>
+            </div>
+        </div>
+    </lib-filter-dropdown>
+</mat-menu>

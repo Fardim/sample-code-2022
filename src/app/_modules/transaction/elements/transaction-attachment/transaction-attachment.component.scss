@@ -1,0 +1,36 @@
+div.root {
+  width: 100%;
+  margin-bottom: 12px;
+
+  .field-label {
+    margin-bottom: 6px;
+  }
+
+  .upload-col {
+    padding: 6px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+
+  .attachment-listrow {
+    flex-wrap: wrap;
+    display: flex;
+    gap: 6px;
+
+    .lib-class {
+      margin: 0 3px 6px 3px;
+      max-width: 300px;
+    }
+
+    .attachment-section {
+      align-items: stretch;
+      padding-left: 6px;
+
+      .attachment-icon {
+        width: 14px;
+        height: 14px;
+        margin-right: 6px;
+      }
+    }
+  }
+}

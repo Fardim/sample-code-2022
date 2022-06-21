@@ -1,0 +1,43 @@
+<div class="root f-col">
+    <mat-toolbar>
+        <mat-toolbar-row>
+          <span>Execution Logs</span>
+          <span class="f-spacer"></span>
+          <button mat-icon-button (click)="close()"><mat-icon>close</mat-icon></button>
+        </mat-toolbar-row>
+    </mat-toolbar>
+     
+    <mat-divider></mat-divider>
+
+    <mat-accordion class="executionlogs-list">
+        <mat-expansion-panel class="mat-elevation-z2 logs-card" *ngFor="let log of executionLogs; trackBy: executionLogsTrackBy" hideToggle>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Task Id : {{ log.reIndexTaskId }}</mat-panel-title>
+                <mat-panel-description>
+                    <ng-template [ngIf]="log.isInterrupted" [ngIfElse]="success">
+                        <mat-icon matTooltip="Execution Interrupted" mat-list-icon  class="failed_run">error</mat-icon>  
+                    </ng-template>
+                    <ng-template #success>
+                        <mat-icon mat-list-icon matTooltip="Successfully Executed" class="success_run">check_circle</mat-icon>
+                    </ng-template>
+                </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <mat-panel-description>
+                <ng-template [ngIf]="log.isInterrupted" [ngIfElse]="success_message">
+                    <div class="f-col logs-items">
+                        <p mat-line><b>Last Run - </b>{{ log.exeEndDate ? (log.exeEndDate | date:'MMM d, y, h:mm:ss a') : 'Running..'  }}</p>
+                        <p mat-line><b>Total Execution Time - </b>Unknown</p>
+                        <p mat-line><b>Message - </b>{{ log.interruptedMessage }}</p>
+                    </div>
+                </ng-template>
+                <ng-template #success_message>
+                    <div class="f-col logs-items">
+                        <p mat-line><b>Last Run - </b>{{ log.exeEndDate ? (log.exeEndDate | date:'MMM d, y, h:mm:ss a') : 'Running..'  }}</p>
+                        <p mat-line><b>Total Execution Time - </b>{{ (log.exeEndDate - log.exeStrtDate) | date:'HH:mm:SS' }}  </p>
+                    </div>
+                </ng-template>
+            </mat-panel-description>
+        </mat-expansion-panel>
+    </mat-accordion>
+</div>

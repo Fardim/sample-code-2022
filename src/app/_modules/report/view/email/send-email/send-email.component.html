@@ -1,0 +1,86 @@
+<div class="root">
+    <form [formGroup]="emailFormGrp">
+        <div class="f-row breadcrum-toolbar">
+            <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+            <div class="col-spacer"></div>
+            <div class="f-col mdo-constrained-right">
+                <div class="f-row breadcrum-head">
+                    <lib-text-line type="leading" i18n="@@send_via_email">Send via email</lib-text-line>
+                    <span class="f-spacer"></span>
+                    <lib-button-group>
+                        <lib-button type="major" (click)="selectTemplate()" i18n="@@select_template">Select a template
+                        </lib-button>
+                        <lib-button type="major" (click)="sendEmail()" i18n="@@send">Send</lib-button>
+                    </lib-button-group>
+                </div>
+            </div>
+        </div>
+        <div class="f-col sidesheetcontent-listing">
+            <div class="f-col mdo-justify">
+                <lib-banner *ngIf="errorMsg" status="error" [text]="errorMsg"></lib-banner>
+                <lib-banner *ngIf="successMsg" status="success" [text]="successMsg"></lib-banner>
+                <div class="f-col mdo-field">
+                    <!-- Multiselect -->
+                    <lib-text-line type="xsmall" class="field-label" weight="strong" i18n="@@email_invalid"
+                        i18n="@@send_to">Send to <span class="mandatory">*</span></lib-text-line>
+
+                    <mat-form-field appearance="outline">
+                        <mat-chip-list #chipList aria-label="User selection">
+                            <lib-chip class="lib-chip" *ngFor="let user of emailRecipients" [selectable]="'true'" [removable]="true"
+                                (removed)="remove(user)">
+                                {{user}}
+                            </lib-chip>
+                            <input required placeholder="Search users..." [formControl]="emailTo"
+                                [matAutocomplete]="auto" [matChipInputFor]="chipList"
+                                [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="'true'"
+                                (matChipInputTokenEnd)="emailTo.touched && emailTo.hasError('email') ? $event.input.value = '' : addUserManually($event);$event.input.value = ''"
+                                (blur)="emailTo.setErrors({email: null});">
+                        </mat-chip-list>
+                        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectUser($event)">
+                            <mat-option [value]="user.userName" *ngFor="let user of filteredUsers | async">
+                                {{user.userName}}
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                    <!-- Multiselect -->
+                    <mat-error *ngIf="emailTo.touched && emailTo.hasError('email')">Email is invalid</mat-error>
+                    <mat-error i18n="@@email_required"
+                        *ngIf="emailTo.touched && emailTo.hasError('required') && emailRecipients.length == 0">Email
+                        is required</mat-error>
+                    <span class="f-row-spacer-half"></span>
+                    <lib-text-line class="cursor" type="xsmall" textColor="link" (click)=addMyself()>Add myself
+                    </lib-text-line>
+                </div>
+                <div class="f-col">
+                    <lib-input i18n-label="@@subject" label="Subject" [type]="'text'" placeholder="Subject"
+                        formControlName="subject" [isRequired]="true" (afterBlur)="isFormValid()"
+                        [hint]="(emailFormGrp.controls.subject.touched && emailFormGrp.controls.subject.errors && emailFormGrp.controls.subject.errors.required) ? 'Subject is a required field' : ''"
+                        [hasError]="emailFormGrp.controls.subject.touched && emailFormGrp.controls.subject.errors && emailFormGrp.controls.subject.errors.required">
+                    </lib-input>
+                </div>
+                <div class="f-col">
+                    <lib-textarea *ngIf="contentEditable" i18n-label="@@message" label="Message" [type]="'text'"
+                        [rows]="5" placeholder="Message" formControlName="message"
+                        [isRequired]="true" (afterBlur)="isFormValid()"
+                        [hasError]="emailFormGrp.controls.message.touched && emailFormGrp.controls.message.errors && emailFormGrp.controls.message.errors.required"
+                        [hint]="(emailFormGrp.controls.message.touched && emailFormGrp.controls.message.errors && emailFormGrp.controls.message.errors.required) ? 'Message is a required field' : ''">
+                    </lib-textarea>
+
+                    <mat-label class="mdo-field-label" i18n="@@messag" *ngIf="!contentEditable">Message</mat-label>
+                    <div id="textarea" data-text="Enter text here" class="message-area"
+                        [innerHTML]="emailFormGrp.controls.message.value" *ngIf="!contentEditable" data-text="Message">
+                    </div>
+                    <mat-error
+                        *ngIf="!contentEditable && emailFormGrp?.controls?.message?.touched && emailFormGrp?.controls?.message?.errors?.required">
+                        Message is required</mat-error>
+                </div>
+
+                <div class="f-col mdo-field">
+                    <lib-text-line type="xsmall" weight="strong" class="field-label">Attachment format</lib-text-line>
+                    <lib-segment [optionsList]="optionsList" labelKey="label" valueKey="value"
+                        formControlName="attachmentType"></lib-segment>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

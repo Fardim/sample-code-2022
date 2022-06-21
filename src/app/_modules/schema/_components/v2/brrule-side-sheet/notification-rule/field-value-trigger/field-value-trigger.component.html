@@ -1,0 +1,21 @@
+<div class="f-col">
+  <pros-blocks-hierarchy
+    [blocksGrp]="udrNodeForm"
+    [operatorsList]="operators"
+    [submitted]="submitted"
+    [sourceList]="fieldListFiltered"
+    [blocksList]="udrBlockList"
+    [showRegex]="false"
+    [isNewModule]="!moduleId"
+    (updateFldList)="updateUDRFldList($event)"
+    [initialSrcList]="initialFieldList"
+    [targetListMetaData]="parentMetadata"
+    [oldListMetaData]="parentMetadata"
+    [moduleId]="moduleId"
+    [isShowOldValue]="true"
+  ></pros-blocks-hierarchy>
+
+  <mat-error class="mdo-field-hint" *ngIf="submitted && udrNodeForm.controls.isFormValid.value">
+    <lib-text-line type="small">Please Enter Field Value or remove blank rule</lib-text-line>
+  </mat-error>
+</div>

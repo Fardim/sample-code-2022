@@ -1,0 +1,44 @@
+<ng-template [ngIf]="!isFilterWidget" [ngIfElse]="filterWidget">
+<div class="f-col lib-input" [id]="formFieldId" [matMenuTriggerFor]="rangeSlider" #trigger="matMenuTrigger">
+    <lib-input [formControl]="appliedValueCtrl" isReadOnly="true" placeholder="Enter the value">
+    </lib-input>
+</div>
+<mat-menu class="filter-mat-menu" #rangeSlider="matMenu">
+    <div class="f-col rangeslider" prosClickStopPropagation>
+        <div class="f-col  menu-spacing">
+            <lib-input [value]="getSelectedRangeValue()" [placeholder]="placeholder" [formControl]="fltrCtrl"
+                [hasError]="isInValidInput()">
+            </lib-input>
+            </div>
+        <div class="selectrange">
+            <lib-text-line type="small" weight="strong">Select range</lib-text-line>
+            <lib-range-slider [formControl]="control" [maxValue]="highValue" showTicks="true"
+                thumbLabel="true" [minValue]="lowerValue">
+            </lib-range-slider>
+        </div>
+        <div class="filter-button-wrapper">
+            <lib-button type="minor" (click)="applyFilter();trigger.closeMenu();" i18n="@@apply">
+                Apply</lib-button>
+        </div>
+    </div>
+</mat-menu>
+</ng-template>
+<ng-template #filterWidget>
+    <div class="f-col rangeslider" prosClickStopPropagation>
+        <div class="f-col  menu-spacing">
+            <lib-input [value]="getSelectedRangeValue()" [placeholder]="placeholder" [formControl]="fltrCtrl"
+                [hasError]="isInValidInput()">
+            </lib-input>
+            </div>
+        <div class="selectrange">
+            <lib-text-line type="small" weight="strong">Select range</lib-text-line>
+            <lib-range-slider [formControl]="control" [maxValue]="highValue" showTicks="true" 
+                thumbLabel="true" [minValue]="lowerValue">
+            </lib-range-slider>
+        </div>
+        <div class="filter-button-wrapper">
+            <lib-button type="minor" (click)="applyFilter()" i18n="@@apply">
+                Apply</lib-button>
+        </div>
+    </div>
+</ng-template>

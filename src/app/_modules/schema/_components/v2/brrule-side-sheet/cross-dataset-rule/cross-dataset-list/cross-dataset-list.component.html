@@ -1,0 +1,125 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+      <lib-button type="plain" (click)="close()" iconFontType="light" icon="times"></lib-button>
+      <div class="col-spacer"></div>
+      <div class="mdo-constrained-right">
+        <div class="f-row breadcrum-head">
+          <lib-text-line i18n="@@business_rules" type="leading"> Cross Dataset Rules </lib-text-line>
+          <span class="f-spacer"></span>
+          <lib-button i18n="@@new_br_rule" type="minor" (click)="createUpdateCrossDatasetRule()">New Cross dataset rule</lib-button>
+        </div>
+      </div>
+    </div>
+  
+    <div class="f-row-spacer-half"></div>
+  
+    <div class="f-col sidesheetcontent-listing">
+      <div class="f-col mdo-justify">
+        <!-- Empty State -->
+        <lib-empty-state
+          class="f-col load-empty"
+          primaryText="Nothing to see here"
+          icon="table"
+          iconSize="200"
+          secondaryText="You don't have any cross dataset rules created yet. Would you like to create one?"
+          *ngIf="!showSkeleton && !formListHasData"
+        >
+          <lib-button i18n="@@new_br_rule" type="minor" (click)="createUpdateCrossDatasetRule()"
+            >New Cross dataset rule
+          </lib-button>
+        </lib-empty-state>
+  
+        <lib-skeleton-overview *ngIf="showSkeleton"></lib-skeleton-overview>
+  
+        <div class="f-row filter-row">
+          <lib-search
+            *ngIf="formListHasData"
+            class="lib-search"
+            i18n-placeholder="@@search"
+            placeholder="Search"
+            (valueChange)="searchFieldSub.next($event)"
+          >
+          </lib-search>
+        </div>
+  
+        <!-- BUSINESS LISTING -->
+        <div class="data-listing" *ngIf="!showSkeleton && formListHasData">
+          <table
+            #table
+            [ngStyle]="{ display: showSkeleton ? 'none' : '' }"
+            mat-table
+            [dataSource]="dataSource"
+            class="mat-elevation-z0"
+          >
+            <ng-template ngFor let-dynCol [ngForOf]="displayedColumns">
+              <!-- Checkbox Column -->
+              <ng-container *ngIf="dynCol === 'action'" [matColumnDef]="dynCol" sticky>
+                <th class="action-cell" mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let row" [ngClass]="{ 'action-cell': dynCol == 'action' }">
+                  <div *ngIf="dynCol == 'action'" class="f-row">
+                    <lib-button
+                      class="action-button"
+                      type="plain"
+                      icon="ellipsis-h"
+                      (click)="$event.stopPropagation()"
+                      [matMenuTriggerFor]="actionMenu"
+                    >
+                    </lib-button>
+                    <mat-menu #actionMenu="matMenu" class="navigation-menu">
+                      <button mat-menu-item i18n="@@edit" (click)="createUpdateCrossDatasetRule(row)">Edit</button>
+                      <lib-section></lib-section>
+                      <button mat-menu-item i18n="@@delete" (click)="deleteBusinessRule(row)">Delete</button>
+                    </mat-menu>
+                  </div>
+                </td>
+              </ng-container>
+  
+              <ng-container *ngIf="dynCol !== 'action'" [matColumnDef]="dynCol">
+                <th class="action-column" mat-header-cell *matHeaderCellDef>
+                  <ng-container *ngIf="dynCol !== 'action'">
+                    {{ getLabel(dynCol) }}
+                  </ng-container>
+                </th>
+  
+                <td mat-cell *matCellDef="let element">
+                  <div class="f-row">
+                    <lib-text-line textColor="link" class="cursor" type="base" (click)="createUpdateCrossDatasetRule(element)">
+                      {{ element[dynCol] ? element[dynCol] : '' }}
+                    </lib-text-line>
+                  </div>
+                </td>
+              </ng-container>
+            </ng-template>
+  
+            <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+            <tr class="mat-row" *matNoDataRow>
+              <td class="mat-cell no-result" [colSpan]="displayedColumns.length">
+                <div class="f-row empty-block">
+                  <lib-empty-state icon="search" primaryText="Nothing to see here"
+                  secondaryText="You don't have records that match the filter">
+                </lib-empty-state>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+  
+        <div class="f-row-spacer-half"></div>
+        <!-- PAGINATION -->
+        <div class="f-row pagination" *ngIf="totalCount">
+          <lib-pagination
+            [currentPageIndex]="recordsPageIndex"
+            [totalCount]="totalCount"
+            [pageSize]="recordsPageSize"
+            (pageChangeEvent)="onPageChange($event)"
+          >
+          </lib-pagination>
+          <lib-text-line type="base" enableWrap="true">
+            {{ displayedRecordsRange }}
+          </lib-text-line>
+        </div>
+      </div>
+    </div>
+  </div>
+  

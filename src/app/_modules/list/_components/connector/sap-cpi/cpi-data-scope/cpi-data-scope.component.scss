@@ -1,0 +1,66 @@
+.root {
+  user-select: text;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+
+  .breadcrum-toolbar {
+    padding: 8px 12px;
+    align-items: flex-start;
+
+    .mdo-constrained-right {
+      width: 100%;
+      margin-right: 0;
+    }
+  }
+
+  .sidesheetcontent-listing {
+    height: 100%;
+
+    .mdo-justify {
+      margin: 0 16px;
+      height: 100%;
+
+      .system {
+        align-items: flex-start;
+        height: 100%;
+
+        .system-fields-col {
+          width: 220px;
+          height: 100%;
+
+          .filters-list {
+            &.cdk-virtual-scroll-viewport {
+              height: calc(100% - 122px);
+              overflow: auto;
+
+              .mat-tree-node {
+                overflow: visible;
+              }
+            }
+          }
+        }
+
+        .system-values-col {
+          width: calc(100% - 220px);
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  div.root {
+    .breadcrum-toolbar {
+      .mdo-constrained-right {
+        margin-right: 50px;
+      }
+    }
+
+    .sidesheetcontent-listing {
+      .mdo-justify {
+        margin: 0 66px;
+      }
+    }
+  }
+}

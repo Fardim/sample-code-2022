@@ -1,0 +1,16 @@
+<div class="f-row chat-members">
+  <lib-avatar-group>
+    <lib-avatar *ngFor="let u of users"
+        initials="u.userName"
+        [online]="true">
+    </lib-avatar>
+    <!-- <lib-avatar initials="SM" [online]="true"></lib-avatar>
+    <lib-avatar initials="RK" [online]="false"></lib-avatar>
+    <lib-avatar initials="+3" [online]="true"></lib-avatar> -->
+  </lib-avatar-group>
+  <div class="f-spacer"></div>
+  <lib-button icon="ellipsis-h" [matMenuTriggerFor]="menu"></lib-button>
+  <mat-menu #menu="matMenu">
+    <lib-filter-option (click)="openManageCollaboratorsDialog()">Manage collaborators</lib-filter-option>
+  </mat-menu>
+</div>

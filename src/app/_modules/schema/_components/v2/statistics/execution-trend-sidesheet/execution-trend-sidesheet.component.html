@@ -1,0 +1,23 @@
+<div class="root">
+    <div class="f-row breadcrum-toolbar">
+        <lib-button (click)="close()" type="plain" icon="times" iconFontType="light"></lib-button>
+        <div class="col-spacer"></div>
+        <div class="f-row mdo-constrained-right">
+            <lib-text-line type="leading" enableWrap="true">
+                <ng-template [ngIf]="schemaInfo" [ngIfElse]="loading">
+                    {{ schemaInfo.moduleDesc || 'Module' }} /
+                    {{ schemaInfo.schemaDescription ? schemaInfo.schemaDescription : 'Untitled'}} / Statistics
+                </ng-template>
+                <ng-template #loading>
+                    Statistics
+                </ng-template>
+            </lib-text-line>
+        </div>
+    </div>
+    <div class="f-col sidesheetcontent-listing">
+        <div class="f-col mdo-justify">
+            <pros-schema-execution-trend [moduleId]="moduleId" [schemaId]="schemaId" [variantId]="variantId" [filter]="statsFilterParams" [unit]="statsFilterParams.unit">
+            </pros-schema-execution-trend>
+        </div>
+    </div>
+</div>

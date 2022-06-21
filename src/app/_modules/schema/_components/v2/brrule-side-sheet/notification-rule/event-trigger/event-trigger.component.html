@@ -1,0 +1,36 @@
+<form [formGroup]="eventFormGroup">
+  <div
+    class="f-col mdo-field"
+    [class.mdo-form-error]="
+      submitted &&
+      (eventFormGroup.controls.event.invalid ||
+        (eventFormGroup.controls?.event?.value && !eventFormGroup.controls?.event?.value?.value))
+    "
+  >
+    <lib-text-line weight="strong" type="xsmall" class="field-label" i18n="@@event">Event<span class="mandatory">*</span></lib-text-line>
+    <!-- input container -->
+    <div class="mdo-field-input">
+      <input
+        matInput
+        placeholder="Type to select an event..."
+        [matAutocomplete]="auto"
+        formControlName="event"
+      />
+      <!-- autocomplete -->
+      <mat-autocomplete class="mdo-autocomplete" #auto="matAutocomplete" [displayWith]="displayWith">
+        <mat-option class="mdo-option" *ngFor="let event of eventList" [value]="event">
+          {{ event.label }}
+        </mat-option>
+      </mat-autocomplete>
+    </div>
+    <mat-error class="mdo-field-hint" *ngIf="submitted && eventFormGroup.get('event').errors?.required">
+      <lib-text-line type="small">This is a required field</lib-text-line>
+    </mat-error>
+    <mat-error
+      class="mdo-field-hint"
+      *ngIf="submitted && eventFormGroup.get('event').value && !eventFormGroup.get('event')?.value?.value"
+    >
+      <lib-text-line type="small">Please select Value from Field List</lib-text-line>
+    </mat-error>
+  </div>
+</form>
